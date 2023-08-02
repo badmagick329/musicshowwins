@@ -19,9 +19,7 @@ load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 BASE_URL = os.environ["BASE_URL"]
-REDDIT_SECRET = os.environ.get("REDDIT_SECRET", "")
-REDDIT_ID = os.environ.get("REDDIT_ID", "")
-REDDIT_AGENT = os.environ.get("REDDIT_AGENT", "")
+WIKI_AGENT = os.environ.get("WIKI_AGENT", "")
 CONTAINERED = os.environ.get("DB_HOST","") != "localhost"
 
 

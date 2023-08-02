@@ -7,15 +7,16 @@ import pytest
 BASE_DIR = Path(__file__).resolve().parent.parent
 if str(BASE_DIR) not in sys.path:
     sys.path.append(str(BASE_DIR))
-from scraper import WikiScraper, logging
+from wikiscraper import WikiScraper, logging
 
 LOG_LEVEL = logging.CRITICAL
 
 
 def test_wins_2013():
     s = WikiScraper(log_level=LOG_LEVEL)
-    url = "https://en.wikipedia.org/wiki/Show!_Music_Core"
-    data = s.read(url, 1)
+    data = s.show_wins(2013, "music_core")
+    if not data:
+        pytest.fail("No data returned")
     songs = [x["Song"] for x in data]
     assert songs.count("Man in Love") == 1
     assert songs.count("Growl") == 3
@@ -25,8 +26,9 @@ def test_wins_2013():
 
 def test_wins_2014():
     s = WikiScraper(log_level=LOG_LEVEL)
-    url = "https://en.wikipedia.org/wiki/Show!_Music_Core"
-    data = s.read(url, 2)
+    data = s.show_wins(2014, "music_core")
+    if not data:
+        pytest.fail("No data returned")
     songs = [x["Song"] for x in data]
     assert songs.count("Friday") == 1
     assert songs.count("Something") == 2
@@ -38,8 +40,9 @@ def test_wins_2014():
 
 def test_wins_2015():
     s = WikiScraper(log_level=LOG_LEVEL)
-    url = "https://en.wikipedia.org/wiki/Show!_Music_Core"
-    data = s.read(url, 3)
+    data = s.show_wins(2015, "music_core")
+    if not data:
+        pytest.fail("No data returned")
     songs = [x["Song"] for x in data]
     assert songs.count("Luv") == 2
     assert songs.count("Déjà-Boo") == 2
@@ -50,9 +53,10 @@ def test_wins_2015():
 
 
 def test_wins_2016():
-    csv_file = Path(__file__).parent.parent / "data" / "2016_music_core.csv"
-    df = pd.read_csv(csv_file)
-    data = df.to_dict("records")
+    s = WikiScraper(log_level=LOG_LEVEL)
+    data = s.show_wins(2016, "music_core")
+    if not data:
+        pytest.fail("No data returned")
     songs = [x["Song"] for x in data]
     assert songs.count("Rough") == 3
     assert songs.count("Navillera") == 3
@@ -64,8 +68,9 @@ def test_wins_2016():
 
 def test_wins_2017():
     s = WikiScraper(log_level=LOG_LEVEL)
-    url = "https://en.wikipedia.org/wiki/Show!_Music_Core"
-    data = s.read(url, 4)
+    data = s.show_wins(2017, "music_core")
+    if not data:
+        pytest.fail("No data returned")
     songs = [x["Song"] for x in data]
     assert songs.count("Really Really") == 1
     assert songs.count("Palette") == 2
@@ -77,8 +82,9 @@ def test_wins_2017():
 
 def test_wins_2018():
     s = WikiScraper(log_level=LOG_LEVEL)
-    url = "https://en.wikipedia.org/wiki/Show!_Music_Core"
-    data = s.read(url, 5)
+    data = s.show_wins(2018, "music_core")
+    if not data:
+        pytest.fail("No data returned")
     songs = [x["Song"] for x in data]
     assert songs.count("Heart Shaker") == 1
     assert songs.count("Love Scenario") == 3
@@ -89,8 +95,9 @@ def test_wins_2018():
 
 def test_wins_2019():
     s = WikiScraper(log_level=LOG_LEVEL)
-    url = "https://en.wikipedia.org/wiki/List_of_Show!_Music_Core_Chart_winners_(2019)"
-    data = s.read(url)
+    data = s.show_wins(2019, "music_core")
+    if not data:
+        pytest.fail("No data returned")
     songs = [x["Song"] for x in data]
     assert songs.count("Icy") == 3
     assert songs.count("Workaholic") == 2
@@ -100,8 +107,9 @@ def test_wins_2019():
 
 def test_wins_2020():
     s = WikiScraper(log_level=LOG_LEVEL)
-    url = "https://en.wikipedia.org/wiki/List_of_Show!_Music_Core_Chart_winners_(2020)"
-    data = s.read(url)
+    data = s.show_wins(2020, "music_core")
+    if not data:
+        pytest.fail("No data returned")
     songs = [x["Song"] for x in data]
     assert songs.count("Psycho") == 3
     assert songs.count("Any Song") == 4
@@ -114,8 +122,9 @@ def test_wins_2020():
 
 def test_wins_2021():
     s = WikiScraper(log_level=LOG_LEVEL)
-    url = "https://en.wikipedia.org/wiki/List_of_Show!_Music_Core_Chart_winners_(2021)"
-    data = s.read(url)
+    data = s.show_wins(2021, "music_core")
+    if not data:
+        pytest.fail("No data returned")
     songs = [x["Song"] for x in data]
     assert songs.count("Celebrity") == 3
     assert songs.count("Life Goes On") == 3
@@ -127,8 +136,9 @@ def test_wins_2021():
 
 def test_wins_2022():
     s = WikiScraper(log_level=LOG_LEVEL)
-    url = "https://en.wikipedia.org/wiki/List_of_Show!_Music_Core_Chart_winners_(2022)"
-    data = s.read(url)
+    data = s.show_wins(2022, "music_core")
+    if not data:
+        pytest.fail("No data returned")
     songs = [x["Song"] for x in data]
     assert songs.count("INVU") == 4
     assert songs.count("Nxde") == 3
@@ -136,3 +146,15 @@ def test_wins_2022():
     assert songs.count("At That Moment") == 2
     assert songs.count("Antifragile") == 3
     assert songs.count("Shut Down") == 1
+
+
+@pytest.mark.skip(reason="Avoid unnecessary requests")
+def test_wins_2023():
+    s = WikiScraper(log_level=LOG_LEVEL)
+    data = s.show_wins(2023, "music_core")
+    if not data:
+        pytest.fail("No data returned")
+    songs = [x["Song"] for x in data]
+    assert songs.count("Ditto") == 4
+    assert songs.count("Rover") == 1
+    assert songs.count("Queencard") == 5
