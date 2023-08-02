@@ -1,5 +1,6 @@
 import json
 import logging
+import os
 import sys
 import time
 from datetime import datetime
@@ -10,12 +11,12 @@ import pandas as pd
 import requests
 from bs4 import BeautifulSoup as bs
 from bs4.element import ResultSet, Tag
+from dotenv import load_dotenv
+
+load_dotenv()
 
 LOG_LEVEL = logging.DEBUG
-DJANGO_BASE = Path(__file__).resolve().parent.parent
-if str(DJANGO_BASE) not in sys.path:
-    sys.path.append(str(DJANGO_BASE))
-from musicshowwins.settings import WIKI_AGENT
+WIKI_AGENT = os.environ.get("WIKI_AGENT", "")
 
 show_type = Literal[
     "music_core",
@@ -48,7 +49,7 @@ class WikiScraper:
         self.saved_responses = self._load(self.RESP_FILE)
         self.past_results = self._load(self.PAST_RESULTS)
         self.last_fetch = None
-        self.delay = 0.1
+        self.delay = 0.2
 
     def _load(self, file: str) -> dict:
         self.CACHE_DIR.mkdir(exist_ok=True)
@@ -63,7 +64,7 @@ class WikiScraper:
             json.dump(data, f, indent=4, ensure_ascii=False)
 
     def get_and_parse(
-        self, url: str, offset: int = 0, cache: bool = True
+        self, url: str, year: int, offset: int = 0, cache: bool = True
     ) -> list[dict[str, str]]:
         """Wrapper around get and parse that caches results"""
         if f"{url}__{offset}" in self.past_results:
@@ -72,8 +73,8 @@ class WikiScraper:
         html = self._get(url)
         if isinstance(html, Exception):
             raise html
-        results = self._parse(html, offset)
-        if f"({datetime.today().year})" not in url and cache:
+        results = self._parse(html, year, offset)
+        if datetime.now().year != year and cache:
             self.past_results[f"{url}__{offset}"] = results
             self._save(self.past_results, self.PAST_RESULTS)
         return results
@@ -105,7 +106,7 @@ class WikiScraper:
             self.logger.error(f"Error while fetching {url}: {e}")
             return e
 
-    def _parse(self, html: str, offset: int = 0) -> list[dict[str, str]]:
+    def _parse(self, html: str, year: int, offset: int = 0) -> list[dict[str, str]]:
         """Parse html table into a list of dicts"""
         soup = bs(html, "lxml")
         tables = soup.select("table")
@@ -119,6 +120,7 @@ class WikiScraper:
             raise ValueError("Error parsing table")
         df = parsed_table[0]
         df = self._clean(df)
+        df.loc[:, "Date"] = df["Date"].apply(lambda x: self._parse_date(f"{x}, {year}"))
         return df.to_dict("records")
 
     def show_wins(
@@ -153,10 +155,11 @@ class WikiScraper:
             raise ValueError(f"Year must be after {MIN_YEAR}")
         if show == "music_core":
             if year > 2018:
-                return self.get_and_parse(MUSIC_CORE_BASE.format(year), 0, cache)
+                return self.get_and_parse(MUSIC_CORE_BASE.format(year), year, 0, cache)
             elif year == 2016:
                 csv_file = Path(__file__).parent / "data" / "2016_music_core.csv"
                 df = pd.read_csv(csv_file)
+                df["Show"] = df["Show"] = "music_core"
                 return df.to_dict("records")
             else:
                 offset = 5
@@ -164,13 +167,15 @@ class WikiScraper:
                     if i == 2016:
                         continue
                     if year == i:
-                        return self.get_and_parse(MUSIC_CORE_OLD, offset, cache)
+                        return self.get_and_parse(MUSIC_CORE_OLD, year, offset, cache)
                     offset -= 1
         elif show == "mcountdown":
-            return self.get_and_parse(MCOUNTDOWN_BASE.format(year), 0, cache)
+            return self.get_and_parse(MCOUNTDOWN_BASE.format(year), year, 0, cache)
         elif show == "show_champion":
             if year > 2020:
-                return self.get_and_parse(SHOW_CHAMPION_BASE.format(year), 0, cache)
+                return self.get_and_parse(
+                    SHOW_CHAMPION_BASE.format(year), year, 0, cache
+                )
             elif year == 2013:
                 csv_file = Path(__file__).parent / "data" / "2013_show_champion.csv"
                 df = pd.read_csv(csv_file)
@@ -179,26 +184,50 @@ class WikiScraper:
                 offset = 6
                 for i in range(2020, MIN_YEAR - 1, -1):
                     if year == i:
-                        return self.get_and_parse(SHOW_CHAMPION_OLD, offset, cache)
+                        return self.get_and_parse(
+                            SHOW_CHAMPION_OLD, year, offset, cache
+                        )
                     offset -= 1
         elif show == "the_show":
             if year > 2020:
-                return self.get_and_parse(THE_SHOW_BASE.format(year), 0, cache)
+                return self.get_and_parse(THE_SHOW_BASE.format(year), year, 0, cache)
+            elif year == 2013:
+                return dict()
             else:
                 offset = 6
                 for i in range(2020, MIN_YEAR - 1, -1):
                     if year == i:
-                        return self.get_and_parse(THE_SHOW_OLD, offset, cache)
+                        return self.get_and_parse(THE_SHOW_OLD, year, offset, cache)
                     offset -= 1
         elif show == "inkigayo":
             if year > 2013:
-                return self.get_and_parse(INKIGAYO_BASE.format(year), 0, cache)
+                return self.get_and_parse(INKIGAYO_BASE.format(year), year, 0, cache)
             elif year == 2013:
                 csv_file = Path(__file__).parent / "data" / "2013_inkigayo.csv"
                 df = pd.read_csv(csv_file)
                 return df.to_dict("records")
         elif show == "music_bank":
-            return self.get_and_parse(MUSIC_BANK_BASE.format(year), 0, cache)
+            return self.get_and_parse(MUSIC_BANK_BASE.format(year), year, 0, cache)
+
+    def all_wins(self, cache: bool = True) -> dict[str, list[dict[str, str]]]:
+        shows = [
+            "music_core",
+            "inkigayo",
+            "mcountdown",
+            "the_show",
+            "show_champion",
+            "music_bank",
+        ]
+        data = dict()
+        for s in shows:
+            print(s)
+            data.setdefault(s, list())
+            for y in range(2014, 2023):
+                print(y)
+                d = self.show_wins(y, s, cache)
+                if d:
+                    data[s].extend(d)
+        return data
 
     def _clean(self, df: pd.DataFrame) -> pd.DataFrame:
         if "Ref." in df.columns:
@@ -210,11 +239,13 @@ class WikiScraper:
         # df.dropna(axis=0, how="any", inplace=True)
         df["Artist"].fillna("", inplace=True)
         df["Song"].fillna("", inplace=True)
+        df["Date"].fillna("", inplace=True)
         df["Song"] = df["Song"].apply(lambda x: self._clean_song(x))
         df = self._remove_no_show(df)
         return df
 
-    def _fix_span(self, table: Tag) -> None:
+    @staticmethod
+    def _fix_span(table: Tag) -> None:
         # A ; used after a number in rowspan and colspan was breaking the
         # pandas parser
         rowspans = table.find_all("td", {"rowspan": True})
@@ -224,7 +255,15 @@ class WikiScraper:
         for c in colspans:
             c["colspan"] = c["colspan"].replace(";", "")
 
-    def _find_tables(self, tables: ResultSet[Tag]) -> list[Tag] | ValueError:
+    @staticmethod
+    def _parse_date(date: str) -> str:
+        try:
+            return datetime.strptime(date, "%B %d, %Y").strftime("%Y-%m-%d")
+        except ValueError:
+            return ""
+
+    @staticmethod
+    def _find_tables(tables: ResultSet[Tag]) -> list[Tag] | ValueError:
         found_tables = list()
         for t in tables:
             rows = t.find_all("tr")
@@ -261,7 +300,8 @@ class WikiScraper:
             song = song.replace(c, "")
         return song.strip()
 
-    def _remove_no_show(self, df: pd.DataFrame) -> pd.DataFrame:
+    @staticmethod
+    def _remove_no_show(df: pd.DataFrame) -> pd.DataFrame:
         no_shows = [
             "no chart",
             "no broadcast",
@@ -275,7 +315,6 @@ class WikiScraper:
                 if ns in c.lower():
                     remove_rows.add(c)
         if remove_rows:
-            self.logger.debug(f"Removing {len(remove_rows)} rows")
             df = df[~df["Song"].isin(remove_rows)]
         return df
 
