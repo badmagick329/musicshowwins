@@ -27,6 +27,10 @@ show_type = Literal[
     "music_bank",
 ]
 
+# TODO
+# Blood, Sweat & Tears to Blood Sweat & Tears
+# lower case all?
+
 
 class WikiScraper:
     CACHE_DIR = Path(__file__).resolve().parent / "cached"
@@ -65,17 +69,18 @@ class WikiScraper:
 
     def get_and_parse(
         self, url: str, year: int, offset: int = 0, cache: bool = True
-    ) -> list[dict[str, str]]:
+    ) -> pd.DataFrame:
         """Wrapper around get and parse that caches results"""
         if f"{url}__{offset}" in self.past_results:
             self.logger.info(f"Using cached results for {url}__{offset}")
-            return self.past_results[f"{url}__{offset}"]
+            data = self.past_results[f"{url}__{offset}"]
+            return pd.DataFrame.from_dict(data, orient="columns")
         html = self._get(url)
         if isinstance(html, Exception):
             raise html
         results = self._parse(html, year, offset)
         if datetime.now().year != year and cache:
-            self.past_results[f"{url}__{offset}"] = results
+            self.past_results[f"{url}__{offset}"] = results.to_dict("records")
             self._save(self.past_results, self.PAST_RESULTS)
         return results
 
@@ -106,7 +111,7 @@ class WikiScraper:
             self.logger.error(f"Error while fetching {url}: {e}")
             return e
 
-    def _parse(self, html: str, year: int, offset: int = 0) -> list[dict[str, str]]:
+    def _parse(self, html: str, year: int, offset: int = 0) -> pd.DataFrame:
         """Parse html table into a list of dicts"""
         soup = bs(html, "lxml")
         tables = soup.select("table")
@@ -121,7 +126,15 @@ class WikiScraper:
         df = parsed_table[0]
         df = self._clean(df)
         df.loc[:, "Date"] = df["Date"].apply(lambda x: self._parse_date(f"{x}, {year}"))
-        return df.to_dict("records")
+        df = df[["Date", "Artist", "Song"]]
+        return df
+
+    def _parse_csv(self, csv_name: str, year: int) -> pd.DataFrame:
+        csv_file = Path(__file__).parent / "data" / csv_name
+        df = pd.read_csv(csv_file)
+        df.loc[:, "Date"] = df["Date"].apply(lambda x: self._parse_date(f"{x}, {year}"))
+        df = df[["Date", "Artist", "Song"]]
+        return df
 
     def show_wins(
         self, year: int, show: show_type, cache: bool = True
@@ -155,11 +168,14 @@ class WikiScraper:
             raise ValueError(f"Year must be after {MIN_YEAR}")
         if show == "music_core":
             if year > 2018:
-                return self.get_and_parse(MUSIC_CORE_BASE.format(year), year, 0, cache)
+                df = self.get_and_parse(MUSIC_CORE_BASE.format(year), year, 0, cache)
+                df["Show"] = "music_core"
+                return df.to_dict("records")
             elif year == 2016:
-                csv_file = Path(__file__).parent / "data" / "2016_music_core.csv"
-                df = pd.read_csv(csv_file)
-                df["Show"] = df["Show"] = "music_core"
+                # Note: Dates for this data are missing so
+                # all wins are entered as 2016-01-01
+                df = self._parse_csv("2016_music_core.csv", year)
+                df["Show"] = "music_core"
                 return df.to_dict("records")
             else:
                 offset = 5
@@ -167,49 +183,62 @@ class WikiScraper:
                     if i == 2016:
                         continue
                     if year == i:
-                        return self.get_and_parse(MUSIC_CORE_OLD, year, offset, cache)
+                        df = self.get_and_parse(MUSIC_CORE_OLD, year, offset, cache)
+                        df["Show"] = "music_core"
+                        return df.to_dict("records")
                     offset -= 1
         elif show == "mcountdown":
-            return self.get_and_parse(MCOUNTDOWN_BASE.format(year), year, 0, cache)
+            df = self.get_and_parse(MCOUNTDOWN_BASE.format(year), year, 0, cache)
+            df["Show"] = "mcountdown"
+            return df.to_dict("records")
         elif show == "show_champion":
             if year > 2020:
-                return self.get_and_parse(
-                    SHOW_CHAMPION_BASE.format(year), year, 0, cache
-                )
+                df = self.get_and_parse(SHOW_CHAMPION_BASE.format(year), year, 0, cache)
+                df["Show"] = "show_champion"
+                return df.to_dict("records")
             elif year == 2013:
-                csv_file = Path(__file__).parent / "data" / "2013_show_champion.csv"
-                df = pd.read_csv(csv_file)
+                df = self._parse_csv("2013_show_champion.csv", year)
+                df["Show"] = "show_champion"
                 return df.to_dict("records")
             else:
                 offset = 6
                 for i in range(2020, MIN_YEAR - 1, -1):
                     if year == i:
-                        return self.get_and_parse(
-                            SHOW_CHAMPION_OLD, year, offset, cache
-                        )
+                        df = self.get_and_parse(SHOW_CHAMPION_OLD, year, offset, cache)
+                        df["Show"] = "show_champion"
+                        return df.to_dict("records")
                     offset -= 1
         elif show == "the_show":
             if year > 2020:
-                return self.get_and_parse(THE_SHOW_BASE.format(year), year, 0, cache)
+                df = self.get_and_parse(THE_SHOW_BASE.format(year), year, 0, cache)
+                df["Show"] = "the_show"
+                return df.to_dict("records")
             elif year == 2013:
-                return dict()
+                # Data for 2013 is missing for the show
+                return list()
             else:
                 offset = 6
                 for i in range(2020, MIN_YEAR - 1, -1):
                     if year == i:
-                        return self.get_and_parse(THE_SHOW_OLD, year, offset, cache)
+                        df = self.get_and_parse(THE_SHOW_OLD, year, offset, cache)
+                        df["Show"] = "the_show"
+                        return df.to_dict("records")
                     offset -= 1
         elif show == "inkigayo":
             if year > 2013:
-                return self.get_and_parse(INKIGAYO_BASE.format(year), year, 0, cache)
+                df = self.get_and_parse(INKIGAYO_BASE.format(year), year, 0, cache)
+                df["Show"] = "inkigayo"
+                return df.to_dict("records")
             elif year == 2013:
-                csv_file = Path(__file__).parent / "data" / "2013_inkigayo.csv"
-                df = pd.read_csv(csv_file)
+                df = self._parse_csv("2013_inkigayo.csv", year)
+                df["Show"] = "inkigayo"
                 return df.to_dict("records")
         elif show == "music_bank":
-            return self.get_and_parse(MUSIC_BANK_BASE.format(year), year, 0, cache)
+            df = self.get_and_parse(MUSIC_BANK_BASE.format(year), year, 0, cache)
+            df["Show"] = "music_bank"
+            return df.to_dict("records")
 
-    def all_wins(self, cache: bool = True) -> dict[str, list[dict[str, str]]]:
+    def all_wins(self, cache: bool = True) -> list[dict[str, str]]:
         shows = [
             "music_core",
             "inkigayo",
@@ -218,15 +247,10 @@ class WikiScraper:
             "show_champion",
             "music_bank",
         ]
-        data = dict()
+        data = list()
         for s in shows:
-            print(s)
-            data.setdefault(s, list())
-            for y in range(2014, 2023):
-                print(y)
-                d = self.show_wins(y, s, cache)
-                if d:
-                    data[s].extend(d)
+            for y in range(2014, 2024):
+                data.extend(self.show_wins(y, s, cache))
         return data
 
     def _clean(self, df: pd.DataFrame) -> pd.DataFrame:
@@ -308,6 +332,12 @@ class WikiScraper:
             "no winner",
             "no show",
             "winner not announced",
+            "rebroadcast",
+            "winners were not announced",
+            "special broadcast",
+            "episode did not air",
+            "m countdown no.1 special",
+            "special edition",
         ]
         remove_rows = set()
         for c in df["Artist"]:
