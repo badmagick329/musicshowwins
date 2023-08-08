@@ -73,7 +73,6 @@ def test_wins_2017():
         pytest.fail("No data returned")
     songs = [x["Song"] for x in data]
     assert songs.count("Fxxk It") == 2
-    assert songs.count("Fxxk It") == 2
     assert songs.count("Rookie") == 2
     assert songs.count("Knock Knock") == 3
     assert songs.count("Gashina") == 3

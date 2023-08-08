@@ -27,10 +27,6 @@ show_type = Literal[
     "music_bank",
 ]
 
-# TODO
-# Blood, Sweat & Tears to Blood Sweat & Tears
-# lower case all?
-
 
 class WikiScraper:
     CACHE_DIR = Path(__file__).resolve().parent / "cached"
@@ -127,6 +123,8 @@ class WikiScraper:
         df = self._clean(df)
         df.loc[:, "Date"] = df["Date"].apply(lambda x: self._parse_date(f"{x}, {year}"))
         df = df[["Date", "Artist", "Song"]]
+        df.loc[:, "Artist"] = df["Artist"].apply(lambda x: x.strip().replace(", ", " "))
+        df.loc[:, "Song"] = df["Song"].apply(lambda x: x.strip())
         return df
 
     def _parse_csv(self, csv_name: str, year: int) -> pd.DataFrame:
@@ -134,6 +132,8 @@ class WikiScraper:
         df = pd.read_csv(csv_file)
         df.loc[:, "Date"] = df["Date"].apply(lambda x: self._parse_date(f"{x}, {year}"))
         df = df[["Date", "Artist", "Song"]]
+        df.loc[:, "Artist"] = df["Artist"].apply(lambda x: x.strip().replace(", ", " "))
+        df.loc[:, "Song"] = df["Song"].apply(lambda x: x.strip())
         return df
 
     def show_wins(
@@ -239,6 +239,13 @@ class WikiScraper:
             return df.to_dict("records")
 
     def all_wins(self, cache: bool = True) -> list[dict[str, str]]:
+        """
+        Return a list of dicts with the following keys:
+        - Artist
+        - Song
+        - Date
+        - Show
+        """
         shows = [
             "music_core",
             "inkigayo",
@@ -249,7 +256,7 @@ class WikiScraper:
         ]
         data = list()
         for s in shows:
-            for y in range(2014, 2024):
+            for y in range(2014, 2023):
                 data.extend(self.show_wins(y, s, cache))
         return data
 
@@ -338,14 +345,20 @@ class WikiScraper:
             "episode did not air",
             "m countdown no.1 special",
             "special edition",
+            "denotes an episode did not air",
+            "episode special",
+            "summer k-pop festival",
+            "dream concert",
+            "gayo daejun",
         ]
-        remove_rows = set()
+        remove_artists = set()
         for c in df["Artist"]:
             for ns in no_shows:
                 if ns in c.lower():
-                    remove_rows.add(c)
-        if remove_rows:
-            df = df[~df["Song"].isin(remove_rows)]
+                    remove_artists.add(c)
+        if remove_artists:
+            df = df[~df["Artist"].isin(remove_artists)]
+        df = df[df["Artist"] != ""]
         return df
 
 
