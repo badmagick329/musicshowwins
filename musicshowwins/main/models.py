@@ -39,6 +39,11 @@ class Win(models.Model):
     music_show = models.ForeignKey(MusicShow, on_delete=models.CASCADE)
     song = models.ForeignKey(Song, on_delete=models.CASCADE)
     date = models.DateField()
+    year = models.IntegerField()
+
+    def save(self, *args, **kwargs):
+        self.year = int(self.date.split("-")[0])
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.music_show} - {self.song} - {self.date}"
@@ -48,3 +53,6 @@ class Win(models.Model):
 
     class Meta:
         unique_together = ("music_show", "song", "date")
+        indexes = [
+            models.Index(fields=["year"]),
+        ]

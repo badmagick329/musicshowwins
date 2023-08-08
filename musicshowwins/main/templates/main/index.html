@@ -4,6 +4,9 @@
   <title>Title</title>
 {% endblock %}
 {% block body %}
-<h1 class="text-3xl font-bold">Hello</h1>
+  <h1 class="text-3xl font-bold">Hello</h1>
+  {% for s in top_songs %}
+    <p>{{ s.artist.name }} - {{ s.name }} - {{ s.wins }}</p>
+  {% endfor %}
 {% endblock %}
 

@@ -256,6 +256,8 @@ class WikiScraper:
         ]
         data = list()
         for s in shows:
+            # TODO:
+            # Change end range to current_year+1 after testing
             for y in range(2014, 2023):
                 data.extend(self.show_wins(y, s, cache))
         return data
