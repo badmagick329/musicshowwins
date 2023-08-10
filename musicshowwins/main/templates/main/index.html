@@ -5,8 +5,15 @@
 {% endblock %}
 {% block body %}
   <h1 class="text-3xl font-bold">Hello</h1>
-  {% for s in top_songs %}
-    <p>{{ s.artist.name }} - {{ s.name }} - {{ s.wins }}</p>
+  {% for song in songs %}
+    <p>{{ song.artist.name }} - {{ song.name }} - {{ song.wins }}</p>
+  {% endfor %}
+  {% for sby in songs_by_year %}
+    <br>
+    <p>{{ sby.year }}</p>
+    {% for ysong in sby.songs %}
+      <p>{{ ysong.artist.name }} - {{ ysong.name }} - {{ ysong.wins }}</p>
+    {% endfor %}
   {% endfor %}
 {% endblock %}
 

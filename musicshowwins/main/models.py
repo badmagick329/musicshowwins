@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import F, Q, QuerySet
 
 
 class MusicShow(models.Model):
@@ -26,7 +27,7 @@ class Song(models.Model):
     artist = models.ForeignKey(Artist, on_delete=models.CASCADE)
 
     def __str__(self):
-        return f"{self.name} - {self.artist}"
+        return f"{self.artist} - {self.name} "
 
     def __repr__(self):
         return f"<Song(id={self.id}, name={self.name}, artist={self.artist})>"
@@ -50,6 +51,36 @@ class Win(models.Model):
 
     def __repr__(self):
         return f"<Win(id={self.id}, music_show={self.music_show}, song={self.song})>"
+
+    @classmethod
+    def top_songs(
+        cls, artist: str | None = None, year: int | None = None, n: int = 20
+    ) -> QuerySet[Song]:
+        songs = Song.objects.select_related("artist")
+        filters = Q()
+        if year:
+            filters &= Q(win__year=year)
+        if artist:
+            filters &= Q(artist__name__iexact=artist)
+        qs = (
+            songs.filter(filters)
+            .annotate(wins=models.Count("win"))
+            .order_by("-wins")[:n]
+        )
+        return qs
+
+    @classmethod
+    def top_artists(cls, year: int | None = None, n: int = 20) -> QuerySet[Artist]:
+        artists = Artist.objects.all()
+        filters = Q()
+        if year:
+            filters &= Q(song__win__year=year)
+        qs = (
+            artists.filter(filters)
+            .annotate(wins=models.Count("song__win"))
+            .order_by("-wins")[:n]
+        )
+        return qs
 
     class Meta:
         unique_together = ("music_show", "song", "date")

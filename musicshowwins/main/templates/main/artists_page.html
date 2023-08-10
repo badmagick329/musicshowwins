@@ -1,0 +1,19 @@
+{% extends "main/base.html" %}
+{% load static %}
+{% block title %}
+  <title>Title</title>
+{% endblock %}
+{% block body %}
+  <h1 class="text-3xl font-bold">Hello</h1>
+  {% for artist in artists %}
+    <p>{{ artist.name }} - {{ artist.wins }}</p>
+  {% endfor %}
+  {% for aby in artists_by_year %}
+    <br>
+    <p>{{ aby.year }}</p>
+    {% for yartist in aby.artists %}
+      <p>{{ yartist.name }} - {{ yartist.wins }}</p>
+    {% endfor %}
+  {% endfor %}
+{% endblock %}
+
