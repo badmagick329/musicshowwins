@@ -1,0 +1,19 @@
+{% extends "main/base.html" %}
+{% load static %}
+{% block title %}
+  <title>Title</title>
+{% endblock %}
+{% block body %}
+  <h1 class="text-3xl font-bold">Hello</h1>
+  {% for song in songs %}
+    <p>{{ song.artist.name }} - {{ song.name }} - {{ song.wins }}</p>
+  {% endfor %}
+  {% for sby in songs_by_year %}
+    <br>
+    <p>{{ sby.year }}</p>
+    {% for ysong in sby.songs %}
+      <p>{{ ysong.artist.name }} - {{ ysong.name }} - {{ ysong.wins }}</p>
+    {% endfor %}
+  {% endfor %}
+{% endblock %}
+

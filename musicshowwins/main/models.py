@@ -15,6 +15,10 @@ class MusicShow(models.Model):
 class Artist(models.Model):
     name = models.CharField(max_length=100)
 
+    @property
+    def display_name(self) -> str:
+        return self.name
+
     def __str__(self):
         return self.name
 
@@ -25,6 +29,10 @@ class Artist(models.Model):
 class Song(models.Model):
     name = models.CharField(max_length=100)
     artist = models.ForeignKey(Artist, on_delete=models.CASCADE)
+
+    @property
+    def display_name(self) -> str:
+        return f"{self.artist.name} - {self.name}"
 
     def __str__(self):
         return f"{self.artist} - {self.name} "
@@ -54,7 +62,7 @@ class Win(models.Model):
 
     @classmethod
     def top_songs(
-        cls, artist: str | None = None, year: int | None = None, n: int = 20
+        cls, artist: str | None = None, year: int | None = None, n: int = 200
     ) -> QuerySet[Song]:
         songs = Song.objects.select_related("artist")
         filters = Q()
@@ -70,7 +78,7 @@ class Win(models.Model):
         return qs
 
     @classmethod
-    def top_artists(cls, year: int | None = None, n: int = 20) -> QuerySet[Artist]:
+    def top_artists(cls, year: int | None = None, n: int = 200) -> QuerySet[Artist]:
         artists = Artist.objects.all()
         filters = Q()
         if year:
@@ -81,6 +89,8 @@ class Win(models.Model):
             .order_by("-wins")[:n]
         )
         return qs
+
+
 
     class Meta:
         unique_together = ("music_show", "song", "date")
