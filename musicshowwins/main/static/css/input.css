@@ -1,3 +1,13 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* .list-radio input[type="radio"]:checked + label { */
+/*   background-color: red; */
+/*   color: #ffffff; */
+/* } */
+
+#list_type > input[type="radio"]:checked + label {
+  background-color:  rgb(236 72 153);
+  color: #ffffff;
+}

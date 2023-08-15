@@ -14,7 +14,7 @@ app_name = MainConfig.name
 def index(request):
     top_items = Win.top_songs()
     for i, item in enumerate(top_items):
-        item.num = i + 1
+        item.rank = i + 1
     current_year = datetime.now().year
 
     context = {
@@ -34,21 +34,26 @@ def list_view(request):
         list_type = "songs"
     if year and not year.isdigit():
         year = None
+    by_ = search.title() if search else ""
     if list_type == "songs":
         print("Getting top songs")
         top_items = Win.top_songs(year=year, artist=search)
+        if top_items:
+            by_ = top_items[0].artist.name
     else:
         print("Getting top artists")
         top_items = Win.top_artists(year=year)
+        if top_items:
+            by_ = top_items[0].name
     for i, item in enumerate(top_items):
-        item.num = i + 1
+        item.rank = i + 1
     table_header = ""
     if list_type == "songs":
         table_header = "Top Songs "
     else:
         table_header = "Top Artists "
     if search:
-        table_header += f"by {search.title()} "
+        table_header += f"by {by_} "
     if year:
         table_header += f"in {year} "
     else:
