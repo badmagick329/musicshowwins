@@ -6,7 +6,8 @@
 {% block body %}
   <div class="flex flex-col min-h-full items-center mt-2">
     <form class="flex flex-col w-full items-center mb-2">
-      <input id="artist_search" type="text" name="search" placeholder="Search" 
+      <input id="artist_search" type="text" name="search"
+        placeholder="Search" autocomplete="off"
         class="border-2 rounded-lg p-2 w-3/4 md:w-1/2 2xl:w-1/4"
         hx-trigger="keyup changed delay:500ms"
         hx-get="list_view" hx-target="#win_list"
