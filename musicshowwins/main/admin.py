@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from main.models import Artist, MusicShow, Song, Win
+from main.models import Artist, ArtistFix, MusicShow, Song, SongFix, Win
 
 admin.site.register(MusicShow)
 
@@ -23,6 +23,18 @@ class WinAdmin(admin.ModelAdmin):
     search_fields = ("music_show__name", "song__name", "song__artist__name")
 
 
+class ArtistFixAdmin(admin.ModelAdmin):
+    list_display = ("old", "new")
+    search_fields = ("old", "new")
+
+
+class SongFixAdmin(admin.ModelAdmin):
+    list_display = ("old", "new")
+    search_fields = ("old", "new")
+
+
 admin.site.register(Win, WinAdmin)
 admin.site.register(Song, SongAdmin)
 admin.site.register(Artist, ArtistAdmin)
+admin.site.register(ArtistFix, ArtistFixAdmin)
+admin.site.register(SongFix, SongFixAdmin)

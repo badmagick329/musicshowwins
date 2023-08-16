@@ -17,6 +17,7 @@ load_dotenv()
 
 LOG_LEVEL = logging.DEBUG
 WIKI_AGENT = os.environ.get("WIKI_AGENT", "")
+TESTING = False
 
 show_type = Literal[
     "music_core",
@@ -63,7 +64,7 @@ class WikiScraper:
         with open(file, "w", encoding="utf-8") as f:
             json.dump(data, f, indent=4, ensure_ascii=False)
 
-    def get_and_parse(
+    def _get_and_parse(
         self, url: str, year: int, offset: int = 0, cache: bool = True
     ) -> pd.DataFrame:
         """Wrapper around get and parse that caches results"""
@@ -123,7 +124,9 @@ class WikiScraper:
         df = self._clean(df)
         df.loc[:, "Date"] = df["Date"].apply(lambda x: self._parse_date(f"{x}, {year}"))
         df = df[["Date", "Artist", "Song"]]
-        df.loc[:, "Artist"] = df["Artist"].apply(lambda x: x.strip().replace(", ", " "))
+        df.loc[:, "Artist"] = df["Artist"].apply(
+            lambda x: x.split("feat.")[0].strip().replace(", ", " ")
+        )
         df.loc[:, "Song"] = df["Song"].apply(lambda x: x.strip())
         return df
 
@@ -168,7 +171,7 @@ class WikiScraper:
             raise ValueError(f"Year must be after {MIN_YEAR}")
         if show == "music_core":
             if year > 2018:
-                df = self.get_and_parse(MUSIC_CORE_BASE.format(year), year, 0, cache)
+                df = self._get_and_parse(MUSIC_CORE_BASE.format(year), year, 0, cache)
                 df["Show"] = "music_core"
                 return df.to_dict("records")
             elif year == 2016:
@@ -183,17 +186,19 @@ class WikiScraper:
                     if i == 2016:
                         continue
                     if year == i:
-                        df = self.get_and_parse(MUSIC_CORE_OLD, year, offset, cache)
+                        df = self._get_and_parse(MUSIC_CORE_OLD, year, offset, cache)
                         df["Show"] = "music_core"
                         return df.to_dict("records")
                     offset -= 1
         elif show == "mcountdown":
-            df = self.get_and_parse(MCOUNTDOWN_BASE.format(year), year, 0, cache)
+            df = self._get_and_parse(MCOUNTDOWN_BASE.format(year), year, 0, cache)
             df["Show"] = "mcountdown"
             return df.to_dict("records")
         elif show == "show_champion":
             if year > 2020:
-                df = self.get_and_parse(SHOW_CHAMPION_BASE.format(year), year, 0, cache)
+                df = self._get_and_parse(
+                    SHOW_CHAMPION_BASE.format(year), year, 0, cache
+                )
                 df["Show"] = "show_champion"
                 return df.to_dict("records")
             elif year == 2013:
@@ -204,13 +209,13 @@ class WikiScraper:
                 offset = 6
                 for i in range(2020, MIN_YEAR - 1, -1):
                     if year == i:
-                        df = self.get_and_parse(SHOW_CHAMPION_OLD, year, offset, cache)
+                        df = self._get_and_parse(SHOW_CHAMPION_OLD, year, offset, cache)
                         df["Show"] = "show_champion"
                         return df.to_dict("records")
                     offset -= 1
         elif show == "the_show":
             if year > 2020:
-                df = self.get_and_parse(THE_SHOW_BASE.format(year), year, 0, cache)
+                df = self._get_and_parse(THE_SHOW_BASE.format(year), year, 0, cache)
                 df["Show"] = "the_show"
                 return df.to_dict("records")
             elif year == 2013:
@@ -220,13 +225,13 @@ class WikiScraper:
                 offset = 6
                 for i in range(2020, MIN_YEAR - 1, -1):
                     if year == i:
-                        df = self.get_and_parse(THE_SHOW_OLD, year, offset, cache)
+                        df = self._get_and_parse(THE_SHOW_OLD, year, offset, cache)
                         df["Show"] = "the_show"
                         return df.to_dict("records")
                     offset -= 1
         elif show == "inkigayo":
             if year > 2013:
-                df = self.get_and_parse(INKIGAYO_BASE.format(year), year, 0, cache)
+                df = self._get_and_parse(INKIGAYO_BASE.format(year), year, 0, cache)
                 df["Show"] = "inkigayo"
                 return df.to_dict("records")
             elif year == 2013:
@@ -234,7 +239,7 @@ class WikiScraper:
                 df["Show"] = "inkigayo"
                 return df.to_dict("records")
         elif show == "music_bank":
-            df = self.get_and_parse(MUSIC_BANK_BASE.format(year), year, 0, cache)
+            df = self._get_and_parse(MUSIC_BANK_BASE.format(year), year, 0, cache)
             df["Show"] = "music_bank"
             return df.to_dict("records")
 
@@ -256,6 +261,8 @@ class WikiScraper:
         ]
         data = list()
         current_year = datetime.today().year
+        if TESTING:
+            current_year -= 1
         for s in shows:
             for y in range(2014, current_year + 1):
                 data.extend(self.show_wins(y, s, cache))
