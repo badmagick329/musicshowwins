@@ -676,11 +676,6 @@ video {
   line-height: 2rem;
 }
 
-.text-3xl {
-  font-size: 1.875rem;
-  line-height: 2.25rem;
-}
-
 .text-xl {
   font-size: 1.25rem;
   line-height: 1.75rem;
@@ -720,7 +715,7 @@ video {
 
 /* } */
 
-#list_type > input[type="radio"]:checked + label {
+#list-type > input[type="radio"]:checked + label {
   background-color:  rgb(236 72 153);
   color: #ffffff;
 }
