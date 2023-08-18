@@ -12,6 +12,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    env_file:
+      - ./.env
   musicshowwins:
     build:
       context: ./musicshowwins
@@ -29,8 +31,7 @@ services:
     env_file:
       - ./.env
     depends_on:
-      db:
-        condition: service_healthy
+      - db
   nginx:
     build:
       context: ./nginx
@@ -42,6 +43,8 @@ services:
       - ${NGINX_PORT}:80
     depends_on:
       - musicshowwins
+    env_file:
+      - ./.env
 
 volumes:
   staticfiles:
