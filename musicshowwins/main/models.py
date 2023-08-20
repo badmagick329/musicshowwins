@@ -67,7 +67,7 @@ class Song(models.Model):
         return f"{self.artist.name} - {self.name}"
 
     def __str__(self):
-        return f"{self.artist} - {self.name} "
+        return f"{self.artist} - {self.name}"
 
     def __repr__(self):
         return f"<Song(id={self.id}, name={self.name}, artist={self.artist})>"

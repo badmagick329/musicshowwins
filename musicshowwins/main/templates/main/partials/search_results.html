@@ -1,0 +1,20 @@
+{% load static %}
+<ul>
+  {% for artist in artists %}
+    <li><form
+    hx-get="artist_details"
+    hx-trigger="click"
+    hx-target="#artist-details"
+    hx-indicator="#artist-details-indicator"
+    >
+    <input type="hidden" name="artist_id" value="{{ artist.id }}">
+    <button>{{ artist.name }}</button>
+    </input></form></li>
+  {% endfor %}
+</ul>
+<div id="artist-details">
+<img id="artist-details-indicator" src={% static "images/spinner.gif" %} alt="spinner" class="htmx-indicator" width="20" height="20" />
+{% if details %}
+  {% include "main/partials/artist_details.html" %}
+{% endif %}
+</div>

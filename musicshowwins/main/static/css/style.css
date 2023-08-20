@@ -579,8 +579,20 @@ video {
   display: grid;
 }
 
+.hidden {
+  display: none;
+}
+
 .h-8 {
   height: 2rem;
+}
+
+.h-2 {
+  height: 0.5rem;
+}
+
+.max-h-2 {
+  max-height: 0.5rem;
 }
 
 .min-h-full {
@@ -605,6 +617,10 @@ video {
 
 .w-screen {
   width: 100vw;
+}
+
+.w-2 {
+  width: 0.5rem;
 }
 
 .grid-flow-row {
@@ -674,6 +690,11 @@ video {
 .text-2xl {
   font-size: 1.5rem;
   line-height: 2rem;
+}
+
+.text-3xl {
+  font-size: 1.875rem;
+  line-height: 2.25rem;
 }
 
 .text-xl {

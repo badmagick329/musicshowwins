@@ -3,7 +3,8 @@ from datetime import datetime
 from django.shortcuts import render
 
 from main.apps import MainConfig
-from main.models import Win
+from main.models import Artist, Win
+from main.utils import chart
 
 app_name = MainConfig.name
 
@@ -21,6 +22,41 @@ def index(request):
         "table_header": "Top Songs since 2014",
     }
     return render(request, f"{app_name}/index.html", context)
+
+
+def details(request):
+    search = request.GET.get("search", "").strip()
+    context = {"search": search}
+    return render(request, f"{app_name}/details.html", context)
+
+
+def artist_search(request):
+    search = request.GET.get("search", "").strip()
+    if len(search) < 3:
+        search = ""
+    if search:
+        artists = Artist.objects.filter(name__icontains=search)
+    else:
+        artists = list()
+    context = {"artists": artists}
+    return render(request, f"{app_name}/partials/search_results.html", context)
+
+
+def artist_details(request):
+    artist_id = request.GET.get("artist_id", "").strip()
+    if artist_id and artist_id.isdigit():
+        artist = Artist.objects.get(id=artist_id)
+        artist_name = artist.name
+        artist_wins_image = str(chart(artist.name))
+    else:
+        artist_name = None
+        artist_wins_image = None
+    # print(f"request: {request.GET}")
+    # artist = request.GET.get("artist_name", "").strip()
+    # print(f"artist: {artist}")
+    # artist_wins_image = str(chart("Twice"))
+    context = {"artist_name": "test", "artist_wins_image": artist_wins_image}
+    return render(request, f"{app_name}/partials/artist_details.html", context)
 
 
 def wintable(request):

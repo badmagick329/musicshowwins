@@ -7,3 +7,4 @@ docker-compose-db.yml
 !docker-compose.yml
 notes/
 nginx/conf.d/*
+graphs/
