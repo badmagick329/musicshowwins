@@ -1,11 +1,11 @@
 let artistSearch, songsRadio, artistsRadio, songsLabel, artistsLabel;
 
 function main() {
-  artistSearch = document.querySelector("#artist-search");
-  songsRadio = document.querySelector("#list-type > input[type=radio]:nth-child(1)");
-  artistsRadio = document.querySelector("#list-type > input[type=radio]:nth-child(3)");
-  songsLabel = document.querySelector("#list-type > label:nth-child(2)");
-  artistsLabel = document.querySelector("#list-type > label:nth-child(4)");
+  artistSearch = document.querySelector("#artist_search");
+  songsRadio = document.querySelector("#list_type > input[type=radio]:nth-child(1)");
+  artistsRadio = document.querySelector("#list_type > input[type=radio]:nth-child(3)");
+  songsLabel = document.querySelector("#list_type > label:nth-child(2)");
+  artistsLabel = document.querySelector("#list_type > label:nth-child(4)");
   artistSearch.value = "";
   songsRadio.checked = true;
   artistSearch.addEventListener("keyup", function (e) {

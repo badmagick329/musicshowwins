@@ -7,7 +7,7 @@
 /*   color: #ffffff; */
 /* } */
 
-#list-type > input[type="radio"]:checked + label {
+#list_type > input[type="radio"]:checked + label {
   background-color:  rgb(236 72 153);
   color: #ffffff;
 }
