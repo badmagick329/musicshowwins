@@ -8,3 +8,4 @@ docker-compose-db.yml
 notes/
 nginx/conf.d/*
 graphs/
+certbot/
