@@ -357,6 +357,8 @@ class WikiScraper:
             "summer k-pop festival",
             "dream concert",
             "gayo daejun",
+            "lunar new year",
+            "no.1 special",
         ]
         remove_artists = set()
         for c in df["Artist"]:

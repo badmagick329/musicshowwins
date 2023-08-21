@@ -3,8 +3,7 @@ __pycache__/
 cached/
 .env
 db/
-docker-compose-db.yml
-!docker-compose.yml
+docker-compose*.yml
 notes/
 nginx/conf.d/*
 graphs/
