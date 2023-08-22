@@ -16,37 +16,37 @@ from main.models import Artist, Win
 from musicshowwins.settings import CONTAINERED, STATIC_ROOT
 
 plt.style.use("dark_background")
+if CONTAINERED:
+    STATIC_DIR = STATIC_ROOT
+else:
+    STATIC_DIR = BASE_DIR / "main" / "static"
+CACHE_FOR = 3600 # seconds
 
 
-def chart(artist_name: str) -> str:
-    if CONTAINERED:
-        static_root = STATIC_ROOT
-    else:
-        static_root = BASE_DIR / "main" / "static"
-    graphs_dir = static_root / "images" / "graphs"
+def song_chart(artist_name: str) -> str:
+    graphs_dir = STATIC_DIR / "images" / "graphs"
     file_name = f"{artist_name}_wins.png"
     if (graphs_dir / file_name).exists():
         create_time = (graphs_dir / file_name).stat().st_ctime
-        if datetime.now().timestamp() - create_time < 3600:
-            print(f"Returning cached {file_name}")
+        if datetime.now().timestamp() - create_time < CACHE_FOR:
             return file_name
-    print(f"Creating new {file_name}")
-    wins = (
+    win_values = (
         Win.objects.filter(song__artist__name__iexact=artist_name)
         .annotate(wins=models.Count("song__win"))
+        .values("song__name", "wins")
         .order_by("-wins")
+        .distinct()
     )
-    wins_dict = {}
-    for w in wins:
-        wins_dict[w.song.name] = w.wins
-    df = pd.DataFrame.from_dict(wins_dict, orient="index", columns=["wins"])
-    df = df.sort_values(by="wins", ascending=False)
+    df = pd.DataFrame.from_records(
+        win_values, columns=["song__name", "wins"], index="song__name"
+    )
+    total_wins = df.wins.sum()
     fig, ax = plt.subplots()
-    fig.set_size_inches(12, 8)
+    fig.set_size_inches(10, 7)
     ax.bar(df.index, df.wins, color="C3")
     ax.set_yticks(range(1, df.wins.max() + 1, 1))
     ax.set_ylabel("Wins", rotation=0, labelpad=20)
-    ax.set_title(f"{artist_name} Music Show Wins")
+    ax.set_title(f"{artist_name} Wins - Total: {total_wins}")
     ax.grid(axis="y")
     ax.tick_params("x", labelrotation=75)
     fig.subplots_adjust(bottom=0.22)
@@ -57,4 +57,4 @@ def chart(artist_name: str) -> str:
 if __name__ == "__main__":
     os.environ["DJANGO_SETTINGS_MODULE"] = "musicshowwins.settings"
     django.setup()
-    chart("Twice")
+    song_chart("Twice")

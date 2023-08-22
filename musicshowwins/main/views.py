@@ -4,7 +4,7 @@ from django.shortcuts import render
 
 from main.apps import MainConfig
 from main.models import Artist, Win
-from main.utils import chart
+from main.utils import song_chart
 
 app_name = MainConfig.name
 
@@ -47,15 +47,11 @@ def artist_details(request):
     if artist_id and artist_id.isdigit():
         artist = Artist.objects.get(id=artist_id)
         artist_name = artist.name
-        artist_wins_image = str(chart(artist.name))
+        artist_wins_image = str(song_chart(artist.name))
     else:
         artist_name = None
         artist_wins_image = None
-    # print(f"request: {request.GET}")
-    # artist = request.GET.get("artist_name", "").strip()
-    # print(f"artist: {artist}")
-    # artist_wins_image = str(chart("Twice"))
-    context = {"artist_name": "test", "artist_wins_image": artist_wins_image}
+    context = {"artist_name": artist_name, "artist_wins_image": artist_wins_image}
     return render(request, f"{app_name}/partials/artist_details.html", context)
 
 
