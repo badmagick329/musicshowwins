@@ -1,21 +1,21 @@
 from datetime import datetime
 
-from django.shortcuts import render
 from django.template.response import TemplateResponse
 
 from main.apps import MainConfig
 from main.models import Artist, Win
-from main.utils import song_chart, year_chart
+from main.utils import song_chart, year_chart, add_ranks
 
 app_name = MainConfig.name
 
 
 def index(request):
     top_items = Win.top_songs()
-    for i, item in enumerate(top_items):
-        item.rank = i + 1
+    add_ranks(top_items)
     current_year = datetime.now().year
 
+    # TODO:
+    # Get min and max year from db
     context = {
         "items": top_items,
         "item_type": "songs",
@@ -92,32 +92,26 @@ def year_image_view(request):
 def wintable(request):
     list_type = request.GET.get("list", "songs").strip()
     year = request.GET.get("year", None)
-    search = request.GET.get("search", "").strip()
-    if search:
-        list_type = "songs"
     if year and not year.isdigit():
         year = None
-    by_ = search.title() if search else ""
     if list_type == "songs":
-        top_items = Win.top_songs(year=year, artist=search)
-        if top_items:
-            by_ = top_items[0].artist.name
+        top_items = Win.top_songs(year=year)
     else:
         top_items = Win.top_artists(year=year)
-        if top_items:
-            by_ = top_items[0].name
-    for i, item in enumerate(top_items):
-        item.rank = i + 1
+    add_ranks(top_items)
     table_header = ""
     if list_type == "songs":
         table_header = "Top Songs "
     else:
         table_header = "Top Artists "
-    if search:
-        table_header += f"by {by_} "
+    # TODO:
+    # Get min and max year from db
     if year:
         table_header += f"in {year} "
     else:
         table_header += "since 2014"
     context = {"items": top_items, "item_type": list_type, "table_header": table_header}
     return TemplateResponse(request, f"{app_name}/partials/wintable.html", context)
+
+def about(request):
+    return TemplateResponse(request, f"{app_name}/about.html")

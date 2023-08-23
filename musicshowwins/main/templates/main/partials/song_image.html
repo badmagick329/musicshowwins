@@ -1,5 +1,6 @@
 {% load static %}
-<div class="img-container mb-4 px-2 w-full lg:w-3/4 xl:w-1/2">
+<hr class="my-2 responsive-resize border-2 md:rounded-full border-gray-700 mb-4">
+<div class="img-container mb-4 px-6 w-full lg:w-3/4 xl:w-1/2">
   <p class="text-center text-2xl font-bold mb-2">Song Wins - Total: {{ total_wins }}</p>
   <a href="{% static 'images/charts' %}/{{ song_wins_image }}" target="_blank">
   <img class="rounded-md w-full" src="{% static 'images/charts' %}/{{ song_wins_image }}"

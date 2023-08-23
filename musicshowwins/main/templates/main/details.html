@@ -1,14 +1,15 @@
 {% extends "main/base.html" %}
 {% load static %}
 {% block title %}
-  <title>Title</title>
+  <title>Win Details</title>
 {% endblock %}
 {% block body %}
-  <div class="flex flex-col items-center pt-2">
+  <div class="flex flex-col items-center pt-16">
     <form class="flex flex-col w-full items-center mb-2">
       <input id="artist-search" type="text" name="search"
         placeholder="Search for an artist" autocomplete="off"
-        class="border-2 rounded-lg p-2 w-3/4 md:w-1/2 2xl:w-1/4"
+        class="border-2 rounded-lg p-2 w-3/4 md:w-1/2 2xl:w-1/4 
+        dark:bg-zinc-950 focus:outline-none"
         hx-trigger="keyup changed delay:500ms"
         hx-get="artist_search" hx-target="#search-results"
     </form>

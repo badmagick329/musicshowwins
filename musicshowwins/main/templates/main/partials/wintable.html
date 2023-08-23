@@ -1,23 +1,23 @@
-<p class="text-2xl md:text-3xl font-bold text-center px-2">{{ table_header }}</p>
-<div class="flex flex-col items-center w-full mx-8">
-  <div class="grid grid-cols-10 grid-flow-row gap-4 w-3/4 md:w-1/2 2xl:w-1/4">
-    <div class="col-span-1 text-xl font-bold"></div>
+<h2 class="text-xl md:text-2xl font-semibold text-center px-2">{{ table_header }}</h2>
+<div class="flex flex-col items-center w-full pt-4">
+  <div class="grid grid-cols-10 grid-flow-row gap-4 px-4 responsive-resize">
+    <div class="col-span-2 text-xl font-bold">Rank</div>
     {% if items.item_type == "songs" %}
-      <div class="col-span-7 text-xl font-bold">Songs</div>
+      <div class="col-span-6 text-xl font-bold">Songs</div>
     {% else %}
-      <div class="col-span-7 text-xl font-bold">Artists</div>
+      <div class="col-span-6 text-xl font-bold">Artists</div>
     {% endif %}
     <div class="col-span-2 justify-self-end text-xl font-bold">Wins</div>
     {% if items %}
       {% for item in items %}
-        <div class="col-span-1 font-bold">
+        <div class="col-span-2 font-bold">
         {{item.rank}}.
         {% if item.rank == 1 %}👑
         {% elif item.rank == 2 %}🥈
         {% elif item.rank == 3 %}🥉
         {% endif %}
         </div>
-        <div class="col-span-7">{{item.display_name}}</div>
+        <div class="col-span-6">{{item.display_name}}</div>
         <div class="col-span-2 justify-self-end">{{item.wins}}</div>
       {% endfor %}
     {% else %}

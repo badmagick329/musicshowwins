@@ -7,12 +7,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="color-scheme" content="dark light">
     <link href={% static 'css/style.css' %} rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="{% static 'images/favicon/favicon.ico' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/htmx.org@1.9.3"
             integrity="sha384-lVb3Rd/Ca0AxaoZg5sACe8FJKF0tnUgR2Kd7ehUOG5GCcROv5uBIZsOqovBAcWua"
             crossorigin="anonymous"></script>
     <script src={% static 'js/script.js' %}></script>
   </head>
-  <body class="antialiased bg-gray-900 min-h-screen w-screen">
+  <body class="antialiased bg-gray-900 flex flex-col min-h-screen w-screen">
+    <nav class="w-full bg-zinc-950 py-2 absolute font-semibold xs:text-xl">
+       <ul class="list-none w-full flex justify-around md:justify-center">
+        <li class="inline float-left"><a 
+          class="px-4 px-2 py-2 md:mx-5 hover:bg-selection" 
+          href={% url 'main:index' %}
+          >Top Wins</a></li>
+        <li class="inline float-left"><a 
+          class="px-4 px-2 py-2 md:mx-5 hover:bg-selection" 
+          href={% url 'main:details' %}
+          >Win Details</a></li>
+        <li class="inline float-left"><a 
+          class="px-4 px-2 py-2 md:mx-5 hover:bg-selection" 
+          href={% url 'main:about' %}
+          >About</a></li>
+      </ul> 
+    </nav>
     {% block body %}{% endblock %}
   </body>
 </html>

@@ -1,0 +1,51 @@
+{% extends "main/base.html" %}
+{% load static %}
+{% block title %}
+  <title>About</title>
+{% endblock %}
+{% block body %}
+  <div class="flex flex-col items-center text-left lg:text-xl pt-16">
+    <h2
+    class="text-2xl md:text-3xl font-bold responsive-resize px-4 text-center mb-4"
+    >About Kpop Wins</h2>
+    <p class="px-4 responsive-resize leading-loose mb-4">
+    Have you ever wondered which song by a kpop group got the most music show
+    wins? Maybe you’re looking to see which kpop song achieved the most wins
+    in a specific year. You’ve come to the right place!
+    </p>
+    <p class="px-4 responsive-resize leading-loose mb-4">
+    You can view music show wins by a kpop artist or song at 
+    <a class="font-bold hover:text-selection" href={% url 'main:index' %}>Top Wins</a>.
+    There you’ll find a list of the artists who’ve won the most, or check out
+    the kpop songs with the most wins.
+    </p>
+    <p class="px-4 responsive-resize leading-loose mb-4">
+    You can also use the 
+    <a class="font-bold hover:text-selection" href={% url 'main:details' %}>Win Details</a>
+    page to view information on a group’s past victories. The site allows you
+    to search for charts showing your chosen kpop group’s wins for each year
+    and their top winning songs. 
+    </p>
+    <p class="px-4 responsive-resize leading-loose my-4">
+    The site tracks the following Korean music shows: 
+    </p>
+    <ul class="px-4 responsive-resize leading-loose mb-4">
+      <li>• Music Bank</li>
+      <li>• Show Champion</li>
+      <li>• Music Core</li>
+      <li>• The Show</li>
+      <li>• MCountdown</li>
+      <li>• Inkigayo</li>
+    </ul>
+    <p class="px-4 responsive-resize leading-loose my-4">
+    The sources for this data are listed below:
+    </p>
+    <ul class="px-4 responsive-resize leading-loose">
+      <li>Trust me bro</li>
+      <li>Trust me bro</li>
+      <li>Trust me bro</li>
+      <li>Trust me bro</li>
+    </ul>
+
+  </div>
+{% endblock %}

@@ -1,11 +1,18 @@
 {% extends "main/base.html" %}
 {% load static %}
 {% block title %}
-  <title>Title</title>
+  <title>Kpop Music Show Wins</title>
 {% endblock %}
 {% block body %}
-  <div class="flex flex-col min-h-full items-center mt-2">
-    <div class="flex flex-col min-h-full items-center mb-2 w-3/4 md:w-1/2 2xl:w-1/4">
+  <div class="flex flex-col min-h-full items-center pt-16">
+    <h2 class="text-2xl md:text-3xl font-bold text-center px-2 pt-4">Top Kpop Music Show Wins</h2>
+    <p class="text-center px-2 py-4 responsive-resize">
+      On this page you can view the top artists and songs that have won music shows.
+      You can use the artist and song buttons to toggle between the two lists.
+      Use the year dropdown to filter the list by year.
+    </p>
+    <hr class="responsive-resize border-2 md:rounded-full border-gray-700 mb-4">
+    <div class="flex flex-col min-h-full items-center mb-4 px-4 responsive-resize">
       <form id="list_filters" class="flex w-full justify-between"
         hx-get="wintable" hx-target="#win_list" hx-trigger="change"
         >

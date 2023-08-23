@@ -6,7 +6,10 @@ from pathlib import Path
 import django
 import pandas as pd
 from django.db import models
+from django.db.models import QuerySet
 from matplotlib import pyplot as plt
+
+from main.models import Artist, Song, Win
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 if str(BASE_DIR) not in sys.path:
@@ -29,8 +32,6 @@ CACHE_SECONDS = 3600
 
 def song_chart(artist_name: str) -> tuple[str, dict[str, str]]:
     file_name = f"{artist_name}_wins.png"
-    if cached_file(file_name):
-        return file_name
     wins = Win.objects.filter(song__artist__name__iexact=artist_name)
     song_years = dict()
     for song in wins.values("song__name", "year"):
@@ -45,6 +46,8 @@ def song_chart(artist_name: str) -> tuple[str, dict[str, str]]:
     )
     df = pd.DataFrame.from_records(win_values, columns=["song__name", "wins"])
     total_wins = df.wins.sum()
+    if cached_file(file_name):
+        return file_name, {"total_wins": total_wins}
     df.song__name = df.song__name.apply(lambda x: f"{x} ({song_years[x]})")
     fig, ax = plt.subplots()
     width, height = chart_dims(df.song__name, df.wins)
@@ -62,8 +65,6 @@ def song_chart(artist_name: str) -> tuple[str, dict[str, str]]:
 
 def year_chart(artist_name: str) -> tuple[str, dict[str, str]]:
     file_name = f"{artist_name}_year_wins.png"
-    if cached_file(file_name):
-        return file_name
     year_values = (
         Win.objects.filter(song__artist__name__iexact=artist_name)
         .values("year")
@@ -71,6 +72,8 @@ def year_chart(artist_name: str) -> tuple[str, dict[str, str]]:
         .order_by("year")
     )
     df = pd.DataFrame.from_records(year_values, columns=["year", "wins"])
+    if cached_file(file_name):
+        return file_name, {"best_year": df.wins.idxmax()}
     fig, ax = plt.subplots()
     width, height = chart_dims(df.year, df.wins)
     fig.set_size_inches(width, height)
@@ -96,14 +99,19 @@ def cached_file(file_name: str) -> str | None:
 def chart_dims(row, y_counts):
     if len(row) > 8:
         width = 12
+    elif len(row) < 4:
+        width = 6
     else:
         width = 10
     if y_counts.max() > 40:
         height = 12
     elif y_counts.max() > 30:
         height = 10
+    elif y_counts.max() < 10:
+        height = 7
     else:
         height = 8
+    print(f"{width=} {height=}")
     return width, height
 
 
@@ -128,6 +136,22 @@ def chart_test(artist_name: str):
     ax.set_xticks(df.index)
     fig.subplots_adjust(bottom=0.22)
     fig.savefig((CHARTS_DIR / f"chart_test.png"), dpi=300)
+
+
+def add_ranks(items: QuerySet[Artist | Song]):
+    """Assumes the queryset is sorted by wins in descending order"""
+    rank = None
+    previous_win_count = None
+    for item in items:
+        if rank is None:
+            rank = 1
+            item.rank = rank
+            previous_win_count = item.wins
+            continue
+        if item.wins < previous_win_count:
+            rank += 1
+        item.rank = rank
+        previous_win_count = item.wins
 
 
 if __name__ == "__main__":

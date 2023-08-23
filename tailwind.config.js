@@ -2,8 +2,15 @@
 module.exports = {
   content: ["./musicshowwins/**/*.{html,js}"],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        selection: "#ec4899",
+      },
+      screens: {
+        "xs": "460px",
+        "3xl": "1920px",
+      },
+    },
   },
   plugins: [],
-}
-
+};
