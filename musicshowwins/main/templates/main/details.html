@@ -4,16 +4,25 @@
   <title>Title</title>
 {% endblock %}
 {% block body %}
-  <div class="flex flex-col min-h-full items-center mt-2">
+  <div class="flex flex-col items-center pt-2">
     <form class="flex flex-col w-full items-center mb-2">
       <input id="artist-search" type="text" name="search"
-        placeholder="Search" autocomplete="off"
+        placeholder="Search for an artist" autocomplete="off"
         class="border-2 rounded-lg p-2 w-3/4 md:w-1/2 2xl:w-1/4"
         hx-trigger="keyup changed delay:500ms"
         hx-get="artist_search" hx-target="#search-results"
     </form>
   </div>
   <div id="search-results" class="flex flex-col items-center">
-    {% include "main/partials/search_results.html" %}
+    {% if artist_id %}
+      {% include "main/partials/search_results.html" %}
+    {% endif %}
+  </div>
+  <div id="artist-details" class="flex flex-col items-center">
+    {% if artist_id %}
+      {% include "main/partials/artist_details.html" %}
+    {% else %}
+      <p class="mt-2 text-2xl">No artist selected</p>
+    {% endif %}
   </div>
 {% endblock %}

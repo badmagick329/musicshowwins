@@ -7,4 +7,5 @@ docker-compose*.yml
 notes/
 nginx/conf.d/*
 graphs/
+charts/
 certbot/

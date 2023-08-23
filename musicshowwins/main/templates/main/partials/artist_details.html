@@ -1,7 +1,13 @@
 {% load static %}
-<a href="{% static 'images/graphs' %}/{{ artist_wins_image }}" target="_blank">
-<img src="{% static 'images/graphs' %}/{{ artist_wins_image }}"
-  alt="{{ artist_name }} image"
-  width="700" height="700"
-  />
-</a>
+<form hx-trigger="load" hx-swap="outerHTML"
+  hx-get={% url 'main:song_image_view' %}>
+  <input type="hidden" name="artist_id" value="{{ artist_id }}">
+  <img alt="Result Loading..." class="htmx-indicator mb-8" width="50" height="50"
+    src="{% static 'images/spinner.gif' %}">
+</form>
+<form hx-trigger="load" hx-swap="outerHTML"
+  hx-get={% url 'main:year_image_view' %}>
+  <input type="hidden" name="artist_id" value="{{ artist_id }}">
+  <img alt="Result Loading..." class="htmx-indicator" width="50" height="50"
+    src="{% static 'images/spinner.gif' %}">
+</form>

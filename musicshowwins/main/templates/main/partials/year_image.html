@@ -1,0 +1,11 @@
+{% load static %}
+<div class="img-container mb-4 px-2 w-full lg:w-3/4 xl:w-1/2">
+  <p class="text-center text-2xl font-bold mb-2">Yearly Wins</p>
+  <a href="{% static 'images/charts' %}/{{ year_wins_image }}" target="_blank">
+  <img class="rounded-md w-full" src="{% static 'images/charts' %}/{{ year_wins_image }}"
+    alt="{{ artist_name }} image"
+    width="700" height="700"
+    />
+  </a>
+</div>
+
