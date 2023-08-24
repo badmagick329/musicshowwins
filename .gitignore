@@ -9,3 +9,4 @@ nginx/conf.d/*
 graphs/
 charts/
 certbot/
+nginx/logs/

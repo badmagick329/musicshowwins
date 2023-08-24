@@ -4,12 +4,13 @@ from django.template.response import TemplateResponse
 
 from main.apps import MainConfig
 from main.models import Artist, Win
-from main.utils import add_ranks, song_chart, year_chart
+from main.utils import add_ranks, song_chart, year_chart, log_access
 from scripts.wikiscraper import WikiScraper
 
 app_name = MainConfig.name
 
 
+@log_access
 def index(request):
     top_items = Win.top_songs()
     add_ranks(top_items)
@@ -26,6 +27,7 @@ def index(request):
     return TemplateResponse(request, f"{app_name}/index.html", context)
 
 
+@log_access
 def details(request):
     search = request.GET.get("search", "").strip()
     artist_id = request.GET.get("artist_id", "").strip()
@@ -33,6 +35,7 @@ def details(request):
     return TemplateResponse(request, f"{app_name}/details.html", context)
 
 
+@log_access
 def artist_search(request):
     search = request.GET.get("search", "").strip()
     if len(search) < 2:
@@ -47,6 +50,7 @@ def artist_search(request):
     )
 
 
+@log_access
 def artist_details(request):
     artist_id = request.GET.get("artist_id", "").strip()
     artist_name = None
@@ -62,6 +66,7 @@ def artist_details(request):
     )
 
 
+@log_access
 def song_image_view(request):
     artist_id = request.GET.get("artist_id", "").strip()
     song_wins_image = None
@@ -76,6 +81,7 @@ def song_image_view(request):
     return TemplateResponse(request, f"{app_name}/partials/song_image.html", context)
 
 
+@log_access
 def year_image_view(request):
     artist_id = request.GET.get("artist_id", "").strip()
     year_wins_image = None
@@ -90,6 +96,7 @@ def year_image_view(request):
     return TemplateResponse(request, f"{app_name}/partials/year_image.html", context)
 
 
+@log_access
 def wintable(request):
     list_type = request.GET.get("list", "songs").strip()
     year = request.GET.get("year", None)
@@ -115,6 +122,7 @@ def wintable(request):
     return TemplateResponse(request, f"{app_name}/partials/wintable.html", context)
 
 
+@log_access
 def about(request):
     s = WikiScraper()
     sources = s.get_sources()

@@ -10,9 +10,10 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
-from pathlib import Path
-from dotenv import load_dotenv
 import os
+from pathlib import Path
+
+from dotenv import load_dotenv
 
 load_dotenv()
 
@@ -20,7 +21,8 @@ load_dotenv()
 BASE_DIR = Path(__file__).resolve().parent.parent
 BASE_URL = os.environ["BASE_URL"]
 WIKI_AGENT = os.environ.get("WIKI_AGENT", "")
-CONTAINERED = os.environ.get("DB_HOST","") != "localhost"
+CONTAINERED = os.environ.get("DB_HOST", "") != "localhost"
+ADMIN_USER = os.environ.get("ADMIN_USER", "")
 
 
 # Quick-start development settings - unsuitable for production
