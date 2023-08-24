@@ -4,7 +4,8 @@ from django.template.response import TemplateResponse
 
 from main.apps import MainConfig
 from main.models import Artist, Win
-from main.utils import song_chart, year_chart, add_ranks
+from main.utils import add_ranks, song_chart, year_chart
+from scripts.wikiscraper import WikiScraper
 
 app_name = MainConfig.name
 
@@ -113,5 +114,8 @@ def wintable(request):
     context = {"items": top_items, "item_type": list_type, "table_header": table_header}
     return TemplateResponse(request, f"{app_name}/partials/wintable.html", context)
 
+
 def about(request):
-    return TemplateResponse(request, f"{app_name}/about.html")
+    s = WikiScraper()
+    sources = s.get_sources()
+    return TemplateResponse(request, f"{app_name}/about.html", {"sources": sources})

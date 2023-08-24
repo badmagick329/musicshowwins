@@ -12,13 +12,12 @@ from bs4 import BeautifulSoup as bs
 from bs4.element import ResultSet, Tag
 from dotenv import load_dotenv
 
-load_dotenv()
-
 LOG_LEVEL = logging.DEBUG
 WIKI_AGENT = os.environ.get("WIKI_AGENT", "")
 TESTING = False
+MIN_YEAR = 2013
 
-show_type = Literal[
+ShowType = Literal[
     "music_core",
     "inkigayo",
     "mcountdown",
@@ -26,6 +25,8 @@ show_type = Literal[
     "show_champion",
     "music_bank",
 ]
+ShowCsv = dict[tuple[ShowType, int], str]
+ShowUrl = dict[tuple[ShowType, int], tuple[str, int]]
 
 
 class WikiScraper:
@@ -37,7 +38,7 @@ class WikiScraper:
         "User-Agent": WIKI_AGENT,
     }
 
-    def __init__(self, log_level) -> None:
+    def __init__(self, log_level=logging.INFO) -> None:
         log = logging.getLogger(__name__)
         handler = logging.StreamHandler()
         handler.setFormatter(
@@ -50,6 +51,43 @@ class WikiScraper:
         self.past_results = self._load(self.PAST_RESULTS)
         self.last_fetch = None
         self.delay = 0.2
+        self.show_urls = dict()
+        self.show_csvs = dict()
+        self._generate_sources()
+
+    def _generate_sources(self):
+        shows = [
+            "music_core",
+            "inkigayo",
+            "mcountdown",
+            "the_show",
+            "show_champion",
+            "music_bank",
+        ]
+        current_year = datetime.today().year
+        for s in shows:
+            for y in range(MIN_YEAR + 1, current_year + 1):
+                url = self._urls_and_offsets(s, y)
+                if not url:
+                    continue
+                url, offset = url
+                self.show_urls[(s, y)] = (url, offset)
+        self.show_csvs = {
+            ("music_core", 2016): "2016_music_core.csv",
+            ("show_champion", 2013): "2013_show_champion.csv",
+            ("show_champion", 2013): "2013_inkigayo.csv",
+        }
+
+    def get_sources(self) -> list[str]:
+        sources = list()
+        for _, v in self.show_urls.items():
+            sources.append(v[0])
+        sources = list(set(sources))
+        sources.sort()
+        sources.append(
+            "https://www.reddit.com/r/kpop/comments/5paj2t/yearend_2016_tally_of_music_show_wins/ - Music Core (2016)"
+        )
+        return sources
 
     def _load(self, file: str) -> dict:
         self.CACHE_DIR.mkdir(exist_ok=True)
@@ -139,7 +177,26 @@ class WikiScraper:
         return df
 
     def show_wins(
-        self, year: int, show: show_type, cache: bool = True
+        self, year: int, show: ShowType, cache: bool = True
+    ) -> list[dict[str, str]] | None:
+        """Get show wins for a given year"""
+        # Note: Dates for this music_core 2016 are missing so
+        # all wins are entered as 2016-01-01
+        if year < MIN_YEAR:
+            raise ValueError(f"Year must be after {MIN_YEAR}")
+        if (show, year) in self.show_urls:
+            url, offset = self.show_urls[(show, year)]
+            df = self._get_and_parse(url, year, offset, cache)
+            df["Show"] = show
+            return df.to_dict("records")
+        if (show, year) in self.show_csvs:
+            csv = self.show_csvs[(show, year)]
+            df = self._parse_csv(csv, year)
+            df["Show"] = show
+            return df.to_dict("records")
+
+    def show_wins__old(
+        self, year: int, show: ShowType, cache: bool = True
     ) -> list[dict[str, str]] | None:
         """Get show wins for a given year"""
         MUSIC_CORE_BASE = (
@@ -165,7 +222,6 @@ class WikiScraper:
         MUSIC_BANK_BASE = (
             "https://en.wikipedia.org/wiki/List_of_Music_Bank_Chart_winners_({})"
         )
-        MIN_YEAR = 2013
         if year < MIN_YEAR:
             raise ValueError(f"Year must be after {MIN_YEAR}")
         if show == "music_core":
@@ -266,6 +322,84 @@ class WikiScraper:
             for y in range(2014, current_year + 1):
                 data.extend(self.show_wins(y, s, cache))
         return data
+
+    def _urls_and_offsets(self, show: ShowType, year: int) -> tuple[str, int] | None:
+        """
+        Returns the url and offset for a given show and year.
+
+        For older years the data was entered on the same page, offset
+        helps to indicate which table should be read on that page
+        """
+        MUSIC_CORE_BASE = (
+            "https://en.wikipedia.org/wiki/List_of_Show!_Music_Core_Chart_winners_({})"
+        )
+        MUSIC_CORE_OLD = "https://en.wikipedia.org/wiki/Show!_Music_Core"
+        MCOUNTDOWN_BASE = (
+            "https://en.wikipedia.org/wiki/List_of_M_Countdown_Chart_winners_({})"
+        )
+        SHOW_CHAMPION_BASE = (
+            "https://en.wikipedia.org/wiki/List_of_Show_Champion_Chart_winners_({})"
+        )
+        SHOW_CHAMPION_OLD = "https://en.wikipedia.org/wiki/Show_Champion"
+        THE_SHOW_BASE = (
+            "https://en.wikipedia.org/wiki/List_of_The_Show_Chart_winners_({})"
+        )
+        THE_SHOW_OLD = (
+            "https://en.wikipedia.org/wiki/The_Show_(South_Korean_TV_program)"
+        )
+        INKIGAYO_BASE = (
+            "https://en.wikipedia.org/wiki/List_of_Inkigayo_Chart_winners_({})"
+        )
+        MUSIC_BANK_BASE = (
+            "https://en.wikipedia.org/wiki/List_of_Music_Bank_Chart_winners_({})"
+        )
+        if year < MIN_YEAR:
+            raise ValueError(f"Year must be after {MIN_YEAR}")
+        if show == "music_core":
+            if year > 2018:
+                return MUSIC_CORE_BASE.format(year), 0
+            elif year == 2016:
+                return None
+            else:
+                offset = 5
+                for i in range(2018, MIN_YEAR - 1, -1):
+                    if i == 2016:
+                        continue
+                    if year == i:
+                        return MUSIC_CORE_OLD, offset
+                    offset -= 1
+        elif show == "mcountdown":
+            return MCOUNTDOWN_BASE.format(year), 0
+        elif show == "show_champion":
+            if year > 2020:
+                return SHOW_CHAMPION_BASE.format(year), 0
+            elif year == 2013:
+                return None
+            else:
+                offset = 6
+                for i in range(2020, MIN_YEAR - 1, -1):
+                    if year == i:
+                        return SHOW_CHAMPION_OLD, offset
+                    offset -= 1
+        elif show == "the_show":
+            if year > 2020:
+                return THE_SHOW_BASE.format(year), 0
+            elif year == 2013:
+                # Data for 2013 is missing for the show
+                return None
+            else:
+                offset = 6
+                for i in range(2020, MIN_YEAR - 1, -1):
+                    if year == i:
+                        return THE_SHOW_OLD, offset
+                    offset -= 1
+        elif show == "inkigayo":
+            if year > 2013:
+                return INKIGAYO_BASE.format(year), 0
+            elif year == 2013:
+                return None
+        elif show == "music_bank":
+            return MUSIC_BANK_BASE.format(year), 0
 
     def _clean(self, df: pd.DataFrame) -> pd.DataFrame:
         if "Ref." in df.columns:
@@ -376,4 +510,5 @@ def main():
 
 
 if __name__ == "__main__":
+    load_dotenv()
     main()

@@ -40,12 +40,10 @@
     <p class="px-4 responsive-resize leading-loose my-4">
     The sources for this data are listed below:
     </p>
-    <ul class="px-4 responsive-resize leading-loose">
-      <li>Trust me bro</li>
-      <li>Trust me bro</li>
-      <li>Trust me bro</li>
-      <li>Trust me bro</li>
+    <ul class="text-sm px-4 responsive-resize leading-relaxed text-gray-400">
+      {% for source in sources %}
+        <li><a href="{{source}}" target="_blank">{{source}}</a></li>
+      {% endfor %}
     </ul>
-
   </div>
 {% endblock %}
