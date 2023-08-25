@@ -6,6 +6,7 @@ db/
 docker-compose*.yml
 notes/
 nginx/conf.d/*
+!nginx/conf.d/main.conf.sample
 graphs/
 charts/
 certbot/
