@@ -10,6 +10,9 @@ module.exports = {
         "xs": "460px",
         "3xl": "1920px",
       },
+      rotate: {
+        '17': '17deg',
+      }
     },
   },
   plugins: [],
