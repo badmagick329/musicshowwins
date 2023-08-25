@@ -5,7 +5,11 @@
 {% endblock %}
 {% block body %}
   <div class="flex flex-col min-h-full items-center pt-16">
-    <h2 class="text-2xl md:text-3xl font-bold text-center px-2 pt-4">Top Kpop Music Show Wins</h2>
+    <div class="flex">
+      <img class="-rotate-17"
+        src="{% static 'images/pinkcrown.png' %}" alt="pink crown" width="45" height="30">
+      <h2 class="text-xl xs:text-2xl md:text-3xl font-bold text-center px-2 pt-4">Top Kpop Music Show Wins</h2>
+    </div>
     <p class="lg:text-xl text-center px-2 py-4 responsive-resize">
       On this page you can view the top artists and songs with a music show win.
       You can use the artist and song buttons to toggle between the two lists.
