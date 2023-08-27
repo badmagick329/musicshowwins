@@ -23,13 +23,17 @@ if __name__ == "__main__":
 from main.models import Artist, Win
 from musicshowwins.settings import ADMIN_USER, CONTAINERED, STATIC_ROOT
 
-plt.style.use("dark_background")
+# plt.style.use("dark_background")
 if CONTAINERED:
     STATIC_DIR = STATIC_ROOT
 else:
     STATIC_DIR = BASE_DIR / "main" / "static"
 CHARTS_DIR = STATIC_DIR / "images" / "charts"
 CACHE_SECONDS = 3600
+CHART_BG_COLOR = "#030712"  # tailwind gray-950
+CHART_FG_COLOR = "#ffffff"
+CHART_FONT = "Roboto Condensed"
+CHART_PLOT_COLOR = "C3"
 
 
 def log_access(func):
@@ -78,9 +82,10 @@ def song_chart(artist_name: str) -> tuple[str, dict[str, str]]:
         return file_name, {"total_wins": total_wins}
     df.song__name = df.song__name.apply(lambda x: f"{x} ({song_years[x]})")
     fig, ax = plt.subplots()
+    set_style(ax, fig)
     width, height = chart_dims(df.song__name, df.wins)
     fig.set_size_inches(width, height)
-    ax.bar(df.song__name, df.wins, color="C3")
+    ax.bar(df.song__name, df.wins, color=CHART_PLOT_COLOR)
     ax.set_yticks(range(1, df.wins.max() + 1, 1))
     ax.set_ylabel("Wins", rotation=0, labelpad=20)
     ax.set_title(f"{artist_name} Song Wins")
@@ -103,9 +108,10 @@ def year_chart(artist_name: str) -> tuple[str, dict[str, str]]:
     if cached_file(file_name):
         return file_name, {"best_year": df.wins.idxmax()}
     fig, ax = plt.subplots()
+    set_style(ax, fig)
     width, height = chart_dims(df.year, df.wins)
     fig.set_size_inches(width, height)
-    ax.bar(df.year, df.wins, color="C3")
+    ax.bar(df.year, df.wins, color=CHART_PLOT_COLOR)
     ax.set_yticks(range(1, df.wins.max() + 1, 1))
     ax.set_ylabel("Wins", rotation=0, labelpad=20)
     ax.set_title(f"{artist_name} Yearly Wins")
@@ -154,8 +160,9 @@ def chart_test(artist_name: str):
     df = pd.DataFrame.from_records(year_values, columns=["year", "wins"], index="year")
     print(df.head(10))
     fig, ax = plt.subplots()
+    set_style(ax, fig)
     fig.set_size_inches(12, 8)
-    ax.bar(df.index, df.wins, color="C3")
+    ax.bar(df.index, df.wins, color=CHART_PLOT_COLOR)
     ax.set_yticks(range(1, df.wins.max() + 1, 1))
     ax.set_ylabel("Wins", rotation=0, labelpad=20)
     ax.set_title(f"{artist_name} Wins for each year")
@@ -180,6 +187,21 @@ def add_ranks(items: QuerySet[Artist | Song]):
             rank += 1
         item.rank = rank
         previous_win_count = item.wins
+
+
+def set_style(ax, fig):
+    ax.set_facecolor(CHART_BG_COLOR)
+    fig.set_facecolor(CHART_BG_COLOR)
+    ax.spines["bottom"].set_color(CHART_FG_COLOR)
+    ax.spines["top"].set_color(CHART_FG_COLOR)
+    ax.spines["left"].set_color(CHART_FG_COLOR)
+    ax.spines["right"].set_color(CHART_FG_COLOR)
+    ax.tick_params(axis="x", colors=CHART_FG_COLOR)
+    ax.tick_params(axis="y", colors=CHART_FG_COLOR)
+    ax.yaxis.label.set_color(CHART_FG_COLOR)
+    ax.xaxis.label.set_color(CHART_FG_COLOR)
+    ax.title.set_color(CHART_FG_COLOR)
+
 
 
 if __name__ == "__main__":
