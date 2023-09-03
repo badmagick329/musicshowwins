@@ -25,6 +25,7 @@
             <div id="list_type">
               <input
               class="opacity-0 fixed w-16 h-8 z-10"
+              autocomplete="off"
               type="radio" hx-trigger="click" name="list" value="songs" checked />
               <label
               class="inline-block text-center bg-gray-700 rounded-lg w-16 px-2 py-1
@@ -32,6 +33,7 @@
               for="songs">Songs</label>
               <input
               class="opacity-0 fixed w-16 h-8 z-10"
+              autocomplete="off"
               type="radio" hx-trigger="click" name="list" value="artists" />
               <label 
               class="inline-block text-center bg-gray-700 rounded-lg w-16 py-1
@@ -40,7 +42,7 @@
             </div>
           </fieldset>
         </div>
-        <select class="rounded-lg px-2 text-center bg-gray-700 font-bold" name="year">
+        <select autocomplete="off" class="rounded-lg px-2 text-center bg-gray-700 font-bold" name="year">
           <option value="">Since 2014</option>
           {% for year in years %}
             <option value="{{ year }}">{{ year }}</option>
