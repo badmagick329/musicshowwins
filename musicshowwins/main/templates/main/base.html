@@ -5,7 +5,7 @@
     {% block title %}{% endblock %}
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="color-scheme" content="dark light">
+    <meta name="color-scheme" content="dark">
     <meta property="og:title" content="Kpop Music Show Wins" />
     <meta property="og:description" content="View the top songs or artists based on kpop music show wins" />
     <meta property="og:image" content="{% static 'images/pinkcrown.png' %}" />
@@ -18,19 +18,19 @@
             integrity="sha384-lVb3Rd/Ca0AxaoZg5sACe8FJKF0tnUgR2Kd7ehUOG5GCcROv5uBIZsOqovBAcWua"
             crossorigin="anonymous"></script>
   </head>
-  <body class="antialiased bg-gray-900 flex flex-col min-h-screen w-screen">
+  <body class="antialiased bg-gray-900 text-white flex flex-col min-h-screen w-screen">
     <nav class="w-full bg-zinc-950 py-2 absolute font-semibold xs:text-xl">
        <ul class="list-none w-full flex justify-around md:justify-center">
         <li class="inline float-left"><a 
-          class="px-4 px-2 py-2 md:mx-5 hover:bg-selection" 
+          class="px-4 py-2 md:mx-5 hover:bg-selection" 
           href={% url 'main:index' %}
           >Top Wins</a></li>
         <li class="inline float-left"><a 
-          class="px-4 px-2 py-2 md:mx-5 hover:bg-selection" 
+          class="px-4 py-2 md:mx-5 hover:bg-selection" 
           href={% url 'main:details' %}
           >Win Details</a></li>
         <li class="inline float-left"><a 
-          class="px-4 px-2 py-2 md:mx-5 hover:bg-selection" 
+          class="px-4 py-2 md:mx-5 hover:bg-selection" 
           href={% url 'main:about' %}
           >About</a></li>
       </ul> 
