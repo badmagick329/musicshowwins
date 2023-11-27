@@ -11,3 +11,4 @@ graphs/
 charts/
 certbot/
 nginx/logs/
+Makefile

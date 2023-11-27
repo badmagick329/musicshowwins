@@ -1,17 +1,18 @@
 from datetime import datetime
 
 from django.template.response import TemplateResponse
-
 from main.apps import MainConfig
 from main.models import Artist, Win
-from main.utils import add_ranks, song_chart, year_chart, log_access
+from main.utils import add_ranks, log_access, song_chart, year_chart
 from scripts.wikiscraper import WikiScraper
 
 app_name = MainConfig.name
+RESULT_LIMIT = 200
+EARLIEST_YEAR = 2014
 
 
 def index(request):
-    top_items = Win.top_songs()
+    top_items = Win.top_songs()[:RESULT_LIMIT]
     add_ranks(top_items)
     current_year = datetime.now().year
 
@@ -20,8 +21,8 @@ def index(request):
     context = {
         "items": top_items,
         "item_type": "songs",
-        "years": list(range(current_year, 2013, -1)),
-        "table_header": "Top Songs since 2014",
+        "years": list(range(current_year, EARLIEST_YEAR - 1, -1)),
+        "table_header": f"Top Songs since {EARLIEST_YEAR}",
     }
     return TemplateResponse(request, f"{app_name}/index.html", context)
 
@@ -73,7 +74,9 @@ def song_image_view(request):
         "song_wins_image": song_wins_image,
         **context_data,
     }
-    return TemplateResponse(request, f"{app_name}/partials/song_image.html", context)
+    return TemplateResponse(
+        request, f"{app_name}/partials/song_image.html", context
+    )
 
 
 def year_image_view(request):
@@ -87,7 +90,9 @@ def year_image_view(request):
         "year_wins_image": year_wins_image,
         **context_data,
     }
-    return TemplateResponse(request, f"{app_name}/partials/year_image.html", context)
+    return TemplateResponse(
+        request, f"{app_name}/partials/year_image.html", context
+    )
 
 
 def wintable(request):
@@ -96,9 +101,9 @@ def wintable(request):
     if year and not year.isdigit():
         year = None
     if list_type == "songs":
-        top_items = Win.top_songs(year=year)
+        top_items = Win.top_songs(year=year)[:RESULT_LIMIT]
     else:
-        top_items = Win.top_artists(year=year)
+        top_items = Win.top_artists(year=year)[:RESULT_LIMIT]
     add_ranks(top_items)
     table_header = ""
     if list_type == "songs":
@@ -110,12 +115,20 @@ def wintable(request):
     if year:
         table_header += f"in {year} "
     else:
-        table_header += "since 2014"
-    context = {"items": top_items, "item_type": list_type, "table_header": table_header}
-    return TemplateResponse(request, f"{app_name}/partials/wintable.html", context)
+        table_header += f"since {EARLIEST_YEAR}"
+    context = {
+        "items": top_items,
+        "item_type": list_type,
+        "table_header": table_header,
+    }
+    return TemplateResponse(
+        request, f"{app_name}/partials/wintable.html", context
+    )
 
 
 def about(request):
     s = WikiScraper()
     sources = s.get_sources()
-    return TemplateResponse(request, f"{app_name}/about.html", {"sources": sources})
+    return TemplateResponse(
+        request, f"{app_name}/about.html", {"sources": sources}
+    )
