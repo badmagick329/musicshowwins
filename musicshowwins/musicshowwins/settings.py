@@ -28,11 +28,11 @@ ADMIN_USER = os.environ.get("ADMIN_USER", "")
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ["SECRET_KEY"]
 DEBUG = int(os.environ["DEBUG"])
 ALLOWED_HOSTS = os.environ["ALLOWED_HOSTS"].split(" ")
 
+PAGE_SIZE = 200
 
 # Application definition
 
@@ -96,6 +96,10 @@ DATABASES = {
     }
 }
 
+REST_FRAMEWORK = {
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "PAGE_SIZE": PAGE_SIZE,
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators

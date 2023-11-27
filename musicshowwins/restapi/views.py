@@ -14,8 +14,8 @@ class TopSongsList(generics.ListAPIView):
     serializer_class = TopSongsSerializer
     filter_backends = [filters.SearchFilter]
     search_fields = ["name", "artist__name"]
+    throttle_classes = [WinListThrottle]
 
-    @throttle_classes([WinListThrottle])
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
 
