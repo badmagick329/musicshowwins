@@ -33,6 +33,7 @@ DEBUG = int(os.environ["DEBUG"])
 ALLOWED_HOSTS = os.environ["ALLOWED_HOSTS"].split(" ")
 
 PAGE_SIZE = 200
+API_CACHE_TTL = 60 * 5  # 5 minutes
 
 # Application definition
 

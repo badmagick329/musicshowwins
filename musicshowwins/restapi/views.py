@@ -8,6 +8,8 @@ from rest_framework.throttling import UserRateThrottle
 
 from .serializers import SongsListSerializer
 
+CACHE_TTL = settings.API_CACHE_TTL
+
 
 class WinListThrottle(UserRateThrottle):
     rate = "30/minute"
@@ -18,6 +20,7 @@ class SongsList(generics.ListAPIView):
     search_fields = ["name", "artist__name"]
     throttle_classes = [WinListThrottle]
 
+    @method_decorator(cache_page(CACHE_TTL))
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
 
