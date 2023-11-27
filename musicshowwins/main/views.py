@@ -1,13 +1,14 @@
 from datetime import datetime
 
 from django.template.response import TemplateResponse
+from django.conf import settings
 from main.apps import MainConfig
 from main.models import Artist, Win
 from main.utils import add_ranks, log_access, song_chart, year_chart
 from scripts.wikiscraper import WikiScraper
 
 app_name = MainConfig.name
-RESULT_LIMIT = 200
+RESULT_LIMIT = settings.PAGE_SIZE
 EARLIEST_YEAR = 2014
 
 
