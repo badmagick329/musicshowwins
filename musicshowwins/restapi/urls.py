@@ -32,5 +32,5 @@ urlpatterns = [
         schema_view.with_ui("redoc", cache_timeout=0),
         name="schema-redoc",
     ),
-    path("songs", views.TopSongsList.as_view(), name="songs"),
+    path("songs", views.SongsList.as_view(), name="songs"),
 ]
