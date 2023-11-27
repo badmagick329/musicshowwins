@@ -19,7 +19,7 @@ class SongSerializer(serializers.ModelSerializer):
         )
 
 
-class TopSongsSerializer(serializers.BaseSerializer):
+class SongsListSerializer(serializers.BaseSerializer):
     def to_representation(self, instance):
         return {
             "song": instance.name,
