@@ -12,3 +12,4 @@ charts/
 certbot/
 nginx/logs/
 Makefile
+crontab
