@@ -95,7 +95,7 @@ class Win(models.Model):
 
     @classmethod
     def top_songs(
-        cls, artist: str | None = None, year: int | None = None
+        cls, artist: str | None = None, year: int | None = None, song: str | None = None
     ) -> QuerySet[Song]:
         songs = Song.objects.select_related("artist")
         filters = Q()
@@ -103,6 +103,8 @@ class Win(models.Model):
             filters &= Q(win__year=year)
         if artist:
             filters &= Q(artist__name__iexact=artist)
+        if song:
+            filters &= Q(name__iexact=song)
         qs = (
             songs.filter(filters)
             .annotate(wins=models.Count("win"))
