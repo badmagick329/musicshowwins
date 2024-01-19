@@ -1,11 +1,12 @@
 from datetime import datetime
 
-from django.template.response import TemplateResponse
 from django.conf import settings
+from django.template.response import TemplateResponse
+
 from main.apps import MainConfig
 from main.models import Artist, Win
-from main.utils import add_ranks, log_access, song_chart, year_chart
-from scripts.wikiscraper import WikiScraper
+from main.utils import add_ranks, song_chart, year_chart
+from scripts.wikiscraper.wikiscraper import WikiScraper
 
 app_name = MainConfig.name
 RESULT_LIMIT = settings.PAGE_SIZE

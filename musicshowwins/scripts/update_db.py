@@ -3,23 +3,28 @@ import os
 import sys
 from pathlib import Path
 
-DJANGO_DIR = Path(__file__).resolve().parent.parent
-if str(DJANGO_DIR) not in sys.path:
-    sys.path.append(str(DJANGO_DIR))
-from wikiscraper import WikiScraper
-
-os.environ["DJANGO_SETTINGS_MODULE"] = "musicshowwins.settings"
-import django
 from django.core.exceptions import ValidationError
+from wikiscraper.wikiscraper import WikiScraper
 
-django.setup()
-from main.models import Artist, ArtistFix, MusicShow, Song, SongFix, Win
+from main.models import Artist, ArtistFix, MusicShow, Song, Win
+
+# DJANGO_DIR = Path(__file__).resolve().parent.parent
+# if str(DJANGO_DIR) not in sys.path:
+#     sys.path.append(str(DJANGO_DIR))
+#
+# os.environ["DJANGO_SETTINGS_MODULE"] = "musicshowwins.settings"
+# import django
+#
+# django.setup()
+
 
 LOG_LEVEL = logging.INFO
 
 log = logging.getLogger(__name__)
 handler = logging.StreamHandler()
-handler.setFormatter(logging.Formatter("%(asctime)s - %(levelname)s - %(message)s"))
+handler.setFormatter(
+    logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
+)
 log.addHandler(handler)
 log.setLevel(LOG_LEVEL)
 
@@ -60,7 +65,9 @@ def error_dump(e: ValidationError, d: dict, data: list, i: int):
         next_ = data[i + 1 : i + 6]
         log.critical("Next\n")
         for n in next_:
-            log.critical(f"{n['Show']}, {n['Artist']}, {n['Song']}, {n['Date']}")
+            log.critical(
+                f"{n['Show']}, {n['Artist']}, {n['Song']}, {n['Date']}"
+            )
     raise e
 
 
@@ -91,7 +98,6 @@ def apply_fixes():
             artist.delete()
     # TODO:
     # Implement SongFix
-
 
 
 def main():

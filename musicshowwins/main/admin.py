@@ -1,9 +1,17 @@
 from django.contrib import admin
 
-from main.models import (Access, Artist, ArtistFix, MusicShow, RemoteAddr,
-                         RequestMethod, RequestPath, Song, SongFix, Win)
+from main.models import (
+    Artist,
+    ArtistFix,
+    MusicShow,
+    Song,
+    SongFix,
+    URLApprovalStatus,
+    Win,
+)
 
 admin.site.register(MusicShow)
+admin.site.register(URLApprovalStatus)
 
 
 class ArtistAdmin(admin.ModelAdmin):
@@ -33,31 +41,8 @@ class SongFixAdmin(admin.ModelAdmin):
     search_fields = ("old", "new")
 
 
-class AccessAdmin(admin.ModelAdmin):
-    list_display = (
-        "remote_addr",
-        "http_user_agent",
-        "query_string",
-        "request_method",
-        "time_local",
-        "request_path",
-    )
-    search_fields = (
-        "remote_addr",
-        "http_user_agent",
-        "query_string",
-        "request_method",
-        "time_local",
-        "request_path",
-    )
-
-
 admin.site.register(Win, WinAdmin)
 admin.site.register(Song, SongAdmin)
 admin.site.register(Artist, ArtistAdmin)
 admin.site.register(ArtistFix, ArtistFixAdmin)
 admin.site.register(SongFix, SongFixAdmin)
-admin.site.register(RequestMethod)
-admin.site.register(RequestPath)
-admin.site.register(RemoteAddr)
-admin.site.register(Access, AccessAdmin)
