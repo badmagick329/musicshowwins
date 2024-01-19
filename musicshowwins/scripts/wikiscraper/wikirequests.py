@@ -1,18 +1,16 @@
 import json
 import logging
-import os
 import time
 from datetime import datetime
 from pathlib import Path
 
 import requests
 
-WIKI_AGENT = os.environ.get("WIKI_AGENT", "")
 from main.models import URLApprovalStatus
+from scripts.wikiscraper.consts import CACHE_DIR, WIKI_AGENT
 
 
 class WikiRequests:
-    CACHE_DIR = Path(__file__).resolve().parent.parent / "cached"
     RESP_FILE = CACHE_DIR / "responses.json"
     DELAY = 0.2
     headers = {
@@ -30,7 +28,7 @@ class WikiRequests:
         self.saved_responses = self._load(self.RESP_FILE)
 
     def _load(self, file: Path) -> dict:
-        self.CACHE_DIR.mkdir(exist_ok=True)
+        CACHE_DIR.mkdir(exist_ok=True)
         if file.exists():
             with open(file, "r", encoding="utf-8") as f:
                 return json.load(f)
@@ -40,7 +38,7 @@ class WikiRequests:
         with open(file, "w", encoding="utf-8") as f:
             json.dump(data, f, indent=4, ensure_ascii=False)
 
-    def get(self, url) -> str | Exception | None:
+    def get(self, url: str) -> str | Exception | None:
         """
         Wrapper around requests.get that caches results and delays
         requests if necessary
