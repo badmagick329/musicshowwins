@@ -31,7 +31,7 @@ log.setLevel(LOG_LEVEL)
 
 def enter_data():
     s = WikiScraper(LOG_LEVEL)
-    data = s.all_wins()
+    data = s.fetch_all_wins()
     for i, d in enumerate(data):
         music_show, _ = MusicShow.objects.get_or_create(name=d["Show"])
         artist = Artist.objects.filter(name__iexact=d["Artist"])

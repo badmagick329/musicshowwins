@@ -6,14 +6,12 @@ from time import perf_counter
 DJANGO_DIR = Path(__file__).resolve().parent.parent
 if str(DJANGO_DIR) not in sys.path:
     sys.path.append(str(DJANGO_DIR))
-from wikiscraper import WikiScraper
 
 os.environ["DJANGO_SETTINGS_MODULE"] = "musicshowwins.settings"
 import django
-from django.core.exceptions import ValidationError
 
 django.setup()
-from main.models import Artist, MusicShow, Song, Win
+from main.models import Win
 
 
 def main():

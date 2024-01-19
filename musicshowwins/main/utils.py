@@ -117,7 +117,6 @@ def chart_dims(row, y_counts):
         height = 7
     else:
         height = 8
-    print(f"{width=} {height=}")
     return width, height
 
 
@@ -132,7 +131,6 @@ def chart_test(artist_name: str):
     df = pd.DataFrame.from_records(
         year_values, columns=["year", "wins"], index="year"
     )
-    print(df.head(10))
     fig, ax = plt.subplots()
     set_style(ax, fig)
     fig.set_size_inches(12, 8)
