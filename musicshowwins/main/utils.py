@@ -1,7 +1,6 @@
 import os
 import sys
 from datetime import datetime
-from functools import wraps
 from pathlib import Path
 
 import django
@@ -10,8 +9,7 @@ from django.db import models
 from django.db.models import QuerySet
 from matplotlib import pyplot as plt
 
-from main.models import (Access, Artist, RemoteAddr, RequestMethod,
-                         RequestPath, Song, Win)
+from main.models import Artist, Song, Win
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 if str(BASE_DIR) not in sys.path:
@@ -21,7 +19,7 @@ if __name__ == "__main__":
     django.setup()
 
 from main.models import Artist, Win
-from musicshowwins.settings import ADMIN_USER, CONTAINERED, STATIC_ROOT
+from musicshowwins.settings import CONTAINERED, STATIC_ROOT
 
 # plt.style.use("dark_background")
 if CONTAINERED:
@@ -34,32 +32,6 @@ CHART_BG_COLOR = "#030712"  # tailwind gray-950
 CHART_FG_COLOR = "#ffffff"
 CHART_FONT = "Roboto Condensed"
 CHART_PLOT_COLOR = "C3"
-
-
-def log_access(func):
-    @wraps(func)
-    def wrapper(request, *args, **kwargs):
-        remote_user = request.META.get("REMOTE_USER", "")
-        if remote_user == ADMIN_USER:
-            return func(request, *args, **kwargs)
-        remote_addr = request.META.get("REMOTE_ADDR", "")[:255]
-        address, _ = RemoteAddr.objects.get_or_create(remote_addr=remote_addr)
-        http_user_agent = request.META.get("HTTP_USER_AGENT", "")[:255]
-        query_string = request.META.get("QUERY_STRING", "")[:255]
-        request_method = request.META.get("REQUEST_METHOD", "")[:255]
-        method, _ = RequestMethod.objects.get_or_create(request_method=request_method)
-        request_path = request.path[:255]
-        path, _ = RequestPath.objects.get_or_create(request_path=request_path)
-        Access.objects.create(
-            remote_addr=address,
-            http_user_agent=http_user_agent,
-            query_string=query_string,
-            request_method=method,
-            request_path=path,
-        )
-        return func(request, *args, **kwargs)
-
-    return wrapper
 
 
 def song_chart(artist_name: str) -> tuple[str, dict[str, str]]:
@@ -157,7 +129,9 @@ def chart_test(artist_name: str):
         .order_by("year")
     )
     print(year_values.query.get_compiler("default").as_sql())
-    df = pd.DataFrame.from_records(year_values, columns=["year", "wins"], index="year")
+    df = pd.DataFrame.from_records(
+        year_values, columns=["year", "wins"], index="year"
+    )
     print(df.head(10))
     fig, ax = plt.subplots()
     set_style(ax, fig)
@@ -201,7 +175,6 @@ def set_style(ax, fig):
     ax.yaxis.label.set_color(CHART_FG_COLOR)
     ax.xaxis.label.set_color(CHART_FG_COLOR)
     ax.title.set_color(CHART_FG_COLOR)
-
 
 
 if __name__ == "__main__":

@@ -3,7 +3,9 @@ from django.db.models import F, Q, QuerySet
 
 
 class MusicShow(models.Model):
-    name = models.CharField(max_length=100, unique=True, blank=False, null=False)
+    name = models.CharField(
+        max_length=100, unique=True, blank=False, null=False
+    )
 
     def __str__(self):
         return self.name
@@ -13,7 +15,9 @@ class MusicShow(models.Model):
 
 
 class Artist(models.Model):
-    name = models.CharField(max_length=100, unique=True, blank=False, null=False)
+    name = models.CharField(
+        max_length=100, unique=True, blank=False, null=False
+    )
 
     def take_songs_from(self, other: "Artist"):
         own_songs = Song.objects.filter(artist=self)
@@ -95,7 +99,10 @@ class Win(models.Model):
 
     @classmethod
     def top_songs(
-        cls, artist: str | None = None, year: int | None = None, song: str | None = None
+        cls,
+        artist: str | None = None,
+        year: int | None = None,
+        song: str | None = None,
     ) -> QuerySet[Song]:
         songs = Song.objects.select_related("artist")
         filters = Q()
@@ -148,36 +155,9 @@ class SongFix(models.Model):
         return f"{self.old} -> {self.new}"
 
 
-class RemoteAddr(models.Model):
-    remote_addr = models.CharField(max_length=255)
+class URLApprovalStatus(models.Model):
+    url = models.CharField(max_length=255, unique=True)
+    approved = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.remote_addr
-
-
-class RequestMethod(models.Model):
-    request_method = models.CharField(max_length=255)
-
-    def __str__(self):
-        return self.request_method
-
-class RequestPath(models.Model):
-    request_path = models.CharField(max_length=255, default="/")
-
-    def __str__(self):
-        return self.request_path
-
-class Access(models.Model):
-    remote_addr = models.ForeignKey(RemoteAddr, on_delete=models.CASCADE)
-    http_user_agent = models.CharField(max_length=255, blank=True, null=True)
-    query_string = models.CharField(max_length=255, blank=True, null=True)
-    request_method = models.ForeignKey(RequestMethod, on_delete=models.CASCADE)
-    time_local = models.DateTimeField(auto_now_add=True)
-    request_path = models.ForeignKey(RequestPath, on_delete=models.CASCADE)
-
-    def __str__(self):
-        return (
-            f"[{self.time_local} {self.remote_addr}]({self.http_user_agent}) "
-            f"- {self.request_method} {self.request_path}{self.query_string}"
-        )
-
+        return f"{self.url} - {self.approved}"

@@ -1,16 +1,16 @@
 import json
 import logging
 import os
-import time
 from datetime import datetime
 from pathlib import Path
 from typing import Literal
 
 import pandas as pd
-import requests
 from bs4 import BeautifulSoup as bs
 from bs4.element import ResultSet, Tag
 from dotenv import load_dotenv
+
+from scripts.wikiscraper.wikirequests import WikiRequests
 
 LOG_LEVEL = logging.DEBUG
 WIKI_AGENT = os.environ.get("WIKI_AGENT", "")
@@ -25,18 +25,24 @@ ShowType = Literal[
     "show_champion",
     "music_bank",
 ]
-ShowCsv = dict[tuple[ShowType, int], str]
-ShowUrl = dict[tuple[ShowType, int], tuple[str, int]]
+ShowCsvs = dict[tuple[ShowType, int], str]
+ShowUrls = dict[tuple[ShowType, int], tuple[str, int]]
 
 
 class WikiScraper:
-    CACHE_DIR = Path(__file__).resolve().parent / "cached"
+    CACHE_DIR = Path(__file__).resolve().parent.parent / "cached"
+    CSV_DIR = Path(__file__).resolve().parent.parent / "data"
     RESP_FILE = CACHE_DIR / "responses.json"
     PAST_RESULTS = CACHE_DIR / "past_results.json"
 
     headers = {
         "User-Agent": WIKI_AGENT,
     }
+    wiki_requests: WikiRequests
+    logger: logging.Logger
+    past_results: dict[str, list[dict[str, str]]]
+    show_urls: ShowUrls
+    show_csvs: ShowCsvs
 
     def __init__(self, log_level=logging.INFO) -> None:
         log = logging.getLogger(__name__)
@@ -47,10 +53,8 @@ class WikiScraper:
         log.addHandler(handler)
         log.setLevel(log_level)
         self.logger = log
-        self.saved_responses = self._load(self.RESP_FILE)
+        self.wiki_requests = WikiRequests()
         self.past_results = self._load(self.PAST_RESULTS)
-        self.last_fetch = None
-        self.delay = 0.2
         self.show_urls = dict()
         self.show_csvs = dict()
         self._generate_sources()
@@ -67,11 +71,11 @@ class WikiScraper:
         current_year = datetime.today().year
         for s in shows:
             for y in range(MIN_YEAR + 1, current_year + 1):
-                url = self._urls_and_offsets(s, y)
+                url = self._urls_and_offsets(s, y)  # type: ignore
                 if not url:
                     continue
                 url, offset = url
-                self.show_urls[(s, y)] = (url, offset)
+                self.show_urls[(s, y)] = (url, offset)  # type: ignore
         self.show_csvs = {
             ("music_core", 2016): "2016_music_core.csv",
             ("show_champion", 2013): "2013_show_champion.csv",
@@ -89,27 +93,27 @@ class WikiScraper:
         )
         return sources
 
-    def _load(self, file: str) -> dict:
-        self.CACHE_DIR.mkdir(exist_ok=True)
+    def _load(self, file: Path) -> dict:
         if file.exists():
             with open(file, "r", encoding="utf-8") as f:
                 return json.load(f)
-        else:
-            return dict()
+        return dict()
 
-    def _save(self, data: dict, file: str) -> None:
+    def _save(self, data: dict, file: Path) -> None:
         with open(file, "w", encoding="utf-8") as f:
             json.dump(data, f, indent=4, ensure_ascii=False)
 
     def _get_and_parse(
         self, url: str, year: int, offset: int = 0, cache: bool = True
-    ) -> pd.DataFrame:
+    ) -> pd.DataFrame | None:
         """Wrapper around get and parse that caches results"""
         if f"{url}__{offset}" in self.past_results:
             self.logger.info(f"Using cached results for {url}__{offset}")
             data = self.past_results[f"{url}__{offset}"]
             return pd.DataFrame.from_dict(data, orient="columns")
-        html = self._get(url)
+        html = self.wiki_requests.get(url)
+        if html is None:
+            return None
         if isinstance(html, Exception):
             raise html
         results = self._parse(html, year, offset)
@@ -117,35 +121,6 @@ class WikiScraper:
             self.past_results[f"{url}__{offset}"] = results.to_dict("records")
             self._save(self.past_results, self.PAST_RESULTS)
         return results
-
-    def _get(self, url) -> str | Exception:
-        """
-        Wrapper around requests.get that caches results and delays
-        requests if necessary
-        """
-        if url in self.saved_responses:
-            self.logger.info(f"Using saved data for {url}")
-            return self.saved_responses[url]
-        try:
-            if self.last_fetch:
-                time_since = datetime.now() - self.last_fetch
-                if time_since.total_seconds() < self.delay:
-                    time.sleep(self.delay - time_since.total_seconds())
-            response = requests.get(url, headers=self.headers)
-            self.last_fetch = datetime.now()
-            if response.status_code == 200:
-                self.logger.info(f"Fetched {url}")
-                if f"({datetime.today().year})" not in url:
-                    self.saved_responses[url] = response.text
-                    self._save(self.saved_responses, self.RESP_FILE)
-                return response.text
-            else:
-                return ValueError(
-                    f"Error {response.status_code} while fetching {url}"
-                )
-        except Exception as e:
-            self.logger.error(f"Error while fetching {url}: {e}")
-            return e
 
     def _parse(self, html: str, year: int, offset: int = 0) -> pd.DataFrame:
         """Parse html table into a list of dicts"""
@@ -172,7 +147,7 @@ class WikiScraper:
         return df
 
     def _parse_csv(self, csv_name: str, year: int) -> pd.DataFrame:
-        csv_file = Path(__file__).parent / "data" / csv_name
+        csv_file = self.CSV_DIR / csv_name
         df = pd.read_csv(csv_file)
         df.loc[:, "Date"] = df["Date"].apply(
             lambda x: self._parse_date(f"{x}, {year}")
@@ -195,10 +170,12 @@ class WikiScraper:
         if (show, year) in self.show_urls:
             url, offset = self.show_urls[(show, year)]
             df = self._get_and_parse(url, year, offset, cache)
+            if df is None:
+                return None
             df["Show"] = show
             return df.to_dict("records")
         if (show, year) in self.show_csvs:
-            csv = self.show_csvs[(show, year)]
+            csv = self.show_csvs[(show, year)]  # type: ignore
             df = self._parse_csv(csv, year)
             df["Show"] = show
             return df.to_dict("records")
@@ -225,7 +202,10 @@ class WikiScraper:
             current_year -= 1
         for s in shows:
             for y in range(2014, current_year + 1):
-                data.extend(self.show_wins(y, s, cache))
+                wins = self.show_wins(y, s, cache)  # type: ignore
+                if wins is None:
+                    continue
+                data.extend(wins)
         return data
 
     def _urls_and_offsets(
@@ -406,9 +386,10 @@ class WikiScraper:
 
 def main():
     s = WikiScraper(log_level=LOG_LEVEL)
-    data = s.all_wins()
-    for d in data:
-        print(d)
+    # data = s.all_wins()
+    # for d in data:
+    #     print(d)
+    wins = s.show_wins(2024, "show_champion")
 
 
 if __name__ == "__main__":
