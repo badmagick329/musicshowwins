@@ -40,7 +40,6 @@ class SongsListSerializer(serializers.BaseSerializer):
                     type=openapi.TYPE_INTEGER,
                 ),
             },
-            "description": "A list of songs, optionally filtered by year and/or artist.",
             "example": [
                 {
                     "song": "Dynamite",

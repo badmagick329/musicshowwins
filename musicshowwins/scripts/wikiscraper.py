@@ -140,7 +140,9 @@ class WikiScraper:
                     self._save(self.saved_responses, self.RESP_FILE)
                 return response.text
             else:
-                return ValueError(f"Error {response.status_code} while fetching {url}")
+                return ValueError(
+                    f"Error {response.status_code} while fetching {url}"
+                )
         except Exception as e:
             self.logger.error(f"Error while fetching {url}: {e}")
             return e
@@ -159,7 +161,9 @@ class WikiScraper:
             raise ValueError("Error parsing table")
         df = parsed_table[0]
         df = self._clean(df)
-        df.loc[:, "Date"] = df["Date"].apply(lambda x: self._parse_date(f"{x}, {year}"))
+        df.loc[:, "Date"] = df["Date"].apply(
+            lambda x: self._parse_date(f"{x}, {year}")
+        )
         df = df[["Date", "Artist", "Song"]]
         df.loc[:, "Artist"] = df["Artist"].apply(
             lambda x: x.split("feat.")[0].strip().replace(", ", " ")
@@ -170,9 +174,13 @@ class WikiScraper:
     def _parse_csv(self, csv_name: str, year: int) -> pd.DataFrame:
         csv_file = Path(__file__).parent / "data" / csv_name
         df = pd.read_csv(csv_file)
-        df.loc[:, "Date"] = df["Date"].apply(lambda x: self._parse_date(f"{x}, {year}"))
+        df.loc[:, "Date"] = df["Date"].apply(
+            lambda x: self._parse_date(f"{x}, {year}")
+        )
         df = df[["Date", "Artist", "Song"]]
-        df.loc[:, "Artist"] = df["Artist"].apply(lambda x: x.strip().replace(", ", " "))
+        df.loc[:, "Artist"] = df["Artist"].apply(
+            lambda x: x.strip().replace(", ", " ")
+        )
         df.loc[:, "Song"] = df["Song"].apply(lambda x: x.strip())
         return df
 
@@ -193,109 +201,6 @@ class WikiScraper:
             csv = self.show_csvs[(show, year)]
             df = self._parse_csv(csv, year)
             df["Show"] = show
-            return df.to_dict("records")
-
-    def show_wins__old(
-        self, year: int, show: ShowType, cache: bool = True
-    ) -> list[dict[str, str]] | None:
-        """Get show wins for a given year"""
-        MUSIC_CORE_BASE = (
-            "https://en.wikipedia.org/wiki/List_of_Show!_Music_Core_Chart_winners_({})"
-        )
-        MUSIC_CORE_OLD = "https://en.wikipedia.org/wiki/Show!_Music_Core"
-        MCOUNTDOWN_BASE = (
-            "https://en.wikipedia.org/wiki/List_of_M_Countdown_Chart_winners_({})"
-        )
-        SHOW_CHAMPION_BASE = (
-            "https://en.wikipedia.org/wiki/List_of_Show_Champion_Chart_winners_({})"
-        )
-        SHOW_CHAMPION_OLD = "https://en.wikipedia.org/wiki/Show_Champion"
-        THE_SHOW_BASE = (
-            "https://en.wikipedia.org/wiki/List_of_The_Show_Chart_winners_({})"
-        )
-        THE_SHOW_OLD = (
-            "https://en.wikipedia.org/wiki/The_Show_(South_Korean_TV_program)"
-        )
-        INKIGAYO_BASE = (
-            "https://en.wikipedia.org/wiki/List_of_Inkigayo_Chart_winners_({})"
-        )
-        MUSIC_BANK_BASE = (
-            "https://en.wikipedia.org/wiki/List_of_Music_Bank_Chart_winners_({})"
-        )
-        if year < MIN_YEAR:
-            raise ValueError(f"Year must be after {MIN_YEAR}")
-        if show == "music_core":
-            if year > 2018:
-                df = self._get_and_parse(MUSIC_CORE_BASE.format(year), year, 0, cache)
-                df["Show"] = "music_core"
-                return df.to_dict("records")
-            elif year == 2016:
-                # Note: Dates for this data are missing so
-                # all wins are entered as 2016-01-01
-                df = self._parse_csv("2016_music_core.csv", year)
-                df["Show"] = "music_core"
-                return df.to_dict("records")
-            else:
-                offset = 5
-                for i in range(2018, MIN_YEAR - 1, -1):
-                    if i == 2016:
-                        continue
-                    if year == i:
-                        df = self._get_and_parse(MUSIC_CORE_OLD, year, offset, cache)
-                        df["Show"] = "music_core"
-                        return df.to_dict("records")
-                    offset -= 1
-        elif show == "mcountdown":
-            df = self._get_and_parse(MCOUNTDOWN_BASE.format(year), year, 0, cache)
-            df["Show"] = "mcountdown"
-            return df.to_dict("records")
-        elif show == "show_champion":
-            if year > 2020:
-                df = self._get_and_parse(
-                    SHOW_CHAMPION_BASE.format(year), year, 0, cache
-                )
-                df["Show"] = "show_champion"
-                return df.to_dict("records")
-            elif year == 2013:
-                df = self._parse_csv("2013_show_champion.csv", year)
-                df["Show"] = "show_champion"
-                return df.to_dict("records")
-            else:
-                offset = 6
-                for i in range(2020, MIN_YEAR - 1, -1):
-                    if year == i:
-                        df = self._get_and_parse(SHOW_CHAMPION_OLD, year, offset, cache)
-                        df["Show"] = "show_champion"
-                        return df.to_dict("records")
-                    offset -= 1
-        elif show == "the_show":
-            if year > 2020:
-                df = self._get_and_parse(THE_SHOW_BASE.format(year), year, 0, cache)
-                df["Show"] = "the_show"
-                return df.to_dict("records")
-            elif year == 2013:
-                # Data for 2013 is missing for the show
-                return list()
-            else:
-                offset = 6
-                for i in range(2020, MIN_YEAR - 1, -1):
-                    if year == i:
-                        df = self._get_and_parse(THE_SHOW_OLD, year, offset, cache)
-                        df["Show"] = "the_show"
-                        return df.to_dict("records")
-                    offset -= 1
-        elif show == "inkigayo":
-            if year > 2013:
-                df = self._get_and_parse(INKIGAYO_BASE.format(year), year, 0, cache)
-                df["Show"] = "inkigayo"
-                return df.to_dict("records")
-            elif year == 2013:
-                df = self._parse_csv("2013_inkigayo.csv", year)
-                df["Show"] = "inkigayo"
-                return df.to_dict("records")
-        elif show == "music_bank":
-            df = self._get_and_parse(MUSIC_BANK_BASE.format(year), year, 0, cache)
-            df["Show"] = "music_bank"
             return df.to_dict("records")
 
     def all_wins(self, cache: bool = True) -> list[dict[str, str]]:
@@ -323,23 +228,19 @@ class WikiScraper:
                 data.extend(self.show_wins(y, s, cache))
         return data
 
-    def _urls_and_offsets(self, show: ShowType, year: int) -> tuple[str, int] | None:
+    def _urls_and_offsets(
+        self, show: ShowType, year: int
+    ) -> tuple[str, int] | None:
         """
         Returns the url and offset for a given show and year.
 
         For older years the data was entered on the same page, offset
         helps to indicate which table should be read on that page
         """
-        MUSIC_CORE_BASE = (
-            "https://en.wikipedia.org/wiki/List_of_Show!_Music_Core_Chart_winners_({})"
-        )
+        MUSIC_CORE_BASE = "https://en.wikipedia.org/wiki/List_of_Show!_Music_Core_Chart_winners_({})"
         MUSIC_CORE_OLD = "https://en.wikipedia.org/wiki/Show!_Music_Core"
-        MCOUNTDOWN_BASE = (
-            "https://en.wikipedia.org/wiki/List_of_M_Countdown_Chart_winners_({})"
-        )
-        SHOW_CHAMPION_BASE = (
-            "https://en.wikipedia.org/wiki/List_of_Show_Champion_Chart_winners_({})"
-        )
+        MCOUNTDOWN_BASE = "https://en.wikipedia.org/wiki/List_of_M_Countdown_Chart_winners_({})"
+        SHOW_CHAMPION_BASE = "https://en.wikipedia.org/wiki/List_of_Show_Champion_Chart_winners_({})"
         SHOW_CHAMPION_OLD = "https://en.wikipedia.org/wiki/Show_Champion"
         THE_SHOW_BASE = (
             "https://en.wikipedia.org/wiki/List_of_The_Show_Chart_winners_({})"
@@ -350,9 +251,7 @@ class WikiScraper:
         INKIGAYO_BASE = (
             "https://en.wikipedia.org/wiki/List_of_Inkigayo_Chart_winners_({})"
         )
-        MUSIC_BANK_BASE = (
-            "https://en.wikipedia.org/wiki/List_of_Music_Bank_Chart_winners_({})"
-        )
+        MUSIC_BANK_BASE = "https://en.wikipedia.org/wiki/List_of_Music_Bank_Chart_winners_({})"
         if year < MIN_YEAR:
             raise ValueError(f"Year must be after {MIN_YEAR}")
         if show == "music_core":
@@ -506,7 +405,10 @@ class WikiScraper:
 
 
 def main():
-    pass
+    s = WikiScraper(log_level=LOG_LEVEL)
+    data = s.all_wins()
+    for d in data:
+        print(d)
 
 
 if __name__ == "__main__":
