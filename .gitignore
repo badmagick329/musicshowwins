@@ -13,3 +13,4 @@ certbot/
 nginx/logs/
 Makefile
 crontab
+deploy.sh
