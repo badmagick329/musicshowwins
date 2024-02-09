@@ -5,8 +5,6 @@ from pathlib import Path
 from typing import Literal
 
 import pandas as pd
-from bs4 import BeautifulSoup as bs
-from bs4.element import ResultSet, Tag
 from dotenv import load_dotenv
 
 from scripts.wikiscraper.consts import CACHE_DIR, CSV_DIR
@@ -115,7 +113,7 @@ class WikiScraper:
 
     def _get_html(self, url: str, offset: int = 0) -> str | Exception | None:
         if f"{url}__{offset}" in self.past_results:
-            self.logger.info(f"Using cached results for {url}__{offset}")
+            # self.logger.info(f"Using cached results for {url}__{offset}")
             data = self.past_results[f"{url}__{offset}"]
             return pd.DataFrame.from_dict(data, orient="columns")  # type: ignore
         html = self.wiki_requests.get(url)
@@ -123,6 +121,7 @@ class WikiScraper:
             return None
         if isinstance(html, Exception):
             raise html
+        return html
 
     def _parse_and_save(
         self,
