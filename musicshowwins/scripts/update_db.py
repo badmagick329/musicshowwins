@@ -4,9 +4,8 @@ import sys
 from pathlib import Path
 
 from django.core.exceptions import ValidationError
-from wikiscraper.wikiscraper import WikiScraper
-
 from main.models import Artist, ArtistFix, MusicShow, Song, Win
+from wikiscraper.wikiscraper import WikiScraper
 
 # DJANGO_DIR = Path(__file__).resolve().parent.parent
 # if str(DJANGO_DIR) not in sys.path:
@@ -22,9 +21,7 @@ LOG_LEVEL = logging.INFO
 
 log = logging.getLogger(__name__)
 handler = logging.StreamHandler()
-handler.setFormatter(
-    logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
-)
+handler.setFormatter(logging.Formatter("%(asctime)s - %(levelname)s - %(message)s"))
 log.addHandler(handler)
 log.setLevel(LOG_LEVEL)
 
@@ -65,9 +62,7 @@ def error_dump(e: ValidationError, d: dict, data: list, i: int):
         next_ = data[i + 1 : i + 6]
         log.critical("Next\n")
         for n in next_:
-            log.critical(
-                f"{n['Show']}, {n['Artist']}, {n['Song']}, {n['Date']}"
-            )
+            log.critical(f"{n['Show']}, {n['Artist']}, {n['Song']}, {n['Date']}")
     raise e
 
 

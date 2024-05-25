@@ -2,7 +2,6 @@ from datetime import datetime
 
 from django.conf import settings
 from django.template.response import TemplateResponse
-
 from main.apps import MainConfig
 from main.models import Artist, Win
 from main.utils import add_ranks, song_chart, year_chart
@@ -76,9 +75,7 @@ def song_image_view(request):
         "song_wins_image": song_wins_image,
         **context_data,
     }
-    return TemplateResponse(
-        request, f"{app_name}/partials/song_image.html", context
-    )
+    return TemplateResponse(request, f"{app_name}/partials/song_image.html", context)
 
 
 def year_image_view(request):
@@ -92,9 +89,7 @@ def year_image_view(request):
         "year_wins_image": year_wins_image,
         **context_data,
     }
-    return TemplateResponse(
-        request, f"{app_name}/partials/year_image.html", context
-    )
+    return TemplateResponse(request, f"{app_name}/partials/year_image.html", context)
 
 
 def wintable(request):
@@ -123,14 +118,10 @@ def wintable(request):
         "item_type": list_type,
         "table_header": table_header,
     }
-    return TemplateResponse(
-        request, f"{app_name}/partials/wintable.html", context
-    )
+    return TemplateResponse(request, f"{app_name}/partials/wintable.html", context)
 
 
 def about(request):
     s = WikiScraper()
     sources = s.get_sources()
-    return TemplateResponse(
-        request, f"{app_name}/about.html", {"sources": sources}
-    )
+    return TemplateResponse(request, f"{app_name}/about.html", {"sources": sources})

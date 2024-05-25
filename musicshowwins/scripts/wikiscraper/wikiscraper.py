@@ -6,7 +6,6 @@ from typing import Literal
 
 import pandas as pd
 from dotenv import load_dotenv
-
 from scripts.wikiscraper.consts import CACHE_DIR, CSV_DIR
 from scripts.wikiscraper.wikiparser import WikiParser
 from scripts.wikiscraper.wikirequests import WikiRequests
@@ -202,10 +201,16 @@ class WikiScraper:
         For older years the data was entered on the same page, offset
         helps to indicate which table should be read on that page
         """
-        MUSIC_CORE_BASE = "https://en.wikipedia.org/wiki/List_of_Show!_Music_Core_Chart_winners_({})"
+        MUSIC_CORE_BASE = (
+            "https://en.wikipedia.org/wiki/List_of_Show!_Music_Core_Chart_winners_({})"
+        )
         MUSIC_CORE_OLD = "https://en.wikipedia.org/wiki/Show!_Music_Core"
-        MCOUNTDOWN_BASE = "https://en.wikipedia.org/wiki/List_of_M_Countdown_Chart_winners_({})"
-        SHOW_CHAMPION_BASE = "https://en.wikipedia.org/wiki/List_of_Show_Champion_Chart_winners_({})"
+        MCOUNTDOWN_BASE = (
+            "https://en.wikipedia.org/wiki/List_of_M_Countdown_Chart_winners_({})"
+        )
+        SHOW_CHAMPION_BASE = (
+            "https://en.wikipedia.org/wiki/List_of_Show_Champion_Chart_winners_({})"
+        )
         SHOW_CHAMPION_OLD = "https://en.wikipedia.org/wiki/Show_Champion"
         THE_SHOW_BASE = (
             "https://en.wikipedia.org/wiki/List_of_The_Show_Chart_winners_({})"
@@ -216,7 +221,9 @@ class WikiScraper:
         INKIGAYO_BASE = (
             "https://en.wikipedia.org/wiki/List_of_Inkigayo_Chart_winners_({})"
         )
-        MUSIC_BANK_BASE = "https://en.wikipedia.org/wiki/List_of_Music_Bank_Chart_winners_({})"
+        MUSIC_BANK_BASE = (
+            "https://en.wikipedia.org/wiki/List_of_Music_Bank_Chart_winners_({})"
+        )
         if year < MIN_YEAR:
             raise ValueError(f"Year must be after {MIN_YEAR}")
         if show == "music_core":

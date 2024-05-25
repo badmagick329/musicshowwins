@@ -3,9 +3,7 @@ from django.db.models import F, Q, QuerySet
 
 
 class MusicShow(models.Model):
-    name = models.CharField(
-        max_length=100, unique=True, blank=False, null=False
-    )
+    name = models.CharField(max_length=100, unique=True, blank=False, null=False)
 
     def __str__(self):
         return self.name
@@ -15,9 +13,7 @@ class MusicShow(models.Model):
 
 
 class Artist(models.Model):
-    name = models.CharField(
-        max_length=100, unique=True, blank=False, null=False
-    )
+    name = models.CharField(max_length=100, unique=True, blank=False, null=False)
 
     def take_songs_from(self, other: "Artist"):
         own_songs = Song.objects.filter(artist=self)
@@ -112,11 +108,7 @@ class Win(models.Model):
             filters &= Q(artist__name__iexact=artist)
         if song:
             filters &= Q(name__iexact=song)
-        qs = (
-            songs.filter(filters)
-            .annotate(wins=models.Count("win"))
-            .order_by("-wins")
-        )
+        qs = songs.filter(filters).annotate(wins=models.Count("win")).order_by("-wins")
         return qs
 
     @classmethod

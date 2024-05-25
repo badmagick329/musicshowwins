@@ -7,9 +7,8 @@ import django
 import pandas as pd
 from django.db import models
 from django.db.models import QuerySet
-from matplotlib import pyplot as plt
-
 from main.models import Artist, Song, Win
+from matplotlib import pyplot as plt
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 if str(BASE_DIR) not in sys.path:
@@ -19,6 +18,7 @@ if __name__ == "__main__":
     django.setup()
 
 from main.models import Artist, Win
+
 from musicshowwins.settings import CONTAINERED, STATIC_ROOT
 
 # plt.style.use("dark_background")
@@ -128,9 +128,7 @@ def chart_test(artist_name: str):
         .order_by("year")
     )
     print(year_values.query.get_compiler("default").as_sql())
-    df = pd.DataFrame.from_records(
-        year_values, columns=["year", "wins"], index="year"
-    )
+    df = pd.DataFrame.from_records(year_values, columns=["year", "wins"], index="year")
     fig, ax = plt.subplots()
     set_style(ax, fig)
     fig.set_size_inches(12, 8)

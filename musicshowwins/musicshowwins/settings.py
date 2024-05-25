@@ -149,7 +149,7 @@ LOGGING = {
 
 USE_X_FORWARDED_HOST = True
 if not DEBUG:
-    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
