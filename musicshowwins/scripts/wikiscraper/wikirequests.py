@@ -5,7 +5,6 @@ from datetime import datetime
 from pathlib import Path
 
 import requests
-
 from main.models import URLApprovalStatus
 from scripts.wikiscraper.consts import CACHE_DIR, WIKI_AGENT
 
@@ -52,14 +51,10 @@ class WikiRequests:
             time_since = datetime.now() - self.last_fetch
             if time_since.total_seconds() < self.DELAY:
                 time.sleep(self.DELAY - time_since.total_seconds())
-            response = requests.get(
-                url, headers=self.headers, allow_redirects=False
-            )
+            response = requests.get(url, headers=self.headers, allow_redirects=False)
             self.last_fetch = datetime.now()
             if response.status_code != 200:
-                return ValueError(
-                    f"Error {response.status_code} while fetching {url}"
-                )
+                return ValueError(f"Error {response.status_code} while fetching {url}")
             self.logger.info(f"Fetched {url}")
             if f"({datetime.today().year})" not in url:
                 self.saved_responses[url] = response.text

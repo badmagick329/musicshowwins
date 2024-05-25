@@ -39,9 +39,7 @@ class WikiParser:
             lambda x: WikiParser._parse_date(f"{x}, {year}")
         )
         df = df[["Date", "Artist", "Song"]]
-        df.loc[:, "Artist"] = df["Artist"].apply(
-            lambda x: x.strip().replace(", ", " ")
-        )
+        df.loc[:, "Artist"] = df["Artist"].apply(lambda x: x.strip().replace(", ", " "))
         df.loc[:, "Song"] = df["Song"].apply(lambda x: x.strip())
         return df
 

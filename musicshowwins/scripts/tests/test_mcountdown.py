@@ -1,3 +1,4 @@
+import logging
 import sys
 from pathlib import Path
 
@@ -6,7 +7,8 @@ import pytest
 BASE_DIR = Path(__file__).resolve().parent.parent
 if str(BASE_DIR) not in sys.path:
     sys.path.append(str(BASE_DIR))
-from wikiscraper import WikiScraper, logging
+
+from wikiscraper.wikiscraper import WikiScraper
 
 LOG_LEVEL = logging.CRITICAL
 

@@ -1,3 +1,4 @@
+import logging
 import sys
 from pathlib import Path
 
@@ -6,7 +7,7 @@ import pytest
 BASE_DIR = Path(__file__).resolve().parent.parent
 if str(BASE_DIR) not in sys.path:
     sys.path.append(str(BASE_DIR))
-from wikiscraper import WikiScraper, logging
+from wikiscraper.wikiscraper import WikiScraper
 
 LOG_LEVEL = logging.CRITICAL
 
@@ -22,7 +23,6 @@ def test_wins_2013():
     assert songs.count("Dream Girl") == 4
     assert songs.count("Love, at first") == 2
     assert artists.count("Exo") == 5
-
 
 
 def test_wins_2014():
