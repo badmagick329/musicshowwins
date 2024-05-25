@@ -1,8 +1,19 @@
 import json
 import logging
+import os
+import sys
 from datetime import datetime
 from pathlib import Path
 from typing import Literal
+
+DJANGO_DIR = Path(__file__).resolve().parent.parent.parent
+if str(DJANGO_DIR) not in sys.path:
+    sys.path.append(str(DJANGO_DIR))
+
+os.environ["DJANGO_SETTINGS_MODULE"] = "musicshowwins.settings"
+import django
+
+django.setup()
 
 import pandas as pd
 from dotenv import load_dotenv

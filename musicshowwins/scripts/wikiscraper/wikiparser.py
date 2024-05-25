@@ -136,6 +136,7 @@ class WikiParser:
             "gayo daejun",
             "lunar new year",
             "no.1 special",
+            "‹See TfM›",
         ]
         remove_artists = set()
         for c in df["Artist"]:
