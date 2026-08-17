@@ -1,0 +1,8 @@
+{% extends "main/base.html" %}
+{% block title %}{{ artist.name }} · Music Show Wins{% endblock %}
+{% block body %}
+<section class="intro"><p class="eyebrow">Artist</p><h1>{{ artist.name }}</h1><p>{{ artist.total_wins }} total win{{ artist.total_wins|pluralize }} in the archive.</p></section>
+<h2>Recent wins</h2><div class="table-wrap"><table><thead><tr><th>Date</th><th>Show</th><th>Song</th></tr></thead><tbody>
+{% for win in wins %}<tr><td>{{ win.date }}</td><td>{{ win.show.name }}</td><td>{{ win.song.title }}</td></tr>{% empty %}<tr><td colspan="3">No wins recorded.</td></tr>{% endfor %}
+</tbody></table></div>
+{% endblock %}

@@ -1,0 +1,10 @@
+{% extends "main/base.html" %}
+{% block title %}Artists · Music Show Wins{% endblock %}
+{% block body %}
+<section class="intro"><p class="eyebrow">Directory</p><h1>Find an artist</h1>
+<form class="search" method="get"><input name="search" value="{{ search }}" placeholder="Search artists" autofocus><button type="submit">Search</button></form></section>
+<div class="cards">
+{% for artist in artists %}<a class="card" href="{% url 'main:artist-detail' artist.pk %}"><strong>{{ artist.name }}</strong><span>{{ artist.total_wins }} win{{ artist.total_wins|pluralize }}</span></a>
+{% empty %}<p class="muted">Enter an artist name to search.</p>{% endfor %}
+</div>
+{% endblock %}

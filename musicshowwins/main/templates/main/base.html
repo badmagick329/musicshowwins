@@ -1,40 +1,22 @@
 {% load static %}
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-  <head>
-    {% block title %}{% endblock %}
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="color-scheme" content="dark">
-    <meta property="og:title" content="Kpop Music Show Wins" />
-    <meta property="og:description" content="View the top songs or artists based on kpop music show wins" />
-    <meta property="og:image" content="{% static 'images/pinkcrown.png' %}" />
-    <link href={% static 'css/style.css' %} rel="stylesheet">
-    <link rel="icon" type="image/x-icon" href="{% static 'images/favicon/favicon.ico' %}">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/htmx.org@1.9.3"
-            integrity="sha384-lVb3Rd/Ca0AxaoZg5sACe8FJKF0tnUgR2Kd7ehUOG5GCcROv5uBIZsOqovBAcWua"
-            crossorigin="anonymous"></script>
-  </head>
-  <body class="antialiased bg-gray-900 text-white flex flex-col min-h-screen w-screen">
-    <nav class="w-full bg-zinc-950 py-2 absolute font-semibold xs:text-xl">
-       <ul class="list-none w-full flex justify-around md:justify-center">
-        <li class="inline float-left"><a 
-          class="px-4 py-2 md:mx-5 hover:bg-selection" 
-          href={% url 'main:index' %}
-          >Top Wins</a></li>
-        <li class="inline float-left"><a 
-          class="px-4 py-2 md:mx-5 hover:bg-selection" 
-          href={% url 'main:details' %}
-          >Win Details</a></li>
-        <li class="inline float-left"><a 
-          class="px-4 py-2 md:mx-5 hover:bg-selection" 
-          href={% url 'main:about' %}
-          >About</a></li>
-      </ul> 
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Music Show Wins{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="{% url 'main:index' %}">Music Show Wins</a>
+    <nav>
+      <a href="{% url 'main:index' %}">Leaderboards</a>
+      <a href="{% url 'main:artists' %}">Artists</a>
+      <a href="{% url 'main:wins' %}">Wins</a>
+      <a href="{% url 'main:about' %}">About</a>
     </nav>
-    {% block body %}{% endblock %}
-  </body>
+  </header>
+  <main class="page">{% block body %}{% endblock %}</main>
+</body>
 </html>

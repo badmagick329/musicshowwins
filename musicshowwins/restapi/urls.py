@@ -1,25 +1,31 @@
-from django.urls import path
-from drf_yasg import openapi
-from drf_yasg.views import get_schema_view
-from rest_framework import permissions
-from restapi import views
+from django.urls import path, re_path
+from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
-schema_view = get_schema_view(
-    openapi.Info(
-        title="Music Show Wins API",
-        default_version="v1",
-        description="Get data about kpop music show wins",
-        license=openapi.License(name="BSD License"),
-    ),
-    public=True,
-    permission_classes=(permissions.AllowAny,),
-)
+from . import views
+
+app_name = "restapi"
 
 urlpatterns = [
+    path("schema/", SpectacularAPIView.as_view(), name="schema"),
     path(
         "docs/",
-        schema_view.with_ui("swagger", cache_timeout=0),
-        name="schema-swagger-ui",
+        SpectacularSwaggerView.as_view(url_name="restapi:schema"),
+        name="docs",
     ),
-    path("songs", views.SongsList.as_view(), name="songs"),
+    re_path(r"^v1/shows/?$", views.ShowList.as_view(), name="shows"),
+    re_path(r"^v1/artists/?$", views.ArtistList.as_view(), name="artists"),
+    path("v1/artists/<int:pk>", views.ArtistDetail.as_view(), name="artist-detail"),
+    re_path(r"^v1/songs/?$", views.SongList.as_view(), name="songs"),
+    path("v1/songs/<int:pk>", views.SongDetail.as_view(), name="song-detail"),
+    re_path(r"^v1/wins/?$", views.WinList.as_view(), name="wins"),
+    re_path(
+        r"^v1/leaderboards/artists/?$",
+        views.ArtistLeaderboard.as_view(),
+        name="leaderboard-artists",
+    ),
+    re_path(
+        r"^v1/leaderboards/songs/?$",
+        views.SongLeaderboard.as_view(),
+        name="leaderboard-songs",
+    ),
 ]

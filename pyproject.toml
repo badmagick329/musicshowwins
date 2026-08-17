@@ -1,0 +1,41 @@
+[project]
+name = "musicshowwins"
+version = "0.1.0"
+description = "K-pop music show wins tracker"
+readme = "README.md"
+requires-python = ">=3.13,<3.14"
+dependencies = [
+    "beautifulsoup4>=4.12",
+    "django>=5.2,<5.3",
+    "djangorestframework>=3.16",
+    "drf-spectacular>=0.28",
+    "lxml>=5.3",
+    "pandas>=2.2",
+    "psycopg[binary]>=3.2",
+    "python-dotenv>=1.0",
+    "requests>=2.32",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+    "pytest-django>=4.8",
+    "ruff>=0.9",
+]
+
+[tool.uv]
+package = false
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "musicshowwins.test_settings"
+pythonpath = ["musicshowwins"]
+testpaths = ["musicshowwins"]
+addopts = "-rP"
+
+[tool.ruff]
+target-version = "py313"
+line-length = 88
+exclude = ["musicshowwins/main/migrations"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]

@@ -1,5 +1,8 @@
 __pycache__/
+.venv/
+.uv-cache/
 .pytest_cache/
+*.sqlite3
 cached/
 .env
 db/
@@ -14,3 +17,4 @@ nginx/logs/
 Makefile
 crontab
 deploy.sh
+db-pg15-backup

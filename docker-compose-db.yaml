@@ -1,0 +1,17 @@
+services:
+  db:
+    image: postgres:17
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:-musicshowwins}
+      POSTGRES_USER: ${DB_USER:-musicshowwins}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-musicshowwins}
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - ./db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-musicshowwins} -d ${DB_NAME:-musicshowwins}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
