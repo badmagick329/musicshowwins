@@ -1,57 +1,38 @@
 {% extends "main/base.html" %}
-{% load static %}
-{% block title %}
-  <title>Kpop Music Show Wins</title>
-{% endblock %}
+{% block title %}Leaderboards · Music Show Wins{% endblock %}
 {% block body %}
-  <div class="flex flex-col min-h-full items-center pt-16">
-    <div class="flex">
-      <img class="-rotate-17"
-        src="{% static 'images/pinkcrown.png' %}" alt="pink crown" width="45" height="30">
-      <h2 class="text-xl xs:text-2xl md:text-3xl font-bold text-center px-2 pt-4">Top Kpop Music Show Wins</h2>
-    </div>
-    <p class="lg:text-xl text-center px-2 py-4 responsive-resize">
-      On this page you can view the top artists and songs with a music show win.
-      You can use the artist and song buttons to toggle between the two lists.
-      Use the year dropdown to filter the list by year.
-    </p>
-    <hr class="responsive-resize border-2 md:rounded-full border-gray-700 mb-4">
-    <div class="flex flex-col min-h-full items-center mb-4 px-4 responsive-resize">
-      <form id="list_filters" class="flex w-full justify-between"
-        hx-get="wintable" hx-target="#win_list" hx-trigger="change"
-        >
-        <div>
-          <fieldset>
-            <div id="list_type">
-              <input
-              class="opacity-0 fixed w-16 h-8 z-10"
-              autocomplete="off"
-              type="radio" hx-trigger="click" name="list" value="songs" checked />
-              <label
-              class="inline-block text-center bg-gray-700 rounded-lg w-16 px-2 py-1
-              font-bold text-white opacity-100"
-              for="songs">Songs</label>
-              <input
-              class="opacity-0 fixed w-16 h-8 z-10"
-              autocomplete="off"
-              type="radio" hx-trigger="click" name="list" value="artists" />
-              <label 
-              class="inline-block text-center bg-gray-700 rounded-lg w-16 py-1
-              font-bold text-white opacity-100"
-              for="artists">Artists</label>
-            </div>
-          </fieldset>
-        </div>
-        <select autocomplete="off" class="rounded-lg px-2 text-center bg-gray-700 font-bold" name="year">
-          <option value="">Since 2014</option>
-          {% for year in years %}
-            <option value="{{ year }}">{{ year }}</option>
-          {% endfor %}
-        </select>
-      </form>
-    </div>
-  </div>
-  <div id="win_list" class="flex flex-col items-center">
-    {% include "main/partials/wintable.html" %}
-  </div>
+<section class="intro">
+  <p class="eyebrow">K-pop archive</p>
+  <h1>Music show win leaderboards</h1>
+  <p>Explore the artists and songs with the most wins in the restored archive.</p>
+</section>
+<form class="filters" method="get">
+  <label>List
+    <select name="list">
+      <option value="artists"{% if kind == 'artists' %} selected{% endif %}>Artists</option>
+      <option value="songs"{% if kind == 'songs' %} selected{% endif %}>Songs</option>
+    </select>
+  </label>
+  <label>Year
+    <select name="year">
+      <option value="">All years</option>
+      {% for option in years %}<option value="{{ option }}"{% if year == option %} selected{% endif %}>{{ option }}</option>{% endfor %}
+    </select>
+  </label>
+  <button type="submit">Apply</button>
+</form>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Rank</th><th>{% if kind == 'artists' %}Artist{% else %}Song{% endif %}</th><th>Wins</th></tr></thead>
+  <tbody>
+  {% for item in items %}
+    <tr>
+      <td>{{ item.rank }}</td>
+      <td>{% if kind == 'artists' %}{{ item.name }}{% else %}{{ item.title }} <span class="muted">· {{ item.artist.name }}</span>{% endif %}</td>
+      <td>{% if kind == 'artists' %}{{ item.wins }}{% else %}{{ item.win_count }}{% endif %}</td>
+    </tr>
+  {% empty %}<tr><td colspan="3">No wins match these filters.</td></tr>{% endfor %}
+  </tbody>
+</table>
+</div>
 {% endblock %}

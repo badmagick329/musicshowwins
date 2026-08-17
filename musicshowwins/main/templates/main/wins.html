@@ -1,0 +1,9 @@
+{% extends "main/base.html" %}
+{% block title %}Wins · Music Show Wins{% endblock %}
+{% block body %}
+<section class="intro"><p class="eyebrow">Archive</p><h1>Dated wins</h1><p>Browse the latest 100 wins in the archive.</p></section>
+<form class="filters" method="get"><label>Year <input name="year" type="number" value="{{ year|default:'' }}" min="2014" max="2100"></label><button type="submit">Apply</button></form>
+<div class="table-wrap"><table><thead><tr><th>Date</th><th>Show</th><th>Song</th><th>Artist</th></tr></thead><tbody>
+{% for win in wins %}<tr><td>{{ win.date }}</td><td>{{ win.show.name }}</td><td>{{ win.song.title }}</td><td>{{ win.song.artist.name }}</td></tr>{% empty %}<tr><td colspan="4">No wins match these filters.</td></tr>{% endfor %}
+</tbody></table></div>
+{% endblock %}

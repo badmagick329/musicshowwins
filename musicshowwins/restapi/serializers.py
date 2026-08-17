@@ -1,57 +1,83 @@
-from collections import OrderedDict
-
-from drf_yasg import openapi
-from main.models import Artist, Song
+from main.models import Artist, MusicShow, Song, Win
 from rest_framework import serializers
 
 
-class ArtistSerializer(serializers.ModelSerializer):
+class ShowSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MusicShow
+        fields = ("id", "slug", "name", "active")
+
+
+class ArtistSummarySerializer(serializers.ModelSerializer):
     class Meta:
         model = Artist
-        fields = ("name",)
+        fields = ("id", "name")
+
+
+class ArtistSerializer(serializers.ModelSerializer):
+    total_wins = serializers.IntegerField(read_only=True)
+
+    class Meta:
+        model = Artist
+        fields = ("id", "name", "total_wins")
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        if not hasattr(instance, "total_wins"):
+            data["total_wins"] = instance.songs.filter(wins__isnull=False).count()
+        return data
 
 
 class SongSerializer(serializers.ModelSerializer):
-    artist = ArtistSerializer()
+    artist = ArtistSummarySerializer(read_only=True)
+    total_wins = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Song
-        fields = (
-            "artist",
-            "name",
-        )
+        fields = ("id", "title", "artist", "total_wins")
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        if not hasattr(instance, "total_wins"):
+            data["total_wins"] = instance.wins.count()
+        return data
 
 
-class SongsListSerializer(serializers.BaseSerializer):
+class WinSerializer(serializers.ModelSerializer):
+    show = ShowSerializer(read_only=True)
+    song = SongSerializer(read_only=True)
+
     class Meta:
-        swagger_schema_fields = {
-            "type": openapi.TYPE_OBJECT,
-            "properties": {
-                "song": openapi.Schema(
-                    description="The name of the song",
-                    type=openapi.TYPE_STRING,
-                ),
-                "artist": openapi.Schema(
-                    description="The name of the artist",
-                    type=openapi.TYPE_STRING,
-                ),
-                "wins": openapi.Schema(
-                    description="The number of wins for this song",
-                    type=openapi.TYPE_INTEGER,
-                ),
-            },
-            "example": [
-                {
-                    "song": "Dynamite",
-                    "artist": "BTS",
-                    "wins": 32,
-                },
-            ],
-        }
+        model = Win
+        fields = ("id", "date", "show", "song")
+
+
+class ArtistLeaderboardSerializer(serializers.Serializer):
+    rank = serializers.IntegerField()
+    wins = serializers.IntegerField()
+    artist = ArtistSummarySerializer(source="*")
 
     def to_representation(self, instance):
         return {
-            "song": instance.name,
-            "artist": instance.artist.name,
+            "rank": instance.rank,
             "wins": instance.wins,
+            "artist": ArtistSummarySerializer(instance).data,
+        }
+
+
+class SongLeaderboardSerializer(serializers.Serializer):
+    rank = serializers.IntegerField()
+    wins = serializers.IntegerField()
+    song = SongSerializer(source="*")
+
+    def to_representation(self, instance):
+        wins = instance.win_count if hasattr(instance, "win_count") else instance.wins
+        return {
+            "rank": instance.rank,
+            "wins": wins,
+            "song": {
+                "id": instance.pk,
+                "title": instance.title,
+                "artist": ArtistSummarySerializer(instance.artist).data,
+            },
         }

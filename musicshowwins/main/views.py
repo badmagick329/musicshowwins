@@ -1,127 +1,71 @@
-from datetime import datetime
+from __future__ import annotations
 
-from django.conf import settings
+from datetime import date
+
+from django.db.models import Q
+from django.shortcuts import get_object_or_404
 from django.template.response import TemplateResponse
-from main.apps import MainConfig
-from main.models import Artist, Win
-from main.utils import add_ranks, song_chart, year_chart
-from scripts.wikiscraper.wikiscraper import WikiScraper
 
-app_name = MainConfig.name
-RESULT_LIMIT = settings.PAGE_SIZE
-EARLIEST_YEAR = 2014
+from .services import all_artists_queryset, leaderboard_queryset, wins_queryset
+
+
+def _year(value: str | None) -> int | None:
+    try:
+        return int(value) if value else None
+    except (TypeError, ValueError):
+        return None
 
 
 def index(request):
-    top_items = Win.top_songs()[:RESULT_LIMIT]
-    add_ranks(top_items)
-    current_year = datetime.now().year
-
-    # TODO:
-    # Get min and max year from db
+    kind = request.GET.get("list", "artists")
+    if kind not in {"artists", "songs"}:
+        kind = "artists"
+    year = _year(request.GET.get("year"))
+    items = leaderboard_queryset(kind, year=year)[:100]
     context = {
-        "items": top_items,
-        "item_type": "songs",
-        "years": list(range(current_year, EARLIEST_YEAR - 1, -1)),
-        "table_header": f"Top Songs since {EARLIEST_YEAR}",
+        "kind": kind,
+        "year": year,
+        "items": items,
+        "years": range(date.today().year, 2013, -1),
     }
-    return TemplateResponse(request, f"{app_name}/index.html", context)
-
-
-def details(request):
-    search = request.GET.get("search", "").strip()
-    artist_id = request.GET.get("artist_id", "").strip()
-    context = {"search": search, "artist_id": artist_id}
-    return TemplateResponse(request, f"{app_name}/details.html", context)
+    return TemplateResponse(request, "main/index.html", context)
 
 
 def artist_search(request):
     search = request.GET.get("search", "").strip()
-    if len(search) < 2:
-        search = ""
+    artists = all_artists_queryset()
     if search:
-        artists = Artist.objects.filter(name__icontains=search)
+        artists = artists.filter(
+            Q(name__icontains=search) | Q(aliases__alias__icontains=search)
+        ).distinct()
     else:
-        artists = list()
-    context = {"artists": artists}
+        artists = artists.none()
     return TemplateResponse(
-        request, f"{app_name}/partials/search_results.html", context
+        request,
+        "main/artists.html",
+        {"artists": artists[:100], "search": search},
     )
 
 
-def artist_details(request):
-    artist_id = request.GET.get("artist_id", "").strip()
-    artist_name = None
-    if artist_id and artist_id.isdigit():
-        artist = Artist.objects.get(id=artist_id)
-        artist_name = artist.name
-    context = {
-        "artist_id": artist_id,
-        "artist_name": artist_name,
-    }
+def artist_detail(request, pk: int):
+    artist = get_object_or_404(all_artists_queryset(), pk=pk)
+    wins = wins_queryset(artist=str(pk))[:100]
     return TemplateResponse(
-        request, f"{app_name}/partials/artist_details.html", context
+        request,
+        "main/artist_detail.html",
+        {"artist": artist, "wins": wins},
     )
 
 
-def song_image_view(request):
-    artist_id = request.GET.get("artist_id", "").strip()
-    song_wins_image = None
-    context_data = {}
-    if artist_id and artist_id.isdigit():
-        artist = Artist.objects.get(id=artist_id)
-        song_wins_image, context_data = song_chart(artist.name)
-    context = {
-        "song_wins_image": song_wins_image,
-        **context_data,
-    }
-    return TemplateResponse(request, f"{app_name}/partials/song_image.html", context)
-
-
-def year_image_view(request):
-    artist_id = request.GET.get("artist_id", "").strip()
-    year_wins_image = None
-    context_data = {}
-    if artist_id and artist_id.isdigit():
-        artist = Artist.objects.get(id=artist_id)
-        year_wins_image, context_data = year_chart(artist.name)
-    context = {
-        "year_wins_image": year_wins_image,
-        **context_data,
-    }
-    return TemplateResponse(request, f"{app_name}/partials/year_image.html", context)
-
-
-def wintable(request):
-    list_type = request.GET.get("list", "songs").strip()
-    year = request.GET.get("year", None)
-    if year and not year.isdigit():
-        year = None
-    if list_type == "songs":
-        top_items = Win.top_songs(year=year)[:RESULT_LIMIT]
-    else:
-        top_items = Win.top_artists(year=year)[:RESULT_LIMIT]
-    add_ranks(top_items)
-    table_header = ""
-    if list_type == "songs":
-        table_header = "Top Songs "
-    else:
-        table_header = "Top Artists "
-    # TODO:
-    # Get min and max year from db
-    if year:
-        table_header += f"in {year} "
-    else:
-        table_header += f"since {EARLIEST_YEAR}"
-    context = {
-        "items": top_items,
-        "item_type": list_type,
-        "table_header": table_header,
-    }
-    return TemplateResponse(request, f"{app_name}/partials/wintable.html", context)
+def wins(request):
+    year = _year(request.GET.get("year"))
+    query = wins_queryset(year=year)
+    return TemplateResponse(
+        request,
+        "main/wins.html",
+        {"wins": query[:100], "year": year},
+    )
 
 
 def about(request):
-    s = WikiScraper()
-    sources = s.get_sources()
-    return TemplateResponse(request, f"{app_name}/about.html", {"sources": sources})
+    return TemplateResponse(request, "main/about.html", {})

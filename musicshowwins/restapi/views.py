@@ -1,59 +1,181 @@
-from django.conf import settings
-from django.utils.decorators import method_decorator
-from django.views.decorators.cache import cache_page
-from drf_yasg import openapi
-from drf_yasg.utils import swagger_auto_schema
-from main.models import Win
+from __future__ import annotations
+
+from datetime import date
+
+from django.db.models import Q
+from main.services import (
+    all_artists_queryset,
+    all_songs_queryset,
+    leaderboard_queryset,
+    show_queryset,
+    wins_queryset,
+)
 from rest_framework import generics
-from rest_framework.throttling import UserRateThrottle
+from rest_framework.exceptions import ValidationError
 
-from .serializers import SongsListSerializer
+from .serializers import (
+    ArtistLeaderboardSerializer,
+    ArtistSerializer,
+    ShowSerializer,
+    SongLeaderboardSerializer,
+    SongSerializer,
+    WinSerializer,
+)
 
-CACHE_TTL = settings.API_CACHE_TTL
+
+def _integer(value: str | None, name: str, *, minimum: int | None = None) -> int | None:
+    if value in (None, ""):
+        return None
+    try:
+        result = int(value)
+    except (TypeError, ValueError):
+        raise ValidationError({name: "Must be an integer."})
+    if minimum is not None and result < minimum:
+        raise ValidationError({name: f"Must be at least {minimum}."})
+    return result
 
 
-class WinListThrottle(UserRateThrottle):
-    rate = "60/minute"
+def _date(value: str | None, name: str) -> date | None:
+    if value in (None, ""):
+        return None
+    try:
+        return date.fromisoformat(value)
+    except (TypeError, ValueError):
+        raise ValidationError({name: "Use YYYY-MM-DD."})
 
 
-class SongsList(generics.ListAPIView):
-    serializer_class = SongsListSerializer
-    throttle_classes = [WinListThrottle]
+def filters(request):
+    params = request.query_params
+    year = _integer(params.get("year"), "year", minimum=1900)
+    date_from = _date(params.get("date_from"), "date_from")
+    date_to = _date(params.get("date_to"), "date_to")
+    if date_from and date_to and date_from > date_to:
+        raise ValidationError({"date_range": "date_from cannot be after date_to."})
+    return {
+        "search": params.get("search", "").strip(),
+        "artist": params.get("artist", "").strip(),
+        "song": params.get("song", "").strip(),
+        "show": params.get("show", "").strip(),
+        "year": year,
+        "date_from": date_from,
+        "date_to": date_to,
+    }
 
-    @method_decorator(cache_page(CACHE_TTL))
-    @swagger_auto_schema(
-        operation_description="Get list of songs",
-        manual_parameters=[
-            openapi.Parameter(
-                name="year",
-                in_=openapi.IN_QUERY,
-                type=openapi.TYPE_INTEGER,
-                description="Filter song wins by year",
-            ),
-            openapi.Parameter(
-                name="name",
-                in_=openapi.IN_QUERY,
-                type=openapi.TYPE_STRING,
-                description="Filter by song name",
-            ),
-            openapi.Parameter(
-                name="artist",
-                in_=openapi.IN_QUERY,
-                type=openapi.TYPE_STRING,
-                description="Filter by artist name",
-            ),
-        ],
-    )
-    def get(self, request, *args, **kwargs):
-        return super().get(request, *args, **kwargs)
+
+def ordered(queryset, request, allowed: set[str], default: str):
+    value = request.query_params.get("ordering", default)
+    parts = [part.strip() for part in value.split(",") if part.strip()]
+    if not parts or any(part.lstrip("-") not in allowed for part in parts):
+        raise ValidationError(
+            {"ordering": f"Allowed fields: {', '.join(sorted(allowed))}."}
+        )
+    return queryset.order_by(*parts)
+
+
+class ShowList(generics.ListAPIView):
+    serializer_class = ShowSerializer
 
     def get_queryset(self):
-        year = self.request.query_params.get("year", None)
-        if year is not None:
-            try:
-                year = int(year)
-            except (TypeError, ValueError):
-                year = None
-        artist = self.request.query_params.get("artist", None)
-        song = self.request.query_params.get("name", None)
-        return Win.top_songs(year=year, artist=artist, song=song)
+        return ordered(
+            show_queryset(self.request.query_params.get("search", "").strip()),
+            self.request,
+            {"name", "slug", "id"},
+            "name",
+        )
+
+
+class ArtistList(generics.ListAPIView):
+    serializer_class = ArtistSerializer
+
+    def get_queryset(self):
+        params = filters(self.request)
+        query = all_artists_queryset(**params)
+        if any(
+            params[key] not in (None, "")
+            for key in ("artist", "song", "show", "year", "date_from", "date_to")
+        ):
+            query = query.filter(
+                pk__in=wins_queryset(**params).values("song__artist_id")
+            )
+        if params["search"]:
+            query = query.filter(
+                Q(name__icontains=params["search"])
+                | Q(aliases__alias__icontains=params["search"])
+            ).distinct()
+        return ordered(query, self.request, {"name", "id", "total_wins"}, "name")
+
+
+class ArtistDetail(generics.RetrieveAPIView):
+    serializer_class = ArtistSerializer
+
+    def get_queryset(self):
+        return all_artists_queryset()
+
+
+class SongList(generics.ListAPIView):
+    serializer_class = SongSerializer
+
+    def get_queryset(self):
+        params = filters(self.request)
+        query = all_songs_queryset(**params)
+        if any(
+            params[key] not in (None, "")
+            for key in ("artist", "song", "show", "year", "date_from", "date_to")
+        ):
+            query = query.filter(pk__in=wins_queryset(**params).values("song_id"))
+        if params["search"]:
+            query = query.filter(
+                Q(title__icontains=params["search"])
+                | Q(artist__name__icontains=params["search"])
+            )
+        return ordered(
+            query,
+            self.request,
+            {"title", "id", "total_wins", "artist__name"},
+            "title",
+        )
+
+
+class SongDetail(generics.RetrieveAPIView):
+    serializer_class = SongSerializer
+
+    def get_queryset(self):
+        return all_songs_queryset()
+
+
+class WinList(generics.ListAPIView):
+    serializer_class = WinSerializer
+
+    def get_queryset(self):
+        return ordered(
+            wins_queryset(with_song_totals=True, **filters(self.request)),
+            self.request,
+            {"date", "id", "show__name", "song__title", "song__artist__name"},
+            "-date",
+        )
+
+
+class LeaderboardList(generics.ListAPIView):
+    leaderboard_kind = "artists"
+
+    def get_queryset(self):
+        params = self.request.query_params
+        year = _integer(params.get("year"), "year", minimum=1900)
+        limit = _integer(params.get("limit"), "limit", minimum=1) or 100
+        if limit > 1000:
+            raise ValidationError({"limit": "Must be no greater than 1000."})
+        return leaderboard_queryset(
+            self.leaderboard_kind,
+            year=year,
+            show=params.get("show", "").strip(),
+        )[:limit]
+
+
+class ArtistLeaderboard(LeaderboardList):
+    serializer_class = ArtistLeaderboardSerializer
+    leaderboard_kind = "artists"
+
+
+class SongLeaderboard(LeaderboardList):
+    serializer_class = SongLeaderboardSerializer
+    leaderboard_kind = "songs"

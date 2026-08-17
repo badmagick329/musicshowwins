@@ -1,16 +1,13 @@
 from django.urls import path
-from main import views
-from main.apps import MainConfig
 
-app_name = MainConfig.name
+from . import views
+
+app_name = "main"
 
 urlpatterns = [
     path("", views.index, name="index"),
-    path("wintable", views.wintable, name="wintable"),
-    path("details", views.details, name="details"),
-    path("artist_search", views.artist_search, name="artist_search"),
-    path("artist_details", views.artist_details, name="artist_details"),
-    path("song_image_view", views.song_image_view, name="song_image_view"),
-    path("year_image_view", views.year_image_view, name="year_image_view"),
+    path("artists", views.artist_search, name="artists"),
+    path("artists/<int:pk>", views.artist_detail, name="artist-detail"),
+    path("wins", views.wins, name="wins"),
     path("about", views.about, name="about"),
 ]
