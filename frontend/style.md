@@ -52,17 +52,20 @@ Pages should use:
 - dense information presented with comfortable spacing.
 
 Decoration should support the subject. Use abstract shapes, typographic motifs,
-subtle dots or grids, ticket-like labels, and small sticker-inspired accents
-instead of copyrighted imagery. Do not let nostalgia interfere with speed,
-clarity, or mobile usability.
+ticket-like labels, and small sticker-inspired accents instead of copyrighted
+imagery. Do not use a dot-matrix, dot-pattern, or generic ambient page
+background. Prefer deliberate solid-color zoning, section bands, borders, and
+typography for variation. Do not let nostalgia interfere with speed, clarity,
+or mobile usability.
 
 ## Theme
 
-Use a light theme only. Do not add a theme switcher or maintain a parallel dark
-theme until explicitly requested.
-
-The page should use a warm, lightly tinted background rather than pure white.
-White or near-white may be used for data surfaces when contrast is needed.
+Use a light-mode interface only. Do not add a theme switcher or maintain a
+parallel dark theme until explicitly requested. “Light” describes the mode and
+contrast model, not an almost-white palette: richer berry, plum, violet, cyan,
+pink, and warm yellow fields are welcome when they create hierarchy and energy.
+Keep readable near-white data surfaces where scanning needs it, and avoid
+letting the whole page become black, grey, or pale cream.
 
 ## Color system
 
@@ -72,9 +75,9 @@ components.
 
 Initial palette direction:
 
-- page background: warm cream, approximately `#FFF8F2`;
-- main surface: near-white, approximately `#FFFCF9`;
-- foreground: ink black, approximately `#19171D`;
+- page background: dusty blush/plum field, approximately `#E9D8E8`;
+- main surface: near-white, approximately `#FFFCFE`;
+- foreground: deep plum ink, approximately `#241526`;
 - muted foreground: warm grey, approximately `#6F6873`;
 - border: dark neutral with lower-emphasis variants;
 - primary brand accent: pop pink, approximately `#FF3D81`;
@@ -175,7 +178,7 @@ The homepage should provide a balanced overview rather than one dominant hero:
 - recent wins;
 - a preview of the artist leaderboard;
 - a preview of the song leaderboard;
-- clear routes into historical browsing.
+- a clear list of the music shows covered by the archive.
 
 Use cards only when they create meaningful grouping. Prefer section bands,
 dividers, tables, and aligned lists over a dashboard made entirely of cards.
@@ -241,8 +244,29 @@ Build reusable patterns for:
 - compact buttons and form controls;
 - quiet site footer.
 
+Global search should look like a first-class part of the page rather than a
+showcase component. Use a warm solid section field that belongs to the core
+plum, pink, and yellow palette; do not introduce an isolated cyan field. Pair
+it with an opaque input surface, a visible label or heading, and a button whose
+wording matches the actual search scope. Do not add an animated border around
+the search form.
+
+Do not add eyebrow, kicker, or surtitle text as decoration. Use one only when
+it communicates essential scope, state, or time context that is not already
+clear from the heading; never manufacture vague marketing labels to fill
+space.
+
 Use shadcn primitives where they improve behavior and consistency. Adapt their
 appearance to this guide instead of treating their defaults as the design.
+
+## Component-library effects
+
+Magic UI and similar libraries may be studied for interaction and composition
+ideas, but their showcase effects are not a design requirement. Do not add an
+effect merely because a component exists. Animated borders, Aurora or gradient
+text, constant sparkles, Light Rays, glassmorphism, giant marketing type, and
+rounded-pill defaults do not fit the current direction. Prefer strong copy,
+solid color, spacing, borders, and useful states over decorative motion.
 
 ## Motion
 
@@ -264,16 +288,13 @@ framework support.
 
 ## Background and decoration
 
-The background may include one subtle atmospheric treatment at a time:
-
-- a faint dot or grid pattern;
-- a soft warm color wash;
-- a small halftone area;
-- an abstract geometric accent;
-- a ticket, label, or sticker-inspired detail.
-
-Keep patterns faint behind data. High-energy decoration belongs around section
-boundaries, headings, or empty space—not underneath dense text and tables.
+Use one solid page background token and deliberate solid section fields: a
+deep berry hero, light data surfaces, and a stronger cyan exploration band are
+appropriate. Do not use a page-wide radial, conic, diagonal, or ambient
+gradient. Future gradients require a specific visual concept and should not be
+the default answer to “more color.” High-energy decoration belongs around
+section boundaries, headings, or empty space—not underneath dense text and
+tables.
 
 ## Imagery and intellectual property
 
@@ -289,6 +310,8 @@ for official material.
 Use a friendly fan-community voice that remains clear and trustworthy.
 
 - Prefer direct, warm language.
+- State what the page or feature actually does; do not substitute vague slogans
+  for a useful product description.
 - Use familiar K-pop terminology where it helps.
 - Avoid corporate product language and exaggerated marketing copy.
 - Do not write as though the site represents artists, labels, or broadcasters.
@@ -348,6 +371,11 @@ Before considering a page complete, check:
 - Is the page free from generic SaaS and default shadcn styling?
 - Are square corners the default?
 - Are colors tokenized and used with hierarchy?
+- Does “light theme” still have enough saturated color and section contrast?
+- Is there no dot-matrix/dot-pattern page background?
+- Are any remaining Magic UI-inspired effects restrained and reduced for users
+  who prefer less motion?
+- Are gradients absent unless a specific visual concept has been approved?
 - Are music-show colors accompanied by text?
 - Does the mobile layout become a deliberate stacked experience?
 - Is decoration supporting rather than obstructing the data?

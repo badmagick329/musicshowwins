@@ -1,7 +1,8 @@
 # Frontend
 
-Minimal Next.js skeleton for the Music Show Wins frontend. Product design and
-feature implementation are intentionally pending; see [`style.md`](style.md).
+Next.js frontend for the Music Show Wins archive. The homepage is a first live
+vertical slice backed by the read-only Django API; see [`style.md`](style.md)
+for the product direction.
 
 ## Stack
 
@@ -14,6 +15,7 @@ feature implementation are intentionally pending; see [`style.md`](style.md).
 
 ```text
 pnpm install
+# copy .env.example to .env.local when the Django API is not on its default URL
 pnpm dev
 ```
 
@@ -24,5 +26,6 @@ The app runs at [http://localhost:3000](http://localhost:3000).
 ```text
 pnpm lint
 pnpm typecheck
+pnpm test
 pnpm build
 ```
