@@ -7,6 +7,7 @@ from pathlib import Path
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 
+from main.bootstrap import CLEAN_COUNTS, CleanupError, apply_cleanup
 from main.models import (
     Artist,
     ArtistAlias,
@@ -14,13 +15,14 @@ from main.models import (
     ImportRun,
     MusicShow,
     Song,
+    SourceApproval,
     SourcePage,
     Win,
     normalize_key,
     normalize_text,
 )
 
-EXPECTED_COUNTS = {"shows": 6, "artists": 296, "songs": 901, "wins": 2965}
+EXPECTED_COUNTS = CLEAN_COUNTS
 MIN_DATE = date(2014, 1, 1)
 MAX_DATE = date(2025, 8, 12)
 
@@ -38,6 +40,10 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         payload = self._load(options["input"])
+        try:
+            payload, cleanup_issues = apply_cleanup(payload)
+        except CleanupError as exc:
+            raise CommandError(str(exc)) from exc
         self._validate_payload(payload)
         self._refuse_nonempty_tables()
 
@@ -86,10 +92,24 @@ class Command(BaseCommand):
                 ],
                 batch_size=500,
             )
+            ImportIssue.objects.bulk_create(
+                [
+                    ImportIssue(
+                        issue_type=issue["issue_type"],
+                        candidate=issue["candidate"],
+                        notes=issue["notes"],
+                    )
+                    for issue in cleanup_issues
+                ],
+                batch_size=100,
+            )
 
         self.stdout.write(
             self.style.SUCCESS(
-                "Restored 6 shows, 296 artists, 901 songs and 2,965 wins."
+                f"Restored {len(payload['shows'])} shows, "
+                f"{len(payload['artists'])} artists, "
+                f"{len(payload['songs'])} songs and {len(payload['wins'])} wins; "
+                "created 12 legacy discrepancy and 33 legacy undated issues."
             )
         )
 
@@ -158,9 +178,18 @@ class Command(BaseCommand):
             ):
                 raise CommandError(f"Invalid artist alias row: {row!r}")
             alias_keys.append(normalize_key(row["alias"]))
-        if set(alias_keys) != {"bigbang", "akdong musician"} or len(alias_keys) != 2:
+        if (
+            set(alias_keys)
+            != {
+                "bigbang",
+                "akdong musician",
+                "txt",
+                "kim woo seok",
+            }
+            or len(alias_keys) != 4
+        ):
             raise CommandError(
-                "Bootstrap aliases must contain only BigBang and Akdong Musician"
+                "Bootstrap aliases must contain only the configured same-act aliases"
             )
         if any(row.get("alias") == "Blackpink and Selena Gomez" for row in aliases):
             raise CommandError(
@@ -192,6 +221,7 @@ class Command(BaseCommand):
             Song,
             Win,
             SourcePage,
+            SourceApproval,
             ImportRun,
             ImportIssue,
         )

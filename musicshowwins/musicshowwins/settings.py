@@ -12,7 +12,10 @@ load_dotenv(PROJECT_ROOT / ".env")
 # environment files live at the repository root.
 BASE_DIR = Path(__file__).resolve().parent.parent
 BASE_URL = os.environ.get("BASE_URL", "http://127.0.0.1:8000")
-WIKI_AGENT = os.environ.get("WIKI_AGENT", "musicshowwins/0.1 (local development)")
+WIKI_AGENT = os.environ.get(
+    "WIKI_AGENT",
+    "KpopWins/0.1 (https://github.com/badmagick329/musicshowwins/issues)",
+)
 DB_HOST = os.environ.get("DB_HOST", "127.0.0.1")
 
 

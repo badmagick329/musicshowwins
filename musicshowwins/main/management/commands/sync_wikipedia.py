@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from datetime import date
 
 from django.core.management.base import BaseCommand, CommandError
@@ -36,6 +37,20 @@ class Command(BaseCommand):
             action="store_true",
             help="Fetch and validate pages without writing any database records.",
         )
+        parser.add_argument(
+            "--format",
+            choices=("text", "json"),
+            default="text",
+            help="Report format (default: text). JSON is written to stdout only.",
+        )
+        parser.add_argument(
+            "--strict",
+            action="store_true",
+            help=(
+                "Exit unsuccessfully when reconciliation work remains, including "
+                "additions, conflicts, missing legacy wins or unapproved pages."
+            ),
+        )
 
     def handle(self, *args, **options):
         years = options.get("years")
@@ -62,12 +77,65 @@ class Command(BaseCommand):
             years=years,
             dry_run=options["dry_run"],
         )
-        mode = "Dry run" if options["dry_run"] else "Sync"
-        self.stdout.write(
-            f"{mode}: {summary.pages_processed} pages, "
-            f"{summary.wins_added} wins added, "
-            f"{summary.conflicts_found} conflicts."
-        )
+        if options["format"] == "json":
+            self.stdout.write(json.dumps(summary.as_dict(), ensure_ascii=False))
+        else:
+            mode = "Dry run" if options["dry_run"] else "Sync"
+            self.stdout.write(
+                f"{mode}: {summary.pages_processed} pages, "
+                f"{summary.wins_added} wins added, "
+                f"{summary.conflicts_found} conflicts, "
+                f"{summary.missing_legacy} missing legacy wins, "
+                f"{summary.unapproved_pages} unapproved pages."
+            )
+            for report in summary.page_reports:
+                details = (
+                    f"{report.show}/{report.year}: {report.status}; "
+                    f"page={report.page_title!r}; revision={report.revision or '-'}; "
+                    f"source_rows={report.source_rows}; "
+                    f"exact_matches={report.exact_matches}; "
+                    f"additions={report.additions}; "
+                    f"conflicts={report.conflicts}; "
+                    f"missing_legacy={report.missing_legacy}"
+                )
+                if report.failure:
+                    details += f"; failure={report.failure}"
+                self.stdout.write(details)
+                for candidate in report.addition_candidates:
+                    self.stdout.write(
+                        "  addition: "
+                        f"{candidate['date']} | {candidate['artist']} | "
+                        f"{candidate['song']}"
+                    )
+                for candidate in report.conflict_candidates:
+                    existing = "; ".join(
+                        f"{item['artist']} | {item['song']}"
+                        for item in candidate["existing"]
+                    )
+                    self.stdout.write(
+                        "  conflict: "
+                        f"{candidate['date']} | incoming "
+                        f"{candidate['incoming']['artist']} | "
+                        f"{candidate['incoming']['song']} | existing {existing}"
+                    )
+                for candidate in report.missing_legacy_candidates:
+                    self.stdout.write(
+                        "  missing legacy: "
+                        f"{candidate['date']} | {candidate['artist']} | "
+                        f"{candidate['song']}"
+                    )
+
         if summary.failures:
-            for failure in summary.failures:
-                self.stdout.write(self.style.WARNING(failure))
+            raise CommandError(
+                "Wikipedia source failures: " + " | ".join(summary.failures)
+            )
+        if options["strict"] and (
+            summary.wins_added
+            or summary.conflicts_found
+            or summary.missing_legacy
+            or summary.unapproved_pages
+        ):
+            raise CommandError(
+                "Strict reconciliation failed: additions, conflicts or missing "
+                "legacy wins remain."
+            )

@@ -63,12 +63,38 @@ def test_parser_expands_spans_and_keeps_exact_collaboration_credit():
     </table>
     """
 
-    rows = parse_wikipedia_html(html, 2025)
+    with pytest.raises(WikipediaParseError, match="multiple wins for date"):
+        parse_wikipedia_html(html, 2025)
+
+
+def test_parser_skips_episode_special_placeholder_before_rowspan_winner():
+    html = """
+    <table class="wikitable">
+      <tr><th>Date</th><th>Artist</th><th>Song</th><th>Score</th></tr>
+      <tr><td rowspan="2">March 8</td>
+          <td class="table-na" colspan="3">Music Core 400th Episode Special</td></tr>
+      <tr><td>TVXQ</td><td>Spellbound</td><td>9,050</td></tr>
+    </table>
+    """
+
+    rows = parse_wikipedia_html(html, 2014)
 
     assert [(row.date.isoformat(), row.artist, row.song) for row in rows] == [
-        ("2025-01-05", "Alpha & Beta feat. Gamma", "Song A"),
-        ("2025-01-05", "Alpha & Beta feat. Gamma", "Song B"),
+        ("2014-03-08", "TVXQ", "Spellbound")
     ]
+
+
+def test_parser_rejects_different_winners_on_the_same_date_as_one_page_failure():
+    html = """
+    <table><tr><th>Date</th><th>Artist</th><th>Song</th></tr>
+      <tr><td>January 5</td><td>First Artist</td><td>First Song</td></tr>
+      <tr><td>January 5</td><td>Second Artist</td><td>Second Song</td></tr>
+      <tr><td>January 12</td><td>Third Artist</td><td>Third Song</td></tr>
+    </table>
+    """
+
+    with pytest.raises(WikipediaParseError, match="2025-01-05"):
+        parse_wikipedia_html(html, 2025)
 
 
 def test_parser_removes_surrounding_song_quotes_only():
@@ -89,6 +115,68 @@ def test_parser_removes_surrounding_song_quotes_only():
     ]
 
 
+def test_parser_removes_only_the_known_korean_version_presentation_suffix():
+    html = """
+    <table><tr><th>Date</th><th>Artist</th><th>Song</th></tr>
+      <tr><td>March 13</td><td>NCT WISH</td>
+          <td><a>Wish</a> <span>(Korean ver.)</span></td></tr>
+      <tr><td>March 14</td><td>NCT WISH</td>
+          <td>&quot; Wish &quot; (Korean ver.)</td></tr>
+      <tr><td>March 20</td><td>Alpha feat. Beta</td>
+          <td>Another Song (Korean Ver.)</td></tr>
+      <tr><td>March 27</td><td>Alpha feat. Beta</td>
+          <td>Another Song (Remix)</td></tr>
+    </table>
+    """
+
+    rows = parse_wikipedia_html(html, 2024)
+
+    assert [(row.artist, row.song) for row in rows] == [
+        ("NCT WISH", "Wish"),
+        ("NCT WISH", "Wish"),
+        ("Alpha feat. Beta", "Another Song (Korean Ver.)"),
+        ("Alpha feat. Beta", "Another Song (Remix)"),
+    ]
+
+
+def test_parser_removes_named_presentation_artifacts_without_global_title_rules():
+    html = """
+    <table><tr><th>Date</th><th>Artist</th><th>Song</th></tr>
+      <tr><td>January 5</td><td>WayV</td>
+          <td>&quot;Frequency&quot; (Korean Ver.)</td></tr>
+      <tr><td>January 12</td><td>Seventeen</td><td>&quot;God of Music</td></tr>
+      <tr><td>January 19</td><td>Chen</td><td>&quot; Shall We?</td></tr>
+      <tr><td>January 26</td><td>Aespa</td>
+          <td>&quot; Up &quot; ( Karina solo)</td></tr>
+    </table>
+    """
+
+    rows = parse_wikipedia_html(html, 2025)
+
+    assert [(row.artist, row.song) for row in rows] == [
+        ("WayV", "Frequency (Korean Ver.)"),
+        ("Seventeen", "God of Music"),
+        ("Chen", "Shall We?"),
+        ("Aespa", "Up (Karina solo)"),
+    ]
+
+
+def test_parser_applies_the_explicit_that_that_credit_move_only():
+    html = """
+    <table><tr><th>Date</th><th>Artist</th><th>Song</th></tr>
+      <tr><td>February 5</td><td>Psy</td><td>That That</td></tr>
+      <tr><td>February 12</td><td>Psy</td><td>Daddy</td></tr>
+    </table>
+    """
+
+    rows = parse_wikipedia_html(html, 2025)
+
+    assert [(row.artist, row.song) for row in rows] == [
+        ("Psy feat. Suga", "That That"),
+        ("Psy", "Daddy"),
+    ]
+
+
 @pytest.mark.parametrize(
     ("show_slug", "html", "expected"),
     [
@@ -104,14 +192,10 @@ def test_parser_removes_surrounding_song_quotes_only():
             "music-core",
             """
             <table><tr><th>Date</th><th>Artist</th><th>Song</th></tr>
-            <tr><td rowspan="2">February 6<sup>[1]</sup></td>
-                <td rowspan="2">Alpha &amp; Beta feat. Gamma</td><td>Song A</td></tr>
-            <tr><td>Song B</td></tr></table>
+            <tr><td>February 6<sup>[1]</sup></td>
+                <td>Alpha &amp; Beta feat. Gamma</td><td>Song A</td></tr></table>
             """,
-            [
-                ("2025-02-06", "Alpha & Beta feat. Gamma", "Song A"),
-                ("2025-02-06", "Alpha & Beta feat. Gamma", "Song B"),
-            ],
+            [("2025-02-06", "Alpha & Beta feat. Gamma", "Song A")],
         ),
         (
             "inkigayo",
@@ -240,4 +324,29 @@ def test_malformed_requested_year_table_is_not_ignored():
     ],
 )
 def test_source_title_handles_dedicated_and_shared_pages(slug, year, expected):
+    assert source_title(slug, year) == expected
+
+
+@pytest.mark.parametrize(
+    ("slug", "year", "expected"),
+    [
+        ("music-core", 2014, "Show! Music Core"),
+        ("music-core", 2015, "List of Show! Music Core Chart winners (2015)"),
+        ("music-core", 2026, "List of Show! Music Core Chart winners (2026)"),
+        ("show-champion", 2014, "Show Champion"),
+        ("show-champion", 2020, "Show Champion"),
+        (
+            "show-champion",
+            2021,
+            "List of Show Champion Chart winners (2021)",
+        ),
+        ("the-show", 2014, "The Show (South Korean TV program)"),
+        ("the-show", 2020, "The Show (South Korean TV program)"),
+        ("the-show", 2021, "List of The Show Chart winners (2021)"),
+        ("inkigayo", 2026, "List of Inkigayo Chart winners (2026)"),
+        ("m-countdown", 2026, "List of M Countdown Chart winners (2026)"),
+        ("music-bank", 2026, "List of Music Bank Chart winners (2026)"),
+    ],
+)
+def test_source_title_routes_supported_year_boundaries(slug, year, expected):
     assert source_title(slug, year) == expected

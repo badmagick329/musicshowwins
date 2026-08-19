@@ -125,7 +125,7 @@ class Win(models.Model):
         ordering = ("-date", "show__name", "song__title")
         constraints = [
             models.UniqueConstraint(
-                fields=("show", "song", "date"), name="unique_win_show_song_date"
+                fields=("show", "date"), name="unique_win_show_date"
             )
         ]
         indexes = [
@@ -156,6 +156,31 @@ class SourcePage(models.Model):
 
     def __str__(self):
         return f"{self.show.name} ({self.year})"
+
+
+class SourceApproval(models.Model):
+    """Explicit permission for a show/year to write Wikipedia wins."""
+
+    show = models.ForeignKey(
+        MusicShow, on_delete=models.CASCADE, related_name="source_approvals"
+    )
+    year = models.PositiveSmallIntegerField()
+    approved = models.BooleanField(default=False)
+    approved_at = models.DateTimeField(null=True, blank=True)
+    approved_by = models.CharField(max_length=150, blank=True)
+    notes = models.TextField(blank=True)
+
+    class Meta:
+        ordering = ("-year", "show__name")
+        constraints = [
+            models.UniqueConstraint(
+                fields=("show", "year"), name="unique_source_approval_show_year"
+            )
+        ]
+
+    def __str__(self):
+        state = "approved" if self.approved else "revoked"
+        return f"{self.show.name} ({self.year}) — {state}"
 
 
 class ImportRun(models.Model):
@@ -189,6 +214,8 @@ class ImportIssue(models.Model):
         INVALID_SOURCE = "invalid_source", "Invalid source"
         MISSING_WIN = "missing_win", "Missing historical win"
         FETCH_ERROR = "fetch_error", "Fetch error"
+        LEGACY_DISCREPANCY = "legacy_discrepancy", "Legacy discrepancy"
+        LEGACY_UNDATED = "legacy_undated", "Legacy undated aggregate"
 
     class Resolution(models.TextChoices):
         OPEN = "open", "Open"

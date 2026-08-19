@@ -1,0 +1,254 @@
+{
+  "version": 1,
+  "artist_renames": [
+    {"from": "BigBang", "to": "Big Bang"},
+    {"from": "Akdong Musician", "to": "AKMU"},
+    {"from": "Aespa[a]", "to": "Aespa"},
+    {"from": "Jungkook (", "to": "Jungkook"},
+    {"from": "TXT", "to": "Tomorrow X Together"},
+    {"from": "Kim Jong-hyun", "to": "Jonghyun"},
+    {"from": "U-Know Yunho", "to": "U-Know"},
+    {"from": "Kim Woo Seok", "to": "Kim Woo-seok"},
+    {"from": "TripleS[c]", "to": "TripleS"},
+    {"from": "Rosé & Bruno Mars", "to": "Rosé and Bruno Mars"}
+  ],
+  "song_renames": [
+    {"artist": "Aespa", "from": "Up (Karina solo) [a]", "to": "Up (Karina solo)"},
+    {"artist": "Aespa[a]", "from": "Up (Karina solo)", "to": "Up (Karina solo)"},
+    {"artist": "Aespa", "from": "Drama ‹See TfM›", "to": "Drama"},
+    {"artist": "Jungkook (", "from": "Seven - Clean Ver.", "to": "Seven"},
+    {"artist": "Cravity", "from": "'Love or Die", "to": "Love or Die"},
+    {"artist": "NCT Wish", "from": "Wish (Korean ver.)", "to": "Wish"},
+    {"artist": "Nayeon", "from": "ABCD (song)", "to": "ABCD"},
+    {"artist": "Baekhyun", "from": "Pineaple Slice", "to": "Pineapple Slice"},
+    {"artist": "WayV", "from": "“Big Bands(Korean ver.)”", "to": "Big Bands"},
+    {"artist": "Tomorrow X Together", "from": "“Beautiful Strangers “", "to": "Beautiful Strangers"},
+    {"artist": "G-Dragon", "from": "Home Sweet Home  [a]", "to": "Home Sweet Home"},
+    {"artist": "BtoB", "from": "Remember That (Spring Memories)", "to": "Remember That"},
+    {"artist": "The Wind", "from": "Hello, My First Love", "to": "Hello: My First Love"},
+    {"artist": "TXT", "from": "Can’t You See Me?", "to": "Can't You See Me?"},
+    {"artist": "NCT Wish", "from": "Songbird (Korean ver.)", "to": "Songbird"},
+    {"artist": "Rosé & Bruno Mars", "from": "Apt.", "to": "APT."}
+  ],
+  "credit_moves": [
+    {"from_artist": "Psy", "song": "That That", "to_artist": "Psy feat. Suga"},
+    {"from_artist": "J-Hope", "song": "On the Street", "to_artist": "J-Hope & J. Cole"},
+    {"from_artist": "Mad Clown & Hyolyn", "song": "Without You", "to_artist": "Mad Clown ft. Hyolyn"}
+  ],
+  "date_corrections": [
+    {"show": "music-core", "from": "2024-04-07", "artist": "NCT Dream", "song": "Smoothie", "to": "2024-04-06"}
+  ],
+  "date_decisions": [
+    {
+      "show": "inkigayo", "date": "2014-04-20",
+      "rows": [
+        {"artist": "AKMU", "song": "200%", "action": "keep"},
+        {"artist": "Akdong Musician", "song": "200%", "action": "discard", "reason": "Canonicalized by the explicit artist alias."}
+      ]
+    },
+    {
+      "show": "inkigayo", "date": "2014-04-27",
+      "rows": [
+        {"artist": "AKMU", "song": "200%", "action": "keep"},
+        {"artist": "Akdong Musician", "song": "200%", "action": "discard", "reason": "Canonicalized by the explicit artist alias."}
+      ]
+    },
+    {
+      "show": "inkigayo", "date": "2014-05-04",
+      "rows": [
+        {"artist": "AKMU", "song": "200%", "action": "keep"},
+        {"artist": "Akdong Musician", "song": "200%", "action": "discard", "reason": "Canonicalized by the explicit artist alias."}
+      ]
+    },
+    {
+      "show": "inkigayo", "date": "2020-09-20",
+      "rows": [
+        {"artist": "BLACKPINK", "song": "Ice Cream", "action": "quarantine", "reason": "Current Wikipedia credits the collaboration as Blackpink and Selena Gomez."},
+        {"artist": "Blackpink and Selena Gomez", "song": "Ice Cream", "action": "keep"}
+      ]
+    },
+    {
+      "show": "inkigayo", "date": "2020-09-27",
+      "rows": [
+        {"artist": "BLACKPINK", "song": "Ice Cream", "action": "quarantine", "reason": "Current Wikipedia credits the collaboration as Blackpink and Selena Gomez."},
+        {"artist": "Blackpink and Selena Gomez", "song": "Ice Cream", "action": "keep"}
+      ]
+    },
+    {
+      "show": "inkigayo", "date": "2020-10-04",
+      "rows": [
+        {"artist": "BLACKPINK", "song": "Ice Cream", "action": "quarantine", "reason": "Current Wikipedia credits the collaboration as Blackpink and Selena Gomez."},
+        {"artist": "Blackpink and Selena Gomez", "song": "Ice Cream", "action": "keep"}
+      ]
+    },
+    {
+      "show": "m-countdown", "date": "2015-06-11",
+      "rows": [
+        {"artist": "Big Bang", "song": "Bang Bang Bang", "action": "keep"},
+        {"artist": "BigBang", "song": "Bang Bang Bang", "action": "discard", "reason": "Canonicalized by the explicit artist alias."}
+      ]
+    },
+    {
+      "show": "m-countdown", "date": "2015-06-25",
+      "rows": [
+        {"artist": "Big Bang", "song": "Bang Bang Bang", "action": "keep"},
+        {"artist": "BigBang", "song": "Bang Bang Bang", "action": "discard", "reason": "Canonicalized by the explicit artist alias."}
+      ]
+    },
+    {
+      "show": "m-countdown", "date": "2015-07-09",
+      "rows": [
+        {"artist": "Big Bang", "song": "Sober", "action": "keep"},
+        {"artist": "BigBang", "song": "Sober", "action": "discard", "reason": "Canonicalized by the explicit artist alias."}
+      ]
+    },
+    {
+      "show": "music-bank", "date": "2023-11-10",
+      "rows": [
+        {"artist": "Jungkook", "song": "Seven", "action": "keep"},
+        {"artist": "Jungkook (", "song": "Seven - Clean Ver.", "action": "discard", "reason": "Removed the malformed artist parenthesis and clean-version presentation suffix."}
+      ]
+    },
+    {
+      "show": "music-bank", "date": "2024-03-08",
+      "rows": [
+        {"artist": "Bibi", "song": "Bam Yang Gang", "action": "quarantine", "reason": "Current Wikipedia credits Cravity as the winner."},
+        {"artist": "Cravity", "song": "'Love or Die", "action": "discard", "reason": "Removed the stray leading quote from the song title."},
+        {"artist": "Cravity", "song": "Love or Die", "action": "keep"}
+      ]
+    },
+    {
+      "show": "inkigayo", "date": "2024-05-12",
+      "rows": [
+        {"artist": "Zico", "song": "Spot!", "action": "keep"},
+        {"artist": "Zico", "song": "Spot! (feat. Jennie)", "action": "quarantine", "reason": "Current Wikipedia credits the winner as Spot! without the featured-artist suffix."}
+      ]
+    },
+    {
+      "show": "inkigayo", "date": "2024-05-19",
+      "rows": [
+        {"artist": "Zico", "song": "Spot!", "action": "keep"},
+        {"artist": "Zico", "song": "Spot! (feat. Jennie)", "action": "quarantine", "reason": "Current Wikipedia credits the winner as Spot! without the featured-artist suffix."}
+      ]
+    },
+    {
+      "show": "show-champion", "date": "2024-03-13",
+      "rows": [
+        {"artist": "NCT Wish", "song": "Wish", "action": "keep"},
+        {"artist": "NCT Wish", "song": "Wish (Korean ver.)", "action": "discard", "reason": "Removed the presentation suffix from the canonical song title."}
+      ]
+    },
+    {
+      "show": "show-champion", "date": "2024-06-19",
+      "rows": [
+        {"artist": "Nayeon", "song": "ABCD (song)", "action": "discard", "reason": "Removed the encyclopedia disambiguation suffix from the song title."},
+        {"artist": "Nayeon", "song": "ABCD", "action": "keep"}
+      ]
+    },
+    {
+      "show": "m-countdown", "date": "2024-07-04",
+      "rows": [
+        {"artist": "Lee Young-ji", "song": "Small Girl (feat. Doh Kyung-soo)", "action": "quarantine", "reason": "Current Wikipedia credits the winner as Small Girl."},
+        {"artist": "Lee Young-ji", "song": "Small Girl", "action": "keep"}
+      ]
+    },
+    {
+      "show": "music-core", "date": "2024-07-06",
+      "rows": [
+        {"artist": "Lee Young-ji", "song": "Small Girl", "action": "keep"},
+        {"artist": "Lee Young-ji", "song": "Small Girl (feat. Doh Kyung-soo)", "action": "quarantine", "reason": "Current Wikipedia credits the winner as Small Girl."}
+      ]
+    },
+    {
+      "show": "inkigayo", "date": "2024-07-07",
+      "rows": [
+        {"artist": "Lee Young-ji", "song": "Small Girl", "action": "keep"},
+        {"artist": "Lee Young-ji", "song": "Small Girl (feat. Doh Kyung-soo)", "action": "quarantine", "reason": "Current Wikipedia credits the winner as Small Girl."}
+      ]
+    },
+    {
+      "show": "m-countdown", "date": "2024-07-11",
+      "rows": [
+        {"artist": "Jimin", "song": "Smeraldo Garden Marching Band (feat. Loco)", "action": "quarantine", "reason": "Current Wikipedia credits the winner as Smeraldo Garden Marching Band."},
+        {"artist": "Jimin", "song": "Smeraldo Garden Marching Band", "action": "keep"}
+      ]
+    },
+    {
+      "show": "music-bank", "date": "2024-09-13",
+      "rows": [
+        {"artist": "Baekhyun", "song": "Pineaple Slice", "action": "discard", "reason": "Corrected the deterministic Pineaple spelling artifact."},
+        {"artist": "Baekhyun", "song": "Pineapple Slice", "action": "keep"}
+      ]
+    },
+    {
+      "show": "music-core", "date": "2024-10-19",
+      "rows": [
+        {"artist": "Aespa", "song": "Up (Karina solo) [a]", "action": "keep"},
+        {"artist": "Aespa[a]", "song": "Up (Karina solo)", "action": "discard", "reason": "Removed the artist and song footnote markers."}
+      ]
+    },
+    {
+      "show": "m-countdown", "date": "2025-02-13",
+      "rows": [
+        {"artist": "Ive", "song": "Attitude", "action": "keep"},
+        {"artist": "Jennie & Dominic Fike", "song": "Love Hangover", "action": "quarantine", "reason": "Current Wikipedia credits Ive as the winner."}
+      ]
+    },
+    {
+      "show": "show-champion", "date": "2025-06-25",
+      "rows": [
+        {"artist": "Kang Daniel", "song": "Episode", "action": "keep"},
+        {"artist": "Xlov", "song": "Bizness", "action": "quarantine", "reason": "Current Wikipedia credits Kang Daniel as the winner."}
+      ]
+    },
+    {
+      "show": "the-show", "date": "2025-07-29",
+      "rows": [
+        {"artist": "WayV", "song": "“Big Bands(Korean ver.)”", "action": "discard", "reason": "Removed the malformed smart-quote presentation artifact."},
+        {"artist": "WayV", "song": "Big Bands", "action": "keep"}
+      ]
+    },
+    {
+      "show": "show-champion", "date": "2025-07-30",
+      "rows": [
+        {"artist": "Tomorrow X Together", "song": "“Beautiful Strangers “", "action": "discard", "reason": "Removed the malformed smart-quote presentation artifact."},
+        {"artist": "Tomorrow X Together", "song": "Beautiful Strangers", "action": "keep"}
+      ]
+    }
+  ],
+  "undated_issues": [
+    {"source_artist": "GFriend", "artist": "GFriend", "song": "Rough", "expected_wins": 3},
+    {"source_artist": "GFriend", "artist": "GFriend", "song": "Navillera", "expected_wins": 3},
+    {"source_artist": "Twice", "artist": "Twice", "song": "TT", "expected_wins": 2},
+    {"source_artist": "Twice", "artist": "Twice", "song": "Cheer Up", "expected_wins": 3},
+    {"source_artist": "Exo", "artist": "EXO", "song": "Monster", "expected_wins": 3},
+    {"source_artist": "Mamamoo", "artist": "Mamamoo", "song": "You're The Best", "expected_wins": 1},
+    {"source_artist": "Exo", "artist": "EXO", "song": "Louder (Lotto)", "expected_wins": 2},
+    {"source_artist": "CNBLUE", "artist": "CNBLUE", "song": "You're So Fine", "expected_wins": 1},
+    {"source_artist": "Red Velvet", "artist": "Red Velvet", "song": "Russian Roulette", "expected_wins": 2},
+    {"source_artist": "BTS", "source_song": "Blood Sweat & Tears", "artist": "BTS", "song": "Blood, Sweat & Tears", "expected_wins": 1},
+    {"source_artist": "I.O.I", "artist": "I.O.I", "song": "Whatta Man", "expected_wins": 1},
+    {"source_artist": "Got7", "artist": "Got7", "song": "Hard Carry", "expected_wins": 1},
+    {"source_artist": "Red Velvet", "artist": "Red Velvet", "song": "One of these Nights", "expected_wins": 1},
+    {"source_artist": "Wonder Girls", "artist": "Wonder Girls", "song": "Why So Lonely", "expected_wins": 1},
+    {"source_artist": "Got7", "artist": "Got7", "song": "Fly", "expected_wins": 1},
+    {"source_artist": "Sistar", "artist": "Sistar", "song": "I Like That", "expected_wins": 1},
+    {"source_artist": "Shinee", "artist": "Shinee", "song": "1 of 1", "expected_wins": 1},
+    {"source_artist": "Taemin", "artist": "Taemin", "song": "Press Your Number", "expected_wins": 1},
+    {"source_artist": "I.O.I", "artist": "I.O.I", "song": "Very Very Very", "expected_wins": 1},
+    {"source_artist": "Seventeen", "artist": "Seventeen", "song": "Boom Boom", "expected_wins": 1},
+    {"source_artist": "Block B", "artist": "Block B", "song": "Toy", "expected_wins": 1},
+    {"source_artist": "BtoB", "artist": "BtoB", "song": "Remember That", "expected_wins": 1},
+    {"source_artist": "iKon", "artist": "iKon", "song": "Dumb & Dumber", "expected_wins": 3},
+    {"source_artist": "Baek", "artist": "Baek", "song": "A-yeon\tSo-So", "expected_wins": 2},
+    {"source_artist": "BTS", "artist": "BTS", "song": "Fire", "expected_wins": 1},
+    {"source_artist": "Infinite", "artist": "Infinite", "song": "The Eye", "expected_wins": 1},
+    {"source_artist": "BLACKPINK", "artist": "BLACKPINK", "song": "Whistle", "expected_wins": 1},
+    {"source_artist": "Big Bang", "artist": "Big Bang", "song": "Fxxk It", "expected_wins": 1},
+    {"source_artist": "Lee Hi", "artist": "Lee Hi", "song": "Breathe", "expected_wins": 1},
+    {"source_artist": "Jung Eun-ji", "artist": "Jung Eun-ji", "song": "Hopefully Sky", "expected_wins": 1},
+    {"source_artist": "Hyuna", "artist": "Hyuna", "song": "How's This", "expected_wins": 1},
+    {"source_artist": "Psy", "artist": "Psy", "song": "Daddy", "expected_wins": 1},
+    {"source_artist": "Winner", "artist": "Winner", "song": "Sentimental", "expected_wins": 1}
+  ]
+}
