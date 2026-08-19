@@ -94,7 +94,7 @@ class Migration(migrations.Migration):
             name="ImportIssue",
             fields=[
                 ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
-                ("issue_type", models.CharField(choices=[("conflict", "Winner conflict"), ("invalid_source", "Invalid source"), ("missing_win", "Missing historical win"), ("fetch_error", "Fetch error")], max_length=30)),
+                ("issue_type", models.CharField(choices=[("conflict", "Winner conflict"), ("invalid_source", "Invalid source"), ("missing_win", "Missing historical win"), ("fetch_error", "Fetch error"), ("legacy_discrepancy", "Legacy discrepancy"), ("legacy_undated", "Legacy undated aggregate")], max_length=30)),
                 ("candidate", models.JSONField(default=dict)),
                 ("resolution", models.CharField(choices=[("open", "Open"), ("accepted", "Accepted"), ("rejected", "Rejected")], default="open", max_length=20)),
                 ("notes", models.TextField(blank=True)),
@@ -119,7 +119,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AddConstraint(
             model_name="win",
-            constraint=models.UniqueConstraint(fields=("show", "song", "date"), name="unique_win_show_song_date"),
+            constraint=models.UniqueConstraint(fields=("show", "date"), name="unique_win_show_date"),
         ),
         migrations.AddIndex(
             model_name="win",

@@ -7,6 +7,7 @@ from main.models import (
     ImportRun,
     MusicShow,
     Song,
+    SourceApproval,
     SourcePage,
     Win,
 )
@@ -59,6 +60,13 @@ class SourcePageAdmin(admin.ModelAdmin):
     list_filter = ("show", "year")
     search_fields = ("page_title",)
     readonly_fields = ("latest_revision", "last_synced_at")
+
+
+@admin.register(SourceApproval)
+class SourceApprovalAdmin(admin.ModelAdmin):
+    list_display = ("show", "year", "approved", "approved_at", "approved_by")
+    list_filter = ("approved", "show", "year")
+    search_fields = ("show__name", "show__slug", "approved_by", "notes")
 
 
 @admin.register(ImportRun)
