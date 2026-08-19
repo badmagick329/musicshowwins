@@ -11,7 +11,15 @@ from main.models import normalize_key
 
 MANIFEST_PATH = Path(__file__).resolve().parent / "data" / "bootstrap_cleanup.json"
 RAW_COUNTS = {"shows": 6, "artists": 296, "songs": 901, "wins": 2965}
-CLEAN_COUNTS = {"shows": 6, "artists": 292, "songs": 885, "wins": 2905}
+CLEAN_COUNTS = {"shows": 6, "artists": 292, "songs": 882, "wins": 2905}
+
+MUSIC_CORE_2016_EVIDENCE = (
+    "Music Core rankings were abolished in November 2015 and did not return "
+    "until April 22, 2017; the aggregate-only 2016 rows are therefore not "
+    "dated wins. Official MBC evidence: "
+    "https://enews.imbc.com/News/RetrieveNewsInfo/162861 and "
+    "https://enews.imbc.com/M/Detail/204086"
+)
 
 
 class CleanupError(ValueError):
@@ -24,7 +32,7 @@ def load_cleanup_manifest(path: Path = MANIFEST_PATH) -> dict[str, Any]:
             manifest = json.load(file)
     except (OSError, json.JSONDecodeError) as exc:
         raise CleanupError(f"Unable to read cleanup manifest: {path}: {exc}") from exc
-    if not isinstance(manifest, dict) or manifest.get("version") != 1:
+    if not isinstance(manifest, dict) or manifest.get("version") != 2:
         raise CleanupError("Unsupported bootstrap cleanup manifest version")
     return manifest
 
@@ -176,6 +184,66 @@ def _legacy_discrepancy_candidate(
     }
 
 
+def _issue_resolution(candidate: dict[str, Any]) -> tuple[str, str]:
+    """Return the reviewed resolution and evidence for a tracked legacy row."""
+
+    artist = normalize_key(candidate.get("artist", ""))
+    song = normalize_key(candidate.get("song", ""))
+    if artist == normalize_key("Zico") and song == normalize_key(
+        "Spot! (feat. Jennie)"
+    ):
+        return (
+            "accepted",
+            "Accepted canonical title SPOT! (feat. JENNIE). Official evidence: "
+            "https://www.youtube.com/watch?v=xfqBQ2XhBCg",
+        )
+    if artist == normalize_key("Lee Young-ji") and song == normalize_key(
+        "Small Girl (feat. Doh Kyung-soo)"
+    ):
+        return (
+            "accepted",
+            "Accepted canonical title Small girl (feat. D.O.). Official evidence: "
+            "https://www.youtube.com/watch?v=11iZcYbq_is",
+        )
+    if artist == normalize_key("Jimin") and song == normalize_key(
+        "Smeraldo Garden Marching Band (feat. Loco)"
+    ):
+        return (
+            "accepted",
+            "Accepted canonical title Smeraldo Garden Marching Band (feat. Loco). "
+            "Official evidence: "
+            "https://bts.ibighit.com/jpn/discography/jimin/detail/muse/",
+        )
+    if artist == normalize_key("BLACKPINK") and song == normalize_key("Ice Cream"):
+        return (
+            "rejected",
+            "Rejected the BLACKPINK-only candidate; the public collaboration "
+            "record is retained. Official evidence: "
+            "https://ygfamily.com/en/artists/blackpink/discography/246",
+        )
+    if artist == normalize_key("Bibi") and song == normalize_key("Bam Yang Gang"):
+        return (
+            "rejected",
+            "Rejected the Bibi candidate; CRAVITY / Love or Die is retained. "
+            "Official evidence: https://www.youtube.com/watch?v=i9LtdEcMTLk",
+        )
+    if artist == normalize_key("Jennie & Dominic Fike") and song == normalize_key(
+        "Love Hangover"
+    ):
+        return (
+            "rejected",
+            "Rejected the candidate; IVE / Attitude is retained. Official evidence: "
+            "https://mnetjp.com/news/detail/20250218151917/",
+        )
+    if artist == normalize_key("Xlov") and song == normalize_key("Bizness"):
+        return (
+            "rejected",
+            "Rejected the candidate; Kang Daniel / Episode is retained. Official "
+            "evidence: https://entertain.daum.net/tv/242903/video/456122599",
+        )
+    return "rejected", "Rejected during the historical reconciliation review."
+
+
 def _validate_source_counts(payload: dict[str, Any]) -> None:
     for key, expected in RAW_COUNTS.items():
         rows = payload.get(key)
@@ -193,7 +261,7 @@ def apply_cleanup(
         raise CleanupError("Unsupported bootstrap data version")
     _validate_source_counts(payload)
     manifest = manifest or load_cleanup_manifest()
-    if manifest.get("version") != 1:
+    if manifest.get("version") != 2:
         raise CleanupError("Unsupported bootstrap cleanup manifest version")
     artist_rules = _artist_renames(manifest)
     song_rules = _song_renames(manifest)
@@ -324,15 +392,14 @@ def apply_cleanup(
             action_row = action_map.get((row["artist"], row["title"]))
             if action_row and action_row["action"] != "keep":
                 if action_row["action"] == "quarantine":
+                    candidate = _legacy_discrepancy_candidate(row, retained_row)
+                    resolution, evidence = _issue_resolution(candidate)
                     issues.append(
                         {
                             "issue_type": "legacy_discrepancy",
-                            "candidate": _legacy_discrepancy_candidate(
-                                row, retained_row
-                            ),
-                            "notes": action_row.get(
-                                "reason", "Legacy row differs from current Wikipedia."
-                            ),
+                            "candidate": candidate,
+                            "resolution": resolution,
+                            "notes": evidence,
                         }
                     )
                 continue
@@ -344,6 +411,7 @@ def apply_cleanup(
         issues.append(
             {
                 "issue_type": "legacy_undated",
+                "resolution": "rejected",
                 "candidate": {
                     "show": "music-core",
                     "year": 2016,
@@ -351,10 +419,7 @@ def apply_cleanup(
                     "song": row["song"],
                     "expected_wins": row["expected_wins"],
                 },
-                "notes": (
-                    "Restored from the aggregate-only 2016 Music Core history; "
-                    "exact dates require manual research."
-                ),
+                "notes": MUSIC_CORE_2016_EVIDENCE,
             }
         )
 

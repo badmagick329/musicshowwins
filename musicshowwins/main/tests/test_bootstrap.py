@@ -24,12 +24,24 @@ def test_bootstrap_restores_exact_domain_dataset(capsys):
 
     assert MusicShow.objects.count() == 6
     assert Artist.objects.count() == 292
-    assert Song.objects.count() == 885
+    assert Song.objects.count() == 882
     assert Win.objects.count() == 2905
     assert ArtistAlias.objects.count() == 4
     assert not SourcePage.objects.exists()
     assert not ImportRun.objects.exists()
     assert ImportIssue.objects.count() == 45
+    assert (
+        ImportIssue.objects.filter(resolution=ImportIssue.Resolution.OPEN).count() == 0
+    )
+    assert ImportIssue.objects.filter(resolved_at__isnull=True).count() == 0
+    assert (
+        ImportIssue.objects.filter(resolution=ImportIssue.Resolution.ACCEPTED).count()
+        == 6
+    )
+    assert (
+        ImportIssue.objects.filter(resolution=ImportIssue.Resolution.REJECTED).count()
+        == 39
+    )
     assert (
         ImportIssue.objects.filter(
             issue_type=ImportIssue.IssueType.LEGACY_DISCREPANCY
@@ -57,6 +69,17 @@ def test_bootstrap_restores_exact_domain_dataset(capsys):
         song__artist__name__in=["BigBang", "Akdong Musician"]
     ).exists()
     assert not Artist.objects.filter(name__in=["Aespa[a]", "Jungkook ("]).exists()
+    assert Artist.objects.filter(name="BLACKPINK and Selena Gomez").count() == 1
+    assert Song.objects.filter(
+        artist__name="Zico", title="SPOT! (feat. JENNIE)"
+    ).count() == 1
+    assert Song.objects.filter(
+        artist__name="Lee Young-ji", title="Small girl (feat. D.O.)"
+    ).count() == 1
+    assert Song.objects.filter(
+        artist__name="Jimin",
+        title="Smeraldo Garden Marching Band (feat. Loco)",
+    ).count() == 1
     assert set(
         Artist.objects.filter(
             name__in=[

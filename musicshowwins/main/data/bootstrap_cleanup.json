@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "artist_renames": [
     {"from": "BigBang", "to": "Big Bang"},
     {"from": "Akdong Musician", "to": "AKMU"},
@@ -10,7 +10,8 @@
     {"from": "U-Know Yunho", "to": "U-Know"},
     {"from": "Kim Woo Seok", "to": "Kim Woo-seok"},
     {"from": "TripleS[c]", "to": "TripleS"},
-    {"from": "Rosé & Bruno Mars", "to": "Rosé and Bruno Mars"}
+    {"from": "Rosé & Bruno Mars", "to": "Rosé and Bruno Mars"},
+    {"from": "Blackpink and Selena Gomez", "to": "BLACKPINK and Selena Gomez"}
   ],
   "song_renames": [
     {"artist": "Aespa", "from": "Up (Karina solo) [a]", "to": "Up (Karina solo)"},
@@ -28,7 +29,12 @@
     {"artist": "The Wind", "from": "Hello, My First Love", "to": "Hello: My First Love"},
     {"artist": "TXT", "from": "Can’t You See Me?", "to": "Can't You See Me?"},
     {"artist": "NCT Wish", "from": "Songbird (Korean ver.)", "to": "Songbird"},
-    {"artist": "Rosé & Bruno Mars", "from": "Apt.", "to": "APT."}
+    {"artist": "Rosé & Bruno Mars", "from": "Apt.", "to": "APT."},
+    {"artist": "Zico", "from": "Spot!", "to": "SPOT! (feat. JENNIE)"},
+    {"artist": "Zico", "from": "Spot! (feat. Jennie)", "to": "SPOT! (feat. JENNIE)"},
+    {"artist": "Lee Young-ji", "from": "Small Girl", "to": "Small girl (feat. D.O.)"},
+    {"artist": "Lee Young-ji", "from": "Small Girl (feat. Doh Kyung-soo)", "to": "Small girl (feat. D.O.)"},
+    {"artist": "Jimin", "from": "Smeraldo Garden Marching Band", "to": "Smeraldo Garden Marching Band (feat. Loco)"}
   ],
   "credit_moves": [
     {"from_artist": "Psy", "song": "That That", "to_artist": "Psy feat. Suga"},

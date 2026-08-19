@@ -249,6 +249,35 @@ def test_quoted_wikipedia_song_matches_unquoted_canonical_title(show):
     assert Win.objects.get().song_id == song.pk
 
 
+@pytest.mark.django_db
+def test_exact_historical_title_shortcuts_match_canonical_songs(show):
+    rows = (
+        ("January 3", "Zico", "Spot!"),
+        ("January 10", "Lee Young-ji", "Small Girl"),
+        ("January 17", "Jimin", "Smeraldo Garden Marching Band"),
+    )
+    canonical = (
+        ("Zico", "SPOT! (feat. JENNIE)", date(2026, 1, 3)),
+        ("Lee Young-ji", "Small girl (feat. D.O.)", date(2026, 1, 10)),
+        (
+            "Jimin",
+            "Smeraldo Garden Marching Band (feat. Loco)",
+            date(2026, 1, 17),
+        ),
+    )
+    for artist_name, title, win_date in canonical:
+        artist = Artist.objects.create(name=artist_name)
+        song = Song.objects.create(artist=artist, title=title)
+        Win.objects.create(show=show, song=song, date=win_date)
+
+    summary = sync(show, FakeClient(html=wins_html(*rows)))
+
+    assert summary.wins_added == 0
+    assert summary.conflicts_found == 0
+    assert Song.objects.filter(title__in=[row[1] for row in canonical]).count() == 3
+    assert ImportIssue.objects.count() == 0
+
+
 class CapturingImporter:
     def __init__(self):
         self.calls = []

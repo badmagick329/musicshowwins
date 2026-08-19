@@ -69,6 +69,17 @@ NO_BROADCAST_MARKERS = (
     "summer k-pop festival",
 )
 
+# Exact title corrections for source presentation shortcuts.  These are kept
+# narrow so unrelated artists or similarly named songs are never rewritten.
+CANONICAL_SONG_TITLES = {
+    ("zico", "spot!"): "SPOT! (feat. JENNIE)",
+    ("lee young-ji", "small girl"): "Small girl (feat. D.O.)",
+    (
+        "jimin",
+        "smeraldo garden marching band",
+    ): "Smeraldo Garden Marching Band (feat. Loco)",
+}
+
 
 class WikipediaError(Exception):
     """Base exception for expected source and parse failures."""
@@ -682,6 +693,15 @@ class WikipediaImporter:
         self.client = client or WikipediaClient()
 
     @staticmethod
+    def _canonical_candidate(candidate: WinCandidate) -> WinCandidate:
+        title = CANONICAL_SONG_TITLES.get(
+            (normalize_key(candidate.artist), normalize_key(candidate.song))
+        )
+        if title is None or title == candidate.song:
+            return candidate
+        return WinCandidate(candidate.date, candidate.artist, title)
+
+    @staticmethod
     def _artist_reference(name: str) -> tuple[Artist | None, str]:
         key = normalize_key(name)
         alias = (
@@ -778,7 +798,8 @@ class WikipediaImporter:
 
             existing = self._existing_wins(show, spec.year)
             expected: set[tuple[date, str, str]] = set()
-            for candidate in candidates:
+            for source_candidate in candidates:
+                candidate = self._canonical_candidate(source_candidate)
                 artist, identity = self._artist_reference(candidate.artist)
                 title_key = normalize_key(candidate.song)
                 expected.add((candidate.date, identity, title_key))
@@ -896,7 +917,8 @@ class WikipediaImporter:
         }
         candidate_keys: set[tuple[date, str, str]] = set()
         result = PageReconciliation()
-        for candidate in candidates:
+        for source_candidate in candidates:
+            candidate = self._canonical_candidate(source_candidate)
             _, identity = self._artist_reference(candidate.artist)
             key = (candidate.date, identity, normalize_key(candidate.song))
             candidate_keys.add(key)
