@@ -179,7 +179,7 @@ class ImportIssueAdmin(admin.ModelAdmin):
 
     decision_labels = {
         ImportIssue.Resolution.OPEN: "Needs review",
-        ImportIssue.Resolution.ACCEPTED: "Candidate is correct (correction required)",
+        ImportIssue.Resolution.ACCEPTED: "Candidate accepted",
         ImportIssue.Resolution.REJECTED: "Keep current public record",
     }
 
@@ -403,9 +403,9 @@ class ImportIssueAdmin(admin.ModelAdmin):
                 "Needs review. No win data is changed by this status."
             ),
             ImportIssue.Resolution.ACCEPTED: (
-                "The quarantined candidate is marked correct, but a separate data "
-                "correction is still required. Saving this status does not restore "
-                "or rewrite Win data."
+                "The quarantined candidate is accepted as correct. This status "
+                "records the review decision; it does not itself rewrite Win data. "
+                "Data corrections are applied separately."
             ),
             ImportIssue.Resolution.REJECTED: (
                 "The quarantined candidate is rejected and the current public record "

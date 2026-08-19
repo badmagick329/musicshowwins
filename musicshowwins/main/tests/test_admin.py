@@ -117,7 +117,7 @@ def test_legacy_undated_detail_explains_aggregate_status():
 
 
 @pytest.mark.django_db
-def test_import_issue_resolution_choices_are_honest_and_evidence_is_read_only():
+def test_import_issue_resolution_choices_are_durable_and_evidence_is_read_only():
     issue = _legacy_discrepancy()
     admin_obj = ImportIssueAdmin(ImportIssue, AdminSite())
     request = RequestFactory().get("/")
@@ -131,7 +131,7 @@ def test_import_issue_resolution_choices_are_honest_and_evidence_is_read_only():
     assert choices[ImportIssue.Resolution.OPEN] == "Needs review"
     assert (
         choices[ImportIssue.Resolution.ACCEPTED]
-        == "Candidate is correct (correction required)"
+        == "Candidate accepted"
     )
     assert choices[ImportIssue.Resolution.REJECTED] == "Keep current public record"
     assert not {
@@ -140,6 +140,13 @@ def test_import_issue_resolution_choices_are_honest_and_evidence_is_read_only():
         "source_page",
         "notes",
     }.intersection(form.base_fields)
+
+    accepted_issue = _legacy_discrepancy()
+    accepted_issue.resolution = ImportIssue.Resolution.ACCEPTED
+    accepted_help = admin_obj.decision_help(accepted_issue)
+    assert "accepted as correct" in accepted_help
+    assert "does not itself rewrite Win data" in accepted_help
+    assert "still required" not in accepted_help
 
 
 @pytest.mark.django_db

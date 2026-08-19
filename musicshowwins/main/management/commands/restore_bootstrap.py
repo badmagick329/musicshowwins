@@ -6,6 +6,7 @@ from pathlib import Path
 
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
+from django.utils import timezone
 
 from main.bootstrap import CLEAN_COUNTS, CleanupError, apply_cleanup
 from main.models import (
@@ -97,7 +98,19 @@ class Command(BaseCommand):
                     ImportIssue(
                         issue_type=issue["issue_type"],
                         candidate=issue["candidate"],
+                        resolution=issue.get(
+                            "resolution", ImportIssue.Resolution.OPEN
+                        ),
                         notes=issue["notes"],
+                        resolved_at=(
+                            timezone.now()
+                            if issue.get("resolution")
+                            in {
+                                ImportIssue.Resolution.ACCEPTED,
+                                ImportIssue.Resolution.REJECTED,
+                            }
+                            else None
+                        ),
                     )
                     for issue in cleanup_issues
                 ],
@@ -109,7 +122,7 @@ class Command(BaseCommand):
                 f"Restored {len(payload['shows'])} shows, "
                 f"{len(payload['artists'])} artists, "
                 f"{len(payload['songs'])} songs and {len(payload['wins'])} wins; "
-                "created 12 legacy discrepancy and 33 legacy undated issues."
+                "created 12 reviewed discrepancy and 33 rejected undated issues."
             )
         )
 

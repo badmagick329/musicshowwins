@@ -29,11 +29,11 @@ uv run python manage.py restore_bootstrap
 
 The restore is atomic, validates all references and expected counts, and refuses
 to run when any domain table already contains data. The snapshot restores 6
-shows, 292 artists, 885 songs and 2,905 dated wins. It also creates 12 open
-legacy discrepancy issues and 33 open `legacy_undated` issues for the aggregate-
-only Music Core 2016 history. Those issues are review data, not public dated
-wins. A different JSON file may be supplied explicitly with `--input`; local
-paths do not need to be committed.
+shows, 292 artists, 882 songs and 2,905 dated wins. It also creates 12 reviewed
+legacy discrepancy issues and 33 rejected `legacy_undated` issues for the
+aggregate-only Music Core 2016 history. Those issues remain as audit data, not
+public dated wins. A different JSON file may be supplied explicitly with
+`--input`; local paths do not need to be committed.
 
 Start the temporary Django UI with:
 
@@ -84,9 +84,8 @@ step after reviewing the dry-run report. New show/year sources are denied by
 default; approve one explicitly with `approve_wikipedia_source` after reviewing
 its dry-run report. A real sync reports unapproved pages without writing them.
 Use `--revoke` to disable a previously approved source. Music Core 2016 is a
-known unavailable Wikipedia page, and its
-original aggregate records remain in the undated review backlog until dates can
-be researched manually.
+known unavailable Wikipedia page; its original aggregate records are retained
+as rejected audit issues and are not restored as dated wins.
 
 Production deployment and automated scheduling are out of scope for this phase.
 
