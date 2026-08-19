@@ -44,6 +44,9 @@ uv run python manage.py runserver
 The UI provides artist and song leaderboards, artist search and details, and a
 dated wins view. It is intentionally small while the backend is being revived.
 
+The Next.js frontend skeleton lives in [`frontend/`](frontend/README.md).
+Product design and feature implementation are intentionally pending.
+
 ## Wikipedia synchronization
 
 Synchronization runs sequentially through Wikimedia's Action API. It retries
@@ -125,6 +128,5 @@ uv run python manage.py makemigrations --check --dry-run
 
 ## Deferred work
 
-Next.js, donations, accounts, public submissions, production deployment, and
-scheduled synchronization are deliberately deferred until the backend and
-temporary UI are stable.
+Donations, accounts, public submissions, production deployment, and scheduled
+synchronization are deliberately deferred until the product UI is defined.
