@@ -189,8 +189,10 @@ class ImportIssueAdmin(admin.ModelAdmin):
         return False
 
     def get_queryset(self, request):
-        return super().get_queryset(request).select_related(
-            "source_page__show", "import_run"
+        return (
+            super()
+            .get_queryset(request)
+            .select_related("source_page__show", "import_run")
         )
 
     def get_form(self, request, obj=None, **kwargs):
@@ -263,9 +265,7 @@ class ImportIssueAdmin(admin.ModelAdmin):
         )
 
     @classmethod
-    def _record_fields(
-        cls, record: Any, keys: Iterable[str] | None = None
-    ) -> str:
+    def _record_fields(cls, record: Any, keys: Iterable[str] | None = None) -> str:
         if not isinstance(record, dict):
             return cls._display_value(record)
         selected_keys = tuple(keys) if keys is not None else tuple(record)
@@ -277,12 +277,15 @@ class ImportIssueAdmin(admin.ModelAdmin):
             for key in selected_keys
             if key in record
         )
-        return format_html_join(
-            "",
-            '<div class="import-issue-detail-row">'
-            "<strong>{}</strong><span>{}</span></div>",
-            rows,
-        ) or "—"
+        return (
+            format_html_join(
+                "",
+                '<div class="import-issue-detail-row">'
+                "<strong>{}</strong><span>{}</span></div>",
+                rows,
+            )
+            or "—"
+        )
 
     @admin.display(description="Issue")
     def issue_type_summary(self, obj: ImportIssue) -> str:
@@ -369,10 +372,7 @@ class ImportIssueAdmin(admin.ModelAdmin):
                 "",
                 '<div class="import-issue-detail-row"><strong>{}</strong>'
                 "<span>{}</span></div>",
-                (
-                    ("Existing record", self._record_text(record))
-                    for record in retained
-                ),
+                (("Existing record", self._record_text(record)) for record in retained),
             )
         return self._record_fields(retained, ("artist", "song"))
 

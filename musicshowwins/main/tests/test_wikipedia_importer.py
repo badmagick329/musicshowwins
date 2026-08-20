@@ -533,9 +533,7 @@ def test_command_raises_on_source_failures(monkeypatch):
 
 @pytest.mark.django_db
 def test_new_source_is_denied_until_explicitly_approved(show):
-    client = FakeClient(
-        html=wins_html(("January 3", "TBA", "TBA")), revision="2027"
-    )
+    client = FakeClient(html=wins_html(("January 3", "TBA", "TBA")), revision="2027")
 
     summary = WikipediaImporter(client).sync(
         shows=[show.slug], years=[2026], dry_run=False
@@ -635,9 +633,7 @@ def test_strict_real_sync_rejects_unapproved_page(show, monkeypatch):
 @pytest.mark.django_db
 def test_approval_command_can_revoke_source(show):
     call_command("approve_wikipedia_source", show=show.slug, year=2027)
-    call_command(
-        "approve_wikipedia_source", show=show.slug, year=2027, revoke=True
-    )
+    call_command("approve_wikipedia_source", show=show.slug, year=2027, revoke=True)
 
     approval = SourceApproval.objects.get(show=show, year=2027)
     assert not approval.approved

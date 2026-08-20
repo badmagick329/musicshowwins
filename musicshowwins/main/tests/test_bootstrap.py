@@ -70,16 +70,23 @@ def test_bootstrap_restores_exact_domain_dataset(capsys):
     ).exists()
     assert not Artist.objects.filter(name__in=["Aespa[a]", "Jungkook ("]).exists()
     assert Artist.objects.filter(name="BLACKPINK and Selena Gomez").count() == 1
-    assert Song.objects.filter(
-        artist__name="Zico", title="SPOT! (feat. JENNIE)"
-    ).count() == 1
-    assert Song.objects.filter(
-        artist__name="Lee Young-ji", title="Small girl (feat. D.O.)"
-    ).count() == 1
-    assert Song.objects.filter(
-        artist__name="Jimin",
-        title="Smeraldo Garden Marching Band (feat. Loco)",
-    ).count() == 1
+    assert (
+        Song.objects.filter(artist__name="Zico", title="SPOT! (feat. JENNIE)").count()
+        == 1
+    )
+    assert (
+        Song.objects.filter(
+            artist__name="Lee Young-ji", title="Small girl (feat. D.O.)"
+        ).count()
+        == 1
+    )
+    assert (
+        Song.objects.filter(
+            artist__name="Jimin",
+            title="Smeraldo Garden Marching Band (feat. Loco)",
+        ).count()
+        == 1
+    )
     assert set(
         Artist.objects.filter(
             name__in=[

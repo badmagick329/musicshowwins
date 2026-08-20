@@ -98,9 +98,7 @@ class Command(BaseCommand):
                     ImportIssue(
                         issue_type=issue["issue_type"],
                         candidate=issue["candidate"],
-                        resolution=issue.get(
-                            "resolution", ImportIssue.Resolution.OPEN
-                        ),
+                        resolution=issue.get("resolution", ImportIssue.Resolution.OPEN),
                         notes=issue["notes"],
                         resolved_at=(
                             timezone.now()
