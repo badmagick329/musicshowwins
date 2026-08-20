@@ -129,10 +129,7 @@ def test_import_issue_resolution_choices_are_durable_and_evidence_is_read_only()
     choices = dict(form.fields["resolution"].choices)
 
     assert choices[ImportIssue.Resolution.OPEN] == "Needs review"
-    assert (
-        choices[ImportIssue.Resolution.ACCEPTED]
-        == "Candidate accepted"
-    )
+    assert choices[ImportIssue.Resolution.ACCEPTED] == "Candidate accepted"
     assert choices[ImportIssue.Resolution.REJECTED] == "Keep current public record"
     assert not {
         "issue_type",
