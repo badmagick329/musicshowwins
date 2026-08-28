@@ -39,7 +39,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ s
         </section>
 
         <div className="mt-8">
-          <ArtistSearch query={query} results={data.artistResults} />
+          <ArtistSearch query={query} results={data.artistResults} resultCount={data.artistResultCount} />
         </div>
         <ErrorState messages={data.errors} />
 

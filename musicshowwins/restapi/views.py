@@ -102,7 +102,12 @@ class ArtistList(generics.ListAPIView):
                 Q(name__icontains=params["search"])
                 | Q(aliases__alias__icontains=params["search"])
             ).distinct()
-        return ordered(query, self.request, {"name", "id", "total_wins"}, "name")
+        return ordered(
+            query,
+            self.request,
+            {"name", "id", "total_wins"},
+            "-total_wins,name",
+        )
 
 
 class ArtistDetail(generics.RetrieveAPIView):
