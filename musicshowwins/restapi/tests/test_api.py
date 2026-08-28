@@ -38,7 +38,13 @@ def test_read_only_collections_and_contracts(archive):
         == 200
     )
     assert set(shows.data["results"][0]) == {"id", "slug", "name", "active"}
-    assert set(artists.data["results"][0]) == {"id", "name", "total_wins"}
+    assert set(artists.data["results"][0]) == {
+        "id",
+        "name",
+        "total_wins",
+        "winning_songs",
+        "latest_win_date",
+    }
     assert set(songs.data["results"][0]) == {"id", "title", "artist", "total_wins"}
     assert set(wins.data["results"][0]) == {"id", "date", "show", "song"}
 
@@ -64,6 +70,45 @@ def test_filters_ordering_and_invalid_parameters(archive):
         client.get("/api/v1/wins?date_from=2025-02-01&date_to=2025-01-01").status_code
         == 400
     )
+
+
+@pytest.mark.django_db
+def test_artist_ordering_and_win_annotations(archive, django_assert_num_queries):
+    client = APIClient()
+    extra_song = Song.objects.create(artist=archive[1], title="Another")
+    Win.objects.create(show=archive[0], song=extra_song, date=date(2025, 2, 1))
+    no_wins = Artist.objects.create(name="Aardvark")
+
+    with django_assert_num_queries(2):
+        default = client.get("/api/v1/artists").data["results"]
+    assert [artist["name"] for artist in default[:3]] == ["Alpha", "Beta", "Aardvark"]
+    assert default[0] == {
+        "id": archive[1].pk,
+        "name": "Alpha",
+        "total_wins": 3,
+        "winning_songs": 2,
+        "latest_win_date": "2025-02-01",
+    }
+    assert default[2] == {
+        "id": no_wins.pk,
+        "name": "Aardvark",
+        "total_wins": 0,
+        "winning_songs": 0,
+        "latest_win_date": None,
+    }
+
+    ascending = client.get("/api/v1/artists?ordering=name").data["results"]
+    descending = client.get("/api/v1/artists?ordering=-name").data["results"]
+    assert [artist["name"] for artist in ascending[:3]] == [
+        "Aardvark",
+        "Alpha",
+        "Beta",
+    ]
+    assert [artist["name"] for artist in descending[:3]] == [
+        "Beta",
+        "Alpha",
+        "Aardvark",
+    ]
 
 
 @pytest.mark.django_db

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from datetime import date
 
-from django.db.models import Count, F, Prefetch, Q, Window
+from django.db.models import Count, F, Max, Prefetch, Q, Window
 from django.db.models.functions import DenseRank
 
 from .models import Artist, MusicShow, Song, Win
@@ -85,7 +85,13 @@ def wins_queryset(*, with_song_totals: bool = False, **filters):
 def all_artists_queryset(**filters):
     query = win_filters(**filters, prefix="songs__wins__")
     return Artist.objects.annotate(
-        total_wins=Count("songs__wins", filter=query, distinct=True)
+        total_wins=Count("songs__wins", filter=query, distinct=True),
+        winning_songs=Count(
+            "songs",
+            filter=query & Q(songs__wins__isnull=False),
+            distinct=True,
+        ),
+        latest_win_date=Max("songs__wins__date", filter=query),
     ).order_by("name")
 
 
