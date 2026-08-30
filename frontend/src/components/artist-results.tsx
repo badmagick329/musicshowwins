@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import type { Artist } from "@/lib/api";
+import type { Artist } from "@/lib/api-shared";
 import { EmptyState, formatDate } from "@/components/data-display";
 
 export function ArtistResults({ artists, empty }: { artists: Artist[]; empty: string }) {

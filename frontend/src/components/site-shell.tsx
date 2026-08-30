@@ -5,7 +5,7 @@ const links = [
   ["Home", "/"],
   ["Artists", "/artists"],
   ["Songs", "/#songs"],
-  ["Wins", "/#wins"],
+  ["Wins", "/wins"],
   ["Shows", "/#shows"],
   ["About", "/#about"],
 ] as const;

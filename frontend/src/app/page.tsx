@@ -1,4 +1,5 @@
 import { ArtistSearch } from "@/components/artist-search";
+import Link from "next/link";
 import {
   ErrorState,
   Leaderboard,
@@ -44,7 +45,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ s
         <ErrorState messages={data.errors} />
 
         <section id="wins" className="mt-14">
-          <SectionHeading title="Recent wins" />
+          <SectionHeading title="Recent wins" action={<Link href="/wins" className="text-sm font-bold text-brand-pink underline-offset-4 hover:underline">Browse all wins</Link>} />
           <RecentWins wins={data.wins} />
         </section>
 
