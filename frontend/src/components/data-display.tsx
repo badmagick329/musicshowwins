@@ -46,23 +46,23 @@ function leaderboardCopy(row: ArtistLeaderboardRow | SongLeaderboardRow, kind: "
   const title = kind === "artist" ? artistRow.artist.name : songRow.song.title;
   const subtitle = kind === "song" ? songRow.song.artist.name : undefined;
   const artist = kind === "artist" ? artistRow.artist : songRow.song.artist;
-  return { title, subtitle, artist };
+  return { title, subtitle, artist, songId: kind === "song" ? songRow.song.id : undefined };
 }
 
 function DesktopLeaderboardRow({ row, kind }: { row: ArtistLeaderboardRow | SongLeaderboardRow; kind: "artist" | "song" }) {
-  const { title, subtitle, artist } = leaderboardCopy(row, kind);
+  const { title, subtitle, artist, songId } = leaderboardCopy(row, kind);
   return (
     <TableRow className="border-border/70 transition-colors hover:bg-accent/60">
       <TableCell className="w-16 px-4 py-3"><RankMarker rank={row.rank} /></TableCell>
-      <TableCell className="px-4 py-3"><p className="font-semibold">{kind === "artist" ? <Link href={`/artists/${artist.id}`} className="underline-offset-4 hover:underline">{title}</Link> : title}</p>{subtitle && <p className="text-xs text-muted-foreground"><Link href={`/artists/${artist.id}`} className="underline-offset-4 hover:underline">{subtitle}</Link></p>}</TableCell>
+      <TableCell className="px-4 py-3"><p className="font-semibold">{kind === "artist" ? <Link href={`/artists/${artist.id}`} className="underline-offset-4 hover:underline">{title}</Link> : <Link href={`/songs/${songId}`} className="underline-offset-4 hover:underline">{title}</Link>}</p>{subtitle && <p className="text-xs text-muted-foreground"><Link href={`/artists/${artist.id}`} className="underline-offset-4 hover:underline">{subtitle}</Link></p>}</TableCell>
       <TableCell className="w-24 px-4 py-3 text-right font-heading text-lg font-bold tabular-nums">{row.wins}</TableCell>
     </TableRow>
   );
 }
 
 function MobileLeaderboardRow({ row, kind }: { row: ArtistLeaderboardRow | SongLeaderboardRow; kind: "artist" | "song" }) {
-  const { title, subtitle, artist } = leaderboardCopy(row, kind);
-  return <div className="mobile-record items-center gap-3 border-b border-border/70 px-3 py-3"><RankMarker rank={row.rank} /><div className="min-w-0 flex-1"><p className="truncate font-semibold">{kind === "artist" ? <Link href={`/artists/${artist.id}`}>{title}</Link> : title}</p>{subtitle && <p className="truncate text-xs text-muted-foreground"><Link href={`/artists/${artist.id}`}>{subtitle}</Link></p>}</div><p className="font-heading text-lg font-bold tabular-nums"><span className="sr-only">{row.wins} wins</span>{row.wins}</p></div>;
+  const { title, subtitle, artist, songId } = leaderboardCopy(row, kind);
+  return <div className="mobile-record items-center gap-3 border-b border-border/70 px-3 py-3"><RankMarker rank={row.rank} /><div className="min-w-0 flex-1"><p className="truncate font-semibold">{kind === "artist" ? <Link href={`/artists/${artist.id}`}>{title}</Link> : <Link href={`/songs/${songId}`}>{title}</Link>}</p>{subtitle && <p className="truncate text-xs text-muted-foreground"><Link href={`/artists/${artist.id}`}>{subtitle}</Link></p>}</div><p className="font-heading text-lg font-bold tabular-nums"><span className="sr-only">{row.wins} wins</span>{row.wins}</p></div>;
 }
 
 export function Leaderboard({ rows, kind, empty = "No wins to show yet." }: { rows: (ArtistLeaderboardRow | SongLeaderboardRow)[]; kind: "artist" | "song"; empty?: string }) {

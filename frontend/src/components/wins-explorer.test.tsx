@@ -66,8 +66,9 @@ describe("WinsExplorer", () => {
     setUrl("/wins");
     vi.useFakeTimers();
     const replaceState = vi.spyOn(window.history, "replaceState");
-    render(<WinsExplorer />);
+    const view = render(<WinsExplorer />);
     const search = screen.getByLabelText("Search wins");
+    search.focus();
     fireEvent.change(search, { target: { value: "b" } });
     fireEvent.change(search, { target: { value: "bt" } });
     fireEvent.change(search, { target: { value: "bts" } });
@@ -75,6 +76,8 @@ describe("WinsExplorer", () => {
     act(() => vi.advanceTimersByTime(500));
     expect(replaceState).toHaveBeenCalledTimes(1);
     expect(replaceState).toHaveBeenLastCalledWith(null, "", "/wins?search=bts");
+    view.rerender(<WinsExplorer />);
+    expect(document.activeElement).toBe(search);
   });
 
   it("does not write history for an unchanged normalized search", () => {

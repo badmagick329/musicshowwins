@@ -45,7 +45,14 @@ def test_read_only_collections_and_contracts(archive):
         "winning_songs",
         "latest_win_date",
     }
-    assert set(songs.data["results"][0]) == {"id", "title", "artist", "total_wins"}
+    assert set(songs.data["results"][0]) == {
+        "id",
+        "title",
+        "artist",
+        "total_wins",
+        "latest_win_date",
+        "winning_shows",
+    }
     assert set(wins.data["results"][0]) == {"id", "date", "show", "song"}
 
 
@@ -109,6 +116,42 @@ def test_artist_ordering_and_win_annotations(archive, django_assert_num_queries)
         "Alpha",
         "Aardvark",
     ]
+
+
+@pytest.mark.django_db
+def test_song_annotations_ordering_and_query_count(archive, django_assert_num_queries):
+    client = APIClient()
+    second_show = MusicShow.objects.create(slug="the-show", name="The Show")
+    third_artist = Artist.objects.create(name="Aardvark")
+    third_song = Song.objects.create(artist=third_artist, title="Alpha")
+    Win.objects.create(show=second_show, song=archive[3], date=date(2025, 2, 1))
+    Win.objects.create(show=second_show, song=third_song, date=date(2023, 1, 1))
+
+    with django_assert_num_queries(2):
+        default = client.get("/api/v1/songs").data["results"]
+    assert default[0] == {
+        "id": archive[3].pk,
+        "title": "First",
+        "artist": {"id": archive[1].pk, "name": "Alpha"},
+        "total_wins": 3,
+        "latest_win_date": "2025-02-01",
+        "winning_shows": 2,
+    }
+    assert [
+        song["title"]
+        for song in client.get("/api/v1/songs?ordering=title,artist__name").data[
+            "results"
+        ]
+    ] == ["Alpha", "First", "Second"]
+    assert [
+        song["artist"]["name"]
+        for song in client.get("/api/v1/songs?ordering=artist__name,title").data[
+            "results"
+        ]
+    ] == ["Aardvark", "Alpha", "Beta"]
+    detail = client.get(f"/api/v1/songs/{archive[3].pk}")
+    assert detail.data["latest_win_date"] == "2025-02-01"
+    assert detail.data["winning_shows"] == 2
 
 
 @pytest.mark.django_db

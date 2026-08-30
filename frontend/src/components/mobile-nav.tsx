@@ -8,7 +8,7 @@ import Link from "next/link";
 export const mobileNavLinks = [
   ["Home", "/"],
   ["Artists", "/artists"],
-  ["Songs", "/#songs"],
+  ["Songs", "/songs"],
   ["Wins", "/wins"],
   ["Shows", "/#shows"],
   ["About", "/#about"],

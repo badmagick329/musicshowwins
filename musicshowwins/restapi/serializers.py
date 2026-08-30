@@ -33,16 +33,19 @@ class ArtistSerializer(serializers.ModelSerializer):
 class SongSerializer(serializers.ModelSerializer):
     artist = ArtistSummarySerializer(read_only=True)
     total_wins = serializers.IntegerField(read_only=True)
+    latest_win_date = serializers.DateField(read_only=True, allow_null=True)
+    winning_shows = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Song
-        fields = ("id", "title", "artist", "total_wins")
-
-    def to_representation(self, instance):
-        data = super().to_representation(instance)
-        if not hasattr(instance, "total_wins"):
-            data["total_wins"] = instance.wins.count()
-        return data
+        fields = (
+            "id",
+            "title",
+            "artist",
+            "total_wins",
+            "latest_win_date",
+            "winning_shows",
+        )
 
 
 class WinSerializer(serializers.ModelSerializer):

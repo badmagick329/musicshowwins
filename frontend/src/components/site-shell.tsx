@@ -4,7 +4,7 @@ import { MobileNav } from "@/components/mobile-nav";
 const links = [
   ["Home", "/"],
   ["Artists", "/artists"],
-  ["Songs", "/#songs"],
+  ["Songs", "/songs"],
   ["Wins", "/wins"],
   ["Shows", "/#shows"],
   ["About", "/#about"],

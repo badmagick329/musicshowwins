@@ -137,7 +137,7 @@ class SongList(generics.ListAPIView):
             query,
             self.request,
             {"title", "id", "total_wins", "artist__name"},
-            "title",
+            "-total_wins,title,artist__name",
         )
 
 
