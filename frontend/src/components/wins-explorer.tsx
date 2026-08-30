@@ -61,7 +61,7 @@ function WinsRows({ wins }: { wins: Win[] }) {
         <article key={win.id} className="grid gap-2 border-b border-border/70 px-4 py-4 last:border-b-0 md:grid-cols-[7.5rem_minmax(0,1fr)_minmax(0,1fr)_auto] md:items-center md:gap-4">
           <time dateTime={win.date} className="font-heading text-sm font-bold tabular-nums text-muted-foreground">{formatDate(win.date)}</time>
           <Link href={`/artists/${win.song.artist.id}`} className="min-w-0 font-semibold underline-offset-4 hover:underline">{win.song.artist.name}</Link>
-          <span className="min-w-0 font-medium">{win.song.title}</span>
+          <Link href={`/songs/${win.song.id}`} className="min-w-0 font-medium underline-offset-4 hover:underline">{win.song.title}</Link>
           <ShowBadge slug={win.show.slug} name={win.show.name} />
         </article>
       ))}

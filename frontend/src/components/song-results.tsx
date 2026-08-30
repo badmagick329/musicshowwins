@@ -16,11 +16,11 @@ export function SongResults({ songs, empty }: { songs: Song[]; empty: string }) 
   return (
     <div className="border-2 border-foreground bg-card">
       <div className="hidden grid-cols-[minmax(13rem,1fr)_minmax(10rem,0.8fr)_6rem_9rem_5rem_1.25rem] gap-4 border-b-2 border-foreground bg-muted/50 px-4 py-3 text-xs font-bold uppercase tracking-[0.12em] text-muted-foreground lg:grid"><span>Song</span><span>Artist</span><span className="text-right">Wins</span><span>Latest win</span><span className="text-right">Shows</span><span /></div>
-      {songs.map((song) => <Link key={song.id} href={`/songs/${song.id}`} className="group grid gap-2 border-b border-border px-4 py-4 transition-colors hover:bg-accent focus-visible:bg-accent lg:grid-cols-[minmax(13rem,1fr)_minmax(10rem,0.8fr)_6rem_9rem_5rem_1.25rem] lg:items-center lg:gap-4 lg:last:border-b-0">
+      {songs.map((song) => <Link key={song.id} href={`/songs/${song.id}`} className="group relative grid gap-2 border-b border-border px-4 py-4 pr-12 transition-colors hover:bg-accent focus-visible:bg-accent lg:grid-cols-[minmax(13rem,1fr)_minmax(10rem,0.8fr)_6rem_9rem_5rem_1.25rem] lg:items-center lg:gap-4 lg:pr-4 lg:last:border-b-0">
         <div><p className="font-heading text-lg font-bold">{song.title}</p><p className="text-sm text-muted-foreground lg:hidden">{song.artist.name}</p></div>
         <p className="hidden text-sm lg:block">{song.artist.name}</p>
         <div className="flex flex-wrap gap-x-4 gap-y-1 lg:contents"><SongFacts song={song} /></div>
-        <ArrowRight className="hidden size-4 justify-self-end text-brand-pink transition-transform group-hover:translate-x-1 lg:block" aria-label={`View ${song.title}`} />
+        <ArrowRight className="absolute right-4 top-5 size-4 text-brand-pink transition-transform group-hover:translate-x-1 lg:static lg:justify-self-end" aria-hidden="true" />
       </Link>)}
     </div>
   );

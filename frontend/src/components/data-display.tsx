@@ -82,7 +82,7 @@ export function WinRecord({ win, hideArtist = false }: { win: Win; hideArtist?: 
   return (
     <article className="flex items-start gap-3 border-b border-border/70 px-3 py-3 last:border-b-0 sm:items-center">
       <time dateTime={win.date} className="w-20 shrink-0 font-heading text-sm font-bold tabular-nums text-muted-foreground">{formatDate(win.date)}</time>
-      <div className="min-w-0 flex-1"><p className="truncate font-semibold">{win.song.title}</p>{!hideArtist && <p className="truncate text-xs text-muted-foreground"><Link href={`/artists/${win.song.artist.id}`} className="underline-offset-4 hover:underline">{win.song.artist.name}</Link></p>}</div>
+      <div className="min-w-0 flex-1"><p className="truncate font-semibold"><Link href={`/songs/${win.song.id}`} className="underline-offset-4 hover:underline">{win.song.title}</Link></p>{!hideArtist && <p className="truncate text-xs text-muted-foreground"><Link href={`/artists/${win.song.artist.id}`} className="underline-offset-4 hover:underline">{win.song.artist.name}</Link></p>}</div>
       <ShowBadge slug={win.show.slug} name={win.show.name} />
     </article>
   );

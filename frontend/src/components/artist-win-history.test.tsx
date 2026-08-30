@@ -11,7 +11,13 @@ describe("ArtistWinHistory", () => {
   it("renders every win without a disclosure control", () => {
     const html = renderToStaticMarkup(<ArtistWinHistory wins={[win(1), win(2), win(3)]} />);
     expect(html.match(/<article/g)).toHaveLength(3);
+    expect(html).toContain('href="/songs/1"');
     expect(html).not.toContain("<details");
     expect(html).not.toContain("Show earlier wins");
+  });
+
+  it("supports a song-specific empty state", () => {
+    const html = renderToStaticMarkup(<ArtistWinHistory wins={[]} emptyMessage="No dated wins are recorded for this song." />);
+    expect(html).toContain("No dated wins are recorded for this song.");
   });
 });

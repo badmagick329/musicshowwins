@@ -46,6 +46,11 @@ afterEach(() => {
 });
 
 describe("WinsExplorer", () => {
+  it("links song titles to their detail pages", () => {
+    render(<WinsExplorer />);
+    expect(screen.getByRole("link", { name: "Archive Winner" }).getAttribute("href")).toBe("/songs/7");
+  });
+
   it("clears filters from an initially filtered URL", () => {
     setUrl("/wins?show=music-bank&year=2025");
     const pushState = vi.spyOn(window.history, "pushState");
