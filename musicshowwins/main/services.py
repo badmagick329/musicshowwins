@@ -73,9 +73,7 @@ def win_filters(
 def wins_queryset(*, with_song_totals: bool = False, **filters):
     queryset = Win.objects.select_related("show")
     if with_song_totals:
-        songs = Song.objects.select_related("artist").annotate(
-            total_wins=Count("wins", distinct=True)
-        )
+        songs = all_songs_queryset()
         queryset = queryset.prefetch_related(Prefetch("song", queryset=songs))
     else:
         queryset = queryset.select_related("song__artist")
@@ -99,7 +97,11 @@ def all_songs_queryset(**filters):
     query = win_filters(**filters, prefix="wins__")
     return (
         Song.objects.select_related("artist")
-        .annotate(total_wins=Count("wins", filter=query, distinct=True))
+        .annotate(
+            total_wins=Count("wins", filter=query, distinct=True),
+            latest_win_date=Max("wins__date", filter=query),
+            winning_shows=Count("wins__show", filter=query, distinct=True),
+        )
         .order_by("title", "artist__name")
     )
 

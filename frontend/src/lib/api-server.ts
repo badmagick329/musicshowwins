@@ -64,10 +64,13 @@ export async function collectPages<T>(path: string, params: Record<string, strin
 
 export const getArtists = (search = "", page = 1, sort: ArtistSort = "wins") => serverRequestPage<Artist>("/artists", { search: search.trim() || undefined, ordering: artistOrderings[sort], page });
 export const getArtist = (id: number) => serverRequestJson<Artist>(`/artists/${id}`);
+export const getSong = (id: number) => serverRequestJson<Song>(`/songs/${id}`);
+export const getSongs = (search = "", page = 1, ordering = "-total_wins,title,artist__name") => serverRequestPage<Song>("/songs", { search: search.trim() || undefined, ordering, page });
 export const getArtistSongs = (id: number, page = 1) => serverRequestPage<Song>("/songs", { artist: id, ordering: "-total_wins,title", page });
 export const getArtistWins = (id: number, page = 1) => serverRequestPage<Win>("/wins", { artist: id, ordering: "-date", page });
 export const getAllArtistSongs = (id: number) => collectPages<Song>("/songs", { artist: id, ordering: "-total_wins,title" });
 export const getAllArtistWins = (id: number) => collectPages<Win>("/wins", { artist: id, ordering: "-date" });
+export const getAllSongWins = (id: number) => collectPages<Win>("/wins", { song: id, ordering: "-date" });
 
 async function safePage<T>(label: string, path: string, params?: Record<string, string | number>) {
   try { return { page: await serverRequestPage<T>(path, params), error: undefined }; }

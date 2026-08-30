@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { EmptyState, LoadingState, ShowBadge, formatDate } from "@/components/data-display";
 import { browserTransport } from "@/lib/api-browser";
 import type { Show, Win } from "@/lib/api-shared";
@@ -18,22 +18,31 @@ import { showsQueryOptions, winsQueryOptions } from "@/lib/wins-queries";
 
 const pageSize = 100;
 
-function WinsSearchInput({ initialValue, onApply }: { initialValue: string; onApply: (value: string) => void }) {
-  const [value, setValue] = useState(initialValue);
-  const initialValueRef = useRef(initialValue);
+function WinsSearchInput({ query, onApply }: { query: string; onApply: (value: string) => void }) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const valueRef = useRef(query);
+  const timerRef = useRef<number | null>(null);
 
   useEffect(() => {
-    if (value === initialValueRef.current) return;
-    const timer = window.setTimeout(() => onApply(value), 500);
-    return () => window.clearTimeout(timer);
-  }, [onApply, value]);
+    valueRef.current = query;
+    if (inputRef.current && inputRef.current.value !== query) inputRef.current.value = query;
+  }, [query]);
+
+  useEffect(() => () => { if (timerRef.current) window.clearTimeout(timerRef.current); }, []);
+
+  const onChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    valueRef.current = event.target.value;
+    if (timerRef.current) window.clearTimeout(timerRef.current);
+    timerRef.current = window.setTimeout(() => onApply(valueRef.current), 500);
+  }, [onApply]);
 
   return (
     <label className="min-w-0 flex-1 text-sm font-bold">
       Search wins
       <input
-        value={value}
-        onChange={(event) => setValue(event.target.value)}
+        ref={inputRef}
+        defaultValue={query}
+        onChange={onChange}
         placeholder="Artist or song"
         autoComplete="off"
         className="mt-1 min-h-11 w-full border-2 border-foreground bg-card px-3 text-base font-normal placeholder:text-muted-foreground"
@@ -98,7 +107,7 @@ export function WinsExplorer() {
 
       <section className="mt-7 border-2 border-foreground bg-search-surface p-4 sm:p-5" aria-label="Filter wins">
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-          <WinsSearchInput key={filters.search} initialValue={filters.search} onApply={applySearch} />
+          <WinsSearchInput query={filters.search} onApply={applySearch} />
           <label className="text-sm font-bold">Music show
             <select value={filters.show} onChange={(event) => apply({ show: event.target.value })} className="mt-1 min-h-11 w-full border-2 border-foreground bg-card px-3 font-normal">
               <option value="">All shows</option>

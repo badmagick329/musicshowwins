@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { EmptyState, ShowBadge, formatDate } from "@/components/data-display";
 import { ApiRequestError, getAllArtistSongs, getAllArtistWins, getArtist } from "@/lib/api";
@@ -57,7 +58,7 @@ export default async function ArtistPage({ params }: { params: Promise<{ id: str
         </section>
         <section aria-labelledby="songs-title">
           <h2 id="songs-title" className="mb-4 border-b-2 border-foreground pb-3 font-heading text-2xl font-bold">Songs</h2>
-          {songs.length ? <ol className="border border-border bg-card">{songs.map((song, index) => <li key={song.id} className="grid grid-cols-[2.5rem_1fr_auto] items-center gap-3 border-b border-border px-4 py-3 last:border-b-0"><span className="font-heading font-bold tabular-nums text-muted-foreground">{index + 1}</span><span className="font-semibold">{song.title}</span><span className="tabular-nums"><strong>{song.total_wins}</strong> {song.total_wins === 1 ? "win" : "wins"}</span></li>)}</ol> : <EmptyState message="No songs are recorded for this artist." />}
+          {songs.length ? <ol className="border border-border bg-card">{songs.map((song, index) => <li key={song.id} className="grid grid-cols-[2.5rem_1fr_auto] items-center gap-3 border-b border-border px-4 py-3 last:border-b-0"><span className="font-heading font-bold tabular-nums text-muted-foreground">{index + 1}</span><Link href={`/songs/${song.id}`} className="font-semibold underline-offset-4 hover:underline">{song.title}</Link><span className="tabular-nums"><strong>{song.total_wins}</strong> {song.total_wins === 1 ? "win" : "wins"}</span></li>)}</ol> : <EmptyState message="No songs are recorded for this artist." />}
         </section>
       </div>
 

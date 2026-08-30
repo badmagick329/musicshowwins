@@ -14,11 +14,11 @@ export type Artist = {
   winning_songs: number;
   latest_win_date: string | null;
 };
-export type Song = { id: number; title: string; artist: Pick<Artist, "id" | "name">; total_wins: number };
+export type Song = { id: number; title: string; artist: Pick<Artist, "id" | "name">; total_wins: number; latest_win_date: string | null; winning_shows: number };
 export type Show = { id: number; slug: string; name: string; active: boolean };
 export type Win = { id: number; date: string; show: Show; song: Song };
 export type ArtistLeaderboardRow = { rank: number; wins: number; artist: Pick<Artist, "id" | "name"> };
-export type SongLeaderboardRow = { rank: number; wins: number; song: Omit<Song, "total_wins"> };
+export type SongLeaderboardRow = { rank: number; wins: number; song: Pick<Song, "id" | "title" | "artist"> };
 export type HomeData = {
   artists: ArtistLeaderboardRow[];
   songs: SongLeaderboardRow[];

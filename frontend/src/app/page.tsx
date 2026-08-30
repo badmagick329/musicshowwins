@@ -59,7 +59,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ s
             />
           </section>
           <section id="songs">
-            <SectionHeading title="Song leaderboard" />
+            <SectionHeading title="Song leaderboard" action={<Link href="/songs" className="text-sm font-bold text-brand-pink underline-offset-4 hover:underline">Browse all songs</Link>} />
             <Leaderboard
               rows={data.songs}
               kind="song"
