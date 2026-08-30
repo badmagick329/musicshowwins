@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from datetime import date
 
-from django.db.models import Count, F, Max, Prefetch, Q, Window
+from django.db.models import Count, F, Max, Min, OuterRef, Prefetch, Q, Subquery, Window
 from django.db.models.functions import DenseRank
 
 from .models import Artist, MusicShow, Song, Win
@@ -107,7 +107,17 @@ def all_songs_queryset(**filters):
 
 
 def show_queryset(search: str = ""):
-    query = MusicShow.objects.all()
+    latest_win = Win.objects.filter(show=OuterRef("pk")).order_by("-date", "-pk")
+    query = MusicShow.objects.annotate(
+        total_wins=Count("wins", distinct=True),
+        first_win_date=Min("wins__date"),
+        latest_win_date=Max("wins__date"),
+        latest_win_id=Subquery(latest_win.values("id")[:1]),
+        latest_win_song_id=Subquery(latest_win.values("song_id")[:1]),
+        latest_win_song_title=Subquery(latest_win.values("song__title")[:1]),
+        latest_win_artist_id=Subquery(latest_win.values("song__artist_id")[:1]),
+        latest_win_artist_name=Subquery(latest_win.values("song__artist__name")[:1]),
+    )
     if search:
         query = query.filter(Q(name__icontains=search) | Q(slug__icontains=search))
     return query.order_by("name")
