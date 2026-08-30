@@ -4,7 +4,7 @@ import type {
   SongLeaderboardRow,
   Win,
 } from "@/lib/api-shared";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 
@@ -69,6 +69,7 @@ export function Leaderboard({ rows, kind, empty = "No wins to show yet." }: { ro
   return (
     <div className="overflow-hidden border border-border bg-card">
       <Table className="desktop-table w-full border-collapse text-sm">
+        <TableCaption className="sr-only">Top five {kind === "artist" ? "artists" : "songs"} by music-show wins</TableCaption>
         <TableHeader><TableRow className="border-foreground border-b-2 bg-muted/50 text-left text-xs uppercase tracking-[0.12em] text-muted-foreground"><TableHead className="w-16 px-4 py-3">Rank</TableHead><TableHead className="px-4 py-3">{kind === "artist" ? "Artist" : "Song"}</TableHead><TableHead className="w-24 px-4 py-3 text-right">Wins</TableHead></TableRow></TableHeader>
         <TableBody>{rows.map((row, index) => <DesktopLeaderboardRow key={`${kind}-${index}-${row.rank}`} row={row} kind={kind} />)}</TableBody>
       </Table>
@@ -77,11 +78,12 @@ export function Leaderboard({ rows, kind, empty = "No wins to show yet." }: { ro
   );
 }
 
-export function WinRecord({ win, hideArtist = false }: { win: Win; hideArtist?: boolean }) {
+export function WinRecord({ win, hideArtist = false, hideSong = false }: { win: Win; hideArtist?: boolean; hideSong?: boolean }) {
   return (
     <article className="flex items-start gap-3 border-b border-border/70 px-3 py-3 last:border-b-0 sm:items-center">
       <time dateTime={win.date} className="w-20 shrink-0 font-heading text-sm font-bold tabular-nums text-muted-foreground">{formatDate(win.date)}</time>
-      <div className="min-w-0 flex-1"><p className="truncate font-semibold"><Link href={`/songs/${win.song.id}`} className="underline-offset-4 hover:underline">{win.song.title}</Link></p>{!hideArtist && <p className="truncate text-xs text-muted-foreground"><Link href={`/artists/${win.song.artist.id}`} className="underline-offset-4 hover:underline">{win.song.artist.name}</Link></p>}</div>
+      {!hideSong && <div className="min-w-0 flex-1"><p className="truncate font-semibold"><Link href={`/songs/${win.song.id}`} className="underline-offset-4 hover:underline">{win.song.title}</Link></p>{!hideArtist && <p className="truncate text-xs text-muted-foreground"><Link href={`/artists/${win.song.artist.id}`} className="underline-offset-4 hover:underline">{win.song.artist.name}</Link></p>}</div>}
+      {hideSong && <span className="flex-1" />}
       <ShowBadge slug={win.show.slug} name={win.show.name} />
     </article>
   );
@@ -91,7 +93,14 @@ export function RecentWins({ wins }: { wins: Win[] }) {
   if (!wins.length) {
     return <EmptyState message="No recent wins are available right now." />;
   }
-  return <div className="border border-border bg-card">{wins.map((win) => <WinRecord key={win.id} win={win} />)}</div>;
+  return <div className="border border-border bg-card">
+    <Table className="desktop-table border-collapse">
+      <TableCaption className="sr-only">Most recent music-show wins</TableCaption>
+      <TableHeader><TableRow className="border-b-2 border-foreground bg-muted/50 text-xs uppercase tracking-[0.12em] text-muted-foreground"><TableHead className="w-32 px-4 py-3">Date</TableHead><TableHead className="px-4 py-3">Song</TableHead><TableHead className="px-4 py-3">Artist</TableHead><TableHead className="w-44 px-4 py-3 text-right">Music show</TableHead></TableRow></TableHeader>
+      <TableBody>{wins.map((win) => <TableRow key={win.id} className="border-border/70 hover:bg-accent/60"><TableCell className="px-4 py-3"><time dateTime={win.date} className="font-heading text-sm font-bold tabular-nums text-muted-foreground">{formatDate(win.date)}</time></TableCell><TableCell className="px-4 py-3"><Link href={`/songs/${win.song.id}`} className="font-semibold underline-offset-4 hover:underline">{win.song.title}</Link></TableCell><TableCell className="px-4 py-3"><Link href={`/artists/${win.song.artist.id}`} className="underline-offset-4 hover:underline">{win.song.artist.name}</Link></TableCell><TableCell className="w-44 px-4 py-3 text-right"><ShowBadge slug={win.show.slug} name={win.show.name} /></TableCell></TableRow>)}</TableBody>
+    </Table>
+    <div className="mobile-record flex-col">{wins.map((win) => <WinRecord key={win.id} win={win} />)}</div>
+  </div>;
 }
 
 export function MusicShowList({ shows }: { shows: Show[] }) {
@@ -102,12 +111,15 @@ export function MusicShowList({ shows }: { shows: Show[] }) {
   return (
     <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
       {shows.map((show) => (
-        <li
-          key={show.id}
-          className="flex items-center justify-between gap-4 border-2 border-foreground bg-card p-4"
-        >
-          <ShowBadge slug={show.slug} name={show.name} />
-          <span className="text-xs tabular-nums text-muted-foreground">{show.total_wins} wins</span>
+        <li key={show.id}>
+          <Link
+            href={`/wins?show=${encodeURIComponent(show.slug)}#wins-results-title`}
+            aria-label={`Browse ${show.name} wins`}
+            className="flex items-center justify-between gap-4 border-2 border-foreground bg-card p-4 transition-colors hover:bg-accent focus-visible:bg-accent"
+          >
+            <ShowBadge slug={show.slug} name={show.name} />
+            <span className="text-xs tabular-nums text-muted-foreground">{show.total_wins} wins</span>
+          </Link>
         </li>
       ))}
     </ul>

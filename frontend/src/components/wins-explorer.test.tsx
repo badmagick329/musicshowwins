@@ -54,16 +54,12 @@ afterEach(() => {
 });
 
 describe("WinsExplorer", () => {
-  it("uses one deterministic desktop grid for the header and every row", () => {
+  it("uses a semantic desktop table and retains stacked mobile records", () => {
     const { container } = render(<WinsExplorer />);
-    const header = screen.getAllByText("Music show")[1].parentElement;
-    const rows = [...container.querySelectorAll("article")];
-    const gridClass = "md:grid-cols-[7.5rem_minmax(0,0.9fr)_minmax(0,1.1fr)_10rem]";
-    expect(header?.className).toContain(gridClass);
-    expect(rows).toHaveLength(2);
-    for (const row of rows) expect(row.className).toContain(gridClass);
-    expect(screen.getAllByText("Music Bank").at(-1)?.className).toContain("md:justify-self-end");
-    expect(screen.getByText("Show Champion").className).toContain("md:justify-self-end");
+    expect(screen.getByRole("table", { name: "Filtered music-show wins" })).toBeTruthy();
+    for (const heading of ["Date", "Artist", "Song", "Music show"]) expect(screen.getByRole("columnheader", { name: heading })).toBeTruthy();
+    expect(container.querySelectorAll("article")).toHaveLength(2);
+    expect(container.innerHTML).not.toContain("winsGridColumns");
   });
 
   it("shows total pages and waits for real requested-page data before scrolling", () => {
@@ -96,7 +92,8 @@ describe("WinsExplorer", () => {
 
   it("links song titles to their detail pages", () => {
     render(<WinsExplorer />);
-    expect(screen.getByRole("link", { name: "Archive Winner" }).getAttribute("href")).toBe("/songs/7");
+    expect(screen.getAllByRole("link", { name: "Archive Winner" }).every((link) => link.getAttribute("href") === "/songs/7")).toBe(true);
+    expect(screen.getAllByRole("link", { name: "Filter wins by Music Bank" }).every((link) => link.getAttribute("href") === "/wins?show=music-bank#wins-results-title")).toBe(true);
   });
 
   it("clears filters from an initially filtered URL", () => {
@@ -112,7 +109,7 @@ describe("WinsExplorer", () => {
     view.rerender(<WinsExplorer />);
     expect((screen.getByLabelText("Music show") as HTMLSelectElement).value).toBe("");
     expect((screen.getByLabelText("Year") as HTMLSelectElement).value).toBe("");
-    expect(screen.getByText("Archive Winner")).toBeTruthy();
+    expect(screen.getAllByText("Archive Winner")).toHaveLength(2);
   });
 
   it("debounces typing into one replacement history update", () => {
@@ -148,12 +145,12 @@ describe("WinsExplorer", () => {
     setUrl("/wins?show=music-bank");
     const view = render(<WinsExplorer />);
     expect((screen.getByLabelText("Music show") as HTMLSelectElement).value).toBe("music-bank");
-    expect(screen.getByText("Music Bank Winner")).toBeTruthy();
+    expect(screen.getAllByText("Music Bank Winner")).toHaveLength(2);
 
     setUrl("/wins?show=the-show");
     window.dispatchEvent(new PopStateEvent("popstate"));
     view.rerender(<WinsExplorer />);
     expect((screen.getByLabelText("Music show") as HTMLSelectElement).value).toBe("the-show");
-    expect(screen.getByText("The Show Winner")).toBeTruthy();
+    expect(screen.getAllByText("The Show Winner")).toHaveLength(2);
   });
 });

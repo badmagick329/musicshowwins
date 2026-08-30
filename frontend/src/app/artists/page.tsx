@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArtistResults } from "@/components/artist-results";
 import { DebouncedArtistSearch } from "@/components/debounced-artist-search";
-import { Pagination } from "@/components/pagination";
+import { ArchiveResultsSummary, Pagination } from "@/components/pagination";
 import { getArtists, parsePositivePage } from "@/lib/api";
 import { artistSortLabels, artistSorts, artistsUrl, parseArtistSort } from "@/lib/artist-list";
 
@@ -45,7 +45,7 @@ export default async function ArtistsPage({ searchParams }: { searchParams: Prom
       <section className="mt-8" aria-labelledby="artist-results-title">
         <div className="mb-4 flex items-end justify-between gap-4 border-b-2 border-foreground pb-3">
           <h2 id="artist-results-title" className="scroll-mt-24 font-heading text-2xl font-bold">{search ? `Results for “${search}”` : "All artists"}</h2>
-          <span className="text-sm text-muted-foreground">{artists.count} {artists.count === 1 ? "artist" : "artists"}</span>
+          <ArchiveResultsSummary totalCount={artists.count} page={page} resultCount={artists.results.length} singular="artist" plural="artists" />
         </div>
         <ArtistResults artists={artists.results} empty={search ? "No artists found. Try a shorter or alternate name." : "No artists are available right now."} />
         <Pagination page={page} totalCount={artists.count} hasPrevious={Boolean(artists.previous)} hasNext={Boolean(artists.next)} search={search} sort={sort} />

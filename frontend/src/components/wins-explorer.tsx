@@ -15,10 +15,10 @@ import {
 } from "@/lib/wins-filters";
 import { clearWinsNavigation, winsFiltersFromSearchParams, writeWinsHistory } from "@/lib/wins-navigation";
 import { showsQueryOptions, winsQueryOptions } from "@/lib/wins-queries";
-import { archivePageCount, archivePageSize } from "@/lib/pagination";
+import { archivePageCount } from "@/lib/pagination";
 import { usePaginationScroll } from "@/lib/use-pagination-scroll";
-
-const winsGridColumns = "md:grid-cols-[7.5rem_minmax(0,0.9fr)_minmax(0,1.1fr)_10rem]";
+import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { ArchiveResultsSummary } from "@/components/pagination";
 
 function WinsSearchInput({ query, onApply }: { query: string; onApply: (value: string) => void }) {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -56,26 +56,16 @@ function WinsSearchInput({ query, onApply }: { query: string; onApply: (value: s
 function WinsRows({ wins }: { wins: Win[] }) {
   return (
     <div className="border border-border bg-card">
-      <div className={`hidden gap-4 border-b-2 border-foreground bg-muted/50 px-4 py-3 text-xs font-bold uppercase tracking-[0.12em] text-muted-foreground md:grid ${winsGridColumns}`}>
-        <span>Date</span><span>Artist</span><span>Song</span><span className="text-right">Music show</span>
+      <Table className="desktop-table border-collapse">
+        <TableCaption className="sr-only">Filtered music-show wins</TableCaption>
+        <TableHeader><TableRow className="border-b-2 border-foreground bg-muted/50 text-xs uppercase tracking-[0.12em] text-muted-foreground"><TableHead className="w-32 px-4 py-3">Date</TableHead><TableHead className="px-4 py-3">Artist</TableHead><TableHead className="px-4 py-3">Song</TableHead><TableHead className="w-44 px-4 py-3 text-right">Music show</TableHead></TableRow></TableHeader>
+        <TableBody>{wins.map((win) => <TableRow key={win.id} className="border-border/70 hover:bg-accent/60"><TableCell className="px-4 py-4"><time dateTime={win.date} className="font-heading text-sm font-bold tabular-nums text-muted-foreground">{formatDate(win.date)}</time></TableCell><TableCell className="px-4 py-4"><Link href={`/artists/${win.song.artist.id}`} className="font-semibold underline-offset-4 hover:underline">{win.song.artist.name}</Link></TableCell><TableCell className="px-4 py-4"><Link href={`/songs/${win.song.id}`} className="font-medium underline-offset-4 hover:underline">{win.song.title}</Link></TableCell><TableCell className="w-44 px-4 py-4 text-right"><Link href={`/wins?show=${encodeURIComponent(win.show.slug)}#wins-results-title`} aria-label={`Filter wins by ${win.show.name}`}><ShowBadge slug={win.show.slug} name={win.show.name} /></Link></TableCell></TableRow>)}</TableBody>
+      </Table>
+      <div className="mobile-record flex-col">
+        {wins.map((win) => <article key={win.id} className="grid gap-2 border-b border-border/70 px-4 py-4 last:border-b-0"><time dateTime={win.date} className="font-heading text-sm font-bold tabular-nums text-muted-foreground">{formatDate(win.date)}</time><Link href={`/artists/${win.song.artist.id}`} className="min-w-0 font-semibold underline-offset-4 hover:underline">{win.song.artist.name}</Link><Link href={`/songs/${win.song.id}`} className="min-w-0 font-medium underline-offset-4 hover:underline">{win.song.title}</Link><Link href={`/wins?show=${encodeURIComponent(win.show.slug)}#wins-results-title`} aria-label={`Filter wins by ${win.show.name}`}><ShowBadge slug={win.show.slug} name={win.show.name} /></Link></article>)}
       </div>
-      {wins.map((win) => (
-        <article key={win.id} className={`grid gap-2 border-b border-border/70 px-4 py-4 last:border-b-0 md:items-center md:gap-4 ${winsGridColumns}`}>
-          <time dateTime={win.date} className="font-heading text-sm font-bold tabular-nums text-muted-foreground">{formatDate(win.date)}</time>
-          <Link href={`/artists/${win.song.artist.id}`} className="min-w-0 font-semibold underline-offset-4 hover:underline">{win.song.artist.name}</Link>
-          <Link href={`/songs/${win.song.id}`} className="min-w-0 font-medium underline-offset-4 hover:underline">{win.song.title}</Link>
-          <ShowBadge slug={win.show.slug} name={win.show.name} className="md:justify-self-end" />
-        </article>
-      ))}
     </div>
   );
-}
-
-function ResultsSummary({ count, page, resultCount }: { count: number; page: number; resultCount: number }) {
-  if (!count) return <span className="text-sm tabular-nums text-muted-foreground">0 wins</span>;
-  const from = (page - 1) * archivePageSize + 1;
-  const to = from + resultCount - 1;
-  return <span className="text-sm tabular-nums text-muted-foreground">{count} wins · {from}–{to}</span>;
 }
 
 export function WinsExplorer() {
@@ -151,7 +141,7 @@ export function WinsExplorer() {
       <section className="mt-8" aria-labelledby="wins-results-title">
         <div className="mb-4 flex flex-wrap items-end justify-between gap-3 border-b-2 border-foreground pb-3">
           <div><h2 id="wins-results-title" className="scroll-mt-24 font-heading text-2xl font-bold">Results</h2>{wins.isFetching && data && <p role="status" className="mt-1 text-xs text-muted-foreground">Updating results…</p>}</div>
-          {data && <ResultsSummary count={data.count} page={filters.page} resultCount={data.results.length} />}
+          {data && <ArchiveResultsSummary totalCount={data.count} page={filters.page} resultCount={data.results.length} singular="win" plural="wins" />}
         </div>
         {dateRangeError ? null : wins.isLoading && !data ? <LoadingState label="Loading wins…" /> : wins.isError ? (
           <div role="alert" className="border border-destructive bg-danger-surface p-4"><p className="font-semibold">Wins could not load.</p><button type="button" onClick={() => wins.refetch()} className="mt-3 min-h-10 border-2 border-foreground bg-card px-3 text-sm font-bold">Retry</button></div>

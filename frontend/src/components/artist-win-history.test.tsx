@@ -11,6 +11,8 @@ describe("ArtistWinHistory", () => {
   it("renders every win without a disclosure control", () => {
     const html = renderToStaticMarkup(<ArtistWinHistory wins={[win(1), win(2), win(3)]} />);
     expect(html.match(/<article/g)).toHaveLength(3);
+    expect(html).toContain("<table");
+    for (const heading of ["Date", "Song", "Music show"]) expect(html).toContain(heading);
     expect(html).toContain('href="/songs/1"');
     expect(html).not.toContain("<details");
     expect(html).not.toContain("Show earlier wins");

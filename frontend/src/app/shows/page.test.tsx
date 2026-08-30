@@ -27,8 +27,9 @@ describe("ShowsPage", () => {
     expect(html).toContain("42");
     expect(html).toContain('href="/songs/4"');
     expect(html).toContain('href="/artists/3"');
-    expect(html).toContain('href="/wins?show=music-bank"');
+    expect(html).toContain('href="/wins?show=music-bank#wins-results-title"');
     expect(html).toContain("Browse wins");
+    expect(html).toContain("after:absolute after:inset-0");
     expect(html).not.toContain("Active weekly show");
   });
 

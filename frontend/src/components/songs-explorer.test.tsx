@@ -46,6 +46,7 @@ describe("SongsExplorer search", () => {
     queryState.isPlaceholderData = true;
     const view = render(<SongsExplorer />);
     expect(screen.getByText("Page 1 of 2")).toBeTruthy();
+    expect(screen.getByText("1–1 of 101 songs · Page 1 of 2")).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: "Next" }));
     view.rerender(<SongsExplorer />);
     expect(Element.prototype.scrollIntoView).not.toHaveBeenCalled();
@@ -55,6 +56,7 @@ describe("SongsExplorer search", () => {
     view.rerender(<SongsExplorer />);
     expect(Element.prototype.scrollIntoView).toHaveBeenCalledTimes(1);
     expect(Element.prototype.scrollIntoView).toHaveBeenCalledWith({ block: "start" });
+    expect(screen.getByText("101–101 of 101 songs · Page 2 of 2")).toBeTruthy();
   });
 
   it("does not scroll for initial loads, background refetches, or sorting", () => {
