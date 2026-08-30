@@ -91,6 +91,13 @@ The pop-pink accent is the main brand signal. Yellow and cyan are supporting
 highlights, not equal competing brand colors. Large areas should remain warm and
 neutral so the accents retain energy.
 
+### Brand mark
+
+Use the approved standalone mark: a flat pop-pink square, strong plum border
+and hard offset shadow, with a geometric white “K”. Keep it sharp-edged and
+legible at favicon size. Do not add gradients, gloss, dots, imagery, or
+music-show branding, and retain the full KpopWins wordmark where space allows.
+
 ### Music-show identifiers
 
 Give each show a stable interface color. These are navigation aids, not claims
