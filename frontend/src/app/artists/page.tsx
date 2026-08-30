@@ -23,7 +23,7 @@ export default async function ArtistsPage({ searchParams }: { searchParams: Prom
         <p className="mt-2 max-w-2xl text-surface-berry-foreground/80">Browse every artist in the archive or search by name and known alias.</p>
       </header>
       <div className="mt-8 border-2 border-foreground bg-search-surface p-5">
-        <DebouncedArtistSearch key={search} id="artist-list-search" query={search} />
+        <DebouncedArtistSearch id="artist-list-search" query={search} />
       </div>
       <section className="mt-7" aria-labelledby="artist-sort-title">
         <div className="flex flex-col gap-3 border-b-2 border-foreground pb-4 sm:flex-row sm:items-center sm:justify-between">
