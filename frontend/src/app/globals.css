@@ -101,8 +101,24 @@ body {
   @apply text-foreground antialiased;
   background: var(--background);
 }
-a, button, input { @apply outline-ring/50; }
-a:focus-visible, button:focus-visible, input:focus-visible { @apply outline-2 outline-offset-2 outline-ring; }
+a, button, input, select, summary, [role="button"], [role="link"] { @apply outline-ring/50; }
+a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-visible, [role="button"]:focus-visible, [role="link"]:focus-visible { @apply outline-2 outline-offset-2 outline-ring; }
+a[href]:not([aria-disabled="true"]),
+button:not(:disabled),
+[role="button"]:not([aria-disabled="true"]),
+[role="link"]:not([aria-disabled="true"]),
+summary,
+select:not(:disabled),
+input:is([type="button"], [type="submit"], [type="reset"], [type="checkbox"], [type="radio"], [type="file"], [type="color"], [type="range"]):not(:disabled) {
+  cursor: pointer;
+}
+button:disabled,
+[role="button"][aria-disabled="true"],
+[role="link"][aria-disabled="true"],
+select:disabled,
+input:disabled {
+  cursor: not-allowed;
+}
 ::selection { background: color-mix(in srgb, var(--brand-pink) 25%, white); }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -113,7 +129,6 @@ a:focus-visible, button:focus-visible, input:focus-visible { @apply outline-2 ou
   to { opacity: 1; transform: translateY(0); }
 }
 .show-badge { border-color: color-mix(in srgb, var(--show-color) 50%, transparent); background: color-mix(in srgb, var(--show-color) 12%, white); color: color-mix(in srgb, var(--show-color) 80%, black); }
-.show-dot { background-color: var(--show-color); }
 .show-inkigayo { --show-color: var(--show-inkigayo); }
 .show-m-countdown { --show-color: var(--show-m-countdown); }
 .show-music-bank { --show-color: var(--show-music-bank); }

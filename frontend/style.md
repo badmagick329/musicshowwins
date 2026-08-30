@@ -103,9 +103,9 @@ about official show branding.
 - Show Champion: teal;
 - The Show: sunflower yellow.
 
-Use show colors for compact badges, dots, table markers, filters, and small
-section accents. Always include the show name; color must never be the only way
-to identify it.
+Use show colors for compact text-only badges, table markers, filters, and small
+section accents. Music-show badges should not contain decorative leading dots.
+Always include the show name; color must never be the only way to identify it.
 
 ## Typography
 
@@ -343,6 +343,7 @@ Use practical accessible defaults from the beginning:
 - descriptive links and buttons;
 - reduced-motion support;
 - sensible heading order.
+- appropriate cursor affordances for enabled interactive controls and disabled states.
 
 Do not add a custom keyboard-navigation system or other complex accessibility
 infrastructure during the initial frontend phase. Do not remove useful native
