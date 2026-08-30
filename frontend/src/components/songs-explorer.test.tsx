@@ -4,6 +4,8 @@ import { act, cleanup, fireEvent, render, screen } from "@testing-library/react"
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { SongsExplorer } from "./songs-explorer";
 
+const queryState = vi.hoisted(() => ({ isFetching: false, isPlaceholderData: false }));
+
 vi.mock("next/navigation", () => ({
   useSearchParams: () => new URLSearchParams(window.location.search),
 }));
@@ -16,7 +18,8 @@ vi.mock("@tanstack/react-query", () => ({
     return {
       data: { count: 101, next: filters.page === 1 ? "page-2" : null, previous: filters.page > 1 ? "page-1" : null, results: [{ id: 7, title: filters.search ? `${filters.search} Song` : "Archive Song", artist: { id: 3, name: "Artist" }, total_wins: 1, latest_win_date: "2025-01-01", winning_shows: 1 }] },
       isError: false,
-      isFetching: false,
+      isFetching: queryState.isFetching,
+      isPlaceholderData: queryState.isPlaceholderData,
       isLoading: false,
       refetch: vi.fn(),
     };
@@ -32,9 +35,40 @@ afterEach(() => {
   vi.useRealTimers();
   vi.restoreAllMocks();
   setUrl("/songs");
+  queryState.isFetching = false;
+  queryState.isPlaceholderData = false;
 });
 
 describe("SongsExplorer search", () => {
+  it("shows total pages and scrolls only after requested page data replaces the placeholder", () => {
+    Object.defineProperty(Element.prototype, "scrollIntoView", { configurable: true, value: vi.fn() });
+    queryState.isFetching = true;
+    queryState.isPlaceholderData = true;
+    const view = render(<SongsExplorer />);
+    expect(screen.getByText("Page 1 of 2")).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Next" }));
+    view.rerender(<SongsExplorer />);
+    expect(Element.prototype.scrollIntoView).not.toHaveBeenCalled();
+
+    queryState.isFetching = false;
+    queryState.isPlaceholderData = false;
+    view.rerender(<SongsExplorer />);
+    expect(Element.prototype.scrollIntoView).toHaveBeenCalledTimes(1);
+    expect(Element.prototype.scrollIntoView).toHaveBeenCalledWith({ block: "start" });
+  });
+
+  it("does not scroll for initial loads, background refetches, or sorting", () => {
+    Object.defineProperty(Element.prototype, "scrollIntoView", { configurable: true, value: vi.fn() });
+    const view = render(<SongsExplorer />);
+    queryState.isFetching = true;
+    view.rerender(<SongsExplorer />);
+    queryState.isFetching = false;
+    view.rerender(<SongsExplorer />);
+    fireEvent.change(screen.getByLabelText("Sort songs"), { target: { value: "title" } });
+    view.rerender(<SongsExplorer />);
+    expect(Element.prototype.scrollIntoView).not.toHaveBeenCalled();
+  });
+
   it("debounces rapid typing into one normalized replacement update", () => {
     vi.useFakeTimers();
     const replaceState = vi.spyOn(window.history, "replaceState");

@@ -26,11 +26,10 @@ const showLabels: Record<string, string> = {
   "the-show": "The Show",
 };
 
-export function ShowBadge({ slug, name }: { slug: string; name?: string }) {
+export function ShowBadge({ slug, name, className }: { slug: string; name?: string; className?: string }) {
   const showClass = `show-${slug}`;
   return (
-    <span className={cn("show-badge inline-flex items-center gap-1.5 border px-2 py-0.5 text-xs font-bold", showClass)}>
-      <span className="show-dot size-1.5 rounded-full" aria-hidden="true" />
+    <span className={cn("show-badge inline-flex items-center border px-2 py-0.5 text-xs font-bold", showClass, className)}>
       {name ?? showLabels[slug] ?? slug}
     </span>
   );

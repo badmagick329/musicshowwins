@@ -4,6 +4,8 @@ import { act, cleanup, fireEvent, render, screen } from "@testing-library/react"
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { WinsExplorer } from "./wins-explorer";
 
+const queryState = vi.hoisted(() => ({ isFetching: false, isPlaceholderData: false }));
+
 vi.mock("next/navigation", () => ({
   useSearchParams: () => new URLSearchParams(window.location.search),
 }));
@@ -22,12 +24,16 @@ vi.mock("@tanstack/react-query", () => ({
         isFetching: false,
       };
     }
-    const filters = options.queryKey[2] as { show: string; search: string };
+    const filters = options.queryKey[2] as { show: string; search: string; page: number };
     const title = filters.show === "the-show" ? "The Show Winner" : filters.show === "music-bank" ? "Music Bank Winner" : filters.search ? `${filters.search} Winner` : "Archive Winner";
     return {
-      data: { count: 1, next: null, previous: null, results: [{ id: 1, date: "2025-01-01", show: { id: 1, slug: filters.show || "music-bank", name: filters.show === "the-show" ? "The Show" : "Music Bank", active: true }, song: { id: 7, title, artist: { id: 3, name: "Artist" }, total_wins: 1 } }] },
+      data: { count: 201, next: filters.page < 3 ? "next" : null, previous: filters.page > 1 ? "previous" : null, results: [
+        { id: 1, date: "2025-01-01", show: { id: 1, slug: filters.show || "music-bank", name: filters.show === "the-show" ? "The Show" : "Music Bank", active: true }, song: { id: 7, title, artist: { id: 3, name: "Artist" }, total_wins: 1 } },
+        { id: 2, date: "2025-01-02", show: { id: 3, slug: "show-champion", name: "Show Champion", active: true }, song: { id: 8, title: "Second Winner", artist: { id: 4, name: "Another Artist" }, total_wins: 1 } },
+      ] },
       isError: false,
-      isFetching: false,
+      isFetching: queryState.isFetching,
+      isPlaceholderData: queryState.isPlaceholderData,
       isLoading: false,
       refetch: vi.fn(),
     };
@@ -43,9 +49,51 @@ afterEach(() => {
   vi.useRealTimers();
   vi.restoreAllMocks();
   setUrl("/wins");
+  queryState.isFetching = false;
+  queryState.isPlaceholderData = false;
 });
 
 describe("WinsExplorer", () => {
+  it("uses one deterministic desktop grid for the header and every row", () => {
+    const { container } = render(<WinsExplorer />);
+    const header = screen.getAllByText("Music show")[1].parentElement;
+    const rows = [...container.querySelectorAll("article")];
+    const gridClass = "md:grid-cols-[7.5rem_minmax(0,0.9fr)_minmax(0,1.1fr)_10rem]";
+    expect(header?.className).toContain(gridClass);
+    expect(rows).toHaveLength(2);
+    for (const row of rows) expect(row.className).toContain(gridClass);
+    expect(screen.getAllByText("Music Bank").at(-1)?.className).toContain("md:justify-self-end");
+    expect(screen.getByText("Show Champion").className).toContain("md:justify-self-end");
+  });
+
+  it("shows total pages and waits for real requested-page data before scrolling", () => {
+    Object.defineProperty(Element.prototype, "scrollIntoView", { configurable: true, value: vi.fn() });
+    queryState.isFetching = true;
+    queryState.isPlaceholderData = true;
+    const view = render(<WinsExplorer />);
+    expect(screen.getByText("Page 1 of 3")).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Next" }));
+    view.rerender(<WinsExplorer />);
+    expect(Element.prototype.scrollIntoView).not.toHaveBeenCalled();
+
+    queryState.isFetching = false;
+    queryState.isPlaceholderData = false;
+    view.rerender(<WinsExplorer />);
+    expect(Element.prototype.scrollIntoView).toHaveBeenCalledTimes(1);
+  });
+
+  it("does not scroll for background refetches or filter changes", () => {
+    Object.defineProperty(Element.prototype, "scrollIntoView", { configurable: true, value: vi.fn() });
+    const view = render(<WinsExplorer />);
+    queryState.isFetching = true;
+    view.rerender(<WinsExplorer />);
+    queryState.isFetching = false;
+    view.rerender(<WinsExplorer />);
+    fireEvent.change(screen.getByLabelText("Music show"), { target: { value: "the-show" } });
+    view.rerender(<WinsExplorer />);
+    expect(Element.prototype.scrollIntoView).not.toHaveBeenCalled();
+  });
+
   it("links song titles to their detail pages", () => {
     render(<WinsExplorer />);
     expect(screen.getByRole("link", { name: "Archive Winner" }).getAttribute("href")).toBe("/songs/7");

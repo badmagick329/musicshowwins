@@ -15,8 +15,10 @@ import {
 } from "@/lib/wins-filters";
 import { clearWinsNavigation, winsFiltersFromSearchParams, writeWinsHistory } from "@/lib/wins-navigation";
 import { showsQueryOptions, winsQueryOptions } from "@/lib/wins-queries";
+import { archivePageCount, archivePageSize } from "@/lib/pagination";
+import { usePaginationScroll } from "@/lib/use-pagination-scroll";
 
-const pageSize = 100;
+const winsGridColumns = "md:grid-cols-[7.5rem_minmax(0,0.9fr)_minmax(0,1.1fr)_10rem]";
 
 function WinsSearchInput({ query, onApply }: { query: string; onApply: (value: string) => void }) {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -54,15 +56,15 @@ function WinsSearchInput({ query, onApply }: { query: string; onApply: (value: s
 function WinsRows({ wins }: { wins: Win[] }) {
   return (
     <div className="border border-border bg-card">
-      <div className="hidden grid-cols-[7.5rem_minmax(0,1fr)_minmax(0,1fr)_auto] gap-4 border-b-2 border-foreground bg-muted/50 px-4 py-3 text-xs font-bold uppercase tracking-[0.12em] text-muted-foreground md:grid">
-        <span>Date</span><span>Artist</span><span>Song</span><span>Music show</span>
+      <div className={`hidden gap-4 border-b-2 border-foreground bg-muted/50 px-4 py-3 text-xs font-bold uppercase tracking-[0.12em] text-muted-foreground md:grid ${winsGridColumns}`}>
+        <span>Date</span><span>Artist</span><span>Song</span><span className="text-right">Music show</span>
       </div>
       {wins.map((win) => (
-        <article key={win.id} className="grid gap-2 border-b border-border/70 px-4 py-4 last:border-b-0 md:grid-cols-[7.5rem_minmax(0,1fr)_minmax(0,1fr)_auto] md:items-center md:gap-4">
+        <article key={win.id} className={`grid gap-2 border-b border-border/70 px-4 py-4 last:border-b-0 md:items-center md:gap-4 ${winsGridColumns}`}>
           <time dateTime={win.date} className="font-heading text-sm font-bold tabular-nums text-muted-foreground">{formatDate(win.date)}</time>
           <Link href={`/artists/${win.song.artist.id}`} className="min-w-0 font-semibold underline-offset-4 hover:underline">{win.song.artist.name}</Link>
           <Link href={`/songs/${win.song.id}`} className="min-w-0 font-medium underline-offset-4 hover:underline">{win.song.title}</Link>
-          <ShowBadge slug={win.show.slug} name={win.show.name} />
+          <ShowBadge slug={win.show.slug} name={win.show.name} className="md:justify-self-end" />
         </article>
       ))}
     </div>
@@ -71,7 +73,7 @@ function WinsRows({ wins }: { wins: Win[] }) {
 
 function ResultsSummary({ count, page, resultCount }: { count: number; page: number; resultCount: number }) {
   if (!count) return <span className="text-sm tabular-nums text-muted-foreground">0 wins</span>;
-  const from = (page - 1) * pageSize + 1;
+  const from = (page - 1) * archivePageSize + 1;
   const to = from + resultCount - 1;
   return <span className="text-sm tabular-nums text-muted-foreground">{count} wins · {from}–{to}</span>;
 }
@@ -84,16 +86,23 @@ export function WinsExplorer() {
   const dateRangeError = winsDateRangeError(filters);
   const shows = useQuery(showsQueryOptions(browserTransport));
   const wins = useQuery({ ...winsQueryOptions(filters, browserTransport), enabled: !dateRangeError, placeholderData: keepPreviousData });
+  const { requestPaginationScroll, cancelPaginationScroll } = usePaginationScroll(filters.page, Boolean(wins.data) && !wins.isPlaceholderData && !wins.isFetching, "wins-results-title");
   const write = useCallback((update: Partial<WinsFilters>, mode: "push" | "replace" = "push") => writeWinsHistory(filtersRef.current, update, mode), []);
-  const apply = useCallback((update: Partial<WinsFilters>) => write(update), [write]);
+  const apply = useCallback((update: Partial<WinsFilters>) => { cancelPaginationScroll(); return write(update); }, [cancelPaginationScroll, write]);
+  const paginate = useCallback((page: number) => {
+    requestPaginationScroll(page);
+    if (!write({ page })) cancelPaginationScroll();
+  }, [cancelPaginationScroll, requestPaginationScroll, write]);
   const applySearch = useCallback((search: string) => {
+    cancelPaginationScroll();
     if (search.trim() === filtersRef.current.search) return;
     write(search ? { search } : { search: "" }, "replace");
-  }, [write]);
+  }, [cancelPaginationScroll, write]);
   const clearFilters = useCallback(() => {
+    cancelPaginationScroll();
     const navigation = clearWinsNavigation(filtersRef.current);
     if (navigation) window.history.pushState(null, "", navigation.url);
-  }, []);
+  }, [cancelPaginationScroll]);
   const activeFilters = hasActiveWinsFilters(filters);
   const showOptions: Show[] = shows.data?.results ?? [];
   const data = wins.data;
@@ -141,16 +150,16 @@ export function WinsExplorer() {
 
       <section className="mt-8" aria-labelledby="wins-results-title">
         <div className="mb-4 flex flex-wrap items-end justify-between gap-3 border-b-2 border-foreground pb-3">
-          <div><h2 id="wins-results-title" className="font-heading text-2xl font-bold">Results</h2>{wins.isFetching && data && <p role="status" className="mt-1 text-xs text-muted-foreground">Updating results…</p>}</div>
+          <div><h2 id="wins-results-title" className="scroll-mt-24 font-heading text-2xl font-bold">Results</h2>{wins.isFetching && data && <p role="status" className="mt-1 text-xs text-muted-foreground">Updating results…</p>}</div>
           {data && <ResultsSummary count={data.count} page={filters.page} resultCount={data.results.length} />}
         </div>
         {dateRangeError ? null : wins.isLoading && !data ? <LoadingState label="Loading wins…" /> : wins.isError ? (
           <div role="alert" className="border border-destructive bg-danger-surface p-4"><p className="font-semibold">Wins could not load.</p><button type="button" onClick={() => wins.refetch()} className="mt-3 min-h-10 border-2 border-foreground bg-card px-3 text-sm font-bold">Retry</button></div>
         ) : data?.results.length ? <WinsRows wins={data.results} /> : <EmptyState message="No wins match these filters." />}
         {data && !dateRangeError && (data.previous || data.next) && <nav aria-label="Wins pages" className="mt-6 flex items-center justify-between gap-4">
-          {data.previous ? <button type="button" onClick={() => apply({ page: filters.page - 1 })} className="min-h-11 border-2 border-foreground bg-card px-4 text-sm font-bold shadow-[2px_2px_0_var(--foreground)]">Previous</button> : <span />}
-          <span className="text-sm font-semibold tabular-nums">Page {filters.page}</span>
-          {data.next ? <button type="button" onClick={() => apply({ page: filters.page + 1 })} className="min-h-11 border-2 border-foreground bg-card px-4 text-sm font-bold shadow-[2px_2px_0_var(--foreground)]">Next</button> : <span />}
+          {data.previous ? <button type="button" onClick={() => paginate(filters.page - 1)} className="min-h-11 border-2 border-foreground bg-card px-4 text-sm font-bold shadow-[2px_2px_0_var(--foreground)]">Previous</button> : <span />}
+          <span className="text-sm font-semibold tabular-nums">Page {filters.page} of {archivePageCount(data.count)}</span>
+          {data.next ? <button type="button" onClick={() => paginate(filters.page + 1)} className="min-h-11 border-2 border-foreground bg-card px-4 text-sm font-bold shadow-[2px_2px_0_var(--foreground)]">Next</button> : <span />}
         </nav>}
       </section>
     </main>

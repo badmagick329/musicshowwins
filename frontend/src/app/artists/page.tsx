@@ -44,11 +44,11 @@ export default async function ArtistsPage({ searchParams }: { searchParams: Prom
       </section>
       <section className="mt-8" aria-labelledby="artist-results-title">
         <div className="mb-4 flex items-end justify-between gap-4 border-b-2 border-foreground pb-3">
-          <h2 id="artist-results-title" className="font-heading text-2xl font-bold">{search ? `Results for “${search}”` : "All artists"}</h2>
+          <h2 id="artist-results-title" className="scroll-mt-24 font-heading text-2xl font-bold">{search ? `Results for “${search}”` : "All artists"}</h2>
           <span className="text-sm text-muted-foreground">{artists.count} {artists.count === 1 ? "artist" : "artists"}</span>
         </div>
         <ArtistResults artists={artists.results} empty={search ? "No artists found. Try a shorter or alternate name." : "No artists are available right now."} />
-        <Pagination page={page} hasPrevious={Boolean(artists.previous)} hasNext={Boolean(artists.next)} search={search} sort={sort} />
+        <Pagination page={page} totalCount={artists.count} hasPrevious={Boolean(artists.previous)} hasNext={Boolean(artists.next)} search={search} sort={sort} />
       </section>
     </main>
   );
