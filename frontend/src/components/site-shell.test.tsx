@@ -1,6 +1,20 @@
 import { renderToStaticMarkup } from "react-dom/server";
-import { describe, expect, it } from "vitest";
-import { SiteFooter } from "./site-shell";
+import { describe, expect, it, vi } from "vitest";
+
+vi.mock("./mobile-nav", () => ({ MobileNav: () => <button type="button">Menu</button> }));
+
+import { SiteFooter, SiteHeader } from "./site-shell";
+
+describe("SiteHeader", () => {
+  it("uses the reusable brand mark without duplicating the labelled home link", () => {
+    const html = renderToStaticMarkup(<SiteHeader />);
+    expect(html).toContain('aria-label="KpopWins home"');
+    expect(html).toContain('data-brand-mark="true"');
+    expect(html).toContain('aria-hidden="true"');
+    expect(html).toContain(">KpopWins</span>");
+    expect(html).not.toContain(">K</span>");
+  });
+});
 
 describe("SiteFooter", () => {
   it("includes Wikipedia attribution, licensing, and safe external links", () => {

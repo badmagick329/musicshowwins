@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { BrandMark } from "@/components/brand-mark";
 import { MobileNav } from "@/components/mobile-nav";
 
 const links = [
@@ -15,9 +16,7 @@ export function SiteHeader() {
     <header className="border-b border-border bg-card">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-4 lg:px-8">
         <Link href="/" className="group flex items-center gap-2" aria-label="KpopWins home">
-          <span className="grid size-9 place-items-center border-2 border-foreground bg-brand-pink font-heading text-lg font-bold text-white shadow-[3px_3px_0_var(--foreground)] transition-transform group-hover:-translate-y-0.5">
-            K
-          </span>
+          <BrandMark className="size-9 transition-transform group-hover:-translate-y-0.5" />
           <span className="font-heading text-xl font-bold tracking-tight">KpopWins</span>
         </Link>
         <nav aria-label="Primary navigation" className="hidden items-center gap-1 md:flex">
