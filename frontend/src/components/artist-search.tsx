@@ -12,7 +12,7 @@ export function ArtistSearch({ query, results, resultCount }: { query: string; r
           <h2 id="artist-search-title" className="font-heading text-2xl font-bold tracking-tight">Find an artist</h2>
           <p className="mt-1 text-sm text-foreground/70">Search by artist name or known alias.</p>
         </div>
-        <DebouncedArtistSearch key={query} id="artist-search" query={query} />
+        <DebouncedArtistSearch id="artist-search" query={query} />
       </div>
       {query && (
         <div className="mt-5 border-t-2 border-foreground/25 pt-4">
