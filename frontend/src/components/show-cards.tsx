@@ -10,7 +10,7 @@ export function ShowCards({ shows }: { shows: Show[] }) {
   return (
     <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
       {shows.map((show) => (
-        <article key={show.id} className={`show-${show.slug} flex min-w-0 flex-col border-2 border-foreground bg-card p-5 shadow-[4px_4px_0_var(--show-color)]`}>
+        <article key={show.id} className={`show-${show.slug} relative flex min-w-0 cursor-pointer flex-col border-2 border-foreground bg-card p-5 shadow-[4px_4px_0_var(--show-color)] transition-colors hover:bg-accent`}>
           <div className="flex items-start justify-between gap-4">
             <h2 className="font-heading text-xl font-bold">{show.name}</h2>
             <ShowBadge slug={show.slug} name={show.name} className="shrink-0" />
@@ -33,12 +33,12 @@ export function ShowCards({ shows }: { shows: Show[] }) {
             <h3 className="text-xs font-bold uppercase tracking-[0.1em] text-muted-foreground">Most recent winner</h3>
             {show.latest_win ? (
               <div className="mt-2">
-                <p className="font-semibold"><Link href={`/songs/${show.latest_win.song.id}`} className="underline-offset-4 hover:underline">{show.latest_win.song.title}</Link></p>
-                <p className="text-sm text-muted-foreground"><Link href={`/artists/${show.latest_win.song.artist.id}`} className="underline-offset-4 hover:underline">{show.latest_win.song.artist.name}</Link> · <time dateTime={show.latest_win.date}>{formatDate(show.latest_win.date)}</time></p>
+                <p className="font-semibold"><Link href={`/songs/${show.latest_win.song.id}`} className="relative z-10 underline-offset-4 hover:underline">{show.latest_win.song.title}</Link></p>
+                <p className="text-sm text-muted-foreground"><Link href={`/artists/${show.latest_win.song.artist.id}`} className="relative z-10 underline-offset-4 hover:underline">{show.latest_win.song.artist.name}</Link> · <time dateTime={show.latest_win.date}>{formatDate(show.latest_win.date)}</time></p>
               </div>
             ) : <p className="mt-2 text-sm text-muted-foreground">No wins recorded yet.</p>}
           </div>
-          <Link href={`/wins?show=${encodeURIComponent(show.slug)}`} className="mt-5 inline-flex min-h-10 items-center justify-center border border-foreground bg-highlight-yellow px-4 text-sm font-bold shadow-[2px_2px_0_var(--foreground)] transition-transform hover:-translate-y-0.5">Browse wins</Link>
+          <Link href={`/wins?show=${encodeURIComponent(show.slug)}#wins-results-title`} className="mt-5 inline-flex min-h-10 items-center justify-center border border-foreground bg-highlight-yellow px-4 text-sm font-bold shadow-[2px_2px_0_var(--foreground)] after:absolute after:inset-0 focus-visible:after:outline-2 focus-visible:after:outline-offset-[-2px] focus-visible:after:outline-brand-pink">Browse wins</Link>
         </article>
       ))}
     </div>

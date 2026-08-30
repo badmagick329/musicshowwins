@@ -1,6 +1,14 @@
 import Link from "next/link";
 import { artistsUrl, type ArtistSort } from "@/lib/artist-list";
-import { archivePageCount } from "@/lib/pagination";
+import { archivePageCount, archivePageSize } from "@/lib/pagination";
+
+export function ArchiveResultsSummary({ totalCount, page, resultCount, singular, plural }: { totalCount: number; page: number; resultCount: number; singular: string; plural: string }) {
+  const label = totalCount === 1 ? singular : plural;
+  if (!totalCount) return <span className="text-sm tabular-nums text-muted-foreground">0 {plural}</span>;
+  const from = (page - 1) * archivePageSize + 1;
+  const to = from + resultCount - 1;
+  return <span aria-live="polite" className="text-sm tabular-nums text-muted-foreground">{from}–{to} of {totalCount} {label} · Page {page} of {archivePageCount(totalCount)}</span>;
+}
 
 export function Pagination({ page, totalCount, hasPrevious, hasNext, search = "", sort }: { page: number; totalCount: number; hasPrevious: boolean; hasNext: boolean; search?: string; sort: ArtistSort }) {
   if (!hasPrevious && !hasNext) return null;
