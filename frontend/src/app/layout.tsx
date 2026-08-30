@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
+import { QueryProvider } from "@/components/query-provider";
 import { SiteFooter, SiteHeader } from "@/components/site-shell";
 import "./globals.css";
 
@@ -12,9 +13,11 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
   return (
     <html lang="en">
       <body className="flex min-h-screen flex-col">
-        <SiteHeader />
-        <div className="flex-1">{children}</div>
-        <SiteFooter />
+        <QueryProvider>
+          <SiteHeader />
+          <div className="flex-1">{children}</div>
+          <SiteFooter />
+        </QueryProvider>
       </body>
     </html>
   );

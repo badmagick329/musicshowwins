@@ -1,4 +1,4 @@
-import type { Win } from "@/lib/api";
+import type { Win } from "@/lib/api-shared";
 
 export type ArtistSummary = {
   totalWins: number;

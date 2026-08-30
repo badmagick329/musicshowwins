@@ -1,6 +1,6 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import type { Win } from "@/lib/api";
+import type { Win } from "@/lib/api-shared";
 import { ArtistWinHistory } from "./artist-win-history";
 
 function win(id: number): Win {

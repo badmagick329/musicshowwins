@@ -3,7 +3,7 @@ import type {
   Show,
   SongLeaderboardRow,
   Win,
-} from "@/lib/api";
+} from "@/lib/api-shared";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 import Link from "next/link";

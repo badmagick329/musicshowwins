@@ -1,12 +1,13 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { buildApiUrl, collectPages, getArtist, getArtists, getHomeData, parseApiPage, parsePositivePage } from "./api";
+import { parseApiPage, parsePositivePage } from "./api-shared";
+import { buildServerApiUrl, collectPages, getArtist, getArtists, getHomeData } from "./api-server";
 
 afterEach(() => { vi.unstubAllGlobals(); vi.unstubAllEnvs(); });
 
 describe("API URLs and pagination", () => {
   it("encodes query parameters", () => {
     vi.stubEnv("DJANGO_API_BASE_URL", "https://example.test/api/v1/");
-    expect(buildApiUrl("/artists", { search: "Girls' Generation & 소녀시대", page: 2 })).toBe("https://example.test/api/v1/artists?search=Girls%27+Generation+%26+%EC%86%8C%EB%85%80%EC%8B%9C%EB%8C%80&page=2");
+    expect(buildServerApiUrl("/artists", { search: "Girls' Generation & 소녀시대", page: 2 })).toBe("https://example.test/api/v1/artists?search=Girls%27+Generation+%26+%EC%86%8C%EB%85%80%EC%8B%9C%EB%8C%80&page=2");
   });
 
   it("keeps valid pagination metadata and rejects malformed pages", () => {

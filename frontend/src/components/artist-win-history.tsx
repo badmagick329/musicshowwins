@@ -1,4 +1,4 @@
-import type { Win } from "@/lib/api";
+import type { Win } from "@/lib/api-shared";
 import { EmptyState, WinRecord } from "@/components/data-display";
 
 export function ArtistWinHistory({ wins }: { wins: Win[] }) {

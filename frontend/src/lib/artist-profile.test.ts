@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { Win } from "./api";
+import type { Win } from "./api-shared";
 import { buildShowBreakdown, summarizeArtist } from "./artist-profile";
 
 function win(id: number, date: string, show: { id: number; slug: string; name: string }, songId: number): Win {

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import type { Artist } from "@/lib/api";
+import type { Artist } from "@/lib/api-shared";
 import { ArtistResults } from "@/components/artist-results";
 import { DebouncedArtistSearch } from "@/components/debounced-artist-search";
 import { artistsUrl } from "@/lib/artist-list";
