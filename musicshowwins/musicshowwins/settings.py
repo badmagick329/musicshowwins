@@ -17,6 +17,9 @@ WIKI_AGENT = os.environ.get(
     "KpopWins/0.1 (https://github.com/badmagick329/musicshowwins/issues)",
 )
 DB_HOST = os.environ.get("DB_HOST", "127.0.0.1")
+DISCORD_CORRECTIONS_WEBHOOK_URL = os.environ.get(
+    "DISCORD_CORRECTIONS_WEBHOOK_URL", ""
+)
 
 
 # Quick-start development settings - unsuitable for production

@@ -2,10 +2,61 @@ from main.models import Artist, MusicShow, Song, Win
 from rest_framework import serializers
 
 
-class ShowSerializer(serializers.ModelSerializer):
+class ShowSummarySerializer(serializers.ModelSerializer):
     class Meta:
         model = MusicShow
         fields = ("id", "slug", "name", "active")
+
+
+class ShowSerializer(ShowSummarySerializer):
+    total_wins = serializers.IntegerField(read_only=True)
+    first_win_date = serializers.DateField(read_only=True, allow_null=True)
+    latest_win_date = serializers.DateField(read_only=True, allow_null=True)
+    latest_win = serializers.SerializerMethodField()
+
+    class Meta:
+        model = MusicShow
+        fields = (
+            "id",
+            "slug",
+            "name",
+            "active",
+            "total_wins",
+            "first_win_date",
+            "latest_win_date",
+            "latest_win",
+        )
+
+    def get_latest_win(self, instance) -> dict | None:
+        if instance.latest_win_id is None:
+            return None
+        return {
+            "id": instance.latest_win_id,
+            "date": instance.latest_win_date.isoformat(),
+            "song": {
+                "id": instance.latest_win_song_id,
+                "title": instance.latest_win_song_title,
+                "artist": {
+                    "id": instance.latest_win_artist_id,
+                    "name": instance.latest_win_artist_name,
+                },
+            },
+        }
+
+
+class CorrectionSerializer(serializers.Serializer):
+    page_or_record = serializers.CharField(max_length=300)
+    correction = serializers.CharField(max_length=1000)
+    supporting_source = serializers.URLField(
+        max_length=500, required=False, allow_blank=True
+    )
+    contact = serializers.CharField(max_length=200, required=False, allow_blank=True)
+    website = serializers.CharField(max_length=300, required=False, allow_blank=True)
+
+    def validate_supporting_source(self, value):
+        if value and not value.lower().startswith(("http://", "https://")):
+            raise serializers.ValidationError("Use an HTTP or HTTPS URL.")
+        return value
 
 
 class ArtistSummarySerializer(serializers.ModelSerializer):
@@ -49,7 +100,7 @@ class SongSerializer(serializers.ModelSerializer):
 
 
 class WinSerializer(serializers.ModelSerializer):
-    show = ShowSerializer(read_only=True)
+    show = ShowSummarySerializer(read_only=True)
     song = SongSerializer(read_only=True)
 
     class Meta:

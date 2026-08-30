@@ -13,6 +13,11 @@ urlpatterns = [
         name="docs",
     ),
     re_path(r"^v1/shows/?$", views.ShowList.as_view(), name="shows"),
+    re_path(
+        r"^v1/corrections/?$",
+        views.CorrectionCreate.as_view(),
+        name="corrections",
+    ),
     re_path(r"^v1/artists/?$", views.ArtistList.as_view(), name="artists"),
     path("v1/artists/<int:pk>", views.ArtistDetail.as_view(), name="artist-detail"),
     re_path(r"^v1/songs/?$", views.SongList.as_view(), name="songs"),

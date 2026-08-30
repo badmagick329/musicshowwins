@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { parseApiPage, parsePositivePage } from "./api-shared";
 import { buildServerApiUrl, collectPages, getArtist, getArtists, getHomeData } from "./api-server";
+import { submitCorrection } from "./api-browser";
 
 afterEach(() => { vi.unstubAllGlobals(); vi.unstubAllEnvs(); });
 
@@ -33,6 +34,14 @@ describe("API URLs and pagination", () => {
 });
 
 describe("request failures and input", () => {
+  it("posts correction reports through the same-origin API boundary", async () => {
+    const fetchMock = vi.fn(async () => new Response(JSON.stringify({ detail: "Report accepted." }), { status: 202 }));
+    vi.stubGlobal("fetch", fetchMock);
+    const report = { page_or_record: "A record", correction: "A correction", supporting_source: "", contact: "", website: "" };
+    await submitCorrection(report);
+    expect(fetchMock).toHaveBeenCalledWith("/backend-api/corrections", expect.objectContaining({ method: "POST", body: JSON.stringify(report) }));
+  });
+
   it("distinguishes not found from general failures", async () => {
     vi.stubGlobal("fetch", vi.fn(async () => new Response(null, { status: 404 })));
     await expect(getArtist(8)).rejects.toMatchObject({ status: 404, name: "ApiRequestError" });

@@ -10,8 +10,8 @@ export const mobileNavLinks = [
   ["Artists", "/artists"],
   ["Songs", "/songs"],
   ["Wins", "/wins"],
-  ["Shows", "/#shows"],
-  ["About", "/#about"],
+  ["Shows", "/shows"],
+  ["About", "/about"],
 ] as const;
 
 export function MobileNav() {

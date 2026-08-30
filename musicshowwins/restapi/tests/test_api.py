@@ -1,7 +1,10 @@
 import json
 from datetime import date, timedelta
+from unittest.mock import Mock, patch
 
 import pytest
+import requests
+from django.apps import apps
 from django.conf import settings
 from django.core.cache import cache
 from main.models import Artist, MusicShow, Song, Win
@@ -37,7 +40,27 @@ def test_read_only_collections_and_contracts(archive):
         == wins.status_code
         == 200
     )
-    assert set(shows.data["results"][0]) == {"id", "slug", "name", "active"}
+    assert set(shows.data["results"][0]) == {
+        "id",
+        "slug",
+        "name",
+        "active",
+        "total_wins",
+        "first_win_date",
+        "latest_win_date",
+        "latest_win",
+    }
+    assert shows.data["results"][0]["total_wins"] == 3
+    assert shows.data["results"][0]["first_win_date"] == "2024-01-01"
+    assert shows.data["results"][0]["latest_win"] == {
+        "id": Win.objects.get(date=date(2025, 1, 2)).pk,
+        "date": "2025-01-02",
+        "song": {
+            "id": archive[4].pk,
+            "title": "Second",
+            "artist": {"id": archive[2].pk, "name": "Beta"},
+        },
+    }
     assert set(artists.data["results"][0]) == {
         "id",
         "name",
@@ -155,6 +178,28 @@ def test_song_annotations_ordering_and_query_count(archive, django_assert_num_qu
 
 
 @pytest.mark.django_db
+def test_show_annotations_do_not_grow_queries_per_show(
+    archive, django_assert_num_queries
+):
+    for index in range(5):
+        MusicShow.objects.create(slug=f"show-{index}", name=f"Show {index}")
+
+    client = APIClient()
+    with django_assert_num_queries(2):
+        response = client.get("/api/v1/shows")
+
+    assert response.status_code == 200
+    assert response.data["count"] == 6
+    empty_show = next(
+        show for show in response.data["results"] if show["slug"] == "show-0"
+    )
+    assert empty_show["total_wins"] == 0
+    assert empty_show["first_win_date"] is None
+    assert empty_show["latest_win_date"] is None
+    assert empty_show["latest_win"] is None
+
+
+@pytest.mark.django_db
 def test_leaderboards_are_dense_ranked_and_year_filtered(archive):
     client = APIClient()
     artist_c = Artist.objects.create(name="Gamma")
@@ -222,6 +267,125 @@ def test_detail_and_documentation_routes(archive):
     schema = json.loads(client.get("/api/schema/?format=json").content)
     assert schema["openapi"].startswith("3.")
     assert "/api/v1/wins/" in schema["paths"]
+    assert "/api/v1/corrections/" in schema["paths"]
+
+
+def correction_payload(**overrides):
+    return {
+        "page_or_record": "Music Bank — 2 January 2025",
+        "correction": "The winning song title should be Second.",
+        "supporting_source": "https://example.com/source",
+        "contact": "Fan@example.com",
+        "website": "",
+        **overrides,
+    }
+
+
+@pytest.mark.django_db
+def test_correction_delivery_is_structured_private_and_stateless(archive, settings):
+    cache.clear()
+    settings.DISCORD_CORRECTIONS_WEBHOOK_URL = "https://discord.example/webhook"
+    response_mock = Mock()
+    response_mock.raise_for_status.return_value = None
+    main_models = tuple(apps.get_app_config("main").get_models())
+    before_counts = {
+        model: model.objects.count() for model in main_models
+    }
+
+    with patch("restapi.views.requests.post", return_value=response_mock) as post:
+        response = APIClient().post(
+            "/api/v1/corrections", correction_payload(), format="json"
+        )
+
+    assert response.status_code == 202
+    assert {
+        model: model.objects.count() for model in main_models
+    } == before_counts
+    post.assert_called_once()
+    assert post.call_args.kwargs["timeout"] == 5
+    payload = post.call_args.kwargs["json"]
+    assert payload["allowed_mentions"] == {"parse": []}
+    assert [field["name"] for field in payload["embeds"][0]["fields"]] == [
+        "Page or record",
+        "What should be corrected?",
+        "Supporting source",
+        "Contact",
+    ]
+
+
+@pytest.mark.django_db
+def test_correction_validation_and_json_only():
+    cache.clear()
+    client = APIClient()
+    invalid = client.post(
+        "/api/v1/corrections",
+        correction_payload(page_or_record="", supporting_source="ftp://example.com"),
+        format="json",
+    )
+    assert invalid.status_code == 400
+    assert "page_or_record" in invalid.data
+    assert "supporting_source" in invalid.data
+    assert client.post(
+        "/api/v1/corrections", "page_or_record=test", content_type="text/plain"
+    ).status_code == 415
+    assert client.get("/api/v1/corrections").status_code == 405
+
+
+@pytest.mark.django_db
+def test_correction_missing_configuration_and_discord_failure(settings):
+    cache.clear()
+    settings.DISCORD_CORRECTIONS_WEBHOOK_URL = ""
+    assert APIClient().post(
+        "/api/v1/corrections", correction_payload(), format="json"
+    ).status_code == 503
+
+    cache.clear()
+    settings.DISCORD_CORRECTIONS_WEBHOOK_URL = "https://discord.example/webhook"
+    with patch(
+        "restapi.views.requests.post", side_effect=requests.RequestException
+    ):
+        response = APIClient().post(
+            "/api/v1/corrections", correction_payload(), format="json"
+        )
+    assert response.status_code == 503
+    assert "Discord" not in response.data["detail"]
+
+
+@pytest.mark.django_db
+def test_correction_honeypot_returns_success_without_delivery(settings):
+    cache.clear()
+    settings.DISCORD_CORRECTIONS_WEBHOOK_URL = ""
+    with patch("restapi.views.requests.post") as post:
+        response = APIClient().post(
+            "/api/v1/corrections",
+            correction_payload(website="spam.example"),
+            format="json",
+        )
+    assert response.status_code == 202
+    post.assert_not_called()
+
+
+@pytest.mark.django_db
+def test_correction_has_dedicated_anonymous_throttle(settings):
+    cache.clear()
+    settings.DISCORD_CORRECTIONS_WEBHOOK_URL = "https://discord.example/webhook"
+    response_mock = Mock()
+    response_mock.raise_for_status.return_value = None
+    client = APIClient()
+    with patch("restapi.views.requests.post", return_value=response_mock):
+        for _ in range(5):
+            assert client.post(
+                "/api/v1/corrections",
+                correction_payload(contact="", supporting_source=""),
+                format="json",
+                REMOTE_ADDR="203.0.113.77",
+            ).status_code == 202
+        assert client.post(
+            "/api/v1/corrections",
+            correction_payload(),
+            format="json",
+            REMOTE_ADDR="203.0.113.77",
+        ).status_code == 429
 
 
 @pytest.mark.django_db

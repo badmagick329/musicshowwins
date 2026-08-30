@@ -56,7 +56,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ s
         </div>
 
         <section id="shows" className="mt-14">
-          <SectionHeading title="Music shows" />
+          <SectionHeading title="Music shows" action={<Link href="/shows" className="text-sm font-bold text-brand-pink underline-offset-4 hover:underline">Explore all shows</Link>} />
           <p className="mb-5 max-w-2xl text-sm leading-relaxed text-muted-foreground sm:text-base">
             The archive covers six weekly Korean music shows, with historical
             results beginning in 2014.

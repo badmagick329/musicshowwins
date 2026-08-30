@@ -71,6 +71,7 @@ export const getArtistWins = (id: number, page = 1) => serverRequestPage<Win>("/
 export const getAllArtistSongs = (id: number) => collectPages<Song>("/songs", { artist: id, ordering: "-total_wins,title" });
 export const getAllArtistWins = (id: number) => collectPages<Win>("/wins", { artist: id, ordering: "-date" });
 export const getAllSongWins = (id: number) => collectPages<Win>("/wins", { song: id, ordering: "-date" });
+export const getShows = () => serverRequestPage<Show>("/shows");
 
 async function safePage<T>(label: string, path: string, params?: Record<string, string | number>) {
   try { return { page: await serverRequestPage<T>(path, params), error: undefined }; }

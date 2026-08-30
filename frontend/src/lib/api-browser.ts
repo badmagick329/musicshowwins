@@ -1,4 +1,4 @@
-import { parseApiPage, requestJson, serializeApiParams, type ApiParams, type ApiTransport } from "@/lib/api-shared";
+import { ApiRequestError, parseApiPage, requestJson, serializeApiParams, type ApiParams, type ApiTransport, type CorrectionReport } from "@/lib/api-shared";
 
 const browserApiBaseUrl = "/backend-api";
 
@@ -12,3 +12,13 @@ export async function browserRequestPage<T>(path: string, params?: ApiParams, si
 }
 
 export const browserTransport: ApiTransport = { requestPage: browserRequestPage };
+
+export async function submitCorrection(report: CorrectionReport) {
+  const response = await fetch(buildBrowserApiUrl("/corrections"), {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(report),
+  });
+  if (!response.ok) throw new ApiRequestError(response.status);
+  return response.json() as Promise<{ detail: string }>;
+}

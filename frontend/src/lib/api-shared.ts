@@ -15,8 +15,29 @@ export type Artist = {
   latest_win_date: string | null;
 };
 export type Song = { id: number; title: string; artist: Pick<Artist, "id" | "name">; total_wins: number; latest_win_date: string | null; winning_shows: number };
-export type Show = { id: number; slug: string; name: string; active: boolean };
-export type Win = { id: number; date: string; show: Show; song: Song };
+export type ShowSummary = { id: number; slug: string; name: string; active: boolean };
+export type Show = ShowSummary & {
+  id: number;
+  slug: string;
+  name: string;
+  active: boolean;
+  total_wins: number;
+  first_win_date: string | null;
+  latest_win_date: string | null;
+  latest_win: {
+    id: number;
+    date: string;
+    song: Pick<Song, "id" | "title"> & { artist: Pick<Artist, "id" | "name"> };
+  } | null;
+};
+export type CorrectionReport = {
+  page_or_record: string;
+  correction: string;
+  supporting_source: string;
+  contact: string;
+  website: string;
+};
+export type Win = { id: number; date: string; show: ShowSummary; song: Song };
 export type ArtistLeaderboardRow = { rank: number; wins: number; artist: Pick<Artist, "id" | "name"> };
 export type SongLeaderboardRow = { rank: number; wins: number; song: Pick<Song, "id" | "title" | "artist"> };
 export type HomeData = {

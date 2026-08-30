@@ -107,9 +107,7 @@ export function MusicShowList({ shows }: { shows: Show[] }) {
           className="flex items-center justify-between gap-4 border-2 border-foreground bg-card p-4"
         >
           <ShowBadge slug={show.slug} name={show.name} />
-          <span className="text-xs text-muted-foreground">
-            {show.active ? "Active weekly show" : "Historical show"}
-          </span>
+          <span className="text-xs tabular-nums text-muted-foreground">{show.total_wins} wins</span>
         </li>
       ))}
     </ul>

@@ -2,7 +2,10 @@ from __future__ import annotations
 
 from datetime import date
 
+import requests
+from django.conf import settings
 from django.db.models import Q
+from drf_spectacular.utils import extend_schema
 from main.services import (
     all_artists_queryset,
     all_songs_queryset,
@@ -10,17 +13,27 @@ from main.services import (
     show_queryset,
     wins_queryset,
 )
-from rest_framework import generics
+from rest_framework import generics, status
 from rest_framework.exceptions import ValidationError
+from rest_framework.parsers import JSONParser
+from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
+from rest_framework.throttling import AnonRateThrottle
+from rest_framework.views import APIView
 
 from .serializers import (
     ArtistLeaderboardSerializer,
     ArtistSerializer,
+    CorrectionSerializer,
     ShowSerializer,
     SongLeaderboardSerializer,
     SongSerializer,
     WinSerializer,
 )
+
+
+class CorrectionThrottle(AnonRateThrottle):
+    rate = "5/hour"
 
 
 def _integer(value: str | None, name: str, *, minimum: int | None = None) -> int | None:
@@ -82,6 +95,60 @@ class ShowList(generics.ListAPIView):
             {"name", "slug", "id"},
             "name",
         )
+
+
+class CorrectionCreate(APIView):
+    parser_classes = [JSONParser]
+    permission_classes = [AllowAny]
+    throttle_classes = [CorrectionThrottle]
+
+    @extend_schema(
+        request=CorrectionSerializer,
+        responses={202: None, 400: None, 503: None},
+        description="Submit a private correction report for review.",
+    )
+    def post(self, request):
+        serializer = CorrectionSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.validated_data
+
+        if data.get("website"):
+            return Response(
+                {"detail": "Report accepted."}, status=status.HTTP_202_ACCEPTED
+            )
+
+        webhook_url = settings.DISCORD_CORRECTIONS_WEBHOOK_URL
+        if not webhook_url:
+            return Response(
+                {"detail": "Correction reports are temporarily unavailable."},
+                status=status.HTTP_503_SERVICE_UNAVAILABLE,
+            )
+
+        fields = [
+            {"name": "Page or record", "value": data["page_or_record"]},
+            {"name": "What should be corrected?", "value": data["correction"]},
+        ]
+        if data.get("supporting_source"):
+            fields.append(
+                {"name": "Supporting source", "value": data["supporting_source"]}
+            )
+        if data.get("contact"):
+            fields.append({"name": "Contact", "value": data["contact"]})
+
+        payload = {
+            "username": "KpopWins corrections",
+            "embeds": [{"title": "New correction report", "fields": fields}],
+            "allowed_mentions": {"parse": []},
+        }
+        try:
+            response = requests.post(webhook_url, json=payload, timeout=5)
+            response.raise_for_status()
+        except requests.RequestException:
+            return Response(
+                {"detail": "Correction reports are temporarily unavailable."},
+                status=status.HTTP_503_SERVICE_UNAVAILABLE,
+            )
+        return Response({"detail": "Report accepted."}, status=status.HTTP_202_ACCEPTED)
 
 
 class ArtistList(generics.ListAPIView):
