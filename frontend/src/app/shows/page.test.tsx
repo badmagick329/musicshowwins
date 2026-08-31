@@ -31,6 +31,7 @@ describe("ShowsPage", () => {
     expect(html).toContain("View wins");
     expect(html).toContain("after:absolute after:inset-0");
     expect(html).not.toContain("Active weekly show");
+    expect(html).not.toContain("See the latest winner and full results");
   });
 
   it("renders empty and failure states", async () => {

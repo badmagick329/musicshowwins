@@ -46,17 +46,16 @@ export function SiteFooter() {
       <div className="mx-auto grid max-w-7xl gap-4 px-5 py-8 text-sm text-muted-foreground sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start lg:px-8">
         <div className="space-y-2">
           <p><span className="font-heading font-bold text-foreground">KpopWins</span> is a fan-made record of K-pop music show wins.</p>
-          <p className="max-w-3xl text-xs leading-relaxed">Results come from <a href="https://en.wikipedia.org/" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-foreground">Wikipedia contributors</a> and are reviewed by KpopWins. Wikipedia content is available under <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-foreground">CC BY-SA 4.0</a>. KpopWins is independent and is not affiliated with the Wikimedia Foundation.</p>
+          <p className="max-w-3xl text-xs leading-relaxed">Results come from <a href="https://en.wikipedia.org/" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-foreground">Wikipedia contributors</a> and are reviewed by KpopWins. Wikipedia content is available under <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-foreground">CC BY-SA 4.0</a>.</p>
         </div>
-        <div className="flex flex-col items-start gap-4 sm:items-end">
-          {supportUrl && (
+        {supportUrl && (
+          <div className="flex flex-col items-start gap-4 sm:items-end">
             <a href={supportUrl} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-10 items-center gap-2 border border-foreground bg-highlight-yellow px-3 text-sm font-bold text-foreground shadow-[2px_2px_0_var(--foreground)] transition-transform hover:-translate-y-0.5">
               <Coffee className="size-4" aria-hidden="true" />
               Buy me a coffee
             </a>
-          )}
-          <p className="text-xs sm:text-right">Not affiliated with artists, labels, or broadcasters.</p>
-        </div>
+          </div>
+        )}
       </div>
     </footer>
   );

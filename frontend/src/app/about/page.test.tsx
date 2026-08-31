@@ -11,11 +11,8 @@ describe("AboutPage", () => {
   it("contains the public archive and correction copy", () => {
     vi.stubEnv("SUPPORT_URL", "https://support.example/kpopwins");
     const html = renderToStaticMarkup(<AboutPage />);
-    expect(html).toContain("fan-made record of K-pop music show wins");
-    expect(html).toContain("six weekly shows from 2014 onward");
-    expect(html).toContain("KpopWins uses Wikipedia as its source and reviews results before publication.");
-    expect(html).toContain("reviews results before publication");
-    expect(html).toContain("older records may be incomplete or disputed");
+    expect(html).toContain("KpopWins is a fan-made record of K-pop music show wins. It covers six weekly shows from 2014 onward. KpopWins uses Wikipedia as its source and reviews results before publication.");
+    expect(html).not.toContain("older records may be incomplete or disputed");
     expect(html).toContain("do not change public data automatically");
     expect(html).toContain("Report a correction");
     expect(html).toContain("data-correction-form");

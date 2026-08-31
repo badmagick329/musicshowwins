@@ -28,8 +28,8 @@ describe("CorrectionForm", () => {
     expect(screen.getByText("Describe what should be corrected.")).toBeTruthy();
     expect(screen.getByText("Enter a valid HTTP or HTTPS URL.")).toBeTruthy();
     expect(fetch).not.toHaveBeenCalled();
-    expect(screen.getByText(/sent privately through Discord/)).toBeTruthy();
-    expect(screen.getByText(/They are not published/)).toBeTruthy();
+    expect(screen.queryByText(/sent privately through Discord/)).toBeNull();
+    expect(screen.queryByText(/They are not published/)).toBeNull();
   });
 
   it("clears the form and announces success", async () => {
