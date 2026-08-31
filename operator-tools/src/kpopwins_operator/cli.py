@@ -28,6 +28,17 @@ from .registry import RegistryError, load_registry
 from .youtube import YouTubeClient, YouTubeError
 
 
+def _configure_utf8(stream: TextIO) -> None:
+    reconfigure = getattr(stream, "reconfigure", None)
+    if not callable(reconfigure):
+        return
+    try:
+        reconfigure(encoding="utf-8", errors="strict")
+    except (AttributeError, OSError, TypeError, ValueError):
+        # In-memory and custom injected streams may not be reconfigurable.
+        return
+
+
 def _positive_integer(value: str) -> int:
     try:
         parsed = int(value)
@@ -224,8 +235,10 @@ def main(
     now: str | None = None,
     sleep: Callable[[float], None] = time.sleep,
 ) -> int:
-    output = stdout or sys.stdout
-    errors = stderr or sys.stderr
+    output = stdout if stdout is not None else sys.stdout
+    errors = stderr if stderr is not None else sys.stderr
+    _configure_utf8(output)
+    _configure_utf8(errors)
     args = build_parser().parse_args(argv)
     try:
         config = load_config(environ)
