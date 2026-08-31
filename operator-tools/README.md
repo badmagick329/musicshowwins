@@ -1,8 +1,8 @@
 # KpopWins operator tools
 
-This standalone local project maintains an offline win catalogue, search schedule,
-and reviewed reference candidates. It does not search providers or change the
-public KpopWins database directly.
+This standalone local project maintains an offline win catalogue, ingests uploads
+from configured official YouTube channels, and supports local candidate review. It
+does not change the public KpopWins database directly.
 
 ## Install
 
@@ -16,7 +16,35 @@ Runtime data defaults to the repository's ignored `.ignore/operator-tools/`
 directory. Set `KPOPWINS_OPERATOR_HOME` or `KPOPWINS_API_BASE_URL` to override
 the defaults.
 
+Create `.ignore/operator-tools/.env` from `.env.example` and add a local YouTube
+Data API v3 key. Process environment variables override this file. The tool never
+prints the key.
+
+In Google Cloud, create a project, enable YouTube Data API v3, create an API key,
+and restrict that key to the YouTube Data API before placing it in the local file.
+
 ## Use
+
+The complete workflow is:
+
+1. Create a Google Cloud project.
+2. Enable YouTube Data API v3.
+3. Create an API key restricted to that API.
+4. Store the key in `.ignore/operator-tools/.env`.
+5. Initialize or migrate state with `kpopwins-operator init`.
+6. Refresh the local KpopWins catalogue with `refresh-wins`.
+7. Resolve the configured handles with `youtube verify-channels`.
+8. Review every returned channel title and ID.
+9. Save the mappings with `youtube verify-channels --apply`.
+10. Run `youtube ingest` over one or more bounded runs.
+11. Preview and run local matching.
+12. List and inspect candidates individually.
+13. Approve selected candidates; reject unsuitable candidates.
+14. Run `export-approved`.
+15. Import the manifest into local Django for final verification.
+
+The tool reads metadata only: it does not download videos, auto-approve matches,
+or write to production.
 
 Initialize local state:
 
@@ -29,6 +57,44 @@ Refresh the complete win catalogue from a local KpopWins API:
 ```console
 uv run kpopwins-operator refresh-wins
 ```
+
+Resolve the tracked handles and inspect the result before storing it:
+
+```console
+uv run kpopwins-operator youtube verify-channels
+uv run kpopwins-operator youtube verify-channels --apply
+```
+
+`--handle @KBSKpop` limits verification or ingestion to one configured handle.
+Handle resolution uses `channels.list(forHandle=...)` and stores the stable channel
+ID and uploads playlist ID. The registry is
+`official-youtube-channels.toml`; edit it only when an official channel changes.
+
+Ingest uploads, then match them locally against current wins:
+
+```console
+uv run kpopwins-operator youtube ingest --max-pages 10
+uv run kpopwins-operator youtube match --min-score 75 --dry-run
+uv run kpopwins-operator youtube match --min-score 75
+```
+
+The initial scan resumes from its last completed page and stops at uploads older
+than 1 December 2013. Later runs start at the newest uploads and stop after the
+first fully known page. `youtube ingest --restart` discards an initial-scan
+checkpoint. Each playlist page and its video details are stored atomically.
+
+List and inspect pending candidates, then make explicit review decisions:
+
+```console
+uv run kpopwins-operator candidates list --status pending --min-score 75
+uv run kpopwins-operator candidates show 12
+uv run kpopwins-operator candidates approve 12 18
+uv run kpopwins-operator candidates reject 21
+```
+
+Matching uses only locally ingested videos. It requires artist and winner signals,
+uses show, song, date, and negative-title evidence for scoring, and never writes a
+`no_match` search state. Rejected decisions survive later matching runs.
 
 View local counts or list due work for a provider:
 
@@ -50,3 +116,16 @@ Django environment from the repository root:
 ```console
 uv run python manage.py import_win_references .ignore/operator-tools/manifests/win-references-v1.json
 ```
+
+## Quota and recovery
+
+The three API methods used here, `channels.list`, `playlistItems.list`, and
+`videos.list`, each cost one quota unit per call. Attempted calls are recorded by
+Pacific date in SQLite. `YOUTUBE_MAX_API_CALLS_PER_RUN` defaults to 500 and stops a
+run before another request exceeds that local ceiling. A YouTube `quotaExceeded`
+response stops immediately; resume after the daily Pacific-time reset. HTTP 429
+and transient server errors retry up to four attempts and respect `Retry-After`.
+
+If a run fails, fix the cause and rerun it: the last fully stored page remains the
+checkpoint. Use `--restart` only when intentionally repeating the initial history
+scan. All tests use mocked HTTP responses; the test suite never calls YouTube.

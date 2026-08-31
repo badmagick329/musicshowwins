@@ -1,0 +1,29 @@
+[[channels]]
+show_slug = "music-bank"
+handle = "@KBSKpop"
+keywords = ["music bank", "뮤직뱅크"]
+
+[[channels]]
+show_slug = "music-core"
+handle = "@MBCkpop"
+keywords = ["music core", "음악중심"]
+
+[[channels]]
+show_slug = "inkigayo"
+handle = "@SBSKPOP"
+keywords = ["inkigayo", "인기가요"]
+
+[[channels]]
+show_slug = "m-countdown"
+handle = "@Mnet"
+keywords = ["m countdown", "mcountdown", "엠카운트다운"]
+
+[[channels]]
+show_slug = "show-champion"
+handle = "@ALLTHEKPOP"
+keywords = ["show champion", "쇼챔피언"]
+
+[[channels]]
+show_slug = "the-show"
+handle = "@THEKPOP"
+keywords = ["the show", "더쇼"]

@@ -105,6 +105,9 @@ def approved_document(connection: sqlite3.Connection) -> dict[str, Any]:
     )
     references = []
     for row in rows:
+        metadata = json.loads(row["metadata"])
+        if row["provider"] == "youtube":
+            metadata.pop("youtube_match", None)
         references.append(
             {
                 "win": {"show": row["show_slug"], "date": row["win_date"]},
@@ -119,7 +122,7 @@ def approved_document(connection: sqlite3.Connection) -> dict[str, Any]:
                 "status": row["status"],
                 "published_at": row["published_at"],
                 "last_verified_at": row["last_verified_at"],
-                "metadata": json.loads(row["metadata"]),
+                "metadata": metadata,
             }
         )
     document = validate_document({"version": 1, "references": references})
