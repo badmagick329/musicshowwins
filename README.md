@@ -148,11 +148,6 @@ docker run --rm kpopwins:0123456789ab python --version
 docker run --rm kpopwins:0123456789ab node --version
 ```
 
-`docker-compose-production.yaml` runs PostgreSQL 17, a one-shot migration and
-bootstrap service, the Django backend, and the Next.js frontend. Copy
-`.env.production.example` to a private environment file, replace every secret
-placeholder, set the immutable image tag, then validate the configuration:
-
-```text
-docker compose --env-file .env.production -f docker-compose-production.yaml config
-```
+Production orchestration and host configuration are intentionally kept outside
+version control. The public repository only defines and verifies the portable
+application image.

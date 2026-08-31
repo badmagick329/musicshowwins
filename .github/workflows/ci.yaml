@@ -84,9 +84,6 @@ jobs:
       - name: Build Linux AMD64 production image
         run: docker build --platform linux/amd64 --tag kpopwins:ci .
 
-      - name: Validate production Compose
-        run: docker compose --env-file .env.production.example --file docker-compose-production.yaml config --quiet
-
       - name: Check Python runtime
         run: docker run --rm kpopwins:ci python --version
 
