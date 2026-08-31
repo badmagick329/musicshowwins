@@ -34,6 +34,7 @@ certbot
 nginx/logs
 frontend/tsconfig.tsbuildinfo
 frontend/README.md
+operator-tools
 Makefile
 crontab
 deploy.sh
