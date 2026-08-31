@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
+import Script from "next/script";
 import { QueryProvider } from "@/components/query-provider";
 import { SiteFooter, SiteHeader } from "@/components/site-shell";
 import "./globals.css";
@@ -17,6 +18,14 @@ export const dynamic = "force-dynamic";
 export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
   return (
     <html lang="en">
+      <head>
+        <Script
+          defer
+          src="/ingest/js/script.js"
+          data-domain="kpopwins.info"
+          data-api="/ingest/api/event"
+        />
+      </head>
       <body className="flex min-h-screen flex-col">
         <QueryProvider>
           <SiteHeader />
