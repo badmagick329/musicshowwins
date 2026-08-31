@@ -117,8 +117,7 @@ export function CorrectionForm() {
       </div>
       <div>
         <label htmlFor="contact" className="font-bold">Your name or contact details <span className="font-normal text-muted-foreground">(optional)</span></label>
-        <input ref={contactRef} id="contact" name="contact" value={report.contact} onChange={update} maxLength={200} aria-describedby={`contact-privacy${errors.contact ? " contact-error" : ""}`} className={fieldClass} />
-        <p id="contact-privacy" className="mt-2 text-sm leading-relaxed text-muted-foreground">Optional contact details are sent privately through Discord so we can reply. They are not published.</p>
+        <input ref={contactRef} id="contact" name="contact" value={report.contact} onChange={update} maxLength={200} aria-describedby={errors.contact ? "contact-error" : undefined} className={fieldClass} />
         {errors.contact && <p id="contact-error" className="mt-1 text-sm text-destructive">{errors.contact}</p>}
       </div>
       <div className="absolute -left-[10000px] top-auto size-px overflow-hidden" aria-hidden="true">

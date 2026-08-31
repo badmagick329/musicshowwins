@@ -57,9 +57,6 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ s
 
         <section id="shows" className="mt-14">
           <SectionHeading title="Music shows" action={<Link href="/shows" className="text-sm font-bold text-brand-pink underline-offset-4 hover:underline">All shows</Link>} />
-          <p className="mb-5 max-w-2xl text-sm leading-relaxed text-muted-foreground sm:text-base">
-            Six weekly music shows are included, with results from 2014 onward.
-          </p>
           <MusicShowList shows={data.shows} />
         </section>
       </div>
