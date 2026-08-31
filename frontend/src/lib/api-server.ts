@@ -17,6 +17,7 @@ import {
 } from "@/lib/api-shared";
 
 const defaultBaseUrl = "http://127.0.0.1:8000/api/v1";
+const forwardedProtoHeaders = { "X-Forwarded-Proto": "https" };
 
 export function getServerApiBaseUrl() {
   return (process.env.DJANGO_API_BASE_URL ?? defaultBaseUrl).replace(/\/$/, "");
@@ -27,13 +28,13 @@ export function buildServerApiUrl(path: string, params: ApiParams = {}) {
 }
 
 export async function serverRequestPage<T>(path: string, params?: ApiParams, signal?: AbortSignal) {
-  return parseApiPage<T>(await requestJson<unknown>(buildServerApiUrl(path, params), signal));
+  return parseApiPage<T>(await requestJson<unknown>(buildServerApiUrl(path, params), signal, forwardedProtoHeaders));
 }
 
 export const serverTransport: ApiTransport = { requestPage: serverRequestPage };
 
 async function serverRequestJson<T>(path: string, signal?: AbortSignal) {
-  return requestJson<T>(buildServerApiUrl(path), signal);
+  return requestJson<T>(buildServerApiUrl(path), signal, forwardedProtoHeaders);
 }
 
 function nextPageNumber(next: string, expectedPath: string) {

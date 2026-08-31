@@ -3,6 +3,7 @@
 import os
 from pathlib import Path
 
+from django.core.exceptions import ImproperlyConfigured
 from dotenv import load_dotenv
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
@@ -17,9 +18,7 @@ WIKI_AGENT = os.environ.get(
     "KpopWins/0.1 (https://github.com/badmagick329/musicshowwins/issues)",
 )
 DB_HOST = os.environ.get("DB_HOST", "127.0.0.1")
-DISCORD_CORRECTIONS_WEBHOOK_URL = os.environ.get(
-    "DISCORD_CORRECTIONS_WEBHOOK_URL", ""
-)
+DISCORD_CORRECTIONS_WEBHOOK_URL = os.environ.get("DISCORD_CORRECTIONS_WEBHOOK_URL", "")
 
 
 # Quick-start development settings - unsuitable for production
@@ -27,8 +26,21 @@ DISCORD_CORRECTIONS_WEBHOOK_URL = os.environ.get(
 
 SECRET_KEY = os.environ.get("SECRET_KEY", "dev-only-insecure-secret-key")
 DEBUG = os.environ.get("DEBUG", "1").lower() in {"1", "true", "yes", "on"}
-ALLOWED_HOSTS = (
-    os.environ.get("ALLOWED_HOSTS", "127.0.0.1 localhost").replace(",", " ").split()
+
+
+def split_environment_list(value: str) -> list[str]:
+    return value.replace(",", " ").split()
+
+
+if not DEBUG and (
+    not SECRET_KEY.strip() or SECRET_KEY == "dev-only-insecure-secret-key"
+):
+    raise ImproperlyConfigured(
+        "SECRET_KEY must be set to a non-development value when DEBUG=0"
+    )
+
+ALLOWED_HOSTS = split_environment_list(
+    os.environ.get("ALLOWED_HOSTS", "127.0.0.1 localhost")
 )
 
 PAGE_SIZE = 100
@@ -50,6 +62,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -77,7 +90,9 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "musicshowwins.wsgi.application"
-CSRF_TRUSTED_ORIGINS = [BASE_URL]
+CSRF_TRUSTED_ORIGINS = split_environment_list(
+    os.environ.get("CSRF_TRUSTED_ORIGINS", BASE_URL)
+)
 
 
 # Database
@@ -91,6 +106,8 @@ DATABASES = {
         "PASSWORD": os.environ.get("DB_PASSWORD", "musicshowwins"),
         "HOST": DB_HOST,
         "PORT": os.environ.get("DB_PORT", "5432"),
+        "CONN_MAX_AGE": 60 if not DEBUG else 0,
+        "CONN_HEALTH_CHECKS": not DEBUG,
     }
 }
 
@@ -132,6 +149,12 @@ AUTH_PASSWORD_VALIDATORS = [
 USE_X_FORWARDED_HOST = True
 if not DEBUG:
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
@@ -150,6 +173,27 @@ USE_TZ = True
 
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
+if not DEBUG:
+    STORAGES = {
+        "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+        "staticfiles": {
+            "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"
+        },
+    }
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {"console": {"class": "logging.StreamHandler"}},
+    "root": {"handlers": ["console"], "level": "INFO"},
+    "loggers": {
+        "django": {
+            "handlers": ["console"],
+            "level": "INFO",
+            "propagate": False,
+        }
+    },
+}
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field

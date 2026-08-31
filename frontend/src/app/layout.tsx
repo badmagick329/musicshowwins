@@ -12,6 +12,8 @@ export const metadata: Metadata = {
   description: "Search K-pop music show wins by artist, song, show, or date. Coverage starts in 2014.",
 };
 
+export const dynamic = "force-dynamic";
+
 export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
   return (
     <html lang="en">

@@ -44,8 +44,7 @@ uv run python manage.py runserver
 The UI provides artist and song leaderboards, artist search and details, and a
 dated wins view. It is intentionally small while the backend is being revived.
 
-The Next.js frontend skeleton lives in [`frontend/`](frontend/README.md).
-Product design and feature implementation are intentionally pending.
+The public Next.js frontend lives in [`frontend/`](frontend/README.md).
 
 ## Wikipedia synchronization
 
@@ -90,8 +89,6 @@ Use `--revoke` to disable a previously approved source. Music Core 2016 is a
 known unavailable Wikipedia page; its original aggregate records are retained
 as rejected audit issues and are not restored as dated wins.
 
-Production deployment and automated scheduling are out of scope for this phase.
-
 ## API
 
 The read-only API is available at:
@@ -126,7 +123,36 @@ uv run python manage.py check
 uv run python manage.py makemigrations --check --dry-run
 ```
 
-## Deferred work
+Frontend checks:
 
-Donations, accounts, public submissions, production deployment, and scheduled
-synchronization are deliberately deferred until the product UI is defined.
+```text
+cd frontend
+pnpm install --frozen-lockfile
+pnpm lint
+pnpm typecheck
+pnpm test
+pnpm build
+```
+
+## Production image
+
+The root `Dockerfile` builds one Linux AMD64 image containing the locked Django
+environment, collected Django static files, Gunicorn, and the standalone Next.js
+server with its Node.js runtime. The same immutable image can run either process:
+
+```text
+docker build --platform linux/amd64 --tag kpopwins:0123456789ab .
+docker run --rm kpopwins:0123456789ab gunicorn musicshowwins.wsgi:application --bind 0.0.0.0:8000
+docker run --rm kpopwins:0123456789ab node /app/frontend/server.js
+docker run --rm kpopwins:0123456789ab python --version
+docker run --rm kpopwins:0123456789ab node --version
+```
+
+`docker-compose-production.yaml` runs PostgreSQL 17, a one-shot migration and
+bootstrap service, the Django backend, and the Next.js frontend. Copy
+`.env.production.example` to a private environment file, replace every secret
+placeholder, set the immutable image tag, then validate the configuration:
+
+```text
+docker compose --env-file .env.production -f docker-compose-production.yaml config
+```

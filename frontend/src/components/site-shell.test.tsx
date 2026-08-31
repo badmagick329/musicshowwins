@@ -45,6 +45,15 @@ describe("SiteFooter", () => {
     expect(html).toContain("bg-highlight-yellow");
   });
 
+  it("reads the support URL from the runtime environment on each render", () => {
+    vi.stubEnv("SUPPORT_URL", "https://support.example/first");
+    expect(renderToStaticMarkup(<SiteFooter />)).toContain("https://support.example/first");
+    vi.stubEnv("SUPPORT_URL", "https://support.example/second");
+    const html = renderToStaticMarkup(<SiteFooter />);
+    expect(html).toContain("https://support.example/second");
+    expect(html).not.toContain("https://support.example/first");
+  });
+
   it.each([undefined, "", "not a URL", "javascript:alert(1)"])("omits the coffee button for %s", (supportUrl) => {
     vi.stubEnv("SUPPORT_URL", supportUrl);
     const html = renderToStaticMarkup(<SiteFooter />);
