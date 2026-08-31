@@ -4,6 +4,8 @@ This standalone local project maintains an offline win catalogue, ingests upload
 from configured official YouTube channels, and supports local candidate review. It
 does not change the public KpopWins database directly.
 
+For the commands-only workflow, see [WORKFLOW.md](WORKFLOW.md).
+
 ## Install
 
 From `operator-tools/`, install the locked Python 3.13 environment:
