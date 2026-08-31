@@ -1,12 +1,34 @@
 from __future__ import annotations
 
 import json
+from contextlib import contextmanager
 from datetime import date
 
 from django.core.management.base import BaseCommand, CommandError
+from django.db import connection
 
 from main.models import MusicShow
 from main.wikipedia import MIN_YEAR, WikipediaImporter
+
+SYNC_LOCK_ID = 543677702501096823
+
+
+@contextmanager
+def wikipedia_sync_lock():
+    if connection.vendor != "postgresql":
+        yield
+        return
+
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT pg_try_advisory_lock(%s)", [SYNC_LOCK_ID])
+        acquired = bool(cursor.fetchone()[0])
+    if not acquired:
+        raise CommandError("Another Wikipedia synchronization is already running")
+    try:
+        yield
+    finally:
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT pg_advisory_unlock(%s)", [SYNC_LOCK_ID])
 
 
 class Command(BaseCommand):
@@ -72,11 +94,12 @@ class Command(BaseCommand):
         if unknown:
             raise CommandError("Unknown show slug(s): " + ", ".join(unknown))
 
-        summary = WikipediaImporter().sync(
-            shows=shows,
-            years=years,
-            dry_run=options["dry_run"],
-        )
+        with wikipedia_sync_lock():
+            summary = WikipediaImporter().sync(
+                shows=shows,
+                years=years,
+                dry_run=options["dry_run"],
+            )
         if options["format"] == "json":
             self.stdout.write(json.dumps(summary.as_dict(), ensure_ascii=False))
         else:

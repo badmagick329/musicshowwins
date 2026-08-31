@@ -74,3 +74,32 @@ jobs:
 
       - name: Production build
         run: pnpm build
+
+  production-image:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Build Linux AMD64 production image
+        run: docker build --platform linux/amd64 --tag kpopwins:ci .
+
+      - name: Validate production Compose
+        run: docker compose --env-file .env.production.example --file docker-compose-production.yaml config --quiet
+
+      - name: Check Python runtime
+        run: docker run --rm kpopwins:ci python --version
+
+      - name: Check Node.js runtime
+        run: docker run --rm kpopwins:ci node --version
+
+      - name: Run Django deployment checks
+        run: >-
+          docker run --rm
+          --env DEBUG=0
+          --env SECRET_KEY=test-only-ci-production-secret-with-sufficient-entropy
+          --env ALLOWED_HOSTS=api.example.test
+          --env CSRF_TRUSTED_ORIGINS=https://api.example.test
+          --env DB_ENGINE=django.db.backends.sqlite3
+          --env DB_NAME=/tmp/ci-check.sqlite3
+          kpopwins:ci python manage.py check --deploy

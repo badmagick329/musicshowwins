@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { parseApiPage, parsePositivePage } from "./api-shared";
-import { buildServerApiUrl, collectPages, getArtist, getArtists, getHomeData } from "./api-server";
+import { buildServerApiUrl, collectPages, getArtist, getArtists, getHomeData, serverRequestPage } from "./api-server";
 import { submitCorrection } from "./api-browser";
 
 afterEach(() => { vi.unstubAllGlobals(); vi.unstubAllEnvs(); });
@@ -34,6 +34,40 @@ describe("API URLs and pagination", () => {
 });
 
 describe("request failures and input", () => {
+  it("sends the forwarded HTTPS header for server page requests", async () => {
+    const fetchMock = vi.fn<(input: string | URL | Request, init?: RequestInit) => Promise<Response>>(async () =>
+      new Response(JSON.stringify({ count: 0, next: null, previous: null, results: [] })));
+    vi.stubGlobal("fetch", fetchMock);
+    const controller = new AbortController();
+
+    await serverRequestPage("/artists", {}, controller.signal);
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      expect.stringContaining("/api/v1/artists"),
+      expect.objectContaining({
+        cache: "no-store",
+        headers: { "X-Forwarded-Proto": "https" },
+        signal: controller.signal,
+      }),
+    );
+  });
+
+  it("sends the forwarded HTTPS header for server detail requests", async () => {
+    const fetchMock = vi.fn<(input: string | URL | Request, init?: RequestInit) => Promise<Response>>(async () =>
+      new Response(JSON.stringify({ id: 8, name: "Artist" })));
+    vi.stubGlobal("fetch", fetchMock);
+
+    await getArtist(8);
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      expect.stringContaining("/api/v1/artists/8"),
+      expect.objectContaining({
+        cache: "no-store",
+        headers: { "X-Forwarded-Proto": "https" },
+      }),
+    );
+  });
+
   it("posts correction reports through the same-origin API boundary", async () => {
     const fetchMock = vi.fn(async () => new Response(JSON.stringify({ detail: "Report accepted." }), { status: 202 }));
     vi.stubGlobal("fetch", fetchMock);

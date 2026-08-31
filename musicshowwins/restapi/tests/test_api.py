@@ -288,9 +288,7 @@ def test_correction_delivery_is_structured_private_and_stateless(archive, settin
     response_mock = Mock()
     response_mock.raise_for_status.return_value = None
     main_models = tuple(apps.get_app_config("main").get_models())
-    before_counts = {
-        model: model.objects.count() for model in main_models
-    }
+    before_counts = {model: model.objects.count() for model in main_models}
 
     with patch("restapi.views.requests.post", return_value=response_mock) as post:
         response = APIClient().post(
@@ -298,9 +296,7 @@ def test_correction_delivery_is_structured_private_and_stateless(archive, settin
         )
 
     assert response.status_code == 202
-    assert {
-        model: model.objects.count() for model in main_models
-    } == before_counts
+    assert {model: model.objects.count() for model in main_models} == before_counts
     post.assert_called_once()
     assert post.call_args.kwargs["timeout"] == 5
     payload = post.call_args.kwargs["json"]
@@ -325,9 +321,12 @@ def test_correction_validation_and_json_only():
     assert invalid.status_code == 400
     assert "page_or_record" in invalid.data
     assert "supporting_source" in invalid.data
-    assert client.post(
-        "/api/v1/corrections", "page_or_record=test", content_type="text/plain"
-    ).status_code == 415
+    assert (
+        client.post(
+            "/api/v1/corrections", "page_or_record=test", content_type="text/plain"
+        ).status_code
+        == 415
+    )
     assert client.get("/api/v1/corrections").status_code == 405
 
 
@@ -335,15 +334,16 @@ def test_correction_validation_and_json_only():
 def test_correction_missing_configuration_and_discord_failure(settings):
     cache.clear()
     settings.DISCORD_CORRECTIONS_WEBHOOK_URL = ""
-    assert APIClient().post(
-        "/api/v1/corrections", correction_payload(), format="json"
-    ).status_code == 503
+    assert (
+        APIClient()
+        .post("/api/v1/corrections", correction_payload(), format="json")
+        .status_code
+        == 503
+    )
 
     cache.clear()
     settings.DISCORD_CORRECTIONS_WEBHOOK_URL = "https://discord.example/webhook"
-    with patch(
-        "restapi.views.requests.post", side_effect=requests.RequestException
-    ):
+    with patch("restapi.views.requests.post", side_effect=requests.RequestException):
         response = APIClient().post(
             "/api/v1/corrections", correction_payload(), format="json"
         )
@@ -374,18 +374,24 @@ def test_correction_has_dedicated_anonymous_throttle(settings):
     client = APIClient()
     with patch("restapi.views.requests.post", return_value=response_mock):
         for _ in range(5):
-            assert client.post(
+            assert (
+                client.post(
+                    "/api/v1/corrections",
+                    correction_payload(contact="", supporting_source=""),
+                    format="json",
+                    REMOTE_ADDR="203.0.113.77",
+                ).status_code
+                == 202
+            )
+        assert (
+            client.post(
                 "/api/v1/corrections",
-                correction_payload(contact="", supporting_source=""),
+                correction_payload(),
                 format="json",
                 REMOTE_ADDR="203.0.113.77",
-            ).status_code == 202
-        assert client.post(
-            "/api/v1/corrections",
-            correction_payload(),
-            format="json",
-            REMOTE_ADDR="203.0.113.77",
-        ).status_code == 429
+            ).status_code
+            == 429
+        )
 
 
 @pytest.mark.django_db
