@@ -37,7 +37,7 @@ addopts = "-rP"
 [tool.ruff]
 target-version = "py313"
 line-length = 88
-exclude = ["musicshowwins/main/migrations"]
+exclude = ["musicshowwins/main/migrations", "operator-tools"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I"]
