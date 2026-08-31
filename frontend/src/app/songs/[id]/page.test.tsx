@@ -55,17 +55,17 @@ describe("Song detail page", () => {
     const html = renderToStaticMarkup(await SongPage({ params: Promise.resolve({ id: "7" }) }));
     expect(html).toContain("Supernova");
     expect(html).toContain('href="/artists/3"');
-    expect(html).toContain("Winning shows");
+    expect(html).toContain("Shows with wins");
     expect(html).toContain("24 May 2024");
     expect(html).toContain("02 Jun 2024");
     expect(html.match(/<article/g)).toHaveLength(3);
-    const history = html.slice(html.indexOf("Dated win history"));
+    const history = html.slice(html.indexOf("Win history"));
     expect(history.indexOf("02 Jun 2024")).toBeLessThan(history.indexOf("31 May 2024"));
     expect(history.indexOf("31 May 2024")).toBeLessThan(history.indexOf("24 May 2024"));
     expect(apiMocks.getAllSongWins).toHaveBeenCalledWith(7);
 
     await expect(generateMetadata({ params: Promise.resolve({ id: "7" }) })).resolves.toMatchObject({
-      title: "Supernova wins — KpopWins",
+      title: "Supernova by aespa",
       description: expect.stringContaining("aespa"),
     });
   });

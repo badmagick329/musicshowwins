@@ -5,7 +5,7 @@ import { serverTransport } from "@/lib/api-server";
 import { parseWinsFilters, type WinsSearchParams } from "@/lib/wins-filters";
 import { showsQueryOptions, winsQueryOptions } from "@/lib/wins-queries";
 
-export const metadata = { title: "Browse wins — KpopWins", description: "Browse every dated K-pop music-show win in the archive." };
+export const metadata = { title: "Music Show Wins", description: "Search K-pop music show results by artist, song, show, year, or date. Coverage starts in 2014." };
 
 export default async function WinsPage({ searchParams }: { searchParams: Promise<WinsSearchParams> }) {
   const filters = parseWinsFilters(await searchParams);

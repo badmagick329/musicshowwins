@@ -11,11 +11,11 @@ import Home from "./page";
 describe("homepage banner", () => {
   it("uses the simplified copy without the redundant archive panel", async () => {
     const html = renderToStaticMarkup(await Home({ searchParams: Promise.resolve({}) }));
-    expect(html).toContain("Explore K-pop music show wins.");
-    expect(html).toContain("Search artists, songs, and weekly music-show winners from 2014 onward.");
-    expect(html).not.toContain("2014–today");
-    expect(html).not.toContain("Six weekly music shows in one searchable archive.");
+    expect(html).toContain("K-pop music show wins since 2014.");
+    expect(html).toContain("Search by artist or song and browse results from six weekly shows.");
+    expect(html).not.toContain("clearly kept");
+    expect(html).not.toContain("Explore K-pop");
     expect(html).toContain('href="/shows"');
-    expect(html).toContain("Explore all shows");
+    expect(html).toContain("All shows");
   });
 });

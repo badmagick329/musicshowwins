@@ -28,6 +28,8 @@ describe("CorrectionForm", () => {
     expect(screen.getByText("Describe what should be corrected.")).toBeTruthy();
     expect(screen.getByText("Enter a valid HTTP or HTTPS URL.")).toBeTruthy();
     expect(fetch).not.toHaveBeenCalled();
+    expect(screen.getByText(/sent privately through Discord/)).toBeTruthy();
+    expect(screen.getByText(/They are not published/)).toBeTruthy();
   });
 
   it("clears the form and announces success", async () => {
@@ -36,7 +38,7 @@ describe("CorrectionForm", () => {
     renderForm();
     fillRequired();
     fireEvent.click(screen.getByRole("button", { name: "Send correction" }));
-    await screen.findByText(/report has been received/);
+    await screen.findByText("Your correction report was sent.");
     expect((screen.getByLabelText(/Page or record/) as HTMLInputElement).value).toBe("");
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });

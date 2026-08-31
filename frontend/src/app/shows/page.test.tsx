@@ -28,15 +28,15 @@ describe("ShowsPage", () => {
     expect(html).toContain('href="/songs/4"');
     expect(html).toContain('href="/artists/3"');
     expect(html).toContain('href="/wins?show=music-bank#wins-results-title"');
-    expect(html).toContain("Browse wins");
+    expect(html).toContain("View wins");
     expect(html).toContain("after:absolute after:inset-0");
     expect(html).not.toContain("Active weekly show");
   });
 
   it("renders empty and failure states", async () => {
     getShows.mockResolvedValue({ count: 0, next: null, previous: null, results: [] });
-    expect(renderToStaticMarkup(await ShowsPage())).toContain("No music-show information");
+    expect(renderToStaticMarkup(await ShowsPage())).toContain("Music show information is unavailable");
     getShows.mockImplementationOnce(async () => { throw new Error("offline"); });
-    expect(renderToStaticMarkup(await ShowsPage())).toContain("We couldn’t load the archive data");
+    expect(renderToStaticMarkup(await ShowsPage())).toContain("Some results couldn&#x27;t load");
   });
 });

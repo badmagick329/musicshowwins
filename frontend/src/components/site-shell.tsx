@@ -45,8 +45,8 @@ export function SiteFooter() {
     <footer id="about" className="mt-20 border-t border-border bg-card">
       <div className="mx-auto grid max-w-7xl gap-4 px-5 py-8 text-sm text-muted-foreground sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start lg:px-8">
         <div className="space-y-2">
-          <p><span className="font-heading font-bold text-foreground">KpopWins</span> is a fan-made archive of Korean music-show wins.</p>
-          <p className="max-w-3xl text-xs leading-relaxed">Music-show results are derived from <a href="https://en.wikipedia.org/" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-foreground">Wikipedia contributors</a> and reviewed by KpopWins. Wikipedia content is available under <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-foreground">CC BY-SA 4.0</a>. KpopWins is independent and is not affiliated with the Wikimedia Foundation.</p>
+          <p><span className="font-heading font-bold text-foreground">KpopWins</span> is a fan-made record of K-pop music show wins.</p>
+          <p className="max-w-3xl text-xs leading-relaxed">Results come from <a href="https://en.wikipedia.org/" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-foreground">Wikipedia contributors</a> and are reviewed by KpopWins. Wikipedia content is available under <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-foreground">CC BY-SA 4.0</a>. KpopWins is independent and is not affiliated with the Wikimedia Foundation.</p>
         </div>
         <div className="flex flex-col items-start gap-4 sm:items-end">
           {supportUrl && (

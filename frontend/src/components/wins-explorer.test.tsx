@@ -56,7 +56,7 @@ afterEach(() => {
 describe("WinsExplorer", () => {
   it("uses a semantic desktop table and retains stacked mobile records", () => {
     const { container } = render(<WinsExplorer />);
-    expect(screen.getByRole("table", { name: "Filtered music-show wins" })).toBeTruthy();
+    expect(screen.getByRole("table", { name: "Filtered music show wins" })).toBeTruthy();
     for (const heading of ["Date", "Artist", "Song", "Music show"]) expect(screen.getByRole("columnheader", { name: heading })).toBeTruthy();
     expect(container.querySelectorAll("article")).toHaveLength(2);
     expect(container.innerHTML).not.toContain("winsGridColumns");

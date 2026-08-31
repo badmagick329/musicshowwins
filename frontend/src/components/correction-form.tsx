@@ -112,13 +112,13 @@ export function CorrectionForm() {
       </div>
       <div>
         <label htmlFor="supporting-source" className="font-bold">Supporting source <span className="font-normal text-muted-foreground">(optional)</span></label>
-        <input ref={sourceRef} id="supporting-source" name="supporting_source" type="url" value={report.supporting_source} onChange={update} maxLength={500} placeholder="https://…" aria-invalid={Boolean(errors.supporting_source)} aria-describedby={errors.supporting_source ? "supporting-source-error" : undefined} className={fieldClass} />
+        <input ref={sourceRef} id="supporting-source" name="supporting_source" type="url" value={report.supporting_source} onChange={update} maxLength={500} placeholder="https://example.com/source" aria-invalid={Boolean(errors.supporting_source)} aria-describedby={errors.supporting_source ? "supporting-source-error" : undefined} className={fieldClass} />
         {errors.supporting_source && <p id="supporting-source-error" className="mt-1 text-sm text-destructive">{errors.supporting_source}</p>}
       </div>
       <div>
         <label htmlFor="contact" className="font-bold">Your name or contact details <span className="font-normal text-muted-foreground">(optional)</span></label>
         <input ref={contactRef} id="contact" name="contact" value={report.contact} onChange={update} maxLength={200} aria-describedby={`contact-privacy${errors.contact ? " contact-error" : ""}`} className={fieldClass} />
-        <p id="contact-privacy" className="mt-2 text-sm leading-relaxed text-muted-foreground">If you include contact details, they will be sent privately with your report through Discord so we can reply. They will not be shown publicly.</p>
+        <p id="contact-privacy" className="mt-2 text-sm leading-relaxed text-muted-foreground">Optional contact details are sent privately through Discord so we can reply. They are not published.</p>
         {errors.contact && <p id="contact-error" className="mt-1 text-sm text-destructive">{errors.contact}</p>}
       </div>
       <div className="absolute -left-[10000px] top-auto size-px overflow-hidden" aria-hidden="true">
@@ -128,8 +128,8 @@ export function CorrectionForm() {
       <button type="submit" disabled={mutation.isPending} className="inline-flex min-h-11 items-center justify-center border border-foreground bg-brand-pink px-5 font-bold text-white shadow-[2px_2px_0_var(--foreground)] transition-transform hover:-translate-y-0.5 disabled:translate-y-0 disabled:opacity-60">
         {mutation.isPending ? "Sending…" : "Send correction"}
       </button>
-      {status === "success" && <p ref={statusRef} tabIndex={-1} role="status" className="border-l-4 border-success bg-muted px-4 py-3 text-sm">Thanks — your correction report has been received.</p>}
-      {status === "error" && <p ref={statusRef} tabIndex={-1} role="alert" className="border-l-4 border-destructive bg-danger-surface px-4 py-3 text-sm">We couldn’t send your report. Your text is still here, so please try again in a moment.</p>}
+      {status === "success" && <p ref={statusRef} tabIndex={-1} role="status" className="border-l-4 border-success bg-muted px-4 py-3 text-sm">Your correction report was sent.</p>}
+      {status === "error" && <p ref={statusRef} tabIndex={-1} role="alert" className="border-l-4 border-destructive bg-danger-surface px-4 py-3 text-sm">We couldn&apos;t send your report. Your text is still here. Try again in a moment.</p>}
     </form>
   );
 }

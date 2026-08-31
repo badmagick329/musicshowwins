@@ -69,7 +69,7 @@ export function Leaderboard({ rows, kind, empty = "No wins to show yet." }: { ro
   return (
     <div className="overflow-hidden border border-border bg-card">
       <Table className="desktop-table w-full border-collapse text-sm">
-        <TableCaption className="sr-only">Top five {kind === "artist" ? "artists" : "songs"} by music-show wins</TableCaption>
+        <TableCaption className="sr-only">Top five {kind === "artist" ? "artists" : "songs"} by music show wins</TableCaption>
         <TableHeader><TableRow className="border-foreground border-b-2 bg-muted/50 text-left text-xs uppercase tracking-[0.12em] text-muted-foreground"><TableHead className="w-16 px-4 py-3">Rank</TableHead><TableHead className="px-4 py-3">{kind === "artist" ? "Artist" : "Song"}</TableHead><TableHead className="w-24 px-4 py-3 text-right">Wins</TableHead></TableRow></TableHeader>
         <TableBody>{rows.map((row, index) => <DesktopLeaderboardRow key={`${kind}-${index}-${row.rank}`} row={row} kind={kind} />)}</TableBody>
       </Table>
@@ -95,7 +95,7 @@ export function RecentWins({ wins }: { wins: Win[] }) {
   }
   return <div className="border border-border bg-card">
     <Table className="desktop-table border-collapse">
-      <TableCaption className="sr-only">Most recent music-show wins</TableCaption>
+      <TableCaption className="sr-only">Most recent music show wins</TableCaption>
       <TableHeader><TableRow className="border-b-2 border-foreground bg-muted/50 text-xs uppercase tracking-[0.12em] text-muted-foreground"><TableHead className="w-32 px-4 py-3">Date</TableHead><TableHead className="px-4 py-3">Song</TableHead><TableHead className="px-4 py-3">Artist</TableHead><TableHead className="w-44 px-4 py-3 text-right">Music show</TableHead></TableRow></TableHeader>
       <TableBody>{wins.map((win) => <TableRow key={win.id} className="border-border/70 hover:bg-accent/60"><TableCell className="px-4 py-3"><time dateTime={win.date} className="font-heading text-sm font-bold tabular-nums text-muted-foreground">{formatDate(win.date)}</time></TableCell><TableCell className="px-4 py-3"><Link href={`/songs/${win.song.id}`} className="font-semibold underline-offset-4 hover:underline">{win.song.title}</Link></TableCell><TableCell className="px-4 py-3"><Link href={`/artists/${win.song.artist.id}`} className="underline-offset-4 hover:underline">{win.song.artist.name}</Link></TableCell><TableCell className="w-44 px-4 py-3 text-right"><ShowBadge slug={win.show.slug} name={win.show.name} /></TableCell></TableRow>)}</TableBody>
     </Table>
@@ -105,7 +105,7 @@ export function RecentWins({ wins }: { wins: Win[] }) {
 
 export function MusicShowList({ shows }: { shows: Show[] }) {
   if (!shows.length) {
-    return <EmptyState message="No music-show information is available right now." />;
+    return <EmptyState message="Music show information is unavailable right now." />;
   }
 
   return (
@@ -114,7 +114,7 @@ export function MusicShowList({ shows }: { shows: Show[] }) {
         <li key={show.id}>
           <Link
             href={`/wins?show=${encodeURIComponent(show.slug)}#wins-results-title`}
-            aria-label={`Browse ${show.name} wins`}
+            aria-label={`View ${show.name} wins`}
             className="flex items-center justify-between gap-4 border-2 border-foreground bg-card p-4 transition-colors hover:bg-accent focus-visible:bg-accent"
           >
             <ShowBadge slug={show.slug} name={show.name} />
@@ -137,7 +137,7 @@ export function ErrorState({ messages }: { messages: string[] }) {
       role="alert"
       className="mt-4 border border-border border-l-4 border-l-warning bg-card px-4 py-3 text-sm text-foreground"
     >
-      We couldn’t load the archive data. Try refreshing the page in a moment.
+      Some results couldn&apos;t load. Refresh the page to try again.
     </div>
   );
 }

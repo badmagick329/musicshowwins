@@ -25,7 +25,7 @@ describe("SiteFooter", () => {
   it("includes Wikipedia attribution, licensing, and safe external links", () => {
     vi.stubEnv("SUPPORT_URL", "");
     const html = renderToStaticMarkup(<SiteFooter />);
-    expect(html).toContain("Music-show results are derived from");
+    expect(html).toContain("Results come from");
     expect(html).toContain("KpopWins is independent and is not affiliated with the Wikimedia Foundation.");
     expect(html).toContain('href="https://en.wikipedia.org/"');
     expect(html).toContain('href="https://creativecommons.org/licenses/by-sa/4.0/"');

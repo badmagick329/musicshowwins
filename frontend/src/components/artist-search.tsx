@@ -16,7 +16,7 @@ export function ArtistSearch({ query, results, resultCount }: { query: string; r
       </div>
       {query && (
         <div className="mt-5 border-t-2 border-foreground/25 pt-4">
-          <div className="mb-3 flex items-center justify-between gap-4"><p className="text-sm font-semibold">Results for “{query}”</p><span className="text-sm text-foreground/70">{resultCount} {resultCount === 1 ? "artist" : "artists"}</span></div>
+          <div className="mb-3 flex items-center justify-between gap-4"><p className="text-sm font-semibold">Results for &quot;{query}&quot;</p><span className="text-sm text-foreground/70">{resultCount} {resultCount === 1 ? "artist" : "artists"}</span></div>
           <ArtistResults artists={results} empty="No artists found. Try a shorter or alternate name." />
           {resultCount > results.length && <Link href={artistsUrl({ search: query })} className="mt-4 inline-flex font-bold underline underline-offset-4">View all {resultCount} results</Link>}
         </div>
