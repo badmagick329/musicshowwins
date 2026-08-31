@@ -3,14 +3,17 @@ from __future__ import annotations
 import argparse
 import sqlite3
 import sys
-from collections.abc import Mapping, Sequence
+import time
+from collections.abc import Callable, Mapping, Sequence
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import TextIO
 
 import requests
 
+from .candidate_review import list_candidates, review_candidates, show_candidate
 from .catalogue import CatalogueError, refresh_catalogue
+from .channel_verification import apply_verified_channels, verify_channels
 from .config import ConfigurationError, load_config
 from .database import (
     DatabaseError,
@@ -18,7 +21,11 @@ from .database import (
     initialize_database,
     open_database,
 )
+from .ingestion import ingest_channels
 from .manifest import ManifestError, approved_document, serialize_document, write_atomic
+from .matching import match_videos
+from .registry import RegistryError, load_registry
+from .youtube import YouTubeClient, YouTubeError
 
 
 def _positive_integer(value: str) -> int:
@@ -28,6 +35,16 @@ def _positive_integer(value: str) -> int:
         raise argparse.ArgumentTypeError("must be an integer") from exc
     if parsed < 1:
         raise argparse.ArgumentTypeError("must be at least 1")
+    return parsed
+
+
+def _nonnegative_integer(value: str) -> int:
+    try:
+        parsed = int(value)
+    except ValueError as exc:
+        raise argparse.ArgumentTypeError("must be an integer") from exc
+    if parsed < 0:
+        raise argparse.ArgumentTypeError("must be at least 0")
     return parsed
 
 
@@ -44,6 +61,52 @@ def build_parser() -> argparse.ArgumentParser:
         "export-approved", help="Export approved reference candidates"
     )
     export_parser.add_argument("--output")
+
+    youtube_parser = subparsers.add_parser(
+        "youtube", help="Use official YouTube channels"
+    )
+    youtube_commands = youtube_parser.add_subparsers(
+        dest="youtube_command", required=True
+    )
+    verify_parser = youtube_commands.add_parser(
+        "verify-channels", help="Resolve configured official channel handles"
+    )
+    verify_parser.add_argument("--apply", action="store_true")
+    verify_parser.add_argument("--handle")
+    ingest_parser = youtube_commands.add_parser(
+        "ingest", help="Ingest official channel upload playlists"
+    )
+    ingest_parser.add_argument("--handle")
+    ingest_parser.add_argument("--max-pages", type=_positive_integer, default=10)
+    ingest_parser.add_argument("--restart", action="store_true")
+    match_parser = youtube_commands.add_parser(
+        "match", help="Match local official videos to wins"
+    )
+    match_parser.add_argument("--show")
+    match_parser.add_argument("--min-score", type=_nonnegative_integer, default=75)
+    match_parser.add_argument("--limit", type=_positive_integer)
+    match_parser.add_argument("--dry-run", action="store_true")
+
+    candidates_parser = subparsers.add_parser(
+        "candidates", help="Review local reference candidates"
+    )
+    candidate_commands = candidates_parser.add_subparsers(
+        dest="candidate_command", required=True
+    )
+    list_parser = candidate_commands.add_parser("list")
+    list_parser.add_argument(
+        "--status", choices=("pending", "approved", "rejected"), default="pending"
+    )
+    list_parser.add_argument("--show")
+    list_parser.add_argument("--provider")
+    list_parser.add_argument("--min-score", type=_nonnegative_integer)
+    list_parser.add_argument("--limit", type=_positive_integer, default=100)
+    show_parser = candidate_commands.add_parser("show")
+    show_parser.add_argument("id", type=_positive_integer)
+    approve_parser = candidate_commands.add_parser("approve")
+    approve_parser.add_argument("ids", nargs="+", type=_positive_integer)
+    reject_parser = candidate_commands.add_parser("reject")
+    reject_parser.add_argument("ids", nargs="+", type=_positive_integer)
     return parser
 
 
@@ -144,6 +207,13 @@ def _now() -> str:
     return datetime.now(UTC).isoformat().replace("+00:00", "Z")
 
 
+def _fixed_clock(instant: datetime) -> Callable[[], datetime]:
+    def clock() -> datetime:
+        return instant
+
+    return clock
+
+
 def main(
     argv: Sequence[str] | None = None,
     *,
@@ -152,6 +222,7 @@ def main(
     stderr: TextIO | None = None,
     session: requests.Session | None = None,
     now: str | None = None,
+    sleep: Callable[[float], None] = time.sleep,
 ) -> int:
     output = stdout or sys.stdout
     errors = stderr or sys.stderr
@@ -195,6 +266,102 @@ def main(
                     )
                     write_atomic(destination, content)
                     print(f"Wrote approved manifest: {destination}", file=output)
+            elif args.command == "youtube":
+                registry = load_registry(config.channel_registry_path)
+                timestamp = now or _now()
+                if args.youtube_command in {"verify-channels", "ingest"}:
+                    client_clock = None
+                    if now:
+                        instant = datetime.fromisoformat(now.replace("Z", "+00:00"))
+                        client_clock = _fixed_clock(instant)
+                    client = YouTubeClient(
+                        config,
+                        connection,
+                        session=session,
+                        clock=client_clock,
+                        sleep=sleep,
+                    )
+                if args.youtube_command == "verify-channels":
+                    verified = verify_channels(registry, client, handle=args.handle)
+                    for result in verified:
+                        print(
+                            f"{result.entry.show_slug}\t{result.entry.handle}\t"
+                            f"{result.resolved.title}\t{result.resolved.channel_id}\t"
+                            f"{result.resolved.uploads_playlist_id}",
+                            file=output,
+                        )
+                    if args.apply:
+                        apply_verified_channels(
+                            connection,
+                            verified,
+                            verified_at=timestamp,
+                            full_registry=args.handle is None,
+                        )
+                        print(
+                            f"Applied {len(verified)} channel mapping(s).", file=output
+                        )
+                    else:
+                        print(
+                            "No channel mappings changed; use --apply to save.",
+                            file=output,
+                        )
+                elif args.youtube_command == "ingest":
+                    counts = ingest_channels(
+                        connection,
+                        client,
+                        handle=args.handle,
+                        max_pages=args.max_pages,
+                        restart=args.restart,
+                        timestamp=timestamp,
+                    )
+                    print(
+                        f"channels={counts.channels} pages={counts.pages} "
+                        f"discovered={counts.discovered} added={counts.added} "
+                        f"updated={counts.updated} unavailable={counts.unavailable} "
+                        f"api-calls={client.calls_used} "
+                        f"more-remaining={'yes' if counts.more_remaining else 'no'}",
+                        file=output,
+                    )
+                elif args.youtube_command == "match":
+                    counts = match_videos(
+                        connection,
+                        registry,
+                        show=args.show,
+                        min_score=args.min_score,
+                        limit=args.limit,
+                        dry_run=args.dry_run,
+                        timestamp=timestamp,
+                    )
+                    print(
+                        f"considered={counts.considered} accepted={counts.accepted} "
+                        f"created={counts.created} updated={counts.updated} "
+                        f"dry-run={'yes' if args.dry_run else 'no'}",
+                        file=output,
+                    )
+            elif args.command == "candidates":
+                timestamp = now or _now()
+                if args.candidate_command == "list":
+                    list_candidates(
+                        connection,
+                        output,
+                        status=args.status,
+                        show=args.show,
+                        provider=args.provider,
+                        minimum_score=args.min_score,
+                        limit=args.limit,
+                    )
+                elif args.candidate_command == "show":
+                    show_candidate(connection, output, args.id)
+                else:
+                    decision = (
+                        "approved"
+                        if args.candidate_command == "approve"
+                        else "rejected"
+                    )
+                    total = review_candidates(
+                        connection, args.ids, decision=decision, timestamp=timestamp
+                    )
+                    print(f"{decision}: {total} candidate(s)", file=output)
         finally:
             connection.close()
         return 0
@@ -203,6 +370,8 @@ def main(
         ConfigurationError,
         DatabaseError,
         ManifestError,
+        RegistryError,
+        YouTubeError,
         OSError,
         sqlite3.Error,
         ValueError,

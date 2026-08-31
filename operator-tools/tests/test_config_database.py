@@ -67,7 +67,7 @@ def test_init_cli_prints_resolved_home_and_version(config):
     assert main(["init"], environ=environment, stdout=output) == 0
 
     assert f"Operator home: {config.home.resolve()}" in output.getvalue()
-    assert "Schema version: 1" in output.getvalue()
+    assert f"Schema version: {SCHEMA_VERSION}" in output.getvalue()
 
 
 def test_candidate_constraints_and_metadata_validation(connection):

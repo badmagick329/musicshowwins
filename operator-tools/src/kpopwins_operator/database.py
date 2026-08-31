@@ -9,14 +9,14 @@ from typing import Any
 from .config import Config
 from .validation import normalize_candidate
 
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2
 
 
 class DatabaseError(RuntimeError):
     pass
 
 
-SCHEMA = """
+SCHEMA_V1 = """
 CREATE TABLE IF NOT EXISTS wins (
     show_slug TEXT NOT NULL,
     win_date TEXT NOT NULL,
@@ -83,6 +83,74 @@ CREATE INDEX IF NOT EXISTS candidate_review_status_idx
     ON reference_candidates(review_status, show_slug, win_date);
 """
 
+MIGRATION_1_TO_2 = """
+CREATE TABLE IF NOT EXISTS youtube_channels (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    show_slug TEXT NOT NULL,
+    configured_handle TEXT NOT NULL,
+    channel_id TEXT NOT NULL,
+    channel_title TEXT NOT NULL,
+    uploads_playlist_id TEXT NOT NULL,
+    verified_at TEXT NOT NULL,
+    is_active INTEGER NOT NULL DEFAULT 1 CHECK (is_active IN (0, 1)),
+    UNIQUE (show_slug, configured_handle)
+);
+
+CREATE INDEX IF NOT EXISTS youtube_channels_channel_idx
+    ON youtube_channels(channel_id, is_active);
+
+CREATE TABLE IF NOT EXISTS youtube_videos (
+    video_id TEXT PRIMARY KEY,
+    channel_id TEXT NOT NULL,
+    title TEXT NOT NULL,
+    description TEXT NOT NULL DEFAULT '',
+    published_at TEXT NOT NULL,
+    duration TEXT NOT NULL DEFAULT '',
+    privacy_status TEXT NOT NULL DEFAULT '',
+    embeddable INTEGER NOT NULL DEFAULT 1 CHECK (embeddable IN (0, 1)),
+    live_broadcast_state TEXT NOT NULL DEFAULT 'none',
+    availability_status TEXT NOT NULL DEFAULT 'active'
+        CHECK (availability_status IN ('active', 'unavailable')),
+    first_seen_at TEXT NOT NULL,
+    last_seen_at TEXT NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS youtube_videos_channel_published_idx
+    ON youtube_videos(channel_id, published_at DESC);
+
+CREATE TABLE IF NOT EXISTS youtube_ingestion_state (
+    channel_id TEXT PRIMARY KEY,
+    next_page_token TEXT,
+    initial_scan_complete INTEGER NOT NULL DEFAULT 0
+        CHECK (initial_scan_complete IN (0, 1)),
+    last_attempted_at TEXT,
+    last_successful_at TEXT,
+    last_error TEXT NOT NULL DEFAULT '',
+    oldest_imported_at TEXT
+);
+
+CREATE TABLE IF NOT EXISTS youtube_candidate_matches (
+    candidate_id INTEGER PRIMARY KEY,
+    video_id TEXT NOT NULL,
+    score INTEGER NOT NULL,
+    reasons TEXT NOT NULL CHECK (json_valid(reasons) AND json_type(reasons) = 'array'),
+    show_mapping TEXT NOT NULL,
+    korean_publication_date TEXT NOT NULL,
+    matched_at TEXT NOT NULL,
+    FOREIGN KEY (candidate_id) REFERENCES reference_candidates(id) ON DELETE CASCADE,
+    FOREIGN KEY (video_id) REFERENCES youtube_videos(video_id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS youtube_api_usage (
+    pacific_date TEXT NOT NULL,
+    api_method TEXT NOT NULL,
+    call_count INTEGER NOT NULL DEFAULT 0 CHECK (call_count >= 0),
+    PRIMARY KEY (pacific_date, api_method)
+);
+"""
+
+SCHEMA = SCHEMA_V1 + MIGRATION_1_TO_2
+
 
 def _connect(path: Path) -> sqlite3.Connection:
     connection = sqlite3.connect(path)
@@ -101,10 +169,12 @@ def initialize_database(config: Config) -> int:
                 "The operator database was created by a newer tool version."
             )
         if version == 0:
-            connection.executescript(SCHEMA)
-            connection.execute(f"PRAGMA user_version = {SCHEMA_VERSION}")
-        elif version < SCHEMA_VERSION:
-            raise DatabaseError("No migration is available for this schema version.")
+            connection.executescript(SCHEMA_V1)
+            connection.execute("PRAGMA user_version = 1")
+            version = 1
+        if version == 1:
+            connection.executescript(MIGRATION_1_TO_2)
+            connection.execute("PRAGMA user_version = 2")
     return SCHEMA_VERSION
 
 
