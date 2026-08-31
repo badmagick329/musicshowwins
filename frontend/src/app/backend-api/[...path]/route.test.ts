@@ -29,7 +29,12 @@ describe("backend API proxy", () => {
     vi.stubGlobal("fetch", fetchMock);
 
     const response = await GET(
-      new NextRequest("https://kpopwins.info/backend-api/wins?page=2&show=music-bank"),
+      new NextRequest("https://kpopwins.info/backend-api/wins?page=2&show=music-bank", {
+        headers: {
+          "x-forwarded-for": "203.0.113.25",
+          "x-real-ip": "203.0.113.25",
+        },
+      }),
       context("wins"),
     );
 
@@ -42,6 +47,8 @@ describe("backend API proxy", () => {
     expect(options.method).toBe("GET");
     expect(options.credentials).toBe("omit");
     expect(headers.get("X-Forwarded-Proto")).toBe("https");
+    expect(headers.get("X-Forwarded-For")).toBe("203.0.113.25");
+    expect(headers.get("X-Real-IP")).toBe("203.0.113.25");
     expect(headers.has("cookie")).toBe(false);
     expect(headers.has("host")).toBe(false);
     expect(response.status).toBe(206);
