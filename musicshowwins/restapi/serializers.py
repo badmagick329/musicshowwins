@@ -1,4 +1,4 @@
-from main.models import Artist, MusicShow, Song, Win
+from main.models import Artist, MusicShow, Song, Win, WinReference
 from rest_framework import serializers
 
 
@@ -99,13 +99,33 @@ class SongSerializer(serializers.ModelSerializer):
         )
 
 
+class WinReferenceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = WinReference
+        fields = (
+            "id",
+            "reference_type",
+            "provider",
+            "external_id",
+            "url",
+            "title",
+            "publisher_name",
+            "is_official",
+            "published_at",
+            "last_verified_at",
+        )
+
+
 class WinSerializer(serializers.ModelSerializer):
     show = ShowSummarySerializer(read_only=True)
     song = SongSerializer(read_only=True)
+    references = WinReferenceSerializer(
+        source="active_references", many=True, read_only=True
+    )
 
     class Meta:
         model = Win
-        fields = ("id", "date", "show", "song")
+        fields = ("id", "date", "show", "song", "references")
 
 
 class ArtistLeaderboardSerializer(serializers.Serializer):
