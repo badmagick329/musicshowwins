@@ -118,6 +118,7 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.AllowAny"],
     "DEFAULT_THROTTLE_CLASSES": ["rest_framework.throttling.AnonRateThrottle"],
     "DEFAULT_THROTTLE_RATES": {"anon": "60/min"},
+    "NUM_PROXIES": 1 if not DEBUG else None,
 }
 
 SPECTACULAR_SETTINGS = {

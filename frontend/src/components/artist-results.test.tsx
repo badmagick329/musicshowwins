@@ -1,6 +1,11 @@
 import { renderToStaticMarkup } from "react-dom/server";
-import { describe, expect, it } from "vitest";
+import type { ComponentProps } from "react";
+import { describe, expect, it, vi } from "vitest";
 import { ArtistResults } from "./artist-results";
+
+vi.mock("next/link", () => ({
+  default: ({ prefetch, ...props }: ComponentProps<"a"> & { prefetch?: boolean }) => <a {...props} data-prefetch={String(prefetch)} />,
+}));
 
 describe("ArtistResults", () => {
   it("renders a semantic desktop table and linked stacked mobile record", () => {
@@ -11,6 +16,7 @@ describe("ArtistResults", () => {
     expect(html).not.toContain("View details");
     expect(html).not.toContain("lucide-arrow-right");
     expect(html).toContain('href="/artists/3"');
+    expect(html.match(/data-prefetch="false"/g)).toHaveLength(2);
     expect(html).toContain("after:absolute after:inset-0");
     expect(html).toContain("mobile-record");
     expect(html).toMatch(/<strong>12<\/strong> wins/);

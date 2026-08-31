@@ -3,6 +3,13 @@ import { parseApiPage, parsePositivePage } from "./api-shared";
 import { buildServerApiUrl, collectPages, getArtist, getArtists, getHomeData, serverRequestPage } from "./api-server";
 import { submitCorrection } from "./api-browser";
 
+vi.mock("next/headers", () => ({
+  headers: vi.fn(async () => new Headers({
+    "x-forwarded-for": "203.0.113.25",
+    "x-real-ip": "203.0.113.25",
+  })),
+}));
+
 afterEach(() => { vi.unstubAllGlobals(); vi.unstubAllEnvs(); });
 
 describe("API URLs and pagination", () => {
@@ -46,7 +53,11 @@ describe("request failures and input", () => {
       expect.stringContaining("/api/v1/artists"),
       expect.objectContaining({
         cache: "no-store",
-        headers: { "X-Forwarded-Proto": "https" },
+        headers: {
+          "X-Forwarded-For": "203.0.113.25",
+          "X-Forwarded-Proto": "https",
+          "X-Real-IP": "203.0.113.25",
+        },
         signal: controller.signal,
       }),
     );
@@ -63,7 +74,11 @@ describe("request failures and input", () => {
       expect.stringContaining("/api/v1/artists/8"),
       expect.objectContaining({
         cache: "no-store",
-        headers: { "X-Forwarded-Proto": "https" },
+        headers: {
+          "X-Forwarded-For": "203.0.113.25",
+          "X-Forwarded-Proto": "https",
+          "X-Real-IP": "203.0.113.25",
+        },
       }),
     );
   });

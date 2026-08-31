@@ -32,6 +32,10 @@ async function proxy(request: NextRequest, context: RouteContext) {
   try {
     const { path } = await context.params;
     const headers = new Headers({ "X-Forwarded-Proto": "https" });
+    const forwardedFor = request.headers.get("x-forwarded-for");
+    const realIp = request.headers.get("x-real-ip");
+    if (forwardedFor) headers.set("X-Forwarded-For", forwardedFor);
+    if (realIp) headers.set("X-Real-IP", realIp);
     const contentType = request.headers.get("content-type");
     if (contentType) headers.set("Content-Type", contentType);
 

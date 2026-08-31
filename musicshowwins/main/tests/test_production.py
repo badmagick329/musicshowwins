@@ -38,6 +38,7 @@ def test_production_settings_parse_hosts_origins_and_secure_database_options():
         "'origins': s.CSRF_TRUSTED_ORIGINS, "
         "'proxy': s.SECURE_PROXY_SSL_HEADER, "
         "'session': s.SESSION_COOKIE_SECURE, 'csrf': s.CSRF_COOKIE_SECURE, "
+        "'num_proxies': s.REST_FRAMEWORK['NUM_PROXIES'], "
         "'age': s.DATABASES['default']['CONN_MAX_AGE'], "
         "'health': s.DATABASES['default']['CONN_HEALTH_CHECKS']}))"
     )
@@ -57,6 +58,7 @@ def test_production_settings_parse_hosts_origins_and_secure_database_options():
         "proxy": ["HTTP_X_FORWARDED_PROTO", "https"],
         "session": True,
         "csrf": True,
+        "num_proxies": 1,
         "age": 60,
         "health": True,
     }

@@ -407,6 +407,39 @@ def test_anonymous_throttle_is_enforced(archive):
 
 
 @pytest.mark.django_db
+def test_anonymous_throttle_distinguishes_clients_behind_frontend(archive, settings):
+    cache.clear()
+    settings.REST_FRAMEWORK["NUM_PROXIES"] = 1
+    client = APIClient()
+    shared_proxy = "172.20.0.5"
+    for _ in range(60):
+        assert (
+            client.get(
+                "/api/v1/shows",
+                REMOTE_ADDR=shared_proxy,
+                HTTP_X_FORWARDED_FOR="203.0.113.42",
+            ).status_code
+            == 200
+        )
+    assert (
+        client.get(
+            "/api/v1/shows",
+            REMOTE_ADDR=shared_proxy,
+            HTTP_X_FORWARDED_FOR="203.0.113.42",
+        ).status_code
+        == 429
+    )
+    assert (
+        client.get(
+            "/api/v1/shows",
+            REMOTE_ADDR=shared_proxy,
+            HTTP_X_FORWARDED_FOR="203.0.113.43",
+        ).status_code
+        == 200
+    )
+
+
+@pytest.mark.django_db
 def test_temporary_ui_pages(archive):
     client = APIClient()
     leaderboard = client.get("/")
