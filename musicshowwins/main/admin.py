@@ -17,6 +17,7 @@ from main.models import (
     SourceApproval,
     SourcePage,
     Win,
+    WinReference,
 )
 
 
@@ -46,6 +47,22 @@ class SongAdmin(admin.ModelAdmin):
     search_fields = ("title", "normalized_title", "artist__name")
 
 
+class WinReferenceInline(admin.TabularInline):
+    model = WinReference
+    extra = 0
+    fields = (
+        "reference_type",
+        "provider",
+        "external_id",
+        "url",
+        "title",
+        "is_official",
+        "status",
+        "published_at",
+        "last_verified_at",
+    )
+
+
 @admin.register(Win)
 class WinAdmin(admin.ModelAdmin):
     list_display = (
@@ -59,6 +76,70 @@ class WinAdmin(admin.ModelAdmin):
     list_filter = ("show", "source_type", "date")
     search_fields = ("show__name", "song__title", "song__artist__name")
     date_hierarchy = "date"
+    inlines = (WinReferenceInline,)
+
+
+@admin.register(WinReference)
+class WinReferenceAdmin(admin.ModelAdmin):
+    list_display = (
+        "win_date",
+        "music_show",
+        "artist",
+        "song",
+        "reference_type",
+        "provider",
+        "title_or_url",
+        "publisher_name",
+        "is_official",
+        "status",
+        "last_verified_at",
+    )
+    list_filter = (
+        "reference_type",
+        "provider",
+        "is_official",
+        "status",
+        "win__show",
+        "win__date",
+    )
+    search_fields = (
+        "win__song__artist__name",
+        "win__song__title",
+        "title",
+        "url",
+        "external_id",
+        "publisher_name",
+        "publisher_external_id",
+    )
+    autocomplete_fields = ("win",)
+    readonly_fields = ("discovered_at", "created_at", "updated_at")
+
+    def get_queryset(self, request):
+        return (
+            super()
+            .get_queryset(request)
+            .select_related("win__show", "win__song__artist")
+        )
+
+    @admin.display(description="Win date", ordering="win__date")
+    def win_date(self, obj):
+        return obj.win.date
+
+    @admin.display(description="Music show", ordering="win__show__name")
+    def music_show(self, obj):
+        return obj.win.show.name
+
+    @admin.display(ordering="win__song__artist__name")
+    def artist(self, obj):
+        return obj.win.song.artist.name
+
+    @admin.display(ordering="win__song__title")
+    def song(self, obj):
+        return obj.win.song.title
+
+    @admin.display(description="Title or URL", ordering="title")
+    def title_or_url(self, obj):
+        return obj.title or obj.url
 
 
 @admin.register(SourcePage)

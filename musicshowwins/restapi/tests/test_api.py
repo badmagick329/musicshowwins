@@ -7,7 +7,7 @@ import requests
 from django.apps import apps
 from django.conf import settings
 from django.core.cache import cache
-from main.models import Artist, MusicShow, Song, Win
+from main.models import Artist, MusicShow, Song, Win, WinReference
 from rest_framework.test import APIClient
 
 
@@ -76,7 +76,14 @@ def test_read_only_collections_and_contracts(archive):
         "latest_win_date",
         "winning_shows",
     }
-    assert set(wins.data["results"][0]) == {"id", "date", "show", "song"}
+    assert set(wins.data["results"][0]) == {
+        "id",
+        "date",
+        "show",
+        "song",
+        "references",
+    }
+    assert wins.data["results"][0]["references"] == []
 
 
 @pytest.mark.django_db
@@ -244,11 +251,73 @@ def test_wins_serialization_has_no_per_row_song_count_queries(
         )
 
     client = APIClient()
-    with django_assert_num_queries(3):
+    for win in Win.objects.all():
+        WinReference.objects.create(
+            win=win,
+            reference_type="article",
+            provider="publisher",
+            url=f"https://example.com/references/{win.pk}",
+        )
+
+    with django_assert_num_queries(4):
         response = client.get("/api/v1/wins")
 
     assert response.status_code == 200
     assert len(response.data["results"]) == 7
+
+
+@pytest.mark.django_db
+def test_win_api_exposes_only_prefetched_active_references(archive):
+    wins = list(Win.objects.order_by("date"))
+    one_reference = WinReference.objects.create(
+        win=wins[1],
+        reference_type="video",
+        provider="youtube",
+        external_id="one",
+        url="https://www.youtube.com/watch?v=one",
+        title="First stage",
+        publisher_name="Official channel",
+        is_official=True,
+    )
+    two_references = [
+        WinReference.objects.create(
+            win=wins[2],
+            reference_type="article",
+            provider="publisher",
+            external_id=str(index),
+            url=f"https://example.com/articles/{index}",
+        )
+        for index in range(2)
+    ]
+    WinReference.objects.create(
+        win=wins[2],
+        reference_type="video",
+        provider="youtube",
+        external_id="unavailable",
+        url="https://www.youtube.com/watch?v=unavailable",
+        status=WinReference.Status.UNAVAILABLE,
+    )
+
+    results = APIClient().get("/api/v1/wins?ordering=date").data["results"]
+
+    assert results[0]["references"] == []
+    assert [item["id"] for item in results[1]["references"]] == [one_reference.pk]
+    assert [item["id"] for item in results[2]["references"]] == [
+        reference.pk for reference in two_references
+    ]
+    assert set(results[1]["references"][0]) == {
+        "id",
+        "reference_type",
+        "provider",
+        "external_id",
+        "url",
+        "title",
+        "publisher_name",
+        "is_official",
+        "published_at",
+        "last_verified_at",
+    }
+    assert "metadata" not in results[1]["references"][0]
 
 
 @pytest.mark.django_db

@@ -7,7 +7,7 @@ from datetime import date
 from django.db.models import Count, F, Max, Min, OuterRef, Prefetch, Q, Subquery, Window
 from django.db.models.functions import DenseRank
 
-from .models import Artist, MusicShow, Song, Win
+from .models import Artist, MusicShow, Song, Win, WinReference
 
 
 def _show_query(value: str, prefix: str = "") -> Q:
@@ -71,7 +71,15 @@ def win_filters(
 
 
 def wins_queryset(*, with_song_totals: bool = False, **filters):
-    queryset = Win.objects.select_related("show")
+    queryset = Win.objects.select_related("show").prefetch_related(
+        Prefetch(
+            "references",
+            queryset=WinReference.objects.filter(
+                status=WinReference.Status.ACTIVE
+            ).order_by("pk"),
+            to_attr="active_references",
+        )
+    )
     if with_song_totals:
         songs = all_songs_queryset()
         queryset = queryset.prefetch_related(Prefetch("song", queryset=songs))

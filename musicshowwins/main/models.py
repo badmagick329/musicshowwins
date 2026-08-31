@@ -137,6 +137,63 @@ class Win(models.Model):
         return f"{self.show.name} - {self.song} - {self.date}"
 
 
+class WinReference(models.Model):
+    class ReferenceType(models.TextChoices):
+        VIDEO = "video", "Video"
+        ARTICLE = "article", "Article"
+        OTHER = "other", "Other"
+
+    class Status(models.TextChoices):
+        ACTIVE = "active", "Active"
+        UNAVAILABLE = "unavailable", "Unavailable"
+
+    win = models.ForeignKey(Win, on_delete=models.CASCADE, related_name="references")
+    reference_type = models.CharField(max_length=20, choices=ReferenceType.choices)
+    provider = models.CharField(max_length=80)
+    external_id = models.CharField(max_length=255, blank=True)
+    url = models.URLField(max_length=2048)
+    title = models.CharField(max_length=500, blank=True)
+    publisher_name = models.CharField(max_length=300, blank=True)
+    publisher_external_id = models.CharField(max_length=255, blank=True)
+    is_official = models.BooleanField(default=False)
+    status = models.CharField(
+        max_length=20, choices=Status.choices, default=Status.ACTIVE
+    )
+    published_at = models.DateTimeField(null=True, blank=True)
+    discovered_at = models.DateTimeField(auto_now_add=True)
+    last_verified_at = models.DateTimeField(null=True, blank=True)
+    metadata = models.JSONField(default=dict, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ("win__date", "provider", "external_id", "url")
+        constraints = [
+            models.UniqueConstraint(
+                fields=("win", "url"), name="unique_win_reference_url"
+            ),
+            models.UniqueConstraint(
+                fields=("win", "provider", "external_id"),
+                condition=~models.Q(external_id=""),
+                name="unique_win_reference_provider_external_id",
+            ),
+        ]
+        indexes = [
+            models.Index(fields=("win", "status"), name="main_winref_win_status_idx"),
+            models.Index(
+                fields=("reference_type", "provider"),
+                name="main_winref_type_provider_idx",
+            ),
+            models.Index(
+                fields=("provider", "external_id"),
+                name="main_winref_provider_ext_idx",
+            ),
+        ]
+
+    def __str__(self):
+        return self.title or self.url
+
+
 class SourcePage(models.Model):
     show = models.ForeignKey(
         MusicShow, on_delete=models.CASCADE, related_name="source_pages"

@@ -1,4 +1,4 @@
-from datetime import timedelta
+from datetime import date, timedelta
 
 import pytest
 from django.contrib.admin.sites import AdminSite
@@ -7,8 +7,13 @@ from django.test import Client, RequestFactory
 from django.urls import reverse
 from django.utils import timezone
 
-from main.admin import ImportIssueAdmin
-from main.models import ImportIssue
+from main.admin import (
+    ImportIssueAdmin,
+    WinAdmin,
+    WinReferenceAdmin,
+    WinReferenceInline,
+)
+from main.models import Artist, ImportIssue, MusicShow, Song, Win, WinReference
 
 
 def _admin_client() -> Client:
@@ -176,3 +181,76 @@ def test_import_issue_admin_maintains_resolved_at_without_changing_wins():
     admin_obj.save_model(request, issue, None, change=True)
     issue.refresh_from_db()
     assert issue.resolved_at is None
+
+
+@pytest.mark.django_db
+def test_win_reference_admin_list_filters_and_search():
+    show = MusicShow.objects.create(slug="music-bank", name="Music Bank")
+    artist = Artist.objects.create(name="Alpha")
+    song = Song.objects.create(artist=artist, title="First")
+    win = Win.objects.create(show=show, song=song, date=date(2026, 1, 2))
+    reference = WinReference.objects.create(
+        win=win,
+        reference_type="video",
+        provider="youtube",
+        external_id="abc123",
+        url="https://www.youtube.com/watch?v=abc123",
+        title="Winner stage",
+        publisher_name="KBS Kpop",
+        is_official=True,
+    )
+    client = _admin_client()
+
+    response = client.get(reverse("admin:main_winreference_changelist"))
+    filtered = client.get(
+        reverse("admin:main_winreference_changelist"),
+        {"status__exact": "active", "q": "Alpha"},
+    )
+
+    assert response.status_code == filtered.status_code == 200
+    content = response.content.decode()
+    assert "Music Bank" in content
+    assert "Alpha" in content
+    assert "First" in content
+    assert "Winner stage" in content
+    assert "KBS Kpop" in content
+    assert str(reference.pk) in content
+    assert filtered.context["cl"].result_count == 1
+
+    admin_obj = WinReferenceAdmin(WinReference, AdminSite())
+    assert admin_obj.autocomplete_fields == ("win",)
+    assert set(admin_obj.readonly_fields) == {
+        "discovered_at",
+        "created_at",
+        "updated_at",
+    }
+    assert set(admin_obj.list_filter) == {
+        "reference_type",
+        "provider",
+        "is_official",
+        "status",
+        "win__show",
+        "win__date",
+    }
+
+
+@pytest.mark.django_db
+def test_win_admin_exposes_compact_reference_inline():
+    show = MusicShow.objects.create(slug="music-bank", name="Music Bank")
+    artist = Artist.objects.create(name="Alpha")
+    song = Song.objects.create(artist=artist, title="First")
+    win = Win.objects.create(show=show, song=song, date=date(2026, 1, 2))
+    WinReference.objects.create(
+        win=win,
+        reference_type="article",
+        provider="publisher",
+        url="https://example.com/article",
+    )
+
+    response = _admin_client().get(reverse("admin:main_win_change", args=(win.pk,)))
+
+    assert response.status_code == 200
+    assert WinReferenceInline in WinAdmin.inlines
+    content = response.content.decode()
+    assert "Win references" in content
+    assert "https://example.com/article" in content
