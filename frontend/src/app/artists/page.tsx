@@ -7,7 +7,7 @@ import { getArtists, parsePositivePage } from "@/lib/api";
 import { artistSortLabels, artistSorts, artistsUrl, parseArtistSort } from "@/lib/artist-list";
 
 export const dynamic = "force-dynamic";
-export const metadata: Metadata = { title: "Artists — KpopWins", description: "Browse K-pop artists and their music-show win totals." };
+export const metadata: Metadata = { title: "Artists", description: "Find artists by name or win total, then view their songs and full win history." };
 
 export default async function ArtistsPage({ searchParams }: { searchParams: Promise<{ search?: string | string[]; page?: string | string[]; sort?: string | string[] }> }) {
   const params = await searchParams;
@@ -20,7 +20,7 @@ export default async function ArtistsPage({ searchParams }: { searchParams: Prom
     <main className="page-enter mx-auto max-w-7xl px-5 pb-8 pt-10 lg:px-8 lg:pt-14">
       <header className="border-2 border-foreground bg-surface-berry p-6 text-surface-berry-foreground shadow-[4px_4px_0_var(--section-ink)] sm:p-8">
         <h1 className="font-heading text-4xl font-bold tracking-tight">Artists</h1>
-        <p className="mt-2 max-w-2xl text-surface-berry-foreground/80">Browse every artist in the archive or search by name and known alias.</p>
+        <p className="mt-2 max-w-2xl text-surface-berry-foreground/80">Find an artist and view their winning songs and full win history.</p>
       </header>
       <div className="mt-8 border-2 border-foreground bg-search-surface p-5">
         <DebouncedArtistSearch id="artist-list-search" query={search} />
@@ -44,7 +44,7 @@ export default async function ArtistsPage({ searchParams }: { searchParams: Prom
       </section>
       <section className="mt-8" aria-labelledby="artist-results-title">
         <div className="mb-4 flex items-end justify-between gap-4 border-b-2 border-foreground pb-3">
-          <h2 id="artist-results-title" className="scroll-mt-24 font-heading text-2xl font-bold">{search ? `Results for “${search}”` : "All artists"}</h2>
+          <h2 id="artist-results-title" className="scroll-mt-24 font-heading text-2xl font-bold">{search ? `Results for "${search}"` : "All artists"}</h2>
           <ArchiveResultsSummary totalCount={artists.count} page={page} resultCount={artists.results.length} singular="artist" plural="artists" />
         </div>
         <ArtistResults artists={artists.results} empty={search ? "No artists found. Try a shorter or alternate name." : "No artists are available right now."} />

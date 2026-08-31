@@ -19,7 +19,7 @@ describe("ArtistWinHistory", () => {
   });
 
   it("supports a song-specific empty state", () => {
-    const html = renderToStaticMarkup(<ArtistWinHistory wins={[]} emptyMessage="No dated wins are recorded for this song." />);
-    expect(html).toContain("No dated wins are recorded for this song.");
+    const html = renderToStaticMarkup(<ArtistWinHistory wins={[]} emptyMessage="No wins with dates are recorded for this song." />);
+    expect(html).toContain("No wins with dates are recorded for this song.");
   });
 });

@@ -57,7 +57,7 @@ function WinsRows({ wins }: { wins: Win[] }) {
   return (
     <div className="border border-border bg-card">
       <Table className="desktop-table border-collapse">
-        <TableCaption className="sr-only">Filtered music-show wins</TableCaption>
+        <TableCaption className="sr-only">Filtered music show wins</TableCaption>
         <TableHeader><TableRow className="border-b-2 border-foreground bg-muted/50 text-xs uppercase tracking-[0.12em] text-muted-foreground"><TableHead className="w-32 px-4 py-3">Date</TableHead><TableHead className="px-4 py-3">Artist</TableHead><TableHead className="px-4 py-3">Song</TableHead><TableHead className="w-44 px-4 py-3 text-right">Music show</TableHead></TableRow></TableHeader>
         <TableBody>{wins.map((win) => <TableRow key={win.id} className="border-border/70 hover:bg-accent/60"><TableCell className="px-4 py-4"><time dateTime={win.date} className="font-heading text-sm font-bold tabular-nums text-muted-foreground">{formatDate(win.date)}</time></TableCell><TableCell className="px-4 py-4"><Link href={`/artists/${win.song.artist.id}`} className="font-semibold underline-offset-4 hover:underline">{win.song.artist.name}</Link></TableCell><TableCell className="px-4 py-4"><Link href={`/songs/${win.song.id}`} className="font-medium underline-offset-4 hover:underline">{win.song.title}</Link></TableCell><TableCell className="w-44 px-4 py-4 text-right"><Link href={`/wins?show=${encodeURIComponent(win.show.slug)}#wins-results-title`} aria-label={`Filter wins by ${win.show.name}`}><ShowBadge slug={win.show.slug} name={win.show.name} /></Link></TableCell></TableRow>)}</TableBody>
       </Table>
@@ -100,8 +100,8 @@ export function WinsExplorer() {
   return (
     <main className="page-enter mx-auto max-w-7xl px-5 pb-8 pt-10 lg:px-8 lg:pt-14">
       <header className="border-2 border-foreground bg-surface-berry p-6 text-surface-berry-foreground shadow-[4px_4px_0_var(--section-ink)] sm:p-8">
-        <h1 className="font-heading text-4xl font-bold tracking-tight sm:text-[44px]">Browse wins</h1>
-        <p className="mt-2 max-w-2xl text-surface-berry-foreground/80">Find every dated music-show win in the archive.</p>
+        <h1 className="font-heading text-4xl font-bold tracking-tight sm:text-[44px]">Music show wins</h1>
+        <p className="mt-2 max-w-2xl text-surface-berry-foreground/80">Search results by artist, song, show, year, or date.</p>
       </header>
 
       <section className="mt-7 border-2 border-foreground bg-search-surface p-4 sm:p-5" aria-label="Filter wins">
@@ -134,7 +134,7 @@ export function WinsExplorer() {
             {activeFilters && <button type="button" onClick={clearFilters} className="min-h-11 border-2 border-foreground bg-card px-4 text-sm font-bold shadow-[2px_2px_0_var(--foreground)] transition-transform hover:-translate-y-0.5">Clear filters</button>}
           </div>
         </div>
-        {shows.isError && <p role="status" className="mt-3 text-sm text-destructive">Music-show choices could not load. You can still browse all shows.</p>}
+        {shows.isError && <p role="status" className="mt-3 text-sm text-destructive">The music show filter couldn&apos;t load. The other filters still work.</p>}
         {dateRangeError && <p role="alert" className="mt-3 border-l-4 border-destructive bg-danger-surface px-3 py-2 text-sm">{dateRangeError}</p>}
       </section>
 
@@ -144,7 +144,7 @@ export function WinsExplorer() {
           {data && <ArchiveResultsSummary totalCount={data.count} page={filters.page} resultCount={data.results.length} singular="win" plural="wins" />}
         </div>
         {dateRangeError ? null : wins.isLoading && !data ? <LoadingState label="Loading wins…" /> : wins.isError ? (
-          <div role="alert" className="border border-destructive bg-danger-surface p-4"><p className="font-semibold">Wins could not load.</p><button type="button" onClick={() => wins.refetch()} className="mt-3 min-h-10 border-2 border-foreground bg-card px-3 text-sm font-bold">Retry</button></div>
+          <div role="alert" className="border border-destructive bg-danger-surface p-4"><p className="font-semibold">Wins couldn&apos;t load. Your filters are unchanged.</p><button type="button" onClick={() => wins.refetch()} className="mt-3 min-h-10 border-2 border-foreground bg-card px-3 text-sm font-bold">Try again</button></div>
         ) : data?.results.length ? <WinsRows wins={data.results} /> : <EmptyState message="No wins match these filters." />}
         {data && !dateRangeError && (data.previous || data.next) && <nav aria-label="Wins pages" className="mt-6 flex items-center justify-between gap-4">
           {data.previous ? <button type="button" onClick={() => paginate(filters.page - 1)} className="min-h-11 border-2 border-foreground bg-card px-4 text-sm font-bold shadow-[2px_2px_0_var(--foreground)]">Previous</button> : <span />}
