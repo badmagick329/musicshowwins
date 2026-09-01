@@ -37,7 +37,7 @@ WIKI_LINK_HOSTS = {
 }
 YOUTUBE_HOSTS = {"youtube.com", "m.youtube.com", "music.youtube.com"}
 VIDEO_ID_RE = re.compile(r"[A-Za-z0-9_-]{5,}")
-HEADING_RE = re.compile(r"^#{1,6}\s*(.+?)\s*$")
+HEADING_RE = re.compile(r"^(#{1,6})\s*(.+?)\s*$")
 MAX_INDEX_PAGES_PER_SHOW = 200
 TOKEN_EXPIRY_SKEW_SECONDS = 300
 MAX_ATTEMPTS = 4
@@ -387,24 +387,31 @@ def extract_section_links(section_markdown: str) -> list[str]:
 def extract_winner_section(markdown: str) -> tuple[bool, str]:
     lines = markdown.splitlines()
     start = None
+    winner_level = 0
     for index, line in enumerate(lines):
         match = HEADING_RE.match(line)
-        if match and match.group(1).strip().casefold() == "winner":
+        if match and match.group(2).strip().casefold() == "winner":
             start = index + 1
+            winner_level = len(match.group(1))
             break
     if start is None:
         return False, ""
     collected: list[str] = []
     for line in lines[start:]:
-        if HEADING_RE.match(line):
+        match = HEADING_RE.match(line)
+        if match and len(match.group(1)) <= winner_level:
             break
         collected.append(line)
     return True, "\n".join(collected).strip()
 
 
+NA_WINNER_TEXTS = {"n/a", "no winner"}
+
+
 def is_na_winner(text: str) -> bool:
-    stripped = re.sub(r"[*_~`]", "", text).strip().rstrip(".").strip()
-    return stripped.casefold() == "n/a"
+    stripped = re.sub(r"[*_~`#]", "", text).strip()
+    stripped = stripped.rstrip(".,!;:").strip()
+    return stripped.casefold() in NA_WINNER_TEXTS
 
 
 def _page_cache_path(config: Config, page_path: str) -> Path:
