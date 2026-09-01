@@ -59,6 +59,16 @@ class CorrectionSerializer(serializers.Serializer):
         return value
 
 
+class SitemapEntrySerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    latest_win_date = serializers.DateField(allow_null=True)
+
+
+class SitemapSerializer(serializers.Serializer):
+    artists = SitemapEntrySerializer(many=True)
+    songs = SitemapEntrySerializer(many=True)
+
+
 class ArtistSummarySerializer(serializers.ModelSerializer):
     class Meta:
         model = Artist

@@ -26,6 +26,7 @@ from .serializers import (
     ArtistSerializer,
     CorrectionSerializer,
     ShowSerializer,
+    SitemapSerializer,
     SongLeaderboardSerializer,
     SongSerializer,
     WinSerializer,
@@ -34,6 +35,25 @@ from .serializers import (
 
 class CorrectionThrottle(AnonRateThrottle):
     rate = "5/hour"
+
+
+class Sitemap(APIView):
+    permission_classes = [AllowAny]
+
+    @extend_schema(
+        responses=SitemapSerializer,
+        description=(
+            "Return every canonical artist and song URL source in one response."
+        ),
+    )
+    def get(self, request):
+        fields = ("id", "latest_win_date")
+        return Response(
+            {
+                "artists": list(all_artists_queryset().values(*fields)),
+                "songs": list(all_songs_queryset().values(*fields)),
+            }
+        )
 
 
 def _integer(value: str | None, name: str, *, minimum: int | None = None) -> int | None:

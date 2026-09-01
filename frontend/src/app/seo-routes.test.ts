@@ -21,13 +21,11 @@ describe("SEO and agent discovery routes", () => {
   });
 
   it("lists canonical static and entity pages", async () => {
-    vi.stubGlobal("fetch", vi.fn(async (input: string | URL | Request) => {
-      const url = new URL(String(input));
-      if (url.pathname.endsWith("/artists")) {
-        return Response.json({ count: 1, next: null, previous: null, results: [{ id: 3, name: "aespa", total_wins: 12, winning_songs: 4, latest_win_date: "2026-08-31" }] });
-      }
-      return Response.json({ count: 1, next: null, previous: null, results: [{ id: 7, title: "Supernova", artist: { id: 3, name: "aespa" }, total_wins: 3, winning_shows: 2, latest_win_date: "2026-08-30" }] });
+    const fetchMock = vi.fn(async () => Response.json({
+      artists: [{ id: 3, latest_win_date: "2026-08-31" }],
+      songs: [{ id: 7, latest_win_date: "2026-08-30" }],
     }));
+    vi.stubGlobal("fetch", fetchMock);
 
     const urls = (await sitemap()).map(({ url }) => url);
     expect(urls).toEqual(expect.arrayContaining([
@@ -36,13 +34,12 @@ describe("SEO and agent discovery routes", () => {
       "https://kpopwins.info/artists/3",
       "https://kpopwins.info/songs/7",
     ]));
+    expect(fetchMock).toHaveBeenCalledOnce();
   });
 
-  it("keeps static discovery available when the data API fails", async () => {
+  it("fails generation instead of publishing a partial sitemap", async () => {
     vi.stubGlobal("fetch", vi.fn(async () => new Response(null, { status: 503 })));
-    const entries = await sitemap();
-    expect(entries).toHaveLength(6);
-    expect(entries.some(({ url }) => url === "https://kpopwins.info/wins")).toBe(true);
+    await expect(sitemap()).rejects.toThrow("Sitemap source failed (503).");
   });
 
   it("publishes concise agent guidance as markdown", async () => {
