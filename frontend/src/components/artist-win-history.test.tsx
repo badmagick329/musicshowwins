@@ -4,7 +4,7 @@ import type { Win } from "@/lib/api-shared";
 import { ArtistWinHistory } from "./artist-win-history";
 
 function win(id: number): Win {
-  return { id, date: `2025-01-0${id}`, show: { id: 1, slug: "music-bank", name: "Music Bank", active: true }, song: { id, title: `Song ${id}`, artist: { id: 1, name: "Artist" }, total_wins: 1, latest_win_date: "2025-01-01", winning_shows: 1 } };
+  return { id, date: `2025-01-0${id}`, show: { id: 1, slug: "music-bank", name: "Music Bank", active: true }, song: { id, title: `Song ${id}`, artist: { id: 1, name: "Artist" }, total_wins: 1, latest_win_date: "2025-01-01", winning_shows: 1 }, references: [] };
 }
 
 describe("ArtistWinHistory", () => {

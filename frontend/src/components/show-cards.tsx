@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { EmptyState, formatDate, ShowBadge } from "@/components/data-display";
+import { EmptyState, ShowBadge } from "@/components/data-display";
+import { formatDate } from "@/lib/utils";
 import type { Show } from "@/lib/api-shared";
 
 export function ShowCards({ shows }: { shows: Show[] }) {

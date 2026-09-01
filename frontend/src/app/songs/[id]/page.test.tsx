@@ -35,6 +35,7 @@ function win(id: number, date: string, show: { id: number; slug: string; name: s
     date,
     show: { ...show, active: true },
     song,
+    references: [],
   };
 }
 
