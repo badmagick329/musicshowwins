@@ -18,9 +18,9 @@ function winContext(win: Win) {
   return `${win.song.title} by ${win.song.artist.name}, ${formatDate(win.date)}, ${win.show.name}`;
 }
 
-const winVideoActionClass = "grid w-full cursor-pointer grid-cols-[0.875rem_1fr_0.875rem] items-center gap-1.5 whitespace-nowrap border-2 border-foreground bg-brand-pink font-bold text-primary-foreground transition-colors motion-reduce:transition-none hover:bg-accent-foreground";
+const winVideoActionClass = "grid cursor-pointer grid-cols-[0.875rem_1fr_0.875rem] items-center gap-1.5 whitespace-nowrap border-2 border-foreground bg-brand-pink font-bold text-primary-foreground transition-colors motion-reduce:transition-none hover:bg-accent-foreground";
 const desktopActionClass = "h-8 px-2.5 text-xs shadow-[2px_2px_0_var(--foreground)]";
-const mobileActionClass = "min-h-11 px-4 text-sm shadow-[2px_2px_0_var(--foreground)]";
+const mobileActionClass = "min-h-11 w-full px-4 text-sm shadow-[2px_2px_0_var(--foreground)]";
 
 function WinVideoActionLink({ win, video, className }: { win: Win; video: WinReference; className: string }) {
   return (
@@ -92,10 +92,11 @@ function WinVideoPanel({ win, videos, panelId }: { win: Win; videos: WinReferenc
   );
 }
 
-export function DesktopWinVideoRow({ win, colSpan, videoCellClassName = "w-44 px-4 py-3 text-right", children }: { win: Win; colSpan: number; videoCellClassName?: string; children: React.ReactNode }) {
+export function DesktopWinVideoRow({ win, colSpan, videoCellClassName = "w-44 px-4 py-3 text-right", compactAction = false, children }: { win: Win; colSpan: number; videoCellClassName?: string; compactAction?: boolean; children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   const videos = winVideoReferences(win);
   const panelId = `win-videos-desktop-${win.id}`;
+  const actionClassName = cn(desktopActionClass, compactAction ? "ml-auto w-44 max-w-full" : "w-full");
   return (
     <>
       <TableRow className="border-border/70 hover:bg-accent/60">
@@ -104,9 +105,9 @@ export function DesktopWinVideoRow({ win, colSpan, videoCellClassName = "w-44 px
           {videos.length === 0 ? (
             <span aria-hidden="true" className="text-muted-foreground">—</span>
           ) : videos.length === 1 ? (
-            <WinVideoActionLink win={win} video={videos[0]} className={desktopActionClass} />
+            <WinVideoActionLink win={win} video={videos[0]} className={actionClassName} />
           ) : (
-            <WinVideoToggleButton win={win} count={videos.length} open={open} panelId={panelId} onToggle={() => setOpen(!open)} className={desktopActionClass} />
+            <WinVideoToggleButton win={win} count={videos.length} open={open} panelId={panelId} onToggle={() => setOpen(!open)} className={actionClassName} />
           )}
         </TableCell>
       </TableRow>
