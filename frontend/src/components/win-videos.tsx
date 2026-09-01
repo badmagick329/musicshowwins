@@ -10,27 +10,46 @@ export function winVideoReferences(win: Win) {
   return win.references.filter((reference) => reference.reference_type === "video");
 }
 
-export function winVideoButtonLabel(count: number) {
-  return count === 1 ? "Watch video" : `${count} videos`;
+export function winVideoActionLabel(count: number) {
+  return count === 1 ? "Watch video" : "Choose video";
 }
 
 function winContext(win: Win) {
   return `${win.song.title} by ${win.song.artist.name}, ${formatDate(win.date)}, ${win.show.name}`;
 }
 
-function WinVideoToggle({ win, count, open, panelId, onToggle, className }: { win: Win; count: number; open: boolean; panelId: string; onToggle: () => void; className: string }) {
-  const label = winVideoButtonLabel(count);
+const winVideoActionClass = "inline-flex min-h-8 cursor-pointer items-center justify-center gap-1.5 whitespace-nowrap border-2 border-foreground bg-brand-pink font-bold text-primary-foreground transition-colors motion-reduce:transition-none hover:bg-accent-foreground";
+const desktopActionClass = "px-2.5 py-1 text-xs shadow-[2px_2px_0_var(--foreground)]";
+const mobileActionClass = "w-full min-h-11 px-4 text-sm shadow-[2px_2px_0_var(--foreground)]";
+
+function WinVideoActionLink({ win, video, className }: { win: Win; video: WinReference; className: string }) {
+  return (
+    <a
+      href={video.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label={`Watch video for ${winContext(win)}`}
+      className={cn(winVideoActionClass, className)}
+    >
+      <Play className="size-3.5 shrink-0" aria-hidden="true" />
+      <span>{winVideoActionLabel(1)}</span>
+      <ExternalLink className="size-3.5 shrink-0" aria-hidden="true" />
+    </a>
+  );
+}
+
+function WinVideoToggleButton({ win, count, open, panelId, onToggle, className }: { win: Win; count: number; open: boolean; panelId: string; onToggle: () => void; className: string }) {
   return (
     <button
       type="button"
       aria-expanded={open}
       aria-controls={panelId}
-      aria-label={`${label} for ${winContext(win)}`}
+      aria-label={`Choose from ${count} videos for ${winContext(win)}`}
       onClick={onToggle}
-      className={cn("inline-flex min-h-8 cursor-pointer items-center justify-center gap-1.5 border-2 border-foreground bg-brand-pink font-bold text-primary-foreground transition-colors motion-reduce:transition-none hover:bg-accent-foreground", className)}
+      className={cn(winVideoActionClass, className)}
     >
       <Play className="size-3.5 shrink-0" aria-hidden="true" />
-      <span>{label}</span>
+      <span>{winVideoActionLabel(count)}</span>
       <ChevronDown aria-hidden="true" className={cn("size-3.5 shrink-0 transition-transform duration-150 motion-reduce:transition-none", open && "rotate-180")} />
     </button>
   );
@@ -73,7 +92,7 @@ function WinVideoPanel({ win, videos, panelId }: { win: Win; videos: WinReferenc
   );
 }
 
-export function DesktopWinVideoRow({ win, colSpan, videoCellClassName = "w-24 px-4 py-3 text-right", children }: { win: Win; colSpan: number; videoCellClassName?: string; children: React.ReactNode }) {
+export function DesktopWinVideoRow({ win, colSpan, videoCellClassName = "w-44 px-4 py-3 text-right", children }: { win: Win; colSpan: number; videoCellClassName?: string; children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   const videos = winVideoReferences(win);
   const panelId = `win-videos-desktop-${win.id}`;
@@ -82,14 +101,16 @@ export function DesktopWinVideoRow({ win, colSpan, videoCellClassName = "w-24 px
       <TableRow className="border-border/70 hover:bg-accent/60">
         {children}
         <TableCell className={videoCellClassName}>
-          {videos.length ? (
-            <WinVideoToggle win={win} count={videos.length} open={open} panelId={panelId} onToggle={() => setOpen(!open)} className="px-2.5 py-1 text-xs shadow-[2px_2px_0_var(--foreground)]" />
-          ) : (
+          {videos.length === 0 ? (
             <span aria-hidden="true" className="text-muted-foreground">—</span>
+          ) : videos.length === 1 ? (
+            <WinVideoActionLink win={win} video={videos[0]} className={desktopActionClass} />
+          ) : (
+            <WinVideoToggleButton win={win} count={videos.length} open={open} panelId={panelId} onToggle={() => setOpen(!open)} className={desktopActionClass} />
           )}
         </TableCell>
       </TableRow>
-      {open && videos.length > 0 && (
+      {open && videos.length > 1 && (
         <TableRow className="border-border/70 hover:bg-inherit">
           <TableCell colSpan={colSpan} className="p-0">
             <WinVideoPanel win={win} videos={videos} panelId={panelId} />
@@ -107,8 +128,14 @@ export function MobileWinVideoDisclosure({ win, className }: { win: Win; classNa
   if (!videos.length) return null;
   return (
     <div className={className}>
-      <WinVideoToggle win={win} count={videos.length} open={open} panelId={panelId} onToggle={() => setOpen(!open)} className="w-full min-h-11 px-4 text-sm shadow-[2px_2px_0_var(--foreground)]" />
-      {open && <div className="pt-2"><WinVideoPanel win={win} videos={videos} panelId={panelId} /></div>}
+      {videos.length === 1 ? (
+        <WinVideoActionLink win={win} video={videos[0]} className={mobileActionClass} />
+      ) : (
+        <>
+          <WinVideoToggleButton win={win} count={videos.length} open={open} panelId={panelId} onToggle={() => setOpen(!open)} className={mobileActionClass} />
+          {open && <div className="pt-2"><WinVideoPanel win={win} videos={videos} panelId={panelId} /></div>}
+        </>
+      )}
     </div>
   );
 }
