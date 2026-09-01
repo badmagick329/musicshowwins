@@ -119,6 +119,79 @@ Django environment from the repository root:
 uv run python manage.py import_win_references .ignore/operator-tools/manifests/win-references-v1.json
 ```
 
+## Reddit wiki audit
+
+The `reddit audit` command performs a read-only audit of the structured
+r/kpop music-show wiki. It never creates, updates, approves, or rejects
+reference candidates, and it never changes win, search, YouTube ingestion, or
+matching state.
+
+Create a Reddit "script" application at <https://www.reddit.com/prefs/apps> and
+store its client ID and secret in `.ignore/operator-tools/.env`:
+
+```dotenv
+REDDIT_CLIENT_ID=...
+REDDIT_CLIENT_SECRET=...
+REDDIT_USER_AGENT=KpopWinsOperator/0.1 (audit; by your-reddit-username)
+```
+
+`REDDIT_TOKEN_URL` and `REDDIT_API_BASE_URL` default to Reddit's supported OAuth
+endpoints and rarely need overriding. All requests use the `client_credentials`
+grant with application-only read access; the secret and the access token are
+kept in memory and never printed. `reddit audit` fails with a clear message
+naming the missing variables when any credential is blank.
+
+Run the audit, then repeat it until it reports `more-remaining=no`:
+
+```console
+uv run kpopwins-operator reddit audit --max-pages 100
+uv run kpopwins-operator reddit audit --show m-countdown --max-pages 100
+uv run kpopwins-operator reddit audit --refresh-indexes --max-pages 100
+uv run kpopwins-operator reddit audit --output .ignore/operator-tools/reports/reddit-audit.json
+```
+
+Behavior:
+
+- The command reads the r/kpop music-show wiki index and the six show archive
+  pages through the OAuth API (`GET /r/kpop/wiki/{page}`); the show slugs map to
+  archive paths through the explicit `REDDIT_SHOW_ARCHIVES` mapping in
+  `kpopwins_operator/reddit.py`. Edit that constant if Reddit renames an archive.
+- Wiki links are normalized across relative, absolute, old-Reddit, and
+  current-Reddit forms and deduplicated. Only structured episode pages whose
+  final path component is an eight-digit date such as `20240628` are collected;
+  ordinary Reddit posts and older non-wiki thread links are ignored.
+- Episode pages are cached under `.ignore/operator-tools/reddit/pages/`, and
+  crawl state is kept in `.ignore/operator-tools/reddit/state.json`. Repeating
+  the command resumes from this cache instead of refetching completed episode
+  pages. `--refresh-indexes` refetches the main and show archive pages so later
+  runs discover newly added episodes. `--max-pages` limits episode-page network
+  requests during one run; cached pages do not count.
+- Each episode is matched to the local catalogue only by `show_slug + win_date`.
+  The local win remains the source of truth; nothing is inferred from prose.
+  The audit reports episodes without local wins and local wins inside a show's
+  discovered coverage range that have no episode page.
+- For every episode the `WINNER` section is isolated case-insensitively and
+  parsing stops at the next Markdown heading. Missing sections, explicit `N/A`,
+  winner text without links, and malformed links are separate outcomes.
+- Links are classified as `existing_approved`, `existing_pending`,
+  `existing_rejected` (matched against local candidates by YouTube video ID
+  first, then canonical URL), `new_official` (video already present in
+  `youtube_videos`, its channel matches an active `youtube_channels` entry for
+  the show, and the local video is active), `known_unavailable` (official and
+  locally tracked but currently unavailable), `new_unverified` (any other new
+  YouTube link), `unsupported_link` (including Naver and other external
+  providers), or `malformed_link`. No Reddit link is treated as proof that a
+  video is official, and nothing is auto-approved.
+- No YouTube API calls are made. The audit is a lower bound built from metadata
+  already collected locally.
+- The JSON report defaults to
+  `.ignore/operator-tools/reports/reddit-audit.json` with a TSV beside it for
+  quick manual inspection. Both are written atomically. Totals are printed after
+  every run even while collection is incomplete.
+
+Transient HTTP failures and HTTP 429 responses retry with bounded backoff while
+respecting `Retry-After`, and all requests set connection and response timeouts.
+
 ## Quota and recovery
 
 The three API methods used here, `channels.list`, `playlistItems.list`, and

@@ -24,7 +24,8 @@ from .database import (
 from .ingestion import ingest_channels
 from .manifest import ManifestError, approved_document, serialize_document, write_atomic
 from .matching import match_videos
-from .registry import RegistryError, load_registry
+from .reddit import RedditError, run_reddit_audit
+from .registry import SUPPORTED_SHOWS, RegistryError, load_registry
 from .youtube import YouTubeClient, YouTubeError
 
 
@@ -104,6 +105,15 @@ def build_parser() -> argparse.ArgumentParser:
     candidate_commands = candidates_parser.add_subparsers(
         dest="candidate_command", required=True
     )
+    reddit_parser = subparsers.add_parser("reddit", help="Read-only r/kpop wiki audit")
+    reddit_commands = reddit_parser.add_subparsers(dest="reddit_command", required=True)
+    audit_parser = reddit_commands.add_parser(
+        "audit", help="Audit r/kpop wiki episode winners without changing state"
+    )
+    audit_parser.add_argument("--show", choices=sorted(SUPPORTED_SHOWS))
+    audit_parser.add_argument("--max-pages", type=_positive_integer, default=100)
+    audit_parser.add_argument("--refresh-indexes", action="store_true")
+    audit_parser.add_argument("--output")
     list_parser = candidate_commands.add_parser("list")
     list_parser.add_argument(
         "--status", choices=("pending", "approved", "rejected"), default="pending"
@@ -351,6 +361,24 @@ def main(
                         f"dry-run={'yes' if args.dry_run else 'no'}",
                         file=output,
                     )
+            elif args.command == "reddit":
+                if args.reddit_command == "audit":
+                    run_reddit_audit(
+                        connection,
+                        config,
+                        show=args.show,
+                        max_pages=args.max_pages,
+                        refresh_indexes=args.refresh_indexes,
+                        output_path=(
+                            Path(args.output).expanduser().resolve()
+                            if args.output
+                            else None
+                        ),
+                        stdout=output,
+                        session=session,
+                        sleep=sleep,
+                        now=now,
+                    )
             elif args.command == "candidates":
                 timestamp = now or _now()
                 if args.candidate_command == "list":
@@ -384,6 +412,7 @@ def main(
         DatabaseError,
         ManifestError,
         RegistryError,
+        RedditError,
         YouTubeError,
         OSError,
         sqlite3.Error,
