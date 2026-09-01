@@ -49,7 +49,7 @@ INKIGAYO_20240616 = """### 2024-06-16
 
 ## WINNER
 
-*N/A*
+### N/A
 """
 
 INKIGAYO_20240623 = """### 2024-06-23
@@ -129,7 +129,18 @@ SHOWCHAMPION_20240710 = """## WINNER
 
 THESHOW_ARCHIVE = """# The Show episodes
 
-Nothing yet.
+* [June 11](/r/kpop/wiki/music-shows/the-show/20240611)
+"""
+
+THESHOW_20240611 = """## WINNER
+
+### [WINNER - REALLY REALLY](https://twitter.com/winner/status/1) + [Encore Fancam](https://www.youtube.com/watch?v=nestedVid1)
+
+----
+
+## ADDITIONAL
+
+* [Extra stage](https://www.youtube.com/watch?v=additionalVid3)
 """
 
 ARCHIVE_PAGES = {
@@ -152,6 +163,7 @@ EPISODE_PAGES = {
     "music-shows/show-music-core/20240803": MUSICCORE_20240803,
     "music-shows/show-music-core/20240810": MUSICCORE_20240810,
     "music-shows/show-champion/20240710": SHOWCHAMPION_20240710,
+    "music-shows/the-show/20240611": THESHOW_20240611,
 }
 
 
@@ -177,6 +189,7 @@ def seed_wins(connection):
         ("music-core", "2024-08-03", "Artist Epsilon", "Song Five"),
         ("music-core", "2024-08-10", "Artist Zeta", "Song Six"),
         ("show-champion", "2024-07-10", "Artist Eta", "Song Seven"),
+        ("the-show", "2024-06-11", "Artist Theta", "Song Eight"),
     ]
     for index, (show, win_date, artist, song) in enumerate(rows, start=1):
         connection.execute(
@@ -305,6 +318,44 @@ def test_winner_section_boundaries_and_na():
     assert not is_na_winner("N/A performance")
 
 
+def test_winner_section_keeps_nested_headings_until_parent_level():
+    found, text = extract_winner_section(THESHOW_20240611)
+    assert found
+    assert "nestedVid1" in text
+    assert "additionalVid3" not in text
+    assert extract_section_links(text) == [
+        "https://twitter.com/winner/status/1",
+        "https://www.youtube.com/watch?v=nestedVid1",
+    ]
+
+    markdown = (
+        "# Show\n\n"
+        "## WINNER\n\n"
+        "### [A](https://a.example/1)\n\n"
+        "### N/A\n\n"
+        "## ETC\n\n"
+        "### [B](https://b.example/2)\n"
+    )
+    found, text = extract_winner_section(markdown)
+    assert found
+    assert "https://a.example/1" in text
+    assert "### N/A" in text
+    assert "b.example" not in text
+
+
+def test_na_winner_recognizes_nested_no_winner_headings():
+    assert is_na_winner("### N/A")
+    assert is_na_winner("### No winner.")
+    assert is_na_winner("###  no winner ")
+    assert is_na_winner("### N/A.")
+    assert is_na_winner("N/A")
+    assert is_na_winner("*N/A*")
+    assert is_na_winner("n/a.")
+    assert not is_na_winner("### No winner announced yet!")
+    assert not is_na_winner("### [WINNER - REALLY REALLY](https://x.example/a)")
+    assert not is_na_winner("----")
+
+
 def test_youtube_url_variants_and_canonicalization():
     variants = [
         "https://www.youtube.com/watch?v=abc123XYZ_1&t=30s",
@@ -363,25 +414,25 @@ def test_full_audit_classifies_links_and_writes_reports(connection, config):
     assert outcome.collection_complete is True
     totals = outcome.totals
     assert totals["archive_pages_scanned"] == 8
-    assert totals["episode_pages_discovered"] == 9
+    assert totals["episode_pages_discovered"] == 10
     assert totals["episode_pages_cached"] == 0
-    assert totals["episode_pages_fetched"] == 9
-    assert totals["episode_pages_parsed"] == 9
-    assert totals["exact_local_win_matches"] == 8
+    assert totals["episode_pages_fetched"] == 10
+    assert totals["episode_pages_parsed"] == 10
+    assert totals["exact_local_win_matches"] == 9
     assert totals["episodes_without_local_wins"] == 1
     assert totals["local_wins_without_episode_pages"] == 1
     assert totals["missing_winner_sections"] == 1
     assert totals["winner_na_sections"] == 1
     assert totals["winner_sections_without_links"] == 1
-    assert totals["total_extracted_links"] == 10
+    assert totals["total_extracted_links"] == 12
     assert totals["existing_approved"] == 1
     assert totals["existing_pending"] == 1
     assert totals["existing_rejected"] == 1
     assert totals["new_official"] == 1
-    assert totals["new_unverified"] == 2
+    assert totals["new_unverified"] == 3
     assert totals["known_unavailable"] == 1
     assert totals["naver_links"] == 1
-    assert totals["unsupported_links"] == 2
+    assert totals["unsupported_links"] == 3
     assert totals["malformed_links"] == 1
     assert output.getvalue().endswith("more-remaining=no\n")
 
@@ -489,7 +540,7 @@ def test_full_audit_classifies_links_and_writes_reports(connection, config):
         "publisher_external_id",
         "existing_review_status",
     ]
-    assert len(tsv) == 11
+    assert len(tsv) == 13
     assert not list(config.reports_dir.glob("*.tmp"))
 
 
@@ -536,6 +587,41 @@ def test_music_core_archive_resolves_through_live_index_path(connection, config)
     assert cached_page.is_file()
 
 
+def test_nested_winner_links_are_parsed_and_later_sections_excluded(connection, config):
+    seed_wins(connection)
+    output = io.StringIO()
+    outcome = run_reddit_audit(
+        connection,
+        reddit_config(config),
+        show="the-show",
+        max_pages=100,
+        refresh_indexes=False,
+        output_path=None,
+        stdout=output,
+        session=audit_session(),
+        now="2026-09-01T12:00:00Z",
+    )
+    assert outcome.totals["episode_pages_discovered"] == 1
+    assert outcome.totals["exact_local_win_matches"] == 1
+    assert outcome.totals["total_extracted_links"] == 2
+    assert outcome.totals["new_unverified"] == 1
+    assert outcome.totals["unsupported_links"] == 1
+
+    report = json.loads(outcome.report_path.read_text(encoding="utf-8"))
+    episode = report["episodes"][0]
+    assert episode["outcome"] == "matched"
+    assert "nestedVid1" in episode["winner_text"]
+    assert [link["link_url"] for link in episode["links"]] == [
+        "https://twitter.com/winner/status/1",
+        "https://www.youtube.com/watch?v=nestedVid1",
+    ]
+    assert episode["links"][1]["canonical_url"] == (
+        "https://www.youtube.com/watch?v=nestedVid1"
+    )
+    assert episode["links"][1]["classification"] == "new_unverified"
+    assert all("additionalVid3" not in link["link_url"] for link in episode["links"])
+
+
 def test_cached_pages_are_reused_and_runs_resume(connection, config):
     seed_wins(connection)
     first = run_reddit_audit(
@@ -568,14 +654,14 @@ def test_cached_pages_are_reused_and_runs_resume(connection, config):
     )
     assert second.more_remaining is False
     assert second.totals["episode_pages_cached"] == 2
-    assert second.totals["episode_pages_fetched"] == 7
+    assert second.totals["episode_pages_fetched"] == 8
     episode_fetches = [
         url
         for url, _ in second_session.gets
         if len(url.rsplit("/", 1)[-1]) == 8 and url.rsplit("/", 1)[-1].isdigit()
     ]
-    assert len(episode_fetches) == 7
-    assert len(second_session.gets) == 7
+    assert len(episode_fetches) == 8
+    assert len(second_session.gets) == 8
 
 
 def test_show_filter_limits_scope_and_output_override(connection, config, tmp_path):
