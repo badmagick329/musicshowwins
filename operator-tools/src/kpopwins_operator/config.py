@@ -9,6 +9,8 @@ from urllib.parse import urlsplit
 DEFAULT_API_BASE_URL = "http://127.0.0.1:8000/api/v1"
 DEFAULT_YOUTUBE_API_BASE_URL = "https://www.googleapis.com/youtube/v3"
 DEFAULT_YOUTUBE_MAX_API_CALLS_PER_RUN = 500
+DEFAULT_REDDIT_TOKEN_URL = "https://www.reddit.com/api/v1/access_token"
+DEFAULT_REDDIT_API_BASE_URL = "https://oauth.reddit.com"
 REPOSITORY_ROOT = Path(__file__).resolve().parents[3]
 
 
@@ -23,6 +25,11 @@ class Config:
     youtube_api_key: str | None = None
     youtube_api_base_url: str = DEFAULT_YOUTUBE_API_BASE_URL
     youtube_max_api_calls_per_run: int = DEFAULT_YOUTUBE_MAX_API_CALLS_PER_RUN
+    reddit_client_id: str | None = None
+    reddit_client_secret: str | None = None
+    reddit_user_agent: str | None = None
+    reddit_token_url: str = DEFAULT_REDDIT_TOKEN_URL
+    reddit_api_base_url: str = DEFAULT_REDDIT_API_BASE_URL
 
     @property
     def database_path(self) -> Path:
@@ -39,6 +46,18 @@ class Config:
     @property
     def channel_registry_path(self) -> Path:
         return REPOSITORY_ROOT / "operator-tools" / "official-youtube-channels.toml"
+
+    @property
+    def reddit_dir(self) -> Path:
+        return self.home / "reddit"
+
+    @property
+    def reports_dir(self) -> Path:
+        return self.home / "reports"
+
+    @property
+    def default_reddit_audit_path(self) -> Path:
+        return self.reports_dir / "reddit-audit.json"
 
 
 def _read_env_file(path: Path) -> dict[str, str]:
@@ -117,10 +136,26 @@ def load_config(environ: Mapping[str, str] | None = None) -> Config:
             "YOUTUBE_MAX_API_CALLS_PER_RUN must be a positive integer."
         )
     youtube_api_key = values.get("YOUTUBE_API_KEY", "").strip() or None
+    reddit_client_id = values.get("REDDIT_CLIENT_ID", "").strip() or None
+    reddit_client_secret = values.get("REDDIT_CLIENT_SECRET", "").strip() or None
+    reddit_user_agent = values.get("REDDIT_USER_AGENT", "").strip() or None
+    reddit_token_url = _http_url(
+        values.get("REDDIT_TOKEN_URL", DEFAULT_REDDIT_TOKEN_URL).strip(),
+        "REDDIT_TOKEN_URL",
+    )
+    reddit_api_base_url = _http_url(
+        values.get("REDDIT_API_BASE_URL", DEFAULT_REDDIT_API_BASE_URL).strip(),
+        "REDDIT_API_BASE_URL",
+    )
     return Config(
         home=home,
         api_base_url=api_base_url,
         youtube_api_key=youtube_api_key,
         youtube_api_base_url=youtube_api_base_url,
         youtube_max_api_calls_per_run=youtube_max_calls,
+        reddit_client_id=reddit_client_id,
+        reddit_client_secret=reddit_client_secret,
+        reddit_user_agent=reddit_user_agent,
+        reddit_token_url=reddit_token_url,
+        reddit_api_base_url=reddit_api_base_url,
     )

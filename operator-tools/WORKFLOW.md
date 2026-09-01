@@ -42,6 +42,19 @@ uv run kpopwins-operator candidates reject 21
 Replace the example IDs with the candidates you reviewed. Keep listing pending
 candidates until none remain.
 
+## Audit the r/kpop wiki (read-only)
+
+```console
+uv run kpopwins-operator reddit audit --max-pages 100
+```
+
+Repeat that command until it reports `more-remaining=no`. Cached episode pages
+are reused, so reruns resume instead of refetching. Use `--refresh-indexes`
+after new episodes are added on Reddit and `--show <slug>` to scope one show.
+Then review the JSON/TSV report under `.ignore/operator-tools/reports/`. This
+command does not create, update, approve, or reject candidates; importing
+Reddit results is a later task.
+
 ## Export and test locally
 
 ```console
