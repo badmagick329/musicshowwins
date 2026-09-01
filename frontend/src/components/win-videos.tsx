@@ -18,9 +18,9 @@ function winContext(win: Win) {
   return `${win.song.title} by ${win.song.artist.name}, ${formatDate(win.date)}, ${win.show.name}`;
 }
 
-const winVideoActionClass = "inline-flex min-h-8 cursor-pointer items-center justify-center gap-1.5 whitespace-nowrap border-2 border-foreground bg-brand-pink font-bold text-primary-foreground transition-colors motion-reduce:transition-none hover:bg-accent-foreground";
-const desktopActionClass = "px-2.5 py-1 text-xs shadow-[2px_2px_0_var(--foreground)]";
-const mobileActionClass = "w-full min-h-11 px-4 text-sm shadow-[2px_2px_0_var(--foreground)]";
+const winVideoActionClass = "grid w-full cursor-pointer grid-cols-[0.875rem_1fr_0.875rem] items-center gap-1.5 whitespace-nowrap border-2 border-foreground bg-brand-pink font-bold text-primary-foreground transition-colors motion-reduce:transition-none hover:bg-accent-foreground";
+const desktopActionClass = "h-8 px-2.5 text-xs shadow-[2px_2px_0_var(--foreground)]";
+const mobileActionClass = "min-h-11 px-4 text-sm shadow-[2px_2px_0_var(--foreground)]";
 
 function WinVideoActionLink({ win, video, className }: { win: Win; video: WinReference; className: string }) {
   return (
@@ -32,7 +32,7 @@ function WinVideoActionLink({ win, video, className }: { win: Win; video: WinRef
       className={cn(winVideoActionClass, className)}
     >
       <Play className="size-3.5 shrink-0" aria-hidden="true" />
-      <span>{winVideoActionLabel(1)}</span>
+      <span className="text-center">{winVideoActionLabel(1)}</span>
       <ExternalLink className="size-3.5 shrink-0" aria-hidden="true" />
     </a>
   );
@@ -49,7 +49,7 @@ function WinVideoToggleButton({ win, count, open, panelId, onToggle, className }
       className={cn(winVideoActionClass, className)}
     >
       <Play className="size-3.5 shrink-0" aria-hidden="true" />
-      <span>{winVideoActionLabel(count)}</span>
+      <span className="text-center">{winVideoActionLabel(count)}</span>
       <ChevronDown aria-hidden="true" className={cn("size-3.5 shrink-0 transition-transform duration-150 motion-reduce:transition-none", open && "rotate-180")} />
     </button>
   );
