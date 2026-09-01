@@ -1,10 +1,10 @@
 // @vitest-environment jsdom
 
-import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { WinsExplorer } from "./wins-explorer";
 
-const queryState = vi.hoisted(() => ({ isFetching: false, isPlaceholderData: false }));
+const queryState = vi.hoisted(() => ({ isFetching: false, isPlaceholderData: false, videoReferences: [] as unknown[] }));
 
 vi.mock("next/navigation", () => ({
   useSearchParams: () => new URLSearchParams(window.location.search),
@@ -28,8 +28,8 @@ vi.mock("@tanstack/react-query", () => ({
     const title = filters.show === "the-show" ? "The Show Winner" : filters.show === "music-bank" ? "Music Bank Winner" : filters.search ? `${filters.search} Winner` : "Archive Winner";
     return {
       data: { count: 201, next: filters.page < 3 ? "next" : null, previous: filters.page > 1 ? "previous" : null, results: [
-        { id: 1, date: "2025-01-01", show: { id: 1, slug: filters.show || "music-bank", name: filters.show === "the-show" ? "The Show" : "Music Bank", active: true }, song: { id: 7, title, artist: { id: 3, name: "Artist" }, total_wins: 1 } },
-        { id: 2, date: "2025-01-02", show: { id: 3, slug: "show-champion", name: "Show Champion", active: true }, song: { id: 8, title: "Second Winner", artist: { id: 4, name: "Another Artist" }, total_wins: 1 } },
+        { id: 1, date: "2025-01-01", show: { id: 1, slug: filters.show || "music-bank", name: filters.show === "the-show" ? "The Show" : "Music Bank", active: true }, song: { id: 7, title, artist: { id: 3, name: "Artist" }, total_wins: 1 }, references: queryState.videoReferences },
+        { id: 2, date: "2025-01-02", show: { id: 3, slug: "show-champion", name: "Show Champion", active: true }, song: { id: 8, title: "Second Winner", artist: { id: 4, name: "Another Artist" }, total_wins: 1 }, references: [] },
       ] },
       isError: false,
       isFetching: queryState.isFetching,
@@ -51,15 +51,38 @@ afterEach(() => {
   setUrl("/wins");
   queryState.isFetching = false;
   queryState.isPlaceholderData = false;
+  queryState.videoReferences = [];
 });
 
 describe("WinsExplorer", () => {
   it("uses a semantic desktop table and retains stacked mobile records", () => {
     const { container } = render(<WinsExplorer />);
     expect(screen.getByRole("table", { name: "Filtered music show wins" })).toBeTruthy();
-    for (const heading of ["Date", "Artist", "Song", "Music show"]) expect(screen.getByRole("columnheader", { name: heading })).toBeTruthy();
+    for (const heading of ["Date", "Artist", "Song", "Music show", "Video"]) expect(screen.getByRole("columnheader", { name: heading })).toBeTruthy();
     expect(container.querySelectorAll("article")).toHaveLength(2);
     expect(container.innerHTML).not.toContain("winsGridColumns");
+  });
+
+  it("expands video references beneath the same win in the desktop table and mobile records", () => {
+    queryState.videoReferences = [{ id: 5, reference_type: "video", provider: "youtube", external_id: "x1", url: "https://www.youtube.com/watch?v=x1", title: "Archive Winner MV", publisher_name: "KBS World", is_official: true, published_at: null, last_verified_at: null }];
+    const { container } = render(<WinsExplorer />);
+    const desktopScope = within(container.querySelector(".desktop-table") as HTMLElement);
+    const button = desktopScope.getByRole("button", { name: "Watch video for Archive Winner by Artist, 01 Jan 2025, Music Bank" });
+    expect(button.getAttribute("aria-expanded")).toBe("false");
+    fireEvent.click(button);
+    expect(button.getAttribute("aria-expanded")).toBe("true");
+    const panel = document.getElementById(button.getAttribute("aria-controls") ?? "");
+    expect(panel).toBeTruthy();
+    expect(container.querySelector('td[colspan="5"]')).toBeTruthy();
+    expect(container.querySelector(".desktop-table tbody")?.contains(panel)).toBe(true);
+    const link = within(panel as HTMLElement).getByRole("link", { name: /Archive Winner MV/ });
+    expect(link.getAttribute("href")).toBe("https://www.youtube.com/watch?v=x1");
+    expect(link.getAttribute("target")).toBe("_blank");
+    expect(link.getAttribute("rel")).toBe("noopener noreferrer");
+
+    const mobileButton = within(container.querySelector(".mobile-record") as HTMLElement).getByRole("button", { name: "Watch video for Archive Winner by Artist, 01 Jan 2025, Music Bank" });
+    fireEvent.click(mobileButton);
+    expect(document.getElementById(mobileButton.getAttribute("aria-controls") ?? "")?.textContent).toContain("KBS World");
   });
 
   it("shows total pages and waits for real requested-page data before scrolling", () => {

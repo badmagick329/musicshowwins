@@ -3,7 +3,7 @@ import type { Win } from "./api-shared";
 import { buildShowBreakdown, summarizeArtist } from "./artist-profile";
 
 function win(id: number, date: string, show: { id: number; slug: string; name: string }, songId: number): Win {
-  return { id, date, show: { ...show, active: true }, song: { id: songId, title: `Song ${songId}`, artist: { id: 1, name: "Artist" }, total_wins: 1, latest_win_date: date, winning_shows: 1 } };
+  return { id, date, show: { ...show, active: true }, song: { id: songId, title: `Song ${songId}`, artist: { id: 1, name: "Artist" }, total_wins: 1, latest_win_date: date, winning_shows: 1 }, references: [] };
 }
 
 const bank = { id: 1, slug: "music-bank", name: "Music Bank" };

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Artist } from "@/lib/api-shared";
-import { EmptyState, formatDate } from "@/components/data-display";
+import { EmptyState } from "@/components/data-display";
+import { formatDate } from "@/lib/utils";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 export function ArtistResults({ artists, empty }: { artists: Artist[]; empty: string }) {

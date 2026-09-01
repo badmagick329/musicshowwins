@@ -4,7 +4,8 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { useCallback, useEffect, useRef } from "react";
-import { EmptyState, LoadingState, ShowBadge, formatDate } from "@/components/data-display";
+import { EmptyState, LoadingState, ShowBadge } from "@/components/data-display";
+import { formatDate } from "@/lib/utils";
 import { browserTransport } from "@/lib/api-browser";
 import type { Show, Win } from "@/lib/api-shared";
 import {
@@ -18,6 +19,7 @@ import { showsQueryOptions, winsQueryOptions } from "@/lib/wins-queries";
 import { archivePageCount } from "@/lib/pagination";
 import { usePaginationScroll } from "@/lib/use-pagination-scroll";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { DesktopWinVideoRow, MobileWinVideoDisclosure } from "@/components/win-videos";
 import { ArchiveResultsSummary } from "@/components/pagination";
 
 function WinsSearchInput({ query, onApply }: { query: string; onApply: (value: string) => void }) {
@@ -58,11 +60,11 @@ function WinsRows({ wins }: { wins: Win[] }) {
     <div className="border border-border bg-card">
       <Table className="desktop-table border-collapse">
         <TableCaption className="sr-only">Filtered music show wins</TableCaption>
-        <TableHeader><TableRow className="border-b-2 border-foreground bg-muted/50 text-xs uppercase tracking-[0.12em] text-muted-foreground"><TableHead className="w-32 px-4 py-3">Date</TableHead><TableHead className="px-4 py-3">Artist</TableHead><TableHead className="px-4 py-3">Song</TableHead><TableHead className="w-44 px-4 py-3 text-right">Music show</TableHead></TableRow></TableHeader>
-        <TableBody>{wins.map((win) => <TableRow key={win.id} className="border-border/70 hover:bg-accent/60"><TableCell className="px-4 py-4"><time dateTime={win.date} className="font-heading text-sm font-bold tabular-nums text-muted-foreground">{formatDate(win.date)}</time></TableCell><TableCell className="px-4 py-4"><Link prefetch={false} href={`/artists/${win.song.artist.id}`} className="font-semibold underline-offset-4 hover:underline">{win.song.artist.name}</Link></TableCell><TableCell className="px-4 py-4"><Link prefetch={false} href={`/songs/${win.song.id}`} className="font-medium underline-offset-4 hover:underline">{win.song.title}</Link></TableCell><TableCell className="w-44 px-4 py-4 text-right"><Link prefetch={false} href={`/wins?show=${encodeURIComponent(win.show.slug)}#wins-results-title`} aria-label={`Filter wins by ${win.show.name}`}><ShowBadge slug={win.show.slug} name={win.show.name} /></Link></TableCell></TableRow>)}</TableBody>
+        <TableHeader><TableRow className="border-b-2 border-foreground bg-muted/50 text-xs uppercase tracking-[0.12em] text-muted-foreground"><TableHead className="w-32 px-4 py-3">Date</TableHead><TableHead className="px-4 py-3">Artist</TableHead><TableHead className="px-4 py-3">Song</TableHead><TableHead className="w-44 px-4 py-3 text-right">Music show</TableHead><TableHead className="w-24 px-4 py-3 text-right">Video</TableHead></TableRow></TableHeader>
+        <TableBody>{wins.map((win) => <DesktopWinVideoRow key={win.id} win={win} colSpan={5} videoCellClassName="w-24 px-4 py-4 text-right"><TableCell className="px-4 py-4"><time dateTime={win.date} className="font-heading text-sm font-bold tabular-nums text-muted-foreground">{formatDate(win.date)}</time></TableCell><TableCell className="px-4 py-4"><Link prefetch={false} href={`/artists/${win.song.artist.id}`} className="font-semibold underline-offset-4 hover:underline">{win.song.artist.name}</Link></TableCell><TableCell className="px-4 py-4"><Link prefetch={false} href={`/songs/${win.song.id}`} className="font-medium underline-offset-4 hover:underline">{win.song.title}</Link></TableCell><TableCell className="w-44 px-4 py-4 text-right"><Link prefetch={false} href={`/wins?show=${encodeURIComponent(win.show.slug)}#wins-results-title`} aria-label={`Filter wins by ${win.show.name}`}><ShowBadge slug={win.show.slug} name={win.show.name} /></Link></TableCell></DesktopWinVideoRow>)}</TableBody>
       </Table>
       <div className="mobile-record flex-col">
-        {wins.map((win) => <article key={win.id} className="grid gap-2 border-b border-border/70 px-4 py-4 last:border-b-0"><time dateTime={win.date} className="font-heading text-sm font-bold tabular-nums text-muted-foreground">{formatDate(win.date)}</time><Link prefetch={false} href={`/artists/${win.song.artist.id}`} className="min-w-0 font-semibold underline-offset-4 hover:underline">{win.song.artist.name}</Link><Link prefetch={false} href={`/songs/${win.song.id}`} className="min-w-0 font-medium underline-offset-4 hover:underline">{win.song.title}</Link><Link prefetch={false} href={`/wins?show=${encodeURIComponent(win.show.slug)}#wins-results-title`} aria-label={`Filter wins by ${win.show.name}`}><ShowBadge slug={win.show.slug} name={win.show.name} /></Link></article>)}
+        {wins.map((win) => <article key={win.id} className="grid gap-2 border-b border-border/70 px-4 py-4 last:border-b-0"><time dateTime={win.date} className="font-heading text-sm font-bold tabular-nums text-muted-foreground">{formatDate(win.date)}</time><Link prefetch={false} href={`/artists/${win.song.artist.id}`} className="min-w-0 font-semibold underline-offset-4 hover:underline">{win.song.artist.name}</Link><Link prefetch={false} href={`/songs/${win.song.id}`} className="min-w-0 font-medium underline-offset-4 hover:underline">{win.song.title}</Link><Link prefetch={false} href={`/wins?show=${encodeURIComponent(win.show.slug)}#wins-results-title`} aria-label={`Filter wins by ${win.show.name}`}><ShowBadge slug={win.show.slug} name={win.show.name} /></Link><MobileWinVideoDisclosure win={win} /></article>)}
       </div>
     </div>
   );

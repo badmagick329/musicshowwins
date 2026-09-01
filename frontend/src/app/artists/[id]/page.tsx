@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { EmptyState, ShowBadge, formatDate } from "@/components/data-display";
+import { EmptyState, ShowBadge } from "@/components/data-display";
+import { formatDate } from "@/lib/utils";
 import { ApiRequestError, getAllArtistSongs, getAllArtistWins, getArtist } from "@/lib/api";
 import { buildShowBreakdown, summarizeArtist } from "@/lib/artist-profile";
 import { ArtistWinHistory } from "@/components/artist-win-history";
