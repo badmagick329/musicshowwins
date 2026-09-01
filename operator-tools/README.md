@@ -170,9 +170,29 @@ Behavior:
   The local win remains the source of truth; nothing is inferred from prose.
   The audit reports episodes without local wins and local wins inside a show's
   discovered coverage range that have no episode page.
-- For every episode the `WINNER` section is isolated case-insensitively and
-  parsing stops at the next Markdown heading. Missing sections, explicit `N/A`,
-  winner text without links, and malformed links are separate outcomes.
+- For every episode the `WINNER` section is isolated case-insensitively; nested
+  headings beneath the WINNER heading belong to the winner section, and parsing
+  stops at the next Markdown heading of equal or higher level. Missing sections,
+  explicit `N/A` (including `### N/A` and `### No winner.` variants), winner
+  text without links, and malformed links are separate outcomes.
+- An episode wiki page that returns HTTP 404 does not abort the audit. It is
+  recorded as `episode_page_not_found`, counted in the show and overall totals,
+  and listed with its show, date, and page path in the JSON report. The attempt
+  still consumes one page of the `--max-pages` budget. Known missing pages are
+  persisted in crawl state, skipped by later runs (so `more-remaining`
+  eventually becomes `no`), and retried when `--refresh-indexes` is used in case
+  Reddit later restores them. A 404 for the main index or a show archive page
+  remains a fatal error reported with the requested wiki path and HTTP status.
+- During archive discovery the final path component of each archive link is
+  inspected. Valid eight-digit calendar dates are episode pages, four-digit
+  years and nonnumeric paths are nested archive indexes, and any other
+  all-numeric target (such as the seven-digit `2015021` seen in real Show
+  Champion data, or eight-digit values that are not valid calendar dates) is
+  malformed. Malformed targets are recorded in the JSON report with the show
+  slug, source archive path, and target path, counted as
+  `malformed_episode_links`, never requested, never counted against
+  `--max-pages`, never added to `missing_episode_pages`, and never affect
+  `more-remaining`.
 - Links are classified as `existing_approved`, `existing_pending`,
   `existing_rejected` (matched against local candidates by YouTube video ID
   first, then canonical URL), `new_official` (video already present in

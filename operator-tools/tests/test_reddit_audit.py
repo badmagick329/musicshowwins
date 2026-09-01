@@ -4,12 +4,16 @@ import io
 import json
 import sqlite3
 
+import pytest
+
 from kpopwins_operator.cli import main
 from kpopwins_operator.config import Config, load_config
 from kpopwins_operator.database import initialize_database, open_database
 from kpopwins_operator.reddit import (
     REDDIT_SHOW_ARCHIVES,
+    RedditError,
     _resolve_archive_path,
+    archive_link_kind,
     episode_date,
     extract_section_links,
     extract_wiki_links,
@@ -120,11 +124,20 @@ MUSICCORE_20240810 = """## WINNER
 SHOWCHAMPION_ARCHIVE = """# Show Champion episodes
 
 * [July 10](/r/kpop/wiki/music-shows/show-champion/20240710)
+* [July 17](/r/kpop/wiki/music-shows/show-champion/20240717)
+* [July 24](/r/kpop/wiki/music-shows/show-champion/20240724)
+* [20150218](/r/kpop/wiki/music-shows/show-champion/2015021)
+* [Broken date](/r/kpop/wiki/music-shows/show-champion/20151332)
 """
 
 SHOWCHAMPION_20240710 = """## WINNER
 
 * [Unverified](https://www.youtube.com/watch?v=unverifiedVid55)
+"""
+
+SHOWCHAMPION_20240724 = """## WINNER
+
+The winner was announced during the broadcast.
 """
 
 THESHOW_ARCHIVE = """# The Show episodes
@@ -163,6 +176,7 @@ EPISODE_PAGES = {
     "music-shows/show-music-core/20240803": MUSICCORE_20240803,
     "music-shows/show-music-core/20240810": MUSICCORE_20240810,
     "music-shows/show-champion/20240710": SHOWCHAMPION_20240710,
+    "music-shows/show-champion/20240724": SHOWCHAMPION_20240724,
     "music-shows/the-show/20240611": THESHOW_20240611,
 }
 
@@ -189,6 +203,7 @@ def seed_wins(connection):
         ("music-core", "2024-08-03", "Artist Epsilon", "Song Five"),
         ("music-core", "2024-08-10", "Artist Zeta", "Song Six"),
         ("show-champion", "2024-07-10", "Artist Eta", "Song Seven"),
+        ("show-champion", "2024-07-24", "Artist Iota", "Song Nine"),
         ("the-show", "2024-06-11", "Artist Theta", "Song Eight"),
     ]
     for index, (show, win_date, artist, song) in enumerate(rows, start=1):
@@ -304,6 +319,31 @@ def test_episode_date_extraction():
     assert episode_date("music-shows/inkigayo/index") is None
 
 
+def test_archive_link_kind_classification():
+    assert archive_link_kind("music-shows/show-champion/20240710") == (
+        "episode",
+        "2024-07-10",
+    )
+    assert archive_link_kind("music-shows/show-champion/2024") == ("index", None)
+    assert archive_link_kind("music-shows/show-champion/openconcert") == (
+        "index",
+        None,
+    )
+    assert archive_link_kind("music-shows/show-champion/2015021") == (
+        "malformed",
+        None,
+    )
+    assert archive_link_kind("music-shows/show-champion/20151332") == (
+        "malformed",
+        None,
+    )
+    assert archive_link_kind("music-shows/show-champion/12345") == ("malformed", None)
+    assert archive_link_kind("music-shows/show-champion/201502181") == (
+        "malformed",
+        None,
+    )
+
+
 def test_winner_section_boundaries_and_na():
     found, text = extract_winner_section(INKIGAYO_20240623)
     assert found
@@ -414,16 +454,18 @@ def test_full_audit_classifies_links_and_writes_reports(connection, config):
     assert outcome.collection_complete is True
     totals = outcome.totals
     assert totals["archive_pages_scanned"] == 8
-    assert totals["episode_pages_discovered"] == 10
+    assert totals["episode_pages_discovered"] == 12
     assert totals["episode_pages_cached"] == 0
-    assert totals["episode_pages_fetched"] == 10
-    assert totals["episode_pages_parsed"] == 10
-    assert totals["exact_local_win_matches"] == 9
+    assert totals["episode_pages_fetched"] == 11
+    assert totals["episode_pages_not_found"] == 1
+    assert totals["episode_pages_parsed"] == 11
+    assert totals["malformed_episode_links"] == 2
+    assert totals["exact_local_win_matches"] == 10
     assert totals["episodes_without_local_wins"] == 1
     assert totals["local_wins_without_episode_pages"] == 1
     assert totals["missing_winner_sections"] == 1
     assert totals["winner_na_sections"] == 1
-    assert totals["winner_sections_without_links"] == 1
+    assert totals["winner_sections_without_links"] == 2
     assert totals["total_extracted_links"] == 12
     assert totals["existing_approved"] == 1
     assert totals["existing_pending"] == 1
@@ -622,6 +664,246 @@ def test_nested_winner_links_are_parsed_and_later_sections_excluded(connection, 
     assert all("additionalVid3" not in link["link_url"] for link in episode["links"])
 
 
+def test_episode_404_is_recorded_reported_and_run_completes(connection, config):
+    seed_wins(connection)
+    outcome = run_reddit_audit(
+        connection,
+        reddit_config(config),
+        show="show-champion",
+        max_pages=100,
+        refresh_indexes=False,
+        output_path=None,
+        stdout=io.StringIO(),
+        session=audit_session(),
+        now="2026-09-01T12:00:00Z",
+    )
+    assert outcome.more_remaining is False
+    assert outcome.collection_complete is True
+    assert outcome.totals["episode_pages_discovered"] == 3
+    assert outcome.totals["episode_pages_fetched"] == 2
+    assert outcome.totals["episode_pages_not_found"] == 1
+    assert outcome.totals["episode_pages_parsed"] == 2
+    assert outcome.totals["exact_local_win_matches"] == 2
+    assert outcome.totals["episode_pages_discovered"] == (
+        outcome.totals["episode_pages_parsed"]
+        + outcome.totals["episode_pages_not_found"]
+    )
+
+    report = json.loads(outcome.report_path.read_text(encoding="utf-8"))
+    assert report["episode_pages_not_found"] == [
+        {
+            "show_slug": "show-champion",
+            "win_date": "2024-07-17",
+            "episode_path": "music-shows/show-champion/20240717",
+            "episode_url": (
+                "https://www.reddit.com/r/kpop/wiki/music-shows/show-champion/20240717"
+            ),
+        }
+    ]
+    assert report["shows"]["show-champion"]["counts"]["episode_pages_not_found"] == 1
+    state = json.loads((config.reddit_dir / "state.json").read_text(encoding="utf-8"))
+    assert state["missing_episode_pages"] == ["music-shows/show-champion/20240717"]
+
+
+def test_repeat_run_skips_known_missing_page(connection, config):
+    seed_wins(connection)
+    run_reddit_audit(
+        connection,
+        reddit_config(config),
+        show="show-champion",
+        max_pages=100,
+        refresh_indexes=False,
+        output_path=None,
+        stdout=io.StringIO(),
+        session=audit_session(),
+        now="2026-09-01T12:00:00Z",
+    )
+    second_session = audit_session()
+    second = run_reddit_audit(
+        connection,
+        reddit_config(config),
+        show="show-champion",
+        max_pages=100,
+        refresh_indexes=False,
+        output_path=None,
+        stdout=io.StringIO(),
+        session=second_session,
+        now="2026-09-01T13:00:00Z",
+    )
+    assert second.more_remaining is False
+    assert second.totals["episode_pages_not_found"] == 1
+    assert second.totals["episode_pages_cached"] == 2
+    assert second.totals["episode_pages_parsed"] == 2
+    assert all("20240717" not in url for url, _ in second_session.gets)
+    assert second_session.gets == []
+
+    report = json.loads(second.report_path.read_text(encoding="utf-8"))
+    assert [
+        (page["show_slug"], page["win_date"], page["episode_path"])
+        for page in report["episode_pages_not_found"]
+    ] == [("show-champion", "2024-07-17", "music-shows/show-champion/20240717")]
+    assert report["shows"]["show-champion"]["counts"]["episode_pages_not_found"] == 1
+    assert report["totals"]["episode_pages_discovered"] == (
+        report["totals"]["episode_pages_parsed"]
+        + report["totals"]["episode_pages_not_found"]
+        + len(report["pending_episode_pages"])
+    )
+
+
+def test_refresh_indexes_retries_known_missing_page(connection, config):
+    seed_wins(connection)
+    run_reddit_audit(
+        connection,
+        reddit_config(config),
+        show="show-champion",
+        max_pages=100,
+        refresh_indexes=False,
+        output_path=None,
+        stdout=io.StringIO(),
+        session=audit_session(),
+        now="2026-09-01T12:00:00Z",
+    )
+    refreshed_session = audit_session()
+    refreshed = run_reddit_audit(
+        connection,
+        reddit_config(config),
+        show="show-champion",
+        max_pages=100,
+        refresh_indexes=True,
+        output_path=None,
+        stdout=io.StringIO(),
+        session=refreshed_session,
+        now="2026-09-01T14:00:00Z",
+    )
+    assert any("20240717" in url for url, _ in refreshed_session.gets)
+    assert refreshed.totals["episode_pages_not_found"] == 1
+    assert refreshed.more_remaining is False
+    state = json.loads((config.reddit_dir / "state.json").read_text(encoding="utf-8"))
+    assert state["missing_episode_pages"] == ["music-shows/show-champion/20240717"]
+
+
+def test_missing_page_consumes_page_budget_and_allows_completion(connection, config):
+    seed_wins(connection)
+    first = run_reddit_audit(
+        connection,
+        reddit_config(config),
+        show="show-champion",
+        max_pages=1,
+        refresh_indexes=False,
+        output_path=None,
+        stdout=io.StringIO(),
+        session=audit_session(),
+        now="2026-09-01T12:00:00Z",
+    )
+    assert first.totals["episode_pages_fetched"] == 1
+    assert first.totals["episode_pages_not_found"] == 0
+    assert first.more_remaining is True
+    assert first.collection_complete is False
+    assert first.totals["episode_pages_discovered"] == (
+        first.totals["episode_pages_parsed"]
+        + first.totals["episode_pages_not_found"]
+        + 2
+    )
+
+    second_session = audit_session()
+    second = run_reddit_audit(
+        connection,
+        reddit_config(config),
+        show="show-champion",
+        max_pages=2,
+        refresh_indexes=False,
+        output_path=None,
+        stdout=io.StringIO(),
+        session=second_session,
+        now="2026-09-01T13:00:00Z",
+    )
+    assert second.totals["episode_pages_not_found"] == 1
+    assert second.totals["episode_pages_fetched"] == 1
+    assert second.more_remaining is False
+    assert second.collection_complete is True
+    assert len(second_session.gets) == 2
+    assert second.totals["episode_pages_discovered"] == (
+        second.totals["episode_pages_parsed"] + second.totals["episode_pages_not_found"]
+    )
+
+
+def test_missing_archive_index_fails_with_path_and_status(connection, config):
+    seed_wins(connection)
+    with pytest.raises(RedditError, match=r"music-shows.*404"):
+        run_reddit_audit(
+            connection,
+            reddit_config(config),
+            show="show-champion",
+            max_pages=100,
+            refresh_indexes=False,
+            output_path=None,
+            stdout=io.StringIO(),
+            session=Session(),
+            now="2026-09-01T12:00:00Z",
+        )
+    partial = audit_session()
+    del partial.pages["https://oauth.reddit.test/r/kpop/wiki/music-shows/show-champion"]
+    with pytest.raises(RedditError, match=r"show-champion.*404"):
+        run_reddit_audit(
+            connection,
+            reddit_config(config),
+            show="show-champion",
+            max_pages=100,
+            refresh_indexes=False,
+            output_path=None,
+            stdout=io.StringIO(),
+            session=partial,
+            now="2026-09-01T12:00:00Z",
+        )
+
+
+def test_malformed_numeric_archive_links_are_recorded_not_requested(connection, config):
+    seed_wins(connection)
+    session = audit_session()
+    outcome = run_reddit_audit(
+        connection,
+        reddit_config(config),
+        show="show-champion",
+        max_pages=100,
+        refresh_indexes=False,
+        output_path=None,
+        stdout=io.StringIO(),
+        session=session,
+        now="2026-09-01T12:00:00Z",
+    )
+    assert outcome.more_remaining is False
+    assert outcome.totals["malformed_episode_links"] == 2
+    assert outcome.totals["episode_pages_discovered"] == 3
+    assert outcome.totals["episode_pages_fetched"] == 2
+    assert outcome.totals["episode_pages_not_found"] == 1
+    assert all(
+        "2015021" not in url and "20151332" not in url for url, _ in session.gets
+    )
+    assert all(len(url.rsplit("/", 1)[-1]) != 7 for url, _ in session.gets)
+
+    report = json.loads(outcome.report_path.read_text(encoding="utf-8"))
+    assert report["malformed_episode_links"] == [
+        {
+            "show_slug": "show-champion",
+            "archive_path": "music-shows/show-champion",
+            "target_path": "music-shows/show-champion/2015021",
+        },
+        {
+            "show_slug": "show-champion",
+            "archive_path": "music-shows/show-champion",
+            "target_path": "music-shows/show-champion/20151332",
+        },
+    ]
+    assert report["shows"]["show-champion"]["counts"]["malformed_episode_links"] == 2
+    state = json.loads((config.reddit_dir / "state.json").read_text(encoding="utf-8"))
+    assert "music-shows/show-champion/2015021" not in state.get(
+        "missing_episode_pages", []
+    )
+    assert "music-shows/show-champion/20151332" not in state.get(
+        "missing_episode_pages", []
+    )
+
+
 def test_cached_pages_are_reused_and_runs_resume(connection, config):
     seed_wins(connection)
     first = run_reddit_audit(
@@ -654,14 +936,15 @@ def test_cached_pages_are_reused_and_runs_resume(connection, config):
     )
     assert second.more_remaining is False
     assert second.totals["episode_pages_cached"] == 2
-    assert second.totals["episode_pages_fetched"] == 8
+    assert second.totals["episode_pages_fetched"] == 9
+    assert second.totals["episode_pages_not_found"] == 1
     episode_fetches = [
         url
         for url, _ in second_session.gets
         if len(url.rsplit("/", 1)[-1]) == 8 and url.rsplit("/", 1)[-1].isdigit()
     ]
-    assert len(episode_fetches) == 8
-    assert len(second_session.gets) == 8
+    assert len(episode_fetches) == 10
+    assert len(second_session.gets) == 10
 
 
 def test_show_filter_limits_scope_and_output_override(connection, config, tmp_path):

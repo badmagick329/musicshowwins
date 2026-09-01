@@ -51,6 +51,10 @@ class RedditCredentialsMissing(RedditError):
     pass
 
 
+class RedditPageMissing(RedditError):
+    pass
+
+
 @dataclass(frozen=True)
 class ParsedLink:
     provider: str
@@ -235,8 +239,13 @@ class RedditClient:
                     self._sleep(self._retry_delay(response, attempt))
                     continue
             if response.status_code >= 400:
+                if response.status_code == 404:
+                    raise RedditPageMissing(
+                        f"Reddit wiki page {path} is missing (HTTP 404)."
+                    )
                 raise RedditError(
-                    f"Reddit API request failed with HTTP {response.status_code}."
+                    f"Reddit API request for {path} failed with "
+                    f"HTTP {response.status_code}."
                 )
             try:
                 payload = response.json()
@@ -326,6 +335,20 @@ def episode_date(page_path: str) -> str | None:
 
 def date_from_components(year: int, month: int, day: int) -> str:
     return date(year, month, day).isoformat()
+
+
+def archive_link_kind(page_path: str) -> tuple[str, str | None]:
+    final = page_path.rstrip("/").rsplit("/", 1)[-1]
+    if re.fullmatch(r"\d{8}", final):
+        win_date = episode_date(page_path)
+        if win_date is not None:
+            return "episode", win_date
+        return "malformed", None
+    if re.fullmatch(r"\d{4}", final):
+        return "index", None
+    if re.fullmatch(r"\d+", final):
+        return "malformed", None
+    return "index", None
 
 
 def canonical_watch_url(video_id: str) -> str:
@@ -467,6 +490,7 @@ def _resolve_archive_path(mapped: str, index_links: list[str]) -> str:
 class _Discovery:
     episodes: dict[str, list[EpisodeRef]]
     archive_paths: dict[str, str]
+    malformed_links: dict[str, list[tuple[str, str]]]
     archive_pages_scanned: int = 0
     indexes_fetched: int = 0
 
@@ -482,6 +506,8 @@ def _discover_episodes(
 ) -> _Discovery:
     episodes: dict[str, list[EpisodeRef]] = {show: {} for show in shows}
     archive_paths: dict[str, str] = {}
+    malformed_links: dict[str, list[tuple[str, str]]] = {show: [] for show in shows}
+    malformed_seen: dict[str, set[tuple[str, str]]] = {show: set() for show in shows}
     scanned = 0
     fetched = 0
 
@@ -521,9 +547,14 @@ def _discover_episodes(
                     prefix
                 ):
                     continue
-                win_date = episode_date(link)
-                if win_date is not None:
+                kind, win_date = archive_link_kind(link)
+                if kind == "episode":
                     episodes[show][link_key] = EpisodeRef(show, link, win_date)
+                elif kind == "malformed":
+                    identity = (archive_path.casefold(), link_key)
+                    if identity not in malformed_seen[show]:
+                        malformed_seen[show].add(identity)
+                        malformed_links[show].append((archive_path, link))
                 elif len(visited) + len(queue) < MAX_INDEX_PAGES_PER_SHOW:
                     queue.append(link)
     return _Discovery(
@@ -532,6 +563,7 @@ def _discover_episodes(
             for show, pages in episodes.items()
         },
         archive_paths=archive_paths,
+        malformed_links=malformed_links,
         archive_pages_scanned=scanned,
         indexes_fetched=fetched,
     )
@@ -712,7 +744,9 @@ def _empty_totals() -> dict[str, int]:
         "episode_pages_discovered": 0,
         "episode_pages_cached": 0,
         "episode_pages_fetched": 0,
+        "episode_pages_not_found": 0,
         "episode_pages_parsed": 0,
+        "malformed_episode_links": 0,
         "exact_local_win_matches": 0,
         "episodes_without_local_wins": 0,
         "local_wins_without_episode_pages": 0,
@@ -781,13 +815,16 @@ def run_reddit_audit(
         state=state,
         timestamp=timestamp,
     )
-    state["updated_at"] = timestamp
-    _store_state(config, state)
 
     episode_list = [ref for show in shows for ref in discovery.episodes[show]]
     contents: dict[str, str] = {}
     cached_by_show = {show: 0 for show in shows}
     fetched_by_show = {show: 0 for show in shows}
+    missing_by_show = {show: 0 for show in shows}
+    missing_refs: list[EpisodeRef] = []
+    known_missing = {
+        path for path in state.get("missing_episode_pages", []) if isinstance(path, str)
+    }
     cached = 0
     fetched = 0
     pending: list[EpisodeRef] = []
@@ -800,17 +837,36 @@ def run_reddit_audit(
             cached += 1
             cached_by_show[ref.show_slug] += 1
     budget = max_pages
+    fetched_keys: set[tuple[str, str]] = set()
+    still_pending: list[EpisodeRef] = []
     for ref in pending:
+        key = ref.page_path.casefold()
+        if key in known_missing and not refresh_indexes:
+            missing_by_show[ref.show_slug] += 1
+            missing_refs.append(ref)
+            continue
         if budget <= 0:
-            break
-        content = client.wiki_page(ref.page_path)
+            still_pending.append(ref)
+            continue
+        try:
+            content = client.wiki_page(ref.page_path)
+        except RedditPageMissing:
+            budget -= 1
+            missing_by_show[ref.show_slug] += 1
+            missing_refs.append(ref)
+            known_missing.add(key)
+            continue
         _store_page(config, ref.page_path, content)
-        contents[ref.page_path.casefold()] = content
+        contents[key] = content
         fetched += 1
         fetched_by_show[ref.show_slug] += 1
+        fetched_keys.add(ref.sort_key)
+        known_missing.discard(key)
         budget -= 1
-    still_pending = pending[fetched:]
     more_remaining = bool(still_pending)
+    state["missing_episode_pages"] = sorted(known_missing)
+    state["updated_at"] = timestamp
+    _store_state(config, state)
 
     wins = _local_wins(connection, shows)
     candidate_index = _candidate_index(connection, shows)
@@ -827,7 +883,6 @@ def run_reddit_audit(
 
     parsed_refs = [ref for ref in episode_list if ref.page_path.casefold() in contents]
     totals["episode_pages_parsed"] = len(parsed_refs)
-    fetched_keys = {ref.sort_key for ref in pending[:fetched]}
     for ref in parsed_refs:
         show_total = show_totals[ref.show_slug]
         source = "fetched" if ref.sort_key in fetched_keys else "cache"
@@ -900,6 +955,8 @@ def run_reddit_audit(
         show_total["episode_pages_discovered"] = len(discovery.episodes[show])
         show_total["episode_pages_cached"] = cached_by_show[show]
         show_total["episode_pages_fetched"] = fetched_by_show[show]
+        show_total["episode_pages_not_found"] = missing_by_show[show]
+        show_total["malformed_episode_links"] = len(discovery.malformed_links[show])
         show_total["episode_pages_parsed"] = (
             cached_by_show[show] + fetched_by_show[show]
         )
@@ -968,6 +1025,26 @@ def run_reddit_audit(
             for show in shows
         },
         "pending_episode_pages": [_episode_url(ref.page_path) for ref in still_pending],
+        "episode_pages_not_found": [
+            {
+                "show_slug": ref.show_slug,
+                "win_date": ref.win_date,
+                "episode_path": ref.page_path,
+                "episode_url": _episode_url(ref.page_path),
+            }
+            for ref in missing_refs
+        ],
+        "malformed_episode_links": [
+            {
+                "show_slug": show,
+                "archive_path": archive_path,
+                "target_path": target_path,
+            }
+            for show in shows
+            for archive_path, target_path in sorted(
+                discovery.malformed_links[show], key=lambda entry: entry[1].casefold()
+            )
+        ],
         "episodes": [
             {
                 "show_slug": outcome.ref.show_slug,
@@ -1019,6 +1096,7 @@ def run_reddit_audit(
             f"parsed={counts['episode_pages_parsed']} "
             f"matched={counts['exact_local_win_matches']} "
             f"no-local-win={counts['episodes_without_local_wins']} "
+            f"missing={counts['episode_pages_not_found']} "
             f"gaps={counts['local_wins_without_episode_pages']}",
             file=stdout,
         )
