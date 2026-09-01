@@ -11,18 +11,15 @@ vi.mock("@/lib/api", async (importOriginal) => ({
 }));
 
 import { dynamic as rootDynamic, metadata as rootMetadata } from "./layout";
-import { metadata as artistsMetadata } from "./artists/page";
-import { metadata as songsMetadata } from "./songs/page";
-import { metadata as winsMetadata } from "./wins/page";
+import { generateMetadata as artistsMetadata } from "./artists/page";
+import { generateMetadata as songsMetadata } from "./songs/page";
+import { generateMetadata as winsMetadata } from "./wins/page";
 import { metadata as showsMetadata } from "./shows/page";
 import { metadata as aboutMetadata } from "./about/page";
 import { generateMetadata as artistMetadata } from "./artists/[id]/page";
 import { generateMetadata as songMetadata } from "./songs/[id]/page";
 
 const staticRoutes = [
-  [artistsMetadata, "Artists", "Find artists by name or win total, then view their songs and full win history."],
-  [songsMetadata, "Songs", "Find songs that won on K-pop music shows and see each song's artist and win history."],
-  [winsMetadata, "Music Show Wins", "Search K-pop music show results by artist, song, show, year, or date. Coverage starts in 2014."],
   [showsMetadata, "Music Shows", "See the latest winner and full results for each of the six weekly shows covered by KpopWins."],
   [aboutMetadata, "About", "KpopWins records K-pop music show wins from 2014 onward. You can also report missing or incorrect results."],
 ] as const;
@@ -50,20 +47,35 @@ describe("page metadata", () => {
     expect(String(metadata.title)).not.toContain("KpopWins");
   });
 
+  it("sets canonical metadata and indexing rules for collection pages", async () => {
+    const artists = await artistsMetadata({ searchParams: Promise.resolve({}) });
+    const songs = await songsMetadata({ searchParams: Promise.resolve({}) });
+    const wins = await winsMetadata({ searchParams: Promise.resolve({}) });
+    expect(artists).toMatchObject({ title: "Artists", alternates: { canonical: "/artists" } });
+    expect(songs).toMatchObject({ title: "Songs", alternates: { canonical: "/songs" } });
+    expect(wins).toMatchObject({ title: "Music Show Wins", alternates: { canonical: "/wins" } });
+
+    await expect(artistsMetadata({ searchParams: Promise.resolve({ search: "aespa" }) })).resolves.toMatchObject({ robots: { index: false, follow: true } });
+    await expect(songsMetadata({ searchParams: Promise.resolve({ sort: "title" }) })).resolves.toMatchObject({ robots: { index: false, follow: true } });
+    await expect(winsMetadata({ searchParams: Promise.resolve({ show: "inkigayo" }) })).resolves.toMatchObject({ robots: { index: false, follow: true } });
+  });
+
   it("sets artist and song detail titles without duplicate branding", async () => {
     const artist = await artistMetadata({ params: Promise.resolve({ id: "3" }) });
     const song = await songMetadata({ params: Promise.resolve({ id: "7" }) });
-    expect(artist).toEqual({
+    expect(artist).toMatchObject({
       title: "aespa Music Show Wins",
       description: "See aespa's winning songs and complete music show win history.",
+      alternates: { canonical: "/artists/3" },
     });
-    expect(song).toEqual({
+    expect(song).toMatchObject({
       title: "Supernova by aespa",
       description: "See every recorded music show win for Supernova by aespa.",
+      alternates: { canonical: "/songs/7" },
     });
 
     const template = (rootMetadata.title as { template: string }).template;
-    for (const title of [...staticRoutes.map(([, value]) => value), artist.title, song.title]) {
+    for (const title of ["Artists", "Songs", "Music Show Wins", ...staticRoutes.map(([, value]) => value), artist.title, song.title]) {
       const rendered = template.replace("%s", String(title));
       expect(rendered.match(/KpopWins/g)).toHaveLength(1);
     }
