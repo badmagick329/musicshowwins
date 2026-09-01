@@ -197,4 +197,16 @@ describe("win video references", () => {
     expect(new Set(widths.map((value) => value.match(/w-\d+/)?.[0])).size).toBe(1);
     views.forEach(({ unmount }) => unmount());
   });
+
+  it("keeps song-history video actions compact while other desktop tables fill their fixed video column", () => {
+    const references = [reference()];
+    const recent = render(<RecentWins wins={[win(1, { references })]} />);
+    const songHistory = render(<ArtistWinHistory wins={[win(1, { references })]} hideSong />);
+    const recentAction = desktop(recent.container).getByRole("link", { name: `Watch video for ${winName}` });
+    const songAction = desktop(songHistory.container).getByRole("link", { name: `Watch video for ${winName}` });
+    expect(recentAction.className.split(" ")).toContain("w-full");
+    expect(songAction.className.split(" ")).not.toContain("w-full");
+    expect(songAction.className).toContain("w-44");
+    expect(songAction.className).toContain("ml-auto");
+  });
 });
