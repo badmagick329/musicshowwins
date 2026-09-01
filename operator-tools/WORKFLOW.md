@@ -68,7 +68,25 @@ repository root, import it into local Django:
 uv run python manage.py import_win_references .ignore/operator-tools/manifests/win-references-v1.json
 ```
 
-Do not commit the manifest. Production transfer is a separate step.
+Do not commit the manifest.
+
+## Import approved references into production
+
+The host-specific import helper lives in the ignored deployment directory. From
+the repository root, run its production dry run:
+
+```powershell
+./.ignore/deployment/import-win-references.ps1
+```
+
+If the dry run passes, import the same manifest:
+
+```powershell
+./.ignore/deployment/import-win-references.ps1 -Apply
+```
+
+The helper streams the manifest into the running backend. It does not copy the
+file onto the server. See `.ignore/deployment/runbook.md` for the private details.
 
 ## Later updates
 
