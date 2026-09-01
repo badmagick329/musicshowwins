@@ -5,11 +5,25 @@ import { DebouncedArtistSearch } from "@/components/debounced-artist-search";
 import { ArchiveResultsSummary, Pagination } from "@/components/pagination";
 import { getArtists, parsePositivePage } from "@/lib/api";
 import { artistSortLabels, artistSorts, artistsUrl, parseArtistSort } from "@/lib/artist-list";
+import { noIndexFollow, pageMetadata } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
-export const metadata: Metadata = { title: "Artists", description: "Find artists by name or win total, then view their songs and full win history." };
+const description = "Find artists by name or win total, then view their songs and full win history.";
+type ArtistsSearchParams = { search?: string | string[]; page?: string | string[]; sort?: string | string[] };
 
-export default async function ArtistsPage({ searchParams }: { searchParams: Promise<{ search?: string | string[]; page?: string | string[]; sort?: string | string[] }> }) {
+export async function generateMetadata({ searchParams }: { searchParams: Promise<ArtistsSearchParams> }): Promise<Metadata> {
+  const params = await searchParams;
+  const search = typeof params.search === "string" ? params.search.trim() : "";
+  const page = parsePositivePage(params.page);
+  const sort = parseArtistSort(params.sort);
+  const canonical = !search && page > 1 ? `/artists?page=${page}` : "/artists";
+  return {
+    ...pageMetadata({ title: page > 1 && !search ? `Artists, page ${page}` : "Artists", description, path: canonical }),
+    robots: search || sort !== "wins" ? noIndexFollow : undefined,
+  };
+}
+
+export default async function ArtistsPage({ searchParams }: { searchParams: Promise<ArtistsSearchParams> }) {
   const params = await searchParams;
   const search = typeof params.search === "string" ? params.search.trim() : "";
   const page = parsePositivePage(params.page);

@@ -1,5 +1,7 @@
 import { ArtistSearch } from "@/components/artist-search";
+import type { Metadata } from "next";
 import Link from "next/link";
+import { JsonLd } from "@/components/json-ld";
 import {
   ErrorState,
   Leaderboard,
@@ -8,8 +10,20 @@ import {
   SectionHeading,
 } from "@/components/data-display";
 import { getHomeData } from "@/lib/api";
+import { noIndexFollow, siteDescription, siteUrl } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata({ searchParams }: { searchParams: Promise<{ search?: string | string[] }> }): Promise<Metadata> {
+  const search = (await searchParams).search;
+  if (typeof search !== "string" || !search.trim()) return { alternates: { canonical: "/" } };
+  return {
+    title: "Artist search results",
+    description: siteDescription,
+    alternates: { canonical: "/" },
+    robots: noIndexFollow,
+  };
+}
 
 export default async function Home({ searchParams }: { searchParams: Promise<{ search?: string }> }) {
   const params = await searchParams;
@@ -17,6 +31,18 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ s
   const data = await getHomeData(query);
 
   return (
+    <>
+      <JsonLd data={{
+        "@context": "https://schema.org",
+        "@type": "Dataset",
+        name: "KpopWins music show wins archive",
+        description: siteDescription,
+        url: siteUrl,
+        license: "https://creativecommons.org/licenses/by-sa/4.0/",
+        isAccessibleForFree: true,
+        temporalCoverage: "2014-01-01/..",
+        keywords: ["K-pop", "music show wins", "artists", "songs", "Korean music shows"],
+      }} />
     <main className="page-enter">
       <div className="mx-auto max-w-7xl px-5 pb-8 pt-10 lg:px-8 lg:pt-14">
         <section className="border-2 border-foreground bg-surface-berry p-6 shadow-[4px_4px_0_var(--section-ink)] sm:p-8 lg:p-10">
@@ -61,5 +87,6 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ s
         </section>
       </div>
     </main>
+    </>
   );
 }

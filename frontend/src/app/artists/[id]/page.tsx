@@ -6,7 +6,9 @@ import { formatDate } from "@/lib/utils";
 import { ApiRequestError, getAllArtistSongs, getAllArtistWins, getArtist } from "@/lib/api";
 import { buildShowBreakdown, summarizeArtist } from "@/lib/artist-profile";
 import { ArtistWinHistory } from "@/components/artist-win-history";
+import { JsonLd } from "@/components/json-ld";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { noIndexFollow, pageMetadata, siteUrl } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
 
@@ -21,11 +23,15 @@ async function loadArtist(id: number) {
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const id = artistId((await params).id);
-  if (!id) return { title: "Artist not found", description: "The requested artist could not be found in KpopWins." };
+  if (!id) return { title: "Artist not found", description: "The requested artist could not be found in KpopWins.", robots: noIndexFollow };
   try {
     const artist = await getArtist(id);
-    return { title: `${artist.name} Music Show Wins`, description: `See ${artist.name}'s winning songs and complete music show win history.` };
-  } catch { return { title: "Artist not found", description: "The requested artist could not be found in KpopWins." }; }
+    return pageMetadata({
+      title: `${artist.name} Music Show Wins`,
+      description: `See ${artist.name}'s winning songs and complete music show win history.`,
+      path: `/artists/${id}`,
+    });
+  } catch { return { title: "Artist not found", description: "The requested artist could not be found in KpopWins.", robots: noIndexFollow }; }
 }
 
 export default async function ArtistPage({ params }: { params: Promise<{ id: string }> }) {
@@ -37,6 +43,16 @@ export default async function ArtistPage({ params }: { params: Promise<{ id: str
   const shows = buildShowBreakdown(wins);
 
   return (
+    <>
+      <JsonLd data={{
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "Home", item: siteUrl },
+          { "@type": "ListItem", position: 2, name: "Artists", item: `${siteUrl}/artists` },
+          { "@type": "ListItem", position: 3, name: artist.name, item: `${siteUrl}/artists/${id}` },
+        ],
+      }} />
     <main className="page-enter mx-auto max-w-7xl px-5 pb-8 pt-10 lg:px-8 lg:pt-14">
       <header className="grid gap-6 border-2 border-foreground bg-surface-berry p-6 text-surface-berry-foreground shadow-[4px_4px_0_var(--section-ink)] sm:p-8 lg:grid-cols-[1fr_auto] lg:items-end">
         <div><h1 className="font-heading text-4xl font-bold tracking-tight sm:text-[44px]">{artist.name}</h1><p className="mt-2 text-surface-berry-foreground/75">Music show wins</p></div>
@@ -69,6 +85,7 @@ export default async function ArtistPage({ params }: { params: Promise<{ id: str
         <ArtistWinHistory wins={wins} />
       </section>
     </main>
+    </>
   );
 }
 

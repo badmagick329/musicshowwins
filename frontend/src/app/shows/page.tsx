@@ -2,11 +2,13 @@ import type { Metadata } from "next";
 import { ErrorState } from "@/components/data-display";
 import { ShowCards } from "@/components/show-cards";
 import { getShows } from "@/lib/api";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Music Shows",
   description: "See the latest winner and full results for each of the six weekly shows covered by KpopWins.",
-};
+  path: "/shows",
+});
 
 export const dynamic = "force-dynamic";
 

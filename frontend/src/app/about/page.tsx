@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import { CorrectionForm } from "@/components/correction-form";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "About",
   description: "KpopWins records K-pop music show wins from 2014 onward. You can also report missing or incorrect results.",
-};
+  path: "/about",
+});
 
 export default function AboutPage() {
   return (
