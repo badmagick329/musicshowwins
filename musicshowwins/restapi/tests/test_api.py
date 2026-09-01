@@ -25,6 +25,23 @@ def archive(db):
 
 
 @pytest.mark.django_db
+def test_sitemap_source_returns_every_entity_without_pagination(archive):
+    response = APIClient().get("/api/v1/sitemap")
+
+    assert response.status_code == 200
+    assert response.data == {
+        "artists": [
+            {"id": archive[1].pk, "latest_win_date": date(2025, 1, 1)},
+            {"id": archive[2].pk, "latest_win_date": date(2025, 1, 2)},
+        ],
+        "songs": [
+            {"id": archive[3].pk, "latest_win_date": date(2025, 1, 1)},
+            {"id": archive[4].pk, "latest_win_date": date(2025, 1, 2)},
+        ],
+    }
+
+
+@pytest.mark.django_db
 def test_read_only_collections_and_contracts(archive):
     client = APIClient()
 

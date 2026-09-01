@@ -13,6 +13,7 @@ urlpatterns = [
         name="docs",
     ),
     re_path(r"^v1/shows/?$", views.ShowList.as_view(), name="shows"),
+    re_path(r"^v1/sitemap/?$", views.Sitemap.as_view(), name="sitemap"),
     re_path(
         r"^v1/corrections/?$",
         views.CorrectionCreate.as_view(),
