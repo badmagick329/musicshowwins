@@ -70,6 +70,29 @@ describe("win video references", () => {
     expect(link.className).toContain("whitespace-nowrap");
   });
 
+  it("sizes both desktop actions identically with the same three-column layout", () => {
+    const { container } = render(<RecentWins wins={[win(1, { references: [reference()] }), win(2, { references: [reference({ id: 5, title: "Second MV" }), reference({ id: 6, url: "https://www.youtube.com/watch?v=ghi789" })] })]} />);
+    const link = desktop(container).getByRole("link", { name: `Watch video for ${winName}` });
+    const button = desktop(container).getByRole("button", { name: `Choose from 2 videos for ${winName}` });
+    expect(link.className).toBe(button.className);
+    for (const className of [link.className, button.className]) {
+      expect(className).toContain("h-8");
+      expect(className).toContain("w-full");
+      expect(className).toContain("grid-cols-[0.875rem_1fr_0.875rem]");
+    }
+    for (const action of [link, button]) {
+      expect(action.childElementCount).toBe(3);
+      expect(action.children[0].getAttribute("class")).toContain("size-3.5");
+      expect(action.children[1].className).toContain("text-center");
+      expect(action.children[2].getAttribute("class")).toContain("size-3.5");
+    }
+    const mobileLink = mobile(container).getByRole("link", { name: `Watch video for ${winName}` });
+    const mobileButton = mobile(container).getByRole("button", { name: `Choose from 2 videos for ${winName}` });
+    expect(mobileLink.className).toBe(mobileButton.className);
+    expect(mobileLink.className).toContain("w-full");
+    expect(mobileLink.className).toContain("min-h-11");
+  });
+
   it("gives the single-video action no disclosure attributes and no panel", () => {
     const { container } = render(<RecentWins wins={[win(1, { references: [reference()] })]} />);
     const link = desktop(container).getByRole("link", { name: `Watch video for ${winName}` });
