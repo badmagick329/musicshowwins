@@ -38,6 +38,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ];
 
   const response = await fetch(buildServerApiUrl("/sitemap"), {
+    headers: { "X-Forwarded-Proto": "https" },
     next: { revalidate: refreshSeconds },
   });
   if (!response.ok) throw new Error(`Sitemap source failed (${response.status}).`);

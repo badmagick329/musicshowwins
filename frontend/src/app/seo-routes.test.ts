@@ -21,10 +21,14 @@ describe("SEO and agent discovery routes", () => {
   });
 
   it("lists canonical static and entity pages", async () => {
-    const fetchMock = vi.fn(async () => Response.json({
-      artists: [{ id: 3, latest_win_date: "2026-08-31" }],
-      songs: [{ id: 7, latest_win_date: "2026-08-30" }],
-    }));
+    const fetchMock = vi.fn(async (input: string | URL | Request, init?: RequestInit) => {
+      void input;
+      void init;
+      return Response.json({
+        artists: [{ id: 3, latest_win_date: "2026-08-31" }],
+        songs: [{ id: 7, latest_win_date: "2026-08-30" }],
+      });
+    });
     vi.stubGlobal("fetch", fetchMock);
 
     const urls = (await sitemap()).map(({ url }) => url);
@@ -35,6 +39,9 @@ describe("SEO and agent discovery routes", () => {
       "https://kpopwins.info/songs/7",
     ]));
     expect(fetchMock).toHaveBeenCalledOnce();
+    const [url, options] = fetchMock.mock.calls[0]!;
+    expect(String(url)).toContain("/api/v1/sitemap");
+    expect(new Headers(options?.headers).get("X-Forwarded-Proto")).toBe("https");
   });
 
   it("fails generation instead of publishing a partial sitemap", async () => {
