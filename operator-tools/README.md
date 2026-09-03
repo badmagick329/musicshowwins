@@ -238,6 +238,20 @@ links are reclassified using the new channel and video metadata:
 uv run kpopwins-operator reddit audit --max-pages 100
 ```
 
+Preview and import the refreshed audit's `new_official` YouTube links as pending
+candidates, then list them in the existing review workflow:
+
+```console
+uv run kpopwins-operator reddit import-official --dry-run
+uv run kpopwins-operator reddit import-official
+uv run kpopwins-operator candidates list --status pending --provider youtube
+```
+
+The import defaults to the completed audit report; `--input` selects another
+report and `--limit` selects a deterministic prefix. It rechecks current wins,
+videos, and active official-channel mappings before writing. Reruns count
+existing candidates without changing pending, approved, or rejected decisions.
+
 ## Quota and recovery
 
 The three API methods used here, `channels.list`, `playlistItems.list`, and

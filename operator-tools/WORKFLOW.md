@@ -65,7 +65,16 @@ uv run kpopwins-operator reddit audit --max-pages 100
 ```
 
 Review the refreshed JSON/TSV report under `.ignore/operator-tools/reports/`.
-Neither command creates, approves, rejects, or otherwise changes candidates.
+Preview and import the official links as pending candidates, then review them:
+
+```console
+uv run kpopwins-operator reddit import-official --dry-run
+uv run kpopwins-operator reddit import-official
+uv run kpopwins-operator candidates list --status pending --provider youtube
+```
+
+Audit and hydration do not change candidates. Importing never approves a
+candidate or overwrites an existing review decision.
 
 ## Export and test locally
 
