@@ -635,19 +635,45 @@ def _channel_metadata(
 
 
 def _video_metadata(connection: sqlite3.Connection) -> dict[str, dict[str, str]]:
-    return {
+    videos = {
         row["video_id"]: {
             "channel_id": row["channel_id"],
+            "channel_title": row["channel_title"],
             "availability_status": row["availability_status"],
             "title": row["title"],
+            "lookup_status": (
+                "available"
+                if row["availability_status"] == "active"
+                else row["lookup_status"] or ""
+            ),
         }
         for row in connection.execute(
             """
-            SELECT video_id, channel_id, title, availability_status
-            FROM youtube_videos
+            SELECT video.video_id, video.channel_id, video.channel_title,
+                   video.title, video.availability_status, lookup.lookup_status
+            FROM youtube_videos AS video
+            LEFT JOIN reddit_youtube_lookup_state AS lookup
+              ON lookup.video_id = video.video_id
             """
         )
     }
+    for row in connection.execute(
+        """
+        SELECT video_id FROM reddit_youtube_lookup_state
+        WHERE lookup_status = 'unavailable'
+        """
+    ):
+        videos.setdefault(
+            row["video_id"],
+            {
+                "channel_id": "",
+                "channel_title": "",
+                "availability_status": "unavailable",
+                "title": "",
+                "lookup_status": "unavailable",
+            },
+        )
+    return videos
 
 
 def _classify_link(
@@ -683,7 +709,8 @@ def _classify_link(
             if video is not None:
                 link.video_title = video["title"]
                 link.publisher_name = channel_titles.get(
-                    video["channel_id"], candidate["publisher_name"]
+                    video["channel_id"],
+                    video["channel_title"] or candidate["publisher_name"],
                 )
                 link.publisher_external_id = (
                     candidate["publisher_external_id"] or video["channel_id"]
@@ -694,10 +721,23 @@ def _classify_link(
                 link.publisher_name = candidate["publisher_name"]
                 link.publisher_external_id = candidate["publisher_external_id"]
             return link
+        if (
+            video is not None
+            and video["availability_status"] != "active"
+            and video["lookup_status"] == "unavailable"
+        ):
+            link.classification = "known_unavailable"
+            link.video_title = video["title"]
+            link.publisher_name = video["channel_title"]
+            link.publisher_external_id = video["channel_id"]
+            link.local_video_status = "unavailable"
+            return link
         if video is not None and video["channel_id"] in official_channels.get(
             ref.show_slug, set()
         ):
-            link.publisher_name = channel_titles.get(video["channel_id"], "")
+            link.publisher_name = channel_titles.get(
+                video["channel_id"], video["channel_title"]
+            )
             link.publisher_external_id = video["channel_id"]
             link.video_title = video["title"]
             link.local_video_status = video["availability_status"]
@@ -709,6 +749,8 @@ def _classify_link(
         link.classification = "new_unverified"
         if video is not None:
             link.video_title = video["title"]
+            link.publisher_name = video["channel_title"]
+            link.publisher_external_id = video["channel_id"]
             link.local_video_status = video["availability_status"]
         return link
     candidate = None

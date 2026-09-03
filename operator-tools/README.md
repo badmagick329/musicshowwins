@@ -197,8 +197,9 @@ Behavior:
   `existing_rejected` (matched against local candidates by YouTube video ID
   first, then canonical URL), `new_official` (video already present in
   `youtube_videos`, its channel matches an active `youtube_channels` entry for
-  the show, and the local video is active), `known_unavailable` (official and
-  locally tracked but currently unavailable), `new_unverified` (any other new
+  the show, and the local video is active), `known_unavailable` (locally tracked
+  as unavailable, including IDs omitted by YouTube metadata lookup),
+  `new_unverified` (any other new
   YouTube link), `unsupported_link` (including Naver and other external
   providers), or `malformed_link`. No Reddit link is treated as proof that a
   video is official, and nothing is auto-approved.
@@ -211,6 +212,31 @@ Behavior:
 
 Transient HTTP failures and HTTP 429 responses retry with bounded backoff while
 respecting `Retry-After`, and all requests set connection and response timeouts.
+
+After `reddit audit` reports `collection_complete=true`, fetch metadata for its
+deduplicated `new_unverified` YouTube links:
+
+```console
+uv run kpopwins-operator init
+uv run kpopwins-operator reddit hydrate-youtube
+uv run kpopwins-operator reddit hydrate-youtube --limit 500
+uv run kpopwins-operator reddit hydrate-youtube --retry-unavailable
+```
+
+The first command applies any pending local schema migration. Hydration reads
+the default `.ignore/operator-tools/reports/reddit-audit.json`; use `--input`
+for another completed version-1 Reddit audit. It stores only YouTube video and
+lookup metadata, commits every batch of at most 50 IDs, and resumes by skipping
+completed IDs. It does not modify the report or create, approve, reject, or
+otherwise alter candidates. `--retry-unavailable` explicitly checks IDs that a
+previous YouTube response omitted.
+
+Repeat hydration until `more-remaining=no`, then rerun the read-only audit so
+links are reclassified using the new channel and video metadata:
+
+```console
+uv run kpopwins-operator reddit audit --max-pages 100
+```
 
 ## Quota and recovery
 

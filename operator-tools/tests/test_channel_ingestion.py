@@ -292,3 +292,58 @@ def test_ingestion_batches_video_lookups_at_fifty_ids(connection):
     )
     assert [len(batch) for batch in client.batches] == [50, 1]
     assert counts.added == 51
+
+
+def test_ingestion_clears_existing_unavailable_reddit_lookup_only(connection):
+    add_channel(connection)
+    connection.execute(
+        """
+        INSERT INTO reddit_youtube_lookup_state (
+            video_id, lookup_status, checked_at
+        ) VALUES ('rediscovered', 'unavailable', '2026-08-30T12:00:00Z')
+        """
+    )
+    connection.commit()
+    client = IngestClient(
+        [
+            PlaylistPage(
+                ("rediscovered", "ordinary"),
+                {
+                    "rediscovered": "2026-01-02T00:00:00Z",
+                    "ordinary": "2026-01-01T00:00:00Z",
+                },
+                None,
+            )
+        ],
+        [[video("rediscovered"), video("ordinary")]],
+    )
+
+    ingest_channels(
+        connection,
+        client,
+        handle=None,
+        max_pages=1,
+        restart=False,
+        timestamp="2026-09-03T12:00:00Z",
+    )
+
+    lookup_rows = list(
+        connection.execute(
+            """
+            SELECT video_id, lookup_status, checked_at
+            FROM reddit_youtube_lookup_state
+            """
+        )
+    )
+    assert [tuple(row) for row in lookup_rows] == [
+        ("rediscovered", "available", "2026-09-03T12:00:00Z")
+    ]
+    assert (
+        connection.execute(
+            """
+            SELECT availability_status FROM youtube_videos
+            WHERE video_id = 'rediscovered'
+            """
+        ).fetchone()[0]
+        == "active"
+    )

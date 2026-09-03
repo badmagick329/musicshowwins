@@ -25,6 +25,11 @@ from .ingestion import ingest_channels
 from .manifest import ManifestError, approved_document, serialize_document, write_atomic
 from .matching import match_videos
 from .reddit import RedditError, run_reddit_audit
+from .reddit_hydration import (
+    RedditHydrationError,
+    hydrate_youtube_ids,
+    load_reddit_youtube_ids,
+)
 from .registry import SUPPORTED_SHOWS, RegistryError, load_registry
 from .youtube import YouTubeClient, YouTubeError
 
@@ -114,6 +119,12 @@ def build_parser() -> argparse.ArgumentParser:
     audit_parser.add_argument("--max-pages", type=_positive_integer, default=100)
     audit_parser.add_argument("--refresh-indexes", action="store_true")
     audit_parser.add_argument("--output")
+    hydrate_parser = reddit_commands.add_parser(
+        "hydrate-youtube", help="Fetch metadata for unverified YouTube audit links"
+    )
+    hydrate_parser.add_argument("--input")
+    hydrate_parser.add_argument("--limit", type=_positive_integer)
+    hydrate_parser.add_argument("--retry-unavailable", action="store_true")
     list_parser = candidate_commands.add_parser("list")
     list_parser.add_argument(
         "--status", choices=("pending", "approved", "rejected"), default="pending"
@@ -379,6 +390,41 @@ def main(
                         sleep=sleep,
                         now=now,
                     )
+                elif args.reddit_command == "hydrate-youtube":
+                    input_path = (
+                        Path(args.input).expanduser().resolve()
+                        if args.input
+                        else config.default_reddit_audit_path
+                    )
+                    video_ids = load_reddit_youtube_ids(input_path)
+                    client_clock = None
+                    if now:
+                        instant = datetime.fromisoformat(now.replace("Z", "+00:00"))
+                        client_clock = _fixed_clock(instant)
+                    client = YouTubeClient(
+                        config,
+                        connection,
+                        session=session,
+                        clock=client_clock,
+                        sleep=sleep,
+                    )
+                    counts = hydrate_youtube_ids(
+                        connection,
+                        client,
+                        video_ids,
+                        limit=args.limit,
+                        retry_unavailable=args.retry_unavailable,
+                        timestamp=now or _now(),
+                    )
+                    print(
+                        f"considered={counts.considered} queried={counts.queried} "
+                        f"batches={counts.batches} added={counts.added} "
+                        f"updated={counts.updated} "
+                        f"unavailable={counts.unavailable} skipped={counts.skipped} "
+                        f"api-calls={client.calls_used} "
+                        f"more-remaining={'yes' if counts.more_remaining else 'no'}",
+                        file=output,
+                    )
             elif args.command == "candidates":
                 timestamp = now or _now()
                 if args.candidate_command == "list":
@@ -413,6 +459,7 @@ def main(
         ManifestError,
         RegistryError,
         RedditError,
+        RedditHydrationError,
         YouTubeError,
         OSError,
         sqlite3.Error,

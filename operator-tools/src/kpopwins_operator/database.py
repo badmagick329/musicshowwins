@@ -9,7 +9,7 @@ from typing import Any
 from .config import Config
 from .validation import normalize_candidate
 
-SCHEMA_VERSION = 2
+SCHEMA_VERSION = 3
 
 
 class DatabaseError(RuntimeError):
@@ -149,7 +149,19 @@ CREATE TABLE IF NOT EXISTS youtube_api_usage (
 );
 """
 
-SCHEMA = SCHEMA_V1 + MIGRATION_1_TO_2
+MIGRATION_2_TO_3 = """
+ALTER TABLE youtube_videos
+ADD COLUMN channel_title TEXT NOT NULL DEFAULT '';
+
+CREATE TABLE reddit_youtube_lookup_state (
+    video_id TEXT PRIMARY KEY,
+    lookup_status TEXT NOT NULL
+        CHECK (lookup_status IN ('available', 'unavailable')),
+    checked_at TEXT NOT NULL
+);
+"""
+
+SCHEMA = SCHEMA_V1 + MIGRATION_1_TO_2 + MIGRATION_2_TO_3
 
 
 def _connect(path: Path) -> sqlite3.Connection:
@@ -175,6 +187,10 @@ def initialize_database(config: Config) -> int:
         if version == 1:
             connection.executescript(MIGRATION_1_TO_2)
             connection.execute("PRAGMA user_version = 2")
+            version = 2
+        if version == 2:
+            connection.executescript(MIGRATION_2_TO_3)
+            connection.execute("PRAGMA user_version = 3")
     return SCHEMA_VERSION
 
 

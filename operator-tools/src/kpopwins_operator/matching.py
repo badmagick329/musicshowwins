@@ -121,7 +121,7 @@ def _candidate_values(row: sqlite3.Row, metadata: dict, timestamp: str) -> dict:
         "external_id": row["video_id"],
         "url": f"https://www.youtube.com/watch?v={row['video_id']}",
         "title": row["title"],
-        "publisher_name": row["channel_title"],
+        "publisher_name": row["channel_title"] or row["resolved_channel_title"],
         "publisher_external_id": row["channel_id"],
         "is_official": 1,
         "status": row["availability_status"],
@@ -168,7 +168,7 @@ def match_videos(
     sql = """
         SELECT DISTINCT wins.show_slug, wins.win_date,
                wins.artist_name, wins.song_title,
-               video.*, channel.channel_title
+               video.*, channel.channel_title AS resolved_channel_title
         FROM wins
         JOIN youtube_channels AS channel
           ON channel.show_slug = wins.show_slug AND channel.is_active = 1

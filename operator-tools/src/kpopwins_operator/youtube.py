@@ -56,6 +56,7 @@ class Video:
     privacy_status: str
     embeddable: bool
     live_broadcast_state: str
+    channel_title: str = ""
 
 
 class YouTubeClient:
@@ -256,8 +257,8 @@ class YouTubeClient:
                 "id": ",".join(video_ids),
                 "maxResults": 50,
                 "fields": (
-                    "items(id,snippet(channelId,title,description,publishedAt,"
-                    "liveBroadcastContent),contentDetails/duration,"
+                    "items(id,snippet(channelId,channelTitle,title,description,"
+                    "publishedAt,liveBroadcastContent),contentDetails/duration,"
                     "status(privacyStatus,embeddable))"
                 ),
             },
@@ -273,6 +274,7 @@ class YouTubeClient:
                 values = {
                     "video_id": item["id"],
                     "channel_id": snippet["channelId"],
+                    "channel_title": snippet["channelTitle"],
                     "title": snippet["title"],
                     "description": snippet.get("description", ""),
                     "published_at": snippet["publishedAt"],
@@ -286,6 +288,7 @@ class YouTubeClient:
             text_fields = (
                 "video_id",
                 "channel_id",
+                "channel_title",
                 "title",
                 "description",
                 "published_at",

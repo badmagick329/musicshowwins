@@ -155,6 +155,7 @@ def test_playlist_and_video_requests_are_paginated_and_shape_checked(
                             "id": "v1",
                             "snippet": {
                                 "channelId": "UC1",
+                                "channelTitle": "Channel One",
                                 "title": "Winner",
                                 "description": "Description",
                                 "publishedAt": "2026-01-01T00:00:00Z",
@@ -174,6 +175,7 @@ def test_playlist_and_video_requests_are_paginated_and_shape_checked(
 
     assert page.next_page_token == "NEXT"
     assert videos[0].video_id == "v1"
+    assert videos[0].channel_title == "Channel One"
     assert session.calls[0][1]["params"]["maxResults"] == 50
     assert session.calls[0][1]["params"]["pageToken"] == "TOKEN"
     assert session.calls[1][1]["params"]["id"] == "v1"

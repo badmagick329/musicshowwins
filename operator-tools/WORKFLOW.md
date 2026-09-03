@@ -51,9 +51,21 @@ uv run kpopwins-operator reddit audit --max-pages 100
 Repeat that command until it reports `more-remaining=no`. Cached episode pages
 are reused, so reruns resume instead of refetching. Use `--refresh-indexes`
 after new episodes are added on Reddit and `--show <slug>` to scope one show.
-Then review the JSON/TSV report under `.ignore/operator-tools/reports/`. This
-command does not create, update, approve, or reject candidates; importing
-Reddit results is a later task.
+Once the audit reports complete collection, hydrate the unverified YouTube links:
+
+```console
+uv run kpopwins-operator reddit hydrate-youtube
+```
+
+Repeat hydration until it reports `more-remaining=no`, then rerun the audit to
+reclassify links using the downloaded metadata:
+
+```console
+uv run kpopwins-operator reddit audit --max-pages 100
+```
+
+Review the refreshed JSON/TSV report under `.ignore/operator-tools/reports/`.
+Neither command creates, approves, rejects, or otherwise changes candidates.
 
 ## Export and test locally
 
