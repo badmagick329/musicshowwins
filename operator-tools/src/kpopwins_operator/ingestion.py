@@ -19,19 +19,20 @@ class IngestionCounts:
     more_remaining: bool = False
 
 
-def _upsert_video(connection: sqlite3.Connection, video: Video, seen_at: str) -> bool:
+def upsert_video(connection: sqlite3.Connection, video: Video, seen_at: str) -> bool:
     existed = connection.execute(
         "SELECT 1 FROM youtube_videos WHERE video_id = ?", (video.video_id,)
     ).fetchone()
     connection.execute(
         """
         INSERT INTO youtube_videos (
-            video_id, channel_id, title, description, published_at, duration,
-            privacy_status, embeddable, live_broadcast_state,
+            video_id, channel_id, channel_title, title, description,
+            published_at, duration, privacy_status, embeddable, live_broadcast_state,
             availability_status, first_seen_at, last_seen_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'active', ?, ?)
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active', ?, ?)
         ON CONFLICT (video_id) DO UPDATE SET
             channel_id = excluded.channel_id,
+            channel_title = excluded.channel_title,
             title = excluded.title,
             description = excluded.description,
             published_at = excluded.published_at,
@@ -45,6 +46,7 @@ def _upsert_video(connection: sqlite3.Connection, video: Video, seen_at: str) ->
         (
             video.video_id,
             video.channel_id,
+            video.channel_title,
             video.title,
             video.description,
             video.published_at,
@@ -55,6 +57,14 @@ def _upsert_video(connection: sqlite3.Connection, video: Video, seen_at: str) ->
             seen_at,
             seen_at,
         ),
+    )
+    connection.execute(
+        """
+        UPDATE reddit_youtube_lookup_state
+        SET lookup_status = 'available', checked_at = ?
+        WHERE video_id = ?
+        """,
+        (seen_at, video.video_id),
     )
     return existed is None
 
@@ -187,7 +197,7 @@ def ingest_channels(
                         raise ValueError(
                             f"Video {video.video_id} belongs to an unexpected channel."
                         )
-                    if _upsert_video(connection, video, timestamp):
+                    if upsert_video(connection, video, timestamp):
                         counts.added += 1
                     else:
                         counts.updated += 1

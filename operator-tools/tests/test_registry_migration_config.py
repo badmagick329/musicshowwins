@@ -6,7 +6,12 @@ import pytest
 
 from kpopwins_operator import config as config_module
 from kpopwins_operator.config import load_config
-from kpopwins_operator.database import SCHEMA_V1, initialize_database, open_database
+from kpopwins_operator.database import (
+    MIGRATION_1_TO_2,
+    SCHEMA_V1,
+    initialize_database,
+    open_database,
+)
 from kpopwins_operator.registry import SUPPORTED_SHOWS, RegistryError, load_registry
 
 
@@ -86,7 +91,7 @@ def test_real_version_one_to_two_migration_preserves_rows(config):
     connection.commit()
     connection.close()
 
-    assert initialize_database(config) == 2
+    assert initialize_database(config) == 3
     with open_database(config) as migrated:
         assert migrated.execute("SELECT COUNT(*) FROM wins").fetchone()[0] == 1
         assert (
@@ -97,4 +102,31 @@ def test_real_version_one_to_two_migration_preserves_rows(config):
         )
         assert migrated.execute(
             "SELECT name FROM sqlite_master WHERE name='youtube_videos'"
+        ).fetchone()
+
+
+def test_version_two_to_three_migration_preserves_videos_and_adds_lookup_state(config):
+    config.home.mkdir(parents=True)
+    connection = sqlite3.connect(config.database_path)
+    connection.executescript(SCHEMA_V1)
+    connection.executescript(MIGRATION_1_TO_2)
+    connection.execute("PRAGMA user_version = 2")
+    connection.execute(
+        """
+        INSERT INTO youtube_videos (
+            video_id, channel_id, title, published_at, first_seen_at, last_seen_at
+        ) VALUES ('v1', 'UC1', 'Existing', '2026-01-01T00:00:00Z', 'old', 'old')
+        """
+    )
+    connection.commit()
+    connection.close()
+
+    assert initialize_database(config) == 3
+    with open_database(config) as migrated:
+        row = migrated.execute(
+            "SELECT title, channel_title FROM youtube_videos WHERE video_id='v1'"
+        ).fetchone()
+        assert tuple(row) == ("Existing", "")
+        assert migrated.execute(
+            "SELECT name FROM sqlite_master WHERE name='reddit_youtube_lookup_state'"
         ).fetchone()

@@ -586,6 +586,41 @@ def test_full_audit_classifies_links_and_writes_reports(connection, config):
     assert not list(config.reports_dir.glob("*.tmp"))
 
 
+def test_active_video_overrides_stale_unavailable_lookup_state(connection, config):
+    seed_wins(connection)
+    connection.execute(
+        """
+        INSERT INTO reddit_youtube_lookup_state (
+            video_id, lookup_status, checked_at
+        ) VALUES ('officialVid1', 'unavailable', '2026-08-30T12:00:00Z')
+        """
+    )
+    connection.commit()
+
+    outcome = run_reddit_audit(
+        connection,
+        reddit_config(config),
+        show="m-countdown",
+        max_pages=100,
+        refresh_indexes=False,
+        output_path=None,
+        stdout=io.StringIO(),
+        session=audit_session(),
+        now="2026-09-01T12:00:00Z",
+    )
+
+    report = json.loads(outcome.report_path.read_text(encoding="utf-8"))
+    active = next(
+        link
+        for episode in report["episodes"]
+        if episode["win_date"] == "2024-06-27"
+        for link in episode["links"]
+    )
+    assert active["classification"] == "new_official"
+    assert active["local_video_status"] == "active"
+    assert outcome.totals["known_unavailable"] == 1
+
+
 def test_music_core_archive_resolves_through_live_index_path(connection, config):
     seed_wins(connection)
     assert REDDIT_SHOW_ARCHIVES["music-core"] == "music-shows/show-music-core"
