@@ -28,7 +28,7 @@ class HydrationCounts:
     more_remaining: bool = False
 
 
-def load_reddit_youtube_ids(path: Path) -> list[str]:
+def load_reddit_audit_report(path: Path) -> dict:
     try:
         report = json.loads(path.read_text(encoding="utf-8"))
     except OSError as exc:
@@ -49,20 +49,26 @@ def load_reddit_youtube_ids(path: Path) -> list[str]:
     episodes = report.get("episodes")
     if not isinstance(episodes, list):
         raise RedditHydrationError("Reddit audit report episodes must be an array.")
-
-    video_ids: list[str] = []
-    seen: set[str] = set()
     for episode in episodes:
         if not isinstance(episode, dict):
             raise RedditHydrationError("Reddit audit episode entries must be objects.")
         links = episode.get("links")
         if not isinstance(links, list):
             raise RedditHydrationError("Reddit audit episode links must be an array.")
+        if any(not isinstance(link, dict) for link in links):
+            raise RedditHydrationError("Reddit audit links must be objects.")
+    return report
+
+
+def load_reddit_youtube_ids(path: Path) -> list[str]:
+    report = load_reddit_audit_report(path)
+
+    video_ids: list[str] = []
+    seen: set[str] = set()
+    for episode in report["episodes"]:
         if episode.get("has_local_win") is not True:
             continue
-        for link in links:
-            if not isinstance(link, dict):
-                raise RedditHydrationError("Reddit audit links must be objects.")
+        for link in episode["links"]:
             external_id = link.get("external_id")
             if (
                 link.get("provider") != "youtube"

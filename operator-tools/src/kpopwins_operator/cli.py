@@ -30,6 +30,11 @@ from .reddit_hydration import (
     hydrate_youtube_ids,
     load_reddit_youtube_ids,
 )
+from .reddit_import import (
+    RedditOfficialImportError,
+    import_official_links,
+    load_official_audit_links,
+)
 from .registry import SUPPORTED_SHOWS, RegistryError, load_registry
 from .youtube import YouTubeClient, YouTubeError
 
@@ -110,7 +115,7 @@ def build_parser() -> argparse.ArgumentParser:
     candidate_commands = candidates_parser.add_subparsers(
         dest="candidate_command", required=True
     )
-    reddit_parser = subparsers.add_parser("reddit", help="Read-only r/kpop wiki audit")
+    reddit_parser = subparsers.add_parser("reddit", help="Use the r/kpop wiki audit")
     reddit_commands = reddit_parser.add_subparsers(dest="reddit_command", required=True)
     audit_parser = reddit_commands.add_parser(
         "audit", help="Audit r/kpop wiki episode winners without changing state"
@@ -125,6 +130,12 @@ def build_parser() -> argparse.ArgumentParser:
     hydrate_parser.add_argument("--input")
     hydrate_parser.add_argument("--limit", type=_positive_integer)
     hydrate_parser.add_argument("--retry-unavailable", action="store_true")
+    import_parser = reddit_commands.add_parser(
+        "import-official", help="Import official YouTube audit links as pending"
+    )
+    import_parser.add_argument("--input")
+    import_parser.add_argument("--limit", type=_positive_integer)
+    import_parser.add_argument("--dry-run", action="store_true")
     list_parser = candidate_commands.add_parser("list")
     list_parser.add_argument(
         "--status", choices=("pending", "approved", "rejected"), default="pending"
@@ -425,6 +436,26 @@ def main(
                         f"more-remaining={'yes' if counts.more_remaining else 'no'}",
                         file=output,
                     )
+                elif args.reddit_command == "import-official":
+                    input_path = (
+                        Path(args.input).expanduser().resolve()
+                        if args.input
+                        else config.default_reddit_audit_path
+                    )
+                    entries = load_official_audit_links(input_path)
+                    counts = import_official_links(
+                        connection,
+                        entries,
+                        limit=args.limit,
+                        dry_run=args.dry_run,
+                        timestamp=now or _now(),
+                    )
+                    print(
+                        f"eligible={counts.eligible} selected={counts.selected} "
+                        f"created={counts.created} existing={counts.existing} "
+                        f"dry-run={'yes' if args.dry_run else 'no'}",
+                        file=output,
+                    )
             elif args.command == "candidates":
                 timestamp = now or _now()
                 if args.candidate_command == "list":
@@ -460,6 +491,7 @@ def main(
         RegistryError,
         RedditError,
         RedditHydrationError,
+        RedditOfficialImportError,
         YouTubeError,
         OSError,
         sqlite3.Error,
