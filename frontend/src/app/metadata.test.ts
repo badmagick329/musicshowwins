@@ -21,7 +21,7 @@ import { generateMetadata as songMetadata } from "./songs/[id]/page";
 
 const staticRoutes = [
   [showsMetadata, "Music Shows", "See the latest winner and full results for each of the six weekly shows covered by KpopWins."],
-  [aboutMetadata, "About", "KpopWins records K-pop music show wins from 2014 onward. You can also report missing or incorrect results."],
+  [aboutMetadata, "About", "KpopWins records K-pop music show wins from 2014 onward. Share feedback and suggestions for the archive."],
 ] as const;
 
 beforeEach(() => {

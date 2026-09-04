@@ -12,6 +12,7 @@ export const mobileNavLinks = [
   ["Wins", "/wins"],
   ["Shows", "/shows"],
   ["About", "/about"],
+  ["Feedback", "/about#feedback"],
 ] as const;
 
 export function MobileNav() {
@@ -19,16 +20,16 @@ export function MobileNav() {
 
   return (
     <Dialog.Root open={open} onOpenChange={setOpen}>
-      <Dialog.Trigger className="inline-flex min-h-10 items-center gap-2 border border-foreground bg-card px-3 text-sm font-bold shadow-[2px_2px_0_var(--foreground)] transition-transform hover:-translate-y-0.5 md:hidden">
+      <Dialog.Trigger className="inline-flex min-h-11 items-center gap-2 border border-foreground bg-card px-3 text-sm font-bold shadow-[2px_2px_0_var(--foreground)] transition-transform hover:-translate-y-0.5 md:hidden">
         <Menu className="size-4" aria-hidden="true" />
         <span>Menu</span>
       </Dialog.Trigger>
       <Dialog.Portal>
         <Dialog.Backdrop className="fixed inset-0 z-40 bg-section-ink/55 transition-opacity data-ending-style:opacity-0 data-starting-style:opacity-0" />
-        <Dialog.Popup className="fixed inset-y-0 right-0 z-50 flex w-[min(22rem,calc(100vw-1rem))] flex-col border-l-2 border-foreground bg-card p-5 text-foreground shadow-[-8px_0_0_color-mix(in_srgb,var(--brand-pink)_22%,transparent)] transition-transform data-ending-style:translate-x-full data-starting-style:translate-x-full">
+        <Dialog.Popup className="fixed inset-y-0 right-0 z-50 flex w-[min(22rem,calc(100vw-1rem))] flex-col overflow-y-auto border-l-2 border-foreground bg-card p-5 text-foreground shadow-[-8px_0_0_color-mix(in_srgb,var(--brand-pink)_22%,transparent)] transition-transform data-ending-style:translate-x-full data-starting-style:translate-x-full">
           <div className="flex items-center justify-between border-b-2 border-foreground pb-4">
             <Dialog.Title className="font-heading text-xl font-bold">KpopWins menu</Dialog.Title>
-            <Dialog.Close aria-label="Close menu" className="grid size-10 place-items-center border border-foreground bg-highlight-yellow transition-transform hover:-translate-y-0.5">
+            <Dialog.Close aria-label="Close menu" className="grid size-11 place-items-center border border-foreground bg-highlight-yellow transition-transform hover:-translate-y-0.5">
               <X className="size-5" aria-hidden="true" />
             </Dialog.Close>
           </div>

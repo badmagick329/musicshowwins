@@ -125,7 +125,7 @@ class CorrectionCreate(APIView):
     @extend_schema(
         request=CorrectionSerializer,
         responses={202: None, 400: None, 503: None},
-        description="Submit a private correction report for review.",
+        description="Submit private feedback, suggestions, or corrections.",
     )
     def post(self, request):
         serializer = CorrectionSerializer(data=request.data)
@@ -140,14 +140,15 @@ class CorrectionCreate(APIView):
         webhook_url = settings.DISCORD_CORRECTIONS_WEBHOOK_URL
         if not webhook_url:
             return Response(
-                {"detail": "Correction reports are temporarily unavailable."},
+                {"detail": "Feedback is temporarily unavailable."},
                 status=status.HTTP_503_SERVICE_UNAVAILABLE,
             )
 
-        fields = [
-            {"name": "Page or record", "value": data["page_or_record"]},
-            {"name": "What should be corrected?", "value": data["correction"]},
-        ]
+        fields = [{"name": "Feedback", "value": data["correction"]}]
+        if data.get("page_or_record"):
+            fields.append(
+                {"name": "Related page or link", "value": data["page_or_record"]}
+            )
         if data.get("supporting_source"):
             fields.append(
                 {"name": "Supporting source", "value": data["supporting_source"]}
@@ -156,8 +157,8 @@ class CorrectionCreate(APIView):
             fields.append({"name": "Contact", "value": data["contact"]})
 
         payload = {
-            "username": "KpopWins corrections",
-            "embeds": [{"title": "New correction report", "fields": fields}],
+            "username": "KpopWins feedback",
+            "embeds": [{"title": "New feedback", "fields": fields}],
             "allowed_mentions": {"parse": []},
         }
         try:
@@ -165,7 +166,7 @@ class CorrectionCreate(APIView):
             response.raise_for_status()
         except requests.RequestException:
             return Response(
-                {"detail": "Correction reports are temporarily unavailable."},
+                {"detail": "Feedback is temporarily unavailable."},
                 status=status.HTTP_503_SERVICE_UNAVAILABLE,
             )
         return Response({"detail": "Report accepted."}, status=status.HTTP_202_ACCEPTED)
