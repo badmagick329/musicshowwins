@@ -12,48 +12,47 @@ function renderForm() {
 }
 
 function fillRequired() {
-  fireEvent.change(screen.getByLabelText(/Page or record/), { target: { value: "Music Bank 2025-01-02" } });
-  fireEvent.change(screen.getByLabelText(/What should be corrected/), { target: { value: "The winner is incorrect." } });
+  fireEvent.change(screen.getByLabelText(/Your feedback/), { target: { value: "Please make searching by song easier." } });
 }
 
 describe("CorrectionForm", () => {
   afterEach(() => { cleanup(); vi.unstubAllGlobals(); });
 
-  it("validates required fields and source URLs", () => {
+  it("validates feedback and optional email", () => {
     vi.stubGlobal("fetch", vi.fn());
     renderForm();
-    fireEvent.change(screen.getByLabelText(/Supporting source/), { target: { value: "ftp://example.com" } });
-    fireEvent.click(screen.getByRole("button", { name: "Send correction" }));
-    expect(screen.getByText("Enter the page or record to check.")).toBeTruthy();
-    expect(screen.getByText("Describe what should be corrected.")).toBeTruthy();
-    expect(screen.getByText("Enter a valid HTTP or HTTPS URL.")).toBeTruthy();
+    fireEvent.change(screen.getByLabelText(/Email, if/), { target: { value: "not-an-email" } });
+    fireEvent.click(screen.getByRole("button", { name: "Send feedback" }));
+    expect(screen.getByText("Enter your feedback.")).toBeTruthy();
+    expect(screen.getByText("Enter a valid email address.")).toBeTruthy();
     expect(fetch).not.toHaveBeenCalled();
     expect(screen.queryByText(/sent privately through Discord/)).toBeNull();
     expect(screen.queryByText(/They are not published/)).toBeNull();
   });
 
   it("clears the form and announces success", async () => {
-    const fetchMock = vi.fn(async () => new Response(JSON.stringify({ detail: "Report accepted." }), { status: 202 }));
+    const fetchMock = vi.fn<typeof fetch>(async () => new Response(JSON.stringify({ detail: "Report accepted." }), { status: 202 }));
     vi.stubGlobal("fetch", fetchMock);
     renderForm();
     fillRequired();
-    fireEvent.click(screen.getByRole("button", { name: "Send correction" }));
-    await screen.findByText("Your correction report was sent.");
-    expect((screen.getByLabelText(/Page or record/) as HTMLInputElement).value).toBe("");
+    fireEvent.click(screen.getByRole("button", { name: "Send feedback" }));
+    await screen.findByText("Thanks! Your feedback was sent.");
+    expect((screen.getByLabelText(/Related page or link/) as HTMLInputElement).value).toBe("");
     expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(JSON.parse(String(fetchMock.mock.calls[0][1]?.body)).page_or_record).toBe("");
   });
 
   it("preserves text after failure and blocks duplicate submission", async () => {
-    const fetchMock = vi.fn(async () => new Response(JSON.stringify({ detail: "Unavailable" }), { status: 503 }));
+    const fetchMock = vi.fn<typeof fetch>(async () => new Response(JSON.stringify({ detail: "Unavailable" }), { status: 503 }));
     vi.stubGlobal("fetch", fetchMock);
     renderForm();
     fillRequired();
-    const button = screen.getByRole("button", { name: "Send correction" });
+    const button = screen.getByRole("button", { name: "Send feedback" });
     fireEvent.click(button);
     fireEvent.submit(button.closest("form")!);
     await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
     await waitFor(() => expect(screen.getByRole("alert")).toBeTruthy());
-    expect((screen.getByLabelText(/Page or record/) as HTMLInputElement).value).toBe("Music Bank 2025-01-02");
-    expect((screen.getByLabelText(/What should be corrected/) as HTMLTextAreaElement).value).toBe("The winner is incorrect.");
+    expect((screen.getByLabelText(/Related page or link/) as HTMLInputElement).value).toBe("");
+    expect((screen.getByLabelText(/Your feedback/) as HTMLTextAreaElement).value).toBe("Please make searching by song easier.");
   });
 });

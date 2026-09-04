@@ -388,8 +388,8 @@ def test_correction_delivery_is_structured_private_and_stateless(archive, settin
     payload = post.call_args.kwargs["json"]
     assert payload["allowed_mentions"] == {"parse": []}
     assert [field["name"] for field in payload["embeds"][0]["fields"]] == [
-        "Page or record",
-        "What should be corrected?",
+        "Feedback",
+        "Related page or link",
         "Supporting source",
         "Contact",
     ]
@@ -401,11 +401,11 @@ def test_correction_validation_and_json_only():
     client = APIClient()
     invalid = client.post(
         "/api/v1/corrections",
-        correction_payload(page_or_record="", supporting_source="ftp://example.com"),
+        correction_payload(correction="", supporting_source="ftp://example.com"),
         format="json",
     )
     assert invalid.status_code == 400
-    assert "page_or_record" in invalid.data
+    assert "correction" in invalid.data
     assert "supporting_source" in invalid.data
     assert (
         client.post(
@@ -540,3 +540,19 @@ def test_temporary_ui_pages(archive):
     assert b"First" in detail.content and b"Jan. 1, 2025" in detail.content
     assert wins.status_code == 200
     assert b"Music Bank" in wins.content and b"Second" in wins.content
+
+
+@pytest.mark.django_db
+def test_general_feedback_needs_only_a_message(settings):
+    cache.clear()
+    settings.DISCORD_CORRECTIONS_WEBHOOK_URL = "https://discord.example/webhook"
+    with patch("restapi.views.requests.post") as post:
+        response = APIClient().post(
+            "/api/v1/corrections",
+            {"correction": "Please improve song search."},
+            format="json",
+        )
+    assert response.status_code == 202
+    assert post.call_args.kwargs["json"]["embeds"][0]["fields"] == [
+        {"name": "Feedback", "value": "Please improve song search."}
+    ]

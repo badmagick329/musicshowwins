@@ -45,7 +45,9 @@ class ShowSerializer(ShowSummarySerializer):
 
 
 class CorrectionSerializer(serializers.Serializer):
-    page_or_record = serializers.CharField(max_length=300)
+    page_or_record = serializers.CharField(
+        max_length=300, required=False, allow_blank=True
+    )
     correction = serializers.CharField(max_length=1000)
     supporting_source = serializers.URLField(
         max_length=500, required=False, allow_blank=True

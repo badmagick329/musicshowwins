@@ -17,24 +17,15 @@ type ReportErrors = Partial<Record<keyof CorrectionReport, string>>;
 
 export function validateCorrection(report: CorrectionReport): ReportErrors {
   const errors: ReportErrors = {};
-  if (!report.page_or_record.trim()) errors.page_or_record = "Enter the page or record to check.";
-  else if (report.page_or_record.length > 300) errors.page_or_record = "Use 300 characters or fewer.";
-  if (!report.correction.trim()) errors.correction = "Describe what should be corrected.";
+  if (report.page_or_record.length > 300) errors.page_or_record = "Use 300 characters or fewer.";
+  if (!report.correction.trim()) errors.correction = "Enter your feedback.";
   else if (report.correction.length > 1000) errors.correction = "Use 1,000 characters or fewer.";
-  if (report.supporting_source.length > 500) errors.supporting_source = "Use 500 characters or fewer.";
-  else if (report.supporting_source) {
-    try {
-      const url = new URL(report.supporting_source);
-      if (!['http:', 'https:'].includes(url.protocol)) throw new Error();
-    } catch {
-      errors.supporting_source = "Enter a valid HTTP or HTTPS URL.";
-    }
-  }
   if (report.contact.length > 200) errors.contact = "Use 200 characters or fewer.";
+  else if (report.contact.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(report.contact.trim())) errors.contact = "Enter a valid email address.";
   return errors;
 }
 
-const fieldClass = "mt-2 w-full border border-input bg-card px-3 py-2 text-foreground outline-none focus:border-ring disabled:bg-muted";
+const fieldClass = "mt-2 min-h-11 w-full border border-input bg-card px-3 py-2 text-foreground outline-none focus:border-ring disabled:bg-muted";
 
 export function CorrectionForm() {
   const [report, setReport] = useState(emptyReport);
@@ -43,7 +34,6 @@ export function CorrectionForm() {
   const sendingRef = useRef(false);
   const pageRef = useRef<HTMLInputElement>(null);
   const correctionRef = useRef<HTMLTextAreaElement>(null);
-  const sourceRef = useRef<HTMLInputElement>(null);
   const contactRef = useRef<HTMLInputElement>(null);
   const statusRef = useRef<HTMLParagraphElement>(null);
 
@@ -90,8 +80,8 @@ export function CorrectionForm() {
     setStatus("idle");
     const firstError = (Object.keys(nextErrors) as (keyof CorrectionReport)[])[0];
     if (firstError) {
-      const refs = { page_or_record: pageRef, correction: correctionRef, supporting_source: sourceRef, contact: contactRef };
-      if (firstError !== "website") refs[firstError].current?.focus();
+      const refs = { page_or_record: pageRef, correction: correctionRef, contact: contactRef };
+      if (firstError !== "website" && firstError !== "supporting_source") refs[firstError].current?.focus();
       return;
     }
     sendingRef.current = true;
@@ -101,34 +91,29 @@ export function CorrectionForm() {
   return (
     <form className="mt-6 space-y-5 border-2 border-foreground bg-card p-5 shadow-[4px_4px_0_var(--section-ink)] sm:p-6" onSubmit={submit} noValidate>
       <div>
-        <label htmlFor="page-or-record" className="font-bold">Page or record <span aria-hidden="true">*</span></label>
-        <input ref={pageRef} id="page-or-record" name="page_or_record" value={report.page_or_record} onChange={update} required maxLength={300} aria-invalid={Boolean(errors.page_or_record)} aria-describedby={errors.page_or_record ? "page-or-record-error" : undefined} className={fieldClass} />
-        {errors.page_or_record && <p id="page-or-record-error" className="mt-1 text-sm text-destructive">{errors.page_or_record}</p>}
-      </div>
-      <div>
-        <label htmlFor="correction" className="font-bold">What should be corrected? <span aria-hidden="true">*</span></label>
+        <label htmlFor="correction" className="font-bold">Your feedback <span aria-hidden="true">*</span></label>
         <textarea ref={correctionRef} id="correction" name="correction" value={report.correction} onChange={update} required maxLength={1000} rows={6} aria-invalid={Boolean(errors.correction)} aria-describedby={errors.correction ? "correction-error" : undefined} className={fieldClass} />
         {errors.correction && <p id="correction-error" className="mt-1 text-sm text-destructive">{errors.correction}</p>}
       </div>
       <div>
-        <label htmlFor="supporting-source" className="font-bold">Supporting source <span className="font-normal text-muted-foreground">(optional)</span></label>
-        <input ref={sourceRef} id="supporting-source" name="supporting_source" type="url" value={report.supporting_source} onChange={update} maxLength={500} placeholder="https://example.com/source" aria-invalid={Boolean(errors.supporting_source)} aria-describedby={errors.supporting_source ? "supporting-source-error" : undefined} className={fieldClass} />
-        {errors.supporting_source && <p id="supporting-source-error" className="mt-1 text-sm text-destructive">{errors.supporting_source}</p>}
+        <label htmlFor="page-or-record" className="font-bold">Related page or link <span className="font-normal text-muted-foreground">(optional)</span></label>
+        <input ref={pageRef} id="page-or-record" name="page_or_record" value={report.page_or_record} onChange={update} maxLength={300} aria-invalid={Boolean(errors.page_or_record)} aria-describedby={errors.page_or_record ? "page-or-record-error" : undefined} className={fieldClass} />
+        {errors.page_or_record && <p id="page-or-record-error" className="mt-1 text-sm text-destructive">{errors.page_or_record}</p>}
       </div>
       <div>
-        <label htmlFor="contact" className="font-bold">Your name or contact details <span className="font-normal text-muted-foreground">(optional)</span></label>
-        <input ref={contactRef} id="contact" name="contact" value={report.contact} onChange={update} maxLength={200} aria-describedby={errors.contact ? "contact-error" : undefined} className={fieldClass} />
+        <label htmlFor="contact" className="font-bold">Email, if you&apos;d like a reply <span className="font-normal text-muted-foreground">(optional)</span></label>
+        <input ref={contactRef} id="contact" name="contact" type="email" autoComplete="email" value={report.contact} onChange={update} maxLength={200} aria-describedby={errors.contact ? "contact-error" : undefined} className={fieldClass} />
         {errors.contact && <p id="contact-error" className="mt-1 text-sm text-destructive">{errors.contact}</p>}
       </div>
       <div className="absolute -left-[10000px] top-auto size-px overflow-hidden" aria-hidden="true">
         <label htmlFor="website">Website</label>
         <input id="website" name="website" value={report.website} onChange={update} tabIndex={-1} autoComplete="off" />
       </div>
-      <button type="submit" disabled={mutation.isPending} className="inline-flex min-h-11 items-center justify-center border border-foreground bg-brand-pink px-5 font-bold text-white shadow-[2px_2px_0_var(--foreground)] transition-transform hover:-translate-y-0.5 disabled:translate-y-0 disabled:opacity-60">
-        {mutation.isPending ? "Sending…" : "Send correction"}
+      <button type="submit" disabled={mutation.isPending} className="inline-flex w-full sm:w-auto min-h-11 items-center justify-center border border-foreground bg-brand-pink px-5 font-bold text-white shadow-[2px_2px_0_var(--foreground)] transition-transform hover:-translate-y-0.5 disabled:translate-y-0 disabled:opacity-60">
+        {mutation.isPending ? "Sending…" : "Send feedback"}
       </button>
-      {status === "success" && <p ref={statusRef} tabIndex={-1} role="status" className="border-l-4 border-success bg-muted px-4 py-3 text-sm">Your correction report was sent.</p>}
-      {status === "error" && <p ref={statusRef} tabIndex={-1} role="alert" className="border-l-4 border-destructive bg-danger-surface px-4 py-3 text-sm">We couldn&apos;t send your report. Your text is still here. Try again in a moment.</p>}
+      {status === "success" && <p ref={statusRef} tabIndex={-1} role="status" className="border-l-4 border-success bg-muted px-4 py-3 text-sm">Thanks! Your feedback was sent.</p>}
+      {status === "error" && <p ref={statusRef} tabIndex={-1} role="alert" className="border-l-4 border-destructive bg-danger-surface px-4 py-3 text-sm">We couldn&apos;t send your feedback. Your text is still here. Try again in a moment.</p>}
     </form>
   );
 }

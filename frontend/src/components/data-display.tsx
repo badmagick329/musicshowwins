@@ -83,10 +83,9 @@ export function Leaderboard({ rows, kind, empty = "No wins to show yet." }: { ro
 export function WinRecord({ win, hideArtist = false, hideSong = false }: { win: Win; hideArtist?: boolean; hideSong?: boolean }) {
   return (
     <article className="border-b border-border/70 px-3 py-3 last:border-b-0">
-      <div className="flex items-start gap-3 sm:items-center">
-        <time dateTime={win.date} className="w-20 shrink-0 font-heading text-sm font-bold tabular-nums text-muted-foreground">{formatDate(win.date)}</time>
-        {!hideSong && <div className="min-w-0 flex-1"><p className="truncate font-semibold"><Link prefetch={false} href={`/songs/${win.song.id}`} className="underline-offset-4 hover:underline">{win.song.title}</Link></p>{!hideArtist && <p className="truncate text-xs text-muted-foreground"><Link prefetch={false} href={`/artists/${win.song.artist.id}`} className="underline-offset-4 hover:underline">{win.song.artist.name}</Link></p>}</div>}
-        {hideSong && <span className="flex-1" />}
+      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-x-3 gap-y-2">
+        <time dateTime={win.date} className="font-heading text-sm font-bold tabular-nums text-muted-foreground">{formatDate(win.date)}</time>
+        {!hideSong && <div className="col-span-2 row-start-2 min-w-0"><p className="break-words font-semibold"><Link prefetch={false} href={`/songs/${win.song.id}`} className="underline-offset-4 hover:underline">{win.song.title}</Link></p>{!hideArtist && <p className="break-words text-xs text-muted-foreground"><Link prefetch={false} href={`/artists/${win.song.artist.id}`} className="underline-offset-4 hover:underline">{win.song.artist.name}</Link></p>}</div>}
         <ShowBadge slug={win.show.slug} name={win.show.name} />
       </div>
       <MobileWinVideoDisclosure win={win} className="mt-3" />
