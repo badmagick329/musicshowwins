@@ -89,6 +89,18 @@ export const getAllArtistWins = (id: number) => collectPages<Win>("/wins", { art
 export const getAllSongWins = (id: number) => collectPages<Win>("/wins", { song: id, ordering: "-date" });
 export const getShows = () => serverRequestPage<Show>("/shows");
 
+export async function warmCanonicalArchivePages() {
+  await Promise.all([
+    serverRequestPage<ArtistLeaderboardRow>("/leaderboards/artists", { limit: 5 }),
+    serverRequestPage<SongLeaderboardRow>("/leaderboards/songs", { limit: 5 }),
+    serverRequestPage<Win>("/wins", { page: 1 }),
+    getShows(),
+    getArtists(),
+    getSongs(),
+    serverRequestPage<Win>("/wins", { ordering: "-date", page: 1 }),
+  ]);
+}
+
 async function safePage<T>(label: string, path: string, params?: Record<string, string | number>) {
   try { return { page: await serverRequestPage<T>(path, params), error: undefined }; }
   catch (error) {

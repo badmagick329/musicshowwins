@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { parseApiPage, parsePositivePage } from "./api-shared";
-import { buildServerApiUrl, collectPages, getArtist, getArtists, getHomeData, serverRequestPage } from "./api-server";
+import { buildServerApiUrl, collectPages, getArtist, getArtists, getHomeData, serverRequestPage, warmCanonicalArchivePages } from "./api-server";
 import { submitCorrection } from "./api-browser";
 
 afterEach(() => { vi.unstubAllGlobals(); vi.unstubAllEnvs(); });
@@ -139,5 +139,27 @@ describe("getHomeData", () => {
     const data = await getHomeData("artist");
     expect(data.artistResultCount).toBe(12);
     expect(data.artistResults).toHaveLength(8);
+  });
+});
+
+describe("warmCanonicalArchivePages", () => {
+  it("loads every API response used by the unfiltered main pages", async () => {
+    const fetchMock = vi.fn<(input: string | URL | Request) => Promise<Response>>(async () =>
+      new Response(JSON.stringify({ count: 0, next: null, previous: null, results: [] })));
+    vi.stubGlobal("fetch", fetchMock);
+
+    await warmCanonicalArchivePages();
+
+    const urls = fetchMock.mock.calls.map(([input]) => String(input));
+    expect(urls).toHaveLength(7);
+    expect(urls).toEqual(expect.arrayContaining([
+      expect.stringMatching(/\/leaderboards\/artists\?limit=5$/),
+      expect.stringMatching(/\/leaderboards\/songs\?limit=5$/),
+      expect.stringMatching(/\/wins\?page=1$/),
+      expect.stringMatching(/\/shows$/),
+      expect.stringMatching(/\/artists\?ordering=-total_wins%2Cname&page=1$/),
+      expect.stringMatching(/\/songs\?ordering=-total_wins%2Ctitle%2Cartist__name&page=1$/),
+      expect.stringMatching(/\/wins\?ordering=-date&page=1$/),
+    ]));
   });
 });
