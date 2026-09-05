@@ -64,7 +64,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ s
 
         <div className="mt-14 grid gap-12 lg:grid-cols-2">
           <section id="artists">
-            <SectionHeading title="Artist leaderboard" />
+            <SectionHeading title="Artist leaderboard" action={<Link href="/artists" className="text-sm font-bold text-brand-pink underline-offset-4 hover:underline">All artists</Link>} />
             <Leaderboard
               rows={data.artists}
               kind="artist"

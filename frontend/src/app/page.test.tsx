@@ -17,5 +17,7 @@ describe("homepage banner", () => {
     expect(html).not.toContain("Explore K-pop");
     expect(html).toContain('href="/shows"');
     expect(html).toContain("All shows");
+    expect(html).toContain('href="/artists"');
+    expect(html).toContain("All artists");
   });
 });
