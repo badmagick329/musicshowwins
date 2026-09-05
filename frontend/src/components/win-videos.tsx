@@ -18,7 +18,7 @@ function winContext(win: Win) {
   return `${win.song.title} by ${win.song.artist.name}, ${formatDate(win.date)}, ${win.show.name}`;
 }
 
-const winVideoActionClass = "grid cursor-pointer grid-cols-[0.875rem_1fr_0.875rem] items-center gap-1.5 whitespace-nowrap border-2 border-foreground bg-brand-pink font-bold text-primary-foreground transition-colors motion-reduce:transition-none hover:bg-accent-foreground";
+const winVideoActionClass = "grid cursor-pointer grid-cols-[0.875rem_1fr_0.875rem] items-center gap-1.5 whitespace-nowrap border-2 border-foreground bg-action-pink font-bold text-primary-foreground transition-colors motion-reduce:transition-none hover:bg-accent-foreground";
 const desktopActionClass = "h-8 px-2.5 text-xs shadow-[2px_2px_0_var(--foreground)]";
 const mobileActionClass = "min-h-11 w-full px-4 text-sm shadow-[2px_2px_0_var(--foreground)]";
 

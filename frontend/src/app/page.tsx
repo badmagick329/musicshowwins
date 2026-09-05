@@ -58,13 +58,13 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ s
         <ErrorState messages={data.errors} />
 
         <section id="wins" className="mt-14">
-          <SectionHeading title="Recent wins" action={<Link href="/wins" className="text-sm font-bold text-brand-pink underline-offset-4 hover:underline">View all wins</Link>} />
+          <SectionHeading title="Recent wins" action={<Link href="/wins" className="compact-link-target text-sm font-bold text-link-pink">View all wins</Link>} />
           <RecentWins wins={data.wins} />
         </section>
 
         <div className="mt-14 grid gap-12 lg:grid-cols-2">
           <section id="artists">
-            <SectionHeading title="Artist leaderboard" action={<Link href="/artists" className="text-sm font-bold text-brand-pink underline-offset-4 hover:underline">All artists</Link>} />
+            <SectionHeading title="Artist leaderboard" action={<Link href="/artists" className="compact-link-target text-sm font-bold text-link-pink">All artists</Link>} />
             <Leaderboard
               rows={data.artists}
               kind="artist"
@@ -72,7 +72,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ s
             />
           </section>
           <section id="songs">
-            <SectionHeading title="Song leaderboard" action={<Link href="/songs" className="text-sm font-bold text-brand-pink underline-offset-4 hover:underline">All songs</Link>} />
+            <SectionHeading title="Song leaderboard" action={<Link href="/songs" className="compact-link-target text-sm font-bold text-link-pink">All songs</Link>} />
             <Leaderboard
               rows={data.songs}
               kind="song"
@@ -82,7 +82,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ s
         </div>
 
         <section id="shows" className="mt-14">
-          <SectionHeading title="Music shows" action={<Link href="/shows" className="text-sm font-bold text-brand-pink underline-offset-4 hover:underline">All shows</Link>} />
+          <SectionHeading title="Music shows" action={<Link href="/shows" className="compact-link-target text-sm font-bold text-link-pink">All shows</Link>} />
           <MusicShowList shows={data.shows} />
         </section>
       </div>

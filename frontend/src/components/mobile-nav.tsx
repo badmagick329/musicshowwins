@@ -38,7 +38,7 @@ export function MobileNav() {
           </Dialog.Description>
           <nav aria-label="Mobile navigation" className="mt-6 flex flex-col gap-2">
             {mobileNavLinks.map(([label, href]) => (
-              <Link key={label} href={href} onClick={() => setOpen(false)} className="border-b border-border px-1 py-3 font-heading text-lg font-bold transition-colors hover:text-brand-pink">
+              <Link key={label} href={href} onClick={() => setOpen(false)} className="border-b border-border px-1 py-3 font-heading text-lg font-bold transition-colors hover:text-link-pink">
                 {label}
               </Link>
             ))}

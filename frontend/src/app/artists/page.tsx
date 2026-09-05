@@ -48,7 +48,7 @@ export default async function ArtistsPage({ searchParams }: { searchParams: Prom
                 key={option}
                 href={artistsUrl({ search, sort: option })}
                 aria-current={sort === option ? "page" : undefined}
-                className={`border-r-2 border-foreground px-3 py-2 text-center text-sm font-bold last:border-r-0 ${sort === option ? "bg-brand-pink text-white" : "hover:bg-accent"}`}
+                className={`border-r-2 border-foreground px-3 py-2 text-center text-sm font-bold last:border-r-0 ${sort === option ? "bg-action-pink text-white" : "hover:bg-accent"}`}
               >
                 {artistSortLabels[option]}
               </Link>

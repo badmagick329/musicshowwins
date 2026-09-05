@@ -34,8 +34,8 @@ export function ShowCards({ shows }: { shows: Show[] }) {
             <h3 className="text-xs font-bold uppercase tracking-[0.1em] text-muted-foreground">Most recent winner</h3>
             {show.latest_win ? (
               <div className="mt-2">
-                <p className="font-semibold"><Link prefetch={false} href={`/songs/${show.latest_win.song.id}`} className="relative z-10 underline-offset-4 hover:underline">{show.latest_win.song.title}</Link></p>
-                <p className="text-sm text-muted-foreground"><Link prefetch={false} href={`/artists/${show.latest_win.song.artist.id}`} className="relative z-10 underline-offset-4 hover:underline">{show.latest_win.song.artist.name}</Link> · <time dateTime={show.latest_win.date}>{formatDate(show.latest_win.date)}</time></p>
+                <p className="font-semibold"><Link prefetch={false} href={`/songs/${show.latest_win.song.id}`} className="compact-link-target relative z-10">{show.latest_win.song.title}</Link></p>
+                <p className="text-sm text-muted-foreground"><Link prefetch={false} href={`/artists/${show.latest_win.song.artist.id}`} className="compact-link-target relative z-10">{show.latest_win.song.artist.name}</Link> · <time dateTime={show.latest_win.date}>{formatDate(show.latest_win.date)}</time></p>
               </div>
             ) : <p className="mt-2 text-sm text-muted-foreground">No wins recorded yet.</p>}
           </div>
