@@ -18,6 +18,7 @@ describe("SiteHeader", () => {
     expect(html).toContain('href="/shows"');
     expect(html).toContain('href="/about"');
     expect(html).not.toContain('href="/#shows"');
+    expect(html).not.toContain("Find an artist");
   });
 });
 

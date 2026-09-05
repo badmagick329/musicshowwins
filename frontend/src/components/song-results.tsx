@@ -6,9 +6,9 @@ import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, Tabl
 
 function SongFacts({ song }: { song: Song }) {
   return <>
-    <span className="text-sm tabular-nums"><strong>{song.total_wins}</strong> {song.total_wins === 1 ? "win" : "wins"}</span>
-    <span className="text-sm tabular-nums text-muted-foreground">{song.latest_win_date ? `Latest win ${formatDate(song.latest_win_date)}` : "No win date recorded"}</span>
-    <span className="text-sm tabular-nums text-muted-foreground"><strong className="text-foreground">{song.winning_shows}</strong> {song.winning_shows === 1 ? "show" : "shows"}</span>
+    <span className="whitespace-nowrap text-sm tabular-nums"><strong>{song.total_wins}</strong> {song.total_wins === 1 ? "win" : "wins"}</span>
+    <span className="min-w-0 text-center text-sm tabular-nums text-muted-foreground">{song.latest_win_date ? `Latest win ${formatDate(song.latest_win_date)}` : "No win date recorded"}</span>
+    <span className="whitespace-nowrap text-right text-sm tabular-nums text-muted-foreground"><strong className="text-foreground">{song.winning_shows}</strong> {song.winning_shows === 1 ? "show" : "shows"}</span>
   </>;
 }
 
@@ -24,7 +24,7 @@ export function SongResults({ songs, empty }: { songs: Song[]; empty: string }) 
       <div className="mobile-record flex-col">
       {songs.map((song) => <Link prefetch={false} key={song.id} href={`/songs/${song.id}`} className="group grid gap-2 border-b border-border px-4 py-4 transition-colors last:border-b-0 hover:bg-accent focus-visible:bg-accent">
         <div><p className="font-heading text-lg font-bold">{song.title}</p><p className="text-sm text-muted-foreground lg:hidden">{song.artist.name}</p></div>
-        <div className="flex flex-wrap gap-x-4 gap-y-1"><SongFacts song={song} /></div>
+        <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-baseline gap-x-3"><SongFacts song={song} /></div>
       </Link>)}
       </div>
     </div>

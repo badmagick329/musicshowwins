@@ -28,12 +28,7 @@ export function SiteHeader() {
             </Link>
           ))}
         </nav>
-        <div className="flex items-center gap-3">
-          <Link href="/#search" className="hidden border border-foreground bg-highlight-yellow px-3 py-2 text-sm font-bold shadow-[2px_2px_0_var(--foreground)] transition-transform hover:-translate-y-0.5 sm:inline-flex">
-            Find an artist
-          </Link>
-          <MobileNav />
-        </div>
+        <MobileNav />
       </div>
     </header>
   );
