@@ -93,8 +93,12 @@ export function parseApiPage<T>(value: unknown): ApiPage<T> {
   return page as ApiPage<T>;
 }
 
-export async function requestJson<T>(url: string, signal?: AbortSignal, headers?: HeadersInit) {
-  const response = await fetch(url, { cache: "no-store", signal, headers });
+export type RequestJsonOptions = RequestInit & {
+  next?: { revalidate?: number | false; tags?: string[] };
+};
+
+export async function requestJson<T>(url: string, signal?: AbortSignal, options: RequestJsonOptions = { cache: "no-store" }) {
+  const response = await fetch(url, { ...options, signal });
   if (!response.ok) throw new ApiRequestError(response.status);
   return (await response.json()) as T;
 }

@@ -526,6 +526,45 @@ def test_anonymous_throttle_distinguishes_clients_behind_frontend(archive, setti
 
 
 @pytest.mark.django_db
+def test_trusted_internal_gets_bypass_anonymous_throttle(archive, settings):
+    cache.clear()
+    settings.INTERNAL_API_SECRET = "internal-secret"
+    client = APIClient()
+    for _ in range(61):
+        assert (
+            client.get(
+                "/api/v1/shows",
+                HTTP_X_KPOPWINS_INTERNAL_KEY="internal-secret",
+            ).status_code
+            == 200
+        )
+
+
+@pytest.mark.django_db
+def test_incorrect_internal_secret_does_not_bypass_throttle(archive, settings):
+    cache.clear()
+    settings.INTERNAL_API_SECRET = "internal-secret"
+    client = APIClient()
+    for _ in range(60):
+        assert (
+            client.get(
+                "/api/v1/shows",
+                REMOTE_ADDR="203.0.113.50",
+                HTTP_X_KPOPWINS_INTERNAL_KEY="wrong-secret",
+            ).status_code
+            == 200
+        )
+    assert (
+        client.get(
+            "/api/v1/shows",
+            REMOTE_ADDR="203.0.113.50",
+            HTTP_X_KPOPWINS_INTERNAL_KEY="wrong-secret",
+        ).status_code
+        == 429
+    )
+
+
+@pytest.mark.django_db
 def test_temporary_ui_pages(archive):
     client = APIClient()
     leaderboard = client.get("/")

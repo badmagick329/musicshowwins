@@ -3,13 +3,6 @@ import { parseApiPage, parsePositivePage } from "./api-shared";
 import { buildServerApiUrl, collectPages, getArtist, getArtists, getHomeData, serverRequestPage } from "./api-server";
 import { submitCorrection } from "./api-browser";
 
-vi.mock("next/headers", () => ({
-  headers: vi.fn(async () => new Headers({
-    "x-forwarded-for": "203.0.113.25",
-    "x-real-ip": "203.0.113.25",
-  })),
-}));
-
 afterEach(() => { vi.unstubAllGlobals(); vi.unstubAllEnvs(); });
 
 describe("API URLs and pagination", () => {
@@ -41,7 +34,8 @@ describe("API URLs and pagination", () => {
 });
 
 describe("request failures and input", () => {
-  it("sends the forwarded HTTPS header for server page requests", async () => {
+  it("caches server page requests under the shared archive tag", async () => {
+    vi.stubEnv("INTERNAL_API_SECRET", "internal-secret");
     const fetchMock = vi.fn<(input: string | URL | Request, init?: RequestInit) => Promise<Response>>(async () =>
       new Response(JSON.stringify({ count: 0, next: null, previous: null, results: [] })));
     vi.stubGlobal("fetch", fetchMock);
@@ -52,18 +46,17 @@ describe("request failures and input", () => {
     expect(fetchMock).toHaveBeenCalledWith(
       expect.stringContaining("/api/v1/artists"),
       expect.objectContaining({
-        cache: "no-store",
         headers: {
-          "X-Forwarded-For": "203.0.113.25",
+          "X-KpopWins-Internal-Key": "internal-secret",
           "X-Forwarded-Proto": "https",
-          "X-Real-IP": "203.0.113.25",
         },
+        next: { revalidate: 86400, tags: ["public-archive"] },
         signal: controller.signal,
       }),
     );
   });
 
-  it("sends the forwarded HTTPS header for server detail requests", async () => {
+  it("caches server detail requests without forwarding visitor identity", async () => {
     const fetchMock = vi.fn<(input: string | URL | Request, init?: RequestInit) => Promise<Response>>(async () =>
       new Response(JSON.stringify({ id: 8, name: "Artist" })));
     vi.stubGlobal("fetch", fetchMock);
@@ -73,12 +66,10 @@ describe("request failures and input", () => {
     expect(fetchMock).toHaveBeenCalledWith(
       expect.stringContaining("/api/v1/artists/8"),
       expect.objectContaining({
-        cache: "no-store",
         headers: {
-          "X-Forwarded-For": "203.0.113.25",
           "X-Forwarded-Proto": "https",
-          "X-Real-IP": "203.0.113.25",
         },
+        next: { revalidate: 86400, tags: ["public-archive"] },
       }),
     );
   });

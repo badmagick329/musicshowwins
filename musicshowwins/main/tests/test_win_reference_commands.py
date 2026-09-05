@@ -66,6 +66,26 @@ def test_imports_valid_file_and_normalizes_text(
     assert "created 1, updated 0, unchanged 0" in output
 
 
+def test_changed_import_invalidates_public_cache(
+    reference_win, reference_document, tmp_path
+):
+    with patch(
+        "main.management.commands.import_win_references.invalidate_public_archive_cache"
+    ) as invalidate:
+        _import_file(tmp_path, reference_document)
+    invalidate.assert_called_once_with()
+
+
+def test_dry_run_does_not_invalidate_public_cache(
+    reference_win, reference_document, tmp_path
+):
+    with patch(
+        "main.management.commands.import_win_references.invalidate_public_archive_cache"
+    ) as invalidate:
+        _import_file(tmp_path, reference_document, dry_run=True)
+    invalidate.assert_not_called()
+
+
 def test_imports_from_stdin(reference_win, reference_document):
     output = StringIO()
     with patch("sys.stdin", StringIO(json.dumps(reference_document))):

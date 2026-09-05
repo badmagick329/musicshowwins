@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
+vi.mock("next/server", () => ({ connection: vi.fn(async () => undefined) }));
 import robots from "./robots";
 import sitemap from "./sitemap";
 import { GET as llms } from "./llms.txt/route";

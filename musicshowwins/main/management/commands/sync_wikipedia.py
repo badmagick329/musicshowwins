@@ -7,6 +7,10 @@ from datetime import date
 from django.core.management.base import BaseCommand, CommandError
 from django.db import connection
 
+from main.cache_invalidation import (
+    CacheInvalidationError,
+    invalidate_public_archive_cache,
+)
 from main.models import MusicShow
 from main.wikipedia import MIN_YEAR, WikipediaImporter
 
@@ -100,6 +104,11 @@ class Command(BaseCommand):
                 years=years,
                 dry_run=options["dry_run"],
             )
+        if not options["dry_run"]:
+            try:
+                invalidate_public_archive_cache()
+            except CacheInvalidationError as exc:
+                raise CommandError(str(exc)) from exc
         if options["format"] == "json":
             self.stdout.write(json.dumps(summary.as_dict(), ensure_ascii=False))
         else:

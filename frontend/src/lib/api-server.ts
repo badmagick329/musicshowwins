@@ -1,5 +1,4 @@
 import "server-only";
-import { headers as incomingHeaders } from "next/headers";
 import { artistOrderings, type ArtistSort } from "@/lib/artist-list";
 import {
   buildApiUrl,
@@ -18,14 +17,21 @@ import {
 } from "@/lib/api-shared";
 
 const defaultBaseUrl = "http://127.0.0.1:8000/api/v1";
-async function forwardedRequestHeaders() {
-  const incoming = await incomingHeaders();
+export const publicArchiveCacheTag = "public-archive";
+export const publicArchiveRevalidateSeconds = 86_400;
+
+function internalRequestHeaders() {
   const headers: Record<string, string> = { "X-Forwarded-Proto": "https" };
-  const forwardedFor = incoming.get("x-forwarded-for");
-  const realIp = incoming.get("x-real-ip");
-  if (forwardedFor) headers["X-Forwarded-For"] = forwardedFor;
-  if (realIp) headers["X-Real-IP"] = realIp;
+  const secret = process.env.INTERNAL_API_SECRET;
+  if (secret) headers["X-KpopWins-Internal-Key"] = secret;
   return headers;
+}
+
+function publicArchiveRequestOptions() {
+  return {
+    headers: internalRequestHeaders(),
+    next: { revalidate: publicArchiveRevalidateSeconds, tags: [publicArchiveCacheTag] },
+  };
 }
 
 export function getServerApiBaseUrl() {
@@ -37,13 +43,13 @@ export function buildServerApiUrl(path: string, params: ApiParams = {}) {
 }
 
 export async function serverRequestPage<T>(path: string, params?: ApiParams, signal?: AbortSignal) {
-  return parseApiPage<T>(await requestJson<unknown>(buildServerApiUrl(path, params), signal, await forwardedRequestHeaders()));
+  return parseApiPage<T>(await requestJson<unknown>(buildServerApiUrl(path, params), signal, publicArchiveRequestOptions()));
 }
 
 export const serverTransport: ApiTransport = { requestPage: serverRequestPage };
 
 async function serverRequestJson<T>(path: string, signal?: AbortSignal) {
-  return requestJson<T>(buildServerApiUrl(path), signal, await forwardedRequestHeaders());
+  return requestJson<T>(buildServerApiUrl(path), signal, publicArchiveRequestOptions());
 }
 
 function nextPageNumber(next: string, expectedPath: string) {
