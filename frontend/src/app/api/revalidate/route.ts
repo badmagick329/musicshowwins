@@ -1,6 +1,6 @@
 import { timingSafeEqual } from "node:crypto";
 import { revalidateTag } from "next/cache";
-import { publicArchiveCacheTag } from "@/lib/api-server";
+import { publicArchiveCacheTag, warmCanonicalArchivePages } from "@/lib/api-server";
 
 function validSecret(request: Request) {
   const configured = process.env.CACHE_REVALIDATION_SECRET;
@@ -16,5 +16,13 @@ export async function POST(request: Request) {
     return Response.json({ detail: "Unauthorized." }, { status: 401 });
   }
   revalidateTag(publicArchiveCacheTag, { expire: 0 });
-  return Response.json({ revalidated: true });
+  try {
+    await warmCanonicalArchivePages();
+    return Response.json({ revalidated: true, warmed: true });
+  } catch {
+    return Response.json(
+      { detail: "Cache was invalidated, but canonical pages could not be warmed.", revalidated: true, warmed: false },
+      { status: 502 },
+    );
+  }
 }
