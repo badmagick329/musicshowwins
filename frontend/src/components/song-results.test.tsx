@@ -22,5 +22,6 @@ describe("SongResults", () => {
     expect(html).toContain("5");
     expect(html).toContain("Latest");
     expect(html).toContain("3");
+    expect(html).toContain("grid-cols-[auto_minmax(0,1fr)_auto]");
   });
 });

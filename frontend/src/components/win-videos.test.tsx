@@ -93,8 +93,9 @@ describe("win video references", () => {
     const mobileLink = mobile(container).getByRole("link", { name: `Watch video for ${winName}` });
     const mobileButton = mobile(container).getByRole("button", { name: `Choose from 2 videos for ${winName}` });
     expect(mobileLink.className).toBe(mobileButton.className);
-    expect(mobileLink.className).toContain("w-full");
-    expect(mobileLink.className).toContain("min-h-11");
+    expect(mobileLink.className.split(" ")).not.toContain("w-full");
+    expect(mobileLink.className).toContain("w-44");
+    expect(mobileLink.className).toContain("min-h-10");
   });
 
   it("gives the single-video action no disclosure attributes and no panel", () => {

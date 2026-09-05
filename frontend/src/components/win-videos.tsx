@@ -20,7 +20,7 @@ function winContext(win: Win) {
 
 const winVideoActionClass = "grid cursor-pointer grid-cols-[0.875rem_1fr_0.875rem] items-center gap-1.5 whitespace-nowrap border-2 border-foreground bg-action-pink font-bold text-primary-foreground transition-colors motion-reduce:transition-none hover:bg-accent-foreground";
 const desktopActionClass = "h-8 px-2.5 text-xs shadow-[2px_2px_0_var(--foreground)]";
-const mobileActionClass = "min-h-11 w-full px-4 text-sm shadow-[2px_2px_0_var(--foreground)]";
+const mobileActionClass = "min-h-10 w-44 max-w-full px-3 text-sm shadow-[2px_2px_0_var(--foreground)]";
 
 function YouTubeSearchLink({ win, className }: { win: Win; className?: string }) {
   const date = win.date.slice(2).replaceAll("-", "");
@@ -142,13 +142,13 @@ export function MobileWinVideoDisclosure({ win, className }: { win: Win; classNa
   const panelId = `win-videos-mobile-${win.id}`;
   if (!videos.length) return <div className={className}><YouTubeSearchLink win={win} className="text-sm" /></div>;
   return (
-    <div className={className}>
+    <div className={cn("flex flex-col items-end", className)}>
       {videos.length === 1 ? (
         <WinVideoActionLink win={win} video={videos[0]} className={mobileActionClass} />
       ) : (
         <>
           <WinVideoToggleButton win={win} count={videos.length} open={open} panelId={panelId} onToggle={() => setOpen(!open)} className={mobileActionClass} />
-          {open && <div className="pt-2"><WinVideoPanel win={win} videos={videos} panelId={panelId} /></div>}
+          {open && <div className="w-full pt-2"><WinVideoPanel win={win} videos={videos} panelId={panelId} /></div>}
         </>
       )}
     </div>
