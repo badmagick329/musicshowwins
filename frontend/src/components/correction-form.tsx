@@ -109,7 +109,7 @@ export function CorrectionForm() {
         <label htmlFor="website">Website</label>
         <input id="website" name="website" value={report.website} onChange={update} tabIndex={-1} autoComplete="off" />
       </div>
-      <button type="submit" disabled={mutation.isPending} className="inline-flex w-full sm:w-auto min-h-11 items-center justify-center border border-foreground bg-brand-pink px-5 font-bold text-white shadow-[2px_2px_0_var(--foreground)] transition-transform hover:-translate-y-0.5 disabled:translate-y-0 disabled:opacity-60">
+      <button type="submit" disabled={mutation.isPending} className="inline-flex w-full sm:w-auto min-h-11 items-center justify-center border border-foreground bg-action-pink px-5 font-bold text-white shadow-[2px_2px_0_var(--foreground)] transition-transform hover:-translate-y-0.5 disabled:translate-y-0 disabled:opacity-60">
         {mutation.isPending ? "Sending…" : "Send feedback"}
       </button>
       {status === "success" && <p ref={statusRef} tabIndex={-1} role="status" className="border-l-4 border-success bg-muted px-4 py-3 text-sm">Thanks! Your feedback was sent.</p>}

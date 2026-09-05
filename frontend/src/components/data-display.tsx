@@ -55,7 +55,7 @@ function DesktopLeaderboardRow({ row, kind }: { row: ArtistLeaderboardRow | Song
   return (
     <TableRow className="border-border/70 transition-colors hover:bg-accent/60">
       <TableCell className="w-16 px-4 py-3"><RankMarker rank={row.rank} /></TableCell>
-      <TableCell className="px-4 py-3"><p className="font-semibold">{kind === "artist" ? <Link prefetch={false} href={`/artists/${artist.id}`} className="underline-offset-4 hover:underline">{title}</Link> : <Link prefetch={false} href={`/songs/${songId}`} className="underline-offset-4 hover:underline">{title}</Link>}</p>{subtitle && <p className="text-xs text-muted-foreground"><Link prefetch={false} href={`/artists/${artist.id}`} className="underline-offset-4 hover:underline">{subtitle}</Link></p>}</TableCell>
+      <TableCell className="px-4 py-3"><p className="font-semibold">{kind === "artist" ? <Link prefetch={false} href={`/artists/${artist.id}`} className="compact-link-target">{title}</Link> : <Link prefetch={false} href={`/songs/${songId}`} className="compact-link-target">{title}</Link>}</p>{subtitle && <p className="text-xs text-muted-foreground"><Link prefetch={false} href={`/artists/${artist.id}`} className="compact-link-target">{subtitle}</Link></p>}</TableCell>
       <TableCell className="w-24 px-4 py-3 text-right font-heading text-lg font-bold tabular-nums">{row.wins}</TableCell>
     </TableRow>
   );
@@ -63,7 +63,7 @@ function DesktopLeaderboardRow({ row, kind }: { row: ArtistLeaderboardRow | Song
 
 function MobileLeaderboardRow({ row, kind }: { row: ArtistLeaderboardRow | SongLeaderboardRow; kind: "artist" | "song" }) {
   const { title, subtitle, artist, songId } = leaderboardCopy(row, kind);
-  return <div className="mobile-record items-center gap-3 border-b border-border/70 px-3 py-3"><RankMarker rank={row.rank} /><div className="min-w-0 flex-1"><p className="truncate font-semibold">{kind === "artist" ? <Link prefetch={false} href={`/artists/${artist.id}`}>{title}</Link> : <Link prefetch={false} href={`/songs/${songId}`}>{title}</Link>}</p>{subtitle && <p className="truncate text-xs text-muted-foreground"><Link prefetch={false} href={`/artists/${artist.id}`}>{subtitle}</Link></p>}</div><p className="font-heading text-lg font-bold tabular-nums"><span className="sr-only">{row.wins} wins</span>{row.wins}</p></div>;
+  return <div className="mobile-record items-center gap-3 border-b border-border/70 px-3 py-3"><RankMarker rank={row.rank} /><div className="min-w-0 flex-1"><p className="font-semibold">{kind === "artist" ? <Link prefetch={false} href={`/artists/${artist.id}`} className="compact-link-target w-full truncate">{title}</Link> : <Link prefetch={false} href={`/songs/${songId}`} className="compact-link-target w-full truncate">{title}</Link>}</p>{subtitle && <p className="text-xs text-muted-foreground"><Link prefetch={false} href={`/artists/${artist.id}`} className="compact-link-target w-full truncate">{subtitle}</Link></p>}</div><p className="font-heading text-lg font-bold tabular-nums"><span className="sr-only">{row.wins} wins</span>{row.wins}</p></div>;
 }
 
 export function Leaderboard({ rows, kind, empty = "No wins to show yet." }: { rows: (ArtistLeaderboardRow | SongLeaderboardRow)[]; kind: "artist" | "song"; empty?: string }) {
@@ -85,7 +85,7 @@ export function WinRecord({ win, hideArtist = false, hideSong = false }: { win: 
     <article className="border-b border-border/70 px-3 py-3 last:border-b-0">
       <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-x-3 gap-y-2">
         <time dateTime={win.date} className="font-heading text-sm font-bold tabular-nums text-muted-foreground">{formatDate(win.date)}</time>
-        {!hideSong && <div className="col-span-2 row-start-2 min-w-0"><p className="break-words font-semibold"><Link prefetch={false} href={`/songs/${win.song.id}`} className="underline-offset-4 hover:underline">{win.song.title}</Link></p>{!hideArtist && <p className="break-words text-xs text-muted-foreground"><Link prefetch={false} href={`/artists/${win.song.artist.id}`} className="underline-offset-4 hover:underline">{win.song.artist.name}</Link></p>}</div>}
+        {!hideSong && <div className="col-span-2 row-start-2 min-w-0"><p className="break-words font-semibold"><Link prefetch={false} href={`/songs/${win.song.id}`} className="compact-link-target">{win.song.title}</Link></p>{!hideArtist && <p className="break-words text-xs text-muted-foreground"><Link prefetch={false} href={`/artists/${win.song.artist.id}`} className="compact-link-target">{win.song.artist.name}</Link></p>}</div>}
         <ShowBadge slug={win.show.slug} name={win.show.name} />
       </div>
       <MobileWinVideoDisclosure win={win} className="mt-3" />
@@ -101,7 +101,7 @@ export function RecentWins({ wins }: { wins: Win[] }) {
     <Table className="desktop-table border-collapse">
       <TableCaption className="sr-only">Most recent music show wins</TableCaption>
       <TableHeader><TableRow className="border-b-2 border-foreground bg-muted/50 text-xs uppercase tracking-[0.12em] text-muted-foreground"><TableHead className="w-32 px-4 py-3">Date</TableHead><TableHead className="px-4 py-3">Song</TableHead><TableHead className="px-4 py-3">Artist</TableHead><TableHead className="w-44 px-4 py-3 text-right">Music show</TableHead><TableHead className="w-44 px-4 py-3 text-right">Video</TableHead></TableRow></TableHeader>
-      <TableBody>{wins.map((win) => <DesktopWinVideoRow key={win.id} win={win} colSpan={5}><TableCell className="px-4 py-3"><time dateTime={win.date} className="font-heading text-sm font-bold tabular-nums text-muted-foreground">{formatDate(win.date)}</time></TableCell><TableCell className="px-4 py-3"><Link prefetch={false} href={`/songs/${win.song.id}`} className="font-semibold underline-offset-4 hover:underline">{win.song.title}</Link></TableCell><TableCell className="px-4 py-3"><Link prefetch={false} href={`/artists/${win.song.artist.id}`} className="underline-offset-4 hover:underline">{win.song.artist.name}</Link></TableCell><TableCell className="w-44 px-4 py-3 text-right"><ShowBadge slug={win.show.slug} name={win.show.name} /></TableCell></DesktopWinVideoRow>)}</TableBody>
+      <TableBody>{wins.map((win) => <DesktopWinVideoRow key={win.id} win={win} colSpan={5}><TableCell className="px-4 py-3"><time dateTime={win.date} className="font-heading text-sm font-bold tabular-nums text-muted-foreground">{formatDate(win.date)}</time></TableCell><TableCell className="px-4 py-3"><Link prefetch={false} href={`/songs/${win.song.id}`} className="compact-link-target font-semibold">{win.song.title}</Link></TableCell><TableCell className="px-4 py-3"><Link prefetch={false} href={`/artists/${win.song.artist.id}`} className="compact-link-target">{win.song.artist.name}</Link></TableCell><TableCell className="w-44 px-4 py-3 text-right"><ShowBadge slug={win.show.slug} name={win.show.name} /></TableCell></DesktopWinVideoRow>)}</TableBody>
     </Table>
     <div className="mobile-record flex-col">{wins.map((win) => <WinRecord key={win.id} win={win} />)}</div>
   </div>;

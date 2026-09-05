@@ -25,6 +25,8 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
   --color-brand-pink: var(--brand-pink);
+  --color-link-pink: var(--link-pink);
+  --color-action-pink: var(--action-pink);
   --color-highlight-yellow: var(--highlight-yellow);
   --color-info-cyan: var(--info-cyan);
   --color-success: var(--success);
@@ -72,6 +74,8 @@
   --input: #bfa7bf;
   --ring: #ff3d81;
   --brand-pink: #ff3d81;
+  --link-pink: #971544;
+  --action-pink: #a81750;
   --highlight-yellow: #ffd447;
   --info-cyan: #29bbd1;
   --success: #2f9f68;
@@ -128,7 +132,8 @@ input:disabled {
   from { opacity: 0; transform: translateY(4px); }
   to { opacity: 1; transform: translateY(0); }
 }
-.show-badge { border-color: color-mix(in srgb, var(--show-color) 50%, transparent); background: color-mix(in srgb, var(--show-color) 12%, white); color: color-mix(in srgb, var(--show-color) 80%, black); }
+.show-badge { border-color: color-mix(in srgb, var(--show-color) 50%, transparent); background: color-mix(in srgb, var(--show-color) 12%, white); color: var(--foreground); }
+.compact-link-target { @apply inline-flex min-h-6 min-w-6 max-w-full items-center underline-offset-4 hover:underline focus-visible:outline-offset-[-2px]; }
 .show-inkigayo { --show-color: var(--show-inkigayo); }
 .show-m-countdown { --show-color: var(--show-m-countdown); }
 .show-music-bank { --show-color: var(--show-music-bank); }

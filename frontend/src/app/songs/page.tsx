@@ -1,6 +1,7 @@
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import type { Metadata } from "next";
 import { SongsExplorer } from "@/components/songs-explorer";
+import { QueryProvider } from "@/components/query-provider";
 import { serverTransport } from "@/lib/api-server";
 import { makeQueryClient } from "@/lib/query-client";
 import { parseSongFilters, type SongSearchParams } from "@/lib/song-list";
@@ -22,5 +23,5 @@ export default async function SongsPage({ searchParams }: { searchParams: Promis
   const filters = parseSongFilters(await searchParams);
   const queryClient = makeQueryClient();
   await queryClient.prefetchQuery(songsQueryOptions(filters, serverTransport));
-  return <HydrationBoundary state={dehydrate(queryClient)}><SongsExplorer /></HydrationBoundary>;
+  return <QueryProvider><HydrationBoundary state={dehydrate(queryClient)}><SongsExplorer /></HydrationBoundary></QueryProvider>;
 }

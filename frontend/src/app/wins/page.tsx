@@ -1,6 +1,7 @@
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import type { Metadata } from "next";
 import { WinsExplorer } from "@/components/wins-explorer";
+import { QueryProvider } from "@/components/query-provider";
 import { makeQueryClient } from "@/lib/query-client";
 import { serverTransport } from "@/lib/api-server";
 import { hasActiveWinsFilters, parseWinsFilters, type WinsSearchParams } from "@/lib/wins-filters";
@@ -27,5 +28,5 @@ export default async function WinsPage({ searchParams }: { searchParams: Promise
     queryClient.prefetchQuery(showsQueryOptions(serverTransport)),
   ]);
 
-  return <HydrationBoundary state={dehydrate(queryClient)}><WinsExplorer /></HydrationBoundary>;
+  return <QueryProvider><HydrationBoundary state={dehydrate(queryClient)}><WinsExplorer /></HydrationBoundary></QueryProvider>;
 }

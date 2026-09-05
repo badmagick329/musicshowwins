@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { CorrectionForm } from "@/components/correction-form";
+import { QueryProvider } from "@/components/query-provider";
 import { pageMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = pageMetadata({
@@ -19,7 +20,7 @@ export default function AboutPage() {
       <section id="feedback" className="mt-14 scroll-mt-6" aria-labelledby="feedback-heading">
         <h2 id="feedback-heading" className="border-b-2 border-foreground pb-3 font-heading text-2xl font-bold">Share feedback</h2>
         <p className="mt-4 max-w-2xl leading-relaxed text-muted-foreground">Have an idea, found something confusing, or wish the site did something differently? Tell us below. Corrections and missing video links are welcome too.</p>
-        <CorrectionForm />
+        <QueryProvider><CorrectionForm /></QueryProvider>
       </section>
     </main>
   );
