@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronDown, ExternalLink, Play } from "lucide-react";
+import { ChevronDown, ExternalLink, Play, Search } from "lucide-react";
 import type { Win, WinReference } from "@/lib/api-shared";
 import { cn, formatDate } from "@/lib/utils";
 import { TableCell, TableRow } from "@/components/ui/table";
@@ -21,6 +21,20 @@ function winContext(win: Win) {
 const winVideoActionClass = "grid cursor-pointer grid-cols-[0.875rem_1fr_0.875rem] items-center gap-1.5 whitespace-nowrap border-2 border-foreground bg-brand-pink font-bold text-primary-foreground transition-colors motion-reduce:transition-none hover:bg-accent-foreground";
 const desktopActionClass = "h-8 px-2.5 text-xs shadow-[2px_2px_0_var(--foreground)]";
 const mobileActionClass = "min-h-11 w-full px-4 text-sm shadow-[2px_2px_0_var(--foreground)]";
+
+function YouTubeSearchLink({ win, className }: { win: Win; className?: string }) {
+  const date = win.date.slice(2).replaceAll("-", "");
+  const query = `${win.song.artist.name} ${win.song.title} ${date}`;
+  const href = `https://www.youtube.com/results?${new URLSearchParams({ search_query: query })}`;
+  return (
+    <a href={href} target="_blank" rel="noopener noreferrer"
+      aria-label={`Search YouTube for ${winContext(win)}`}
+      className={cn("inline-flex min-h-11 items-center gap-1.5 text-xs text-muted-foreground underline underline-offset-4 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2", className)}>
+      <Search className="size-3.5 shrink-0" aria-hidden="true" />
+      <span>Search YouTube</span>
+    </a>
+  );
+}
 
 function WinVideoActionLink({ win, video, className }: { win: Win; video: WinReference; className: string }) {
   return (
@@ -103,7 +117,7 @@ export function DesktopWinVideoRow({ win, colSpan, videoCellClassName = "w-44 px
         {children}
         <TableCell className={videoCellClassName}>
           {videos.length === 0 ? (
-            <span aria-hidden="true" className="text-muted-foreground">—</span>
+            <YouTubeSearchLink win={win} />
           ) : videos.length === 1 ? (
             <WinVideoActionLink win={win} video={videos[0]} className={actionClassName} />
           ) : (
@@ -126,7 +140,7 @@ export function MobileWinVideoDisclosure({ win, className }: { win: Win; classNa
   const [open, setOpen] = useState(false);
   const videos = winVideoReferences(win);
   const panelId = `win-videos-mobile-${win.id}`;
-  if (!videos.length) return null;
+  if (!videos.length) return <div className={className}><YouTubeSearchLink win={win} className="text-sm" /></div>;
   return (
     <div className={className}>
       {videos.length === 1 ? (

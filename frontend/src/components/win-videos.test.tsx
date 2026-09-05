@@ -40,15 +40,18 @@ describe("win video references", () => {
     expect(winVideoActionLabel(3)).toBe("Choose video");
   });
 
-  it("shows no video action when a win has no videos", () => {
-    const { container } = render(<RecentWins wins={[win(1)]} />);
-    expect(desktop(container).queryByRole("button", { name: /video/i })).toBeNull();
-    expect(desktop(container).queryByRole("link", { name: /video/i })).toBeNull();
-    expect(mobile(container).queryByRole("button", { name: /video/i })).toBeNull();
-    expect(mobile(container).queryByRole("link", { name: /video/i })).toBeNull();
-    expect(container.querySelector(".desktop-table")?.textContent).toContain("—");
-    expect(container.querySelector(".mobile-record")?.textContent).not.toContain("—");
-    expect(container.querySelector("td[colspan]")).toBeNull();
+  it("offers a YouTube search on desktop and mobile only when no video exists", () => {
+    const { container } = render(<RecentWins wins={[win(1, { references: [reference({ reference_type: "article" })] })]} />);
+    for (const view of [desktop(container), mobile(container)]) {
+      const link = view.getByRole("link", { name: `Search YouTube for ${winName}` });
+      const url = new URL(link.getAttribute("href")!);
+      expect(url.origin + url.pathname).toBe("https://www.youtube.com/results");
+      expect(url.searchParams.get("search_query")).toBe("Riize Boom Boom Bass 240627");
+      expect(link.getAttribute("target")).toBe("_blank");
+      expect(link.getAttribute("rel")).toBe("noopener noreferrer");
+      expect(link.className).not.toContain("bg-brand-pink");
+      expect(view.queryByRole("button", { name: /video/i })).toBeNull();
+    }
   });
 
   it("renders one video as a direct external Watch video link", () => {
@@ -58,6 +61,7 @@ describe("win video references", () => {
     expect(link.getAttribute("target")).toBe("_blank");
     expect(link.getAttribute("rel")).toBe("noopener noreferrer");
     expect(link.textContent).toContain("Watch video");
+    expect(within(container).queryByRole("link", { name: /Search YouTube/ })).toBeNull();
     expect(mobile(container).getByRole("link", { name: `Watch video for ${winName}` })).toBeTruthy();
   });
 
