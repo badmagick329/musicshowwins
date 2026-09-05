@@ -1,9 +1,7 @@
 import type { MetadataRoute } from "next";
-import { buildServerApiUrl } from "@/lib/api-server";
+import { connection } from "next/server";
+import { buildServerApiUrl, publicArchiveCacheTag, publicArchiveRevalidateSeconds } from "@/lib/api-server";
 import { siteUrl } from "@/lib/seo";
-
-export const dynamic = "force-dynamic";
-const refreshSeconds = 86_400;
 
 type SitemapEntry = { id: number; latest_win_date: string | null };
 type SitemapSource = { artists: SitemapEntry[]; songs: SitemapEntry[] };
@@ -28,6 +26,7 @@ function modified(value: string | null) {
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  await connection();
   const staticPages: MetadataRoute.Sitemap = [
     { url: `${siteUrl}/`, changeFrequency: "daily", priority: 1 },
     { url: `${siteUrl}/artists`, changeFrequency: "weekly", priority: 0.9 },
@@ -38,8 +37,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ];
 
   const response = await fetch(buildServerApiUrl("/sitemap"), {
-    headers: { "X-Forwarded-Proto": "https" },
-    next: { revalidate: refreshSeconds },
+    headers: {
+      "X-Forwarded-Proto": "https",
+      ...(process.env.INTERNAL_API_SECRET
+        ? { "X-KpopWins-Internal-Key": process.env.INTERNAL_API_SECRET }
+        : {}),
+    },
+    next: { revalidate: publicArchiveRevalidateSeconds, tags: [publicArchiveCacheTag] },
   });
   if (!response.ok) throw new Error(`Sitemap source failed (${response.status}).`);
   const source: unknown = await response.json();

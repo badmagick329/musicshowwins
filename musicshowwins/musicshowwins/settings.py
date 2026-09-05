@@ -116,10 +116,14 @@ REST_FRAMEWORK = {
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": PAGE_SIZE,
     "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.AllowAny"],
-    "DEFAULT_THROTTLE_CLASSES": ["rest_framework.throttling.AnonRateThrottle"],
+    "DEFAULT_THROTTLE_CLASSES": ["restapi.throttling.InternalAwareAnonRateThrottle"],
     "DEFAULT_THROTTLE_RATES": {"anon": "60/min"},
     "NUM_PROXIES": 1 if not DEBUG else None,
 }
+
+INTERNAL_API_SECRET = os.environ.get("INTERNAL_API_SECRET", "")
+CACHE_REVALIDATION_URL = os.environ.get("CACHE_REVALIDATION_URL", "")
+CACHE_REVALIDATION_SECRET = os.environ.get("CACHE_REVALIDATION_SECRET", "")
 
 SPECTACULAR_SETTINGS = {
     "TITLE": "Music Show Wins API",

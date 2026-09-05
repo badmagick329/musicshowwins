@@ -1,4 +1,5 @@
 import type { NextRequest } from "next/server";
+import { publicArchiveCacheTag, publicArchiveRevalidateSeconds } from "@/lib/api-server";
 
 type RouteContext = { params: Promise<{ path: string[] }> };
 
@@ -32,10 +33,15 @@ async function proxy(request: NextRequest, context: RouteContext) {
   try {
     const { path } = await context.params;
     const headers = new Headers({ "X-Forwarded-Proto": "https" });
-    const forwardedFor = request.headers.get("x-forwarded-for");
-    const realIp = request.headers.get("x-real-ip");
-    if (forwardedFor) headers.set("X-Forwarded-For", forwardedFor);
-    if (realIp) headers.set("X-Real-IP", realIp);
+    if (request.method === "GET") {
+      const secret = process.env.INTERNAL_API_SECRET;
+      if (secret) headers.set("X-KpopWins-Internal-Key", secret);
+    } else {
+      const forwardedFor = request.headers.get("x-forwarded-for");
+      const realIp = request.headers.get("x-real-ip");
+      if (forwardedFor) headers.set("X-Forwarded-For", forwardedFor);
+      if (realIp) headers.set("X-Real-IP", realIp);
+    }
     const contentType = request.headers.get("content-type");
     if (contentType) headers.set("Content-Type", contentType);
 
@@ -44,7 +50,9 @@ async function proxy(request: NextRequest, context: RouteContext) {
       headers,
       body: request.method === "POST" ? await request.arrayBuffer() : undefined,
       credentials: "omit",
-      cache: "no-store",
+      ...(request.method === "GET"
+        ? { next: { revalidate: publicArchiveRevalidateSeconds, tags: [publicArchiveCacheTag] } }
+        : { cache: "no-store" as const }),
       redirect: "manual",
     });
     const responseHeaders = new Headers();

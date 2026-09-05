@@ -125,13 +125,6 @@ input:disabled {
 }
 ::selection { background: color-mix(in srgb, var(--brand-pink) 25%, white); }
 
-@media (prefers-reduced-motion: no-preference) {
-  .page-enter { animation: page-enter 180ms ease-out both; }
-}
-@keyframes page-enter {
-  from { opacity: 0; transform: translateY(4px); }
-  to { opacity: 1; transform: translateY(0); }
-}
 .show-badge { border-color: color-mix(in srgb, var(--show-color) 50%, transparent); background: color-mix(in srgb, var(--show-color) 12%, white); color: var(--foreground); }
 .compact-link-target { @apply inline-flex min-h-6 min-w-6 max-w-full items-center underline-offset-4 hover:underline focus-visible:outline-offset-[-2px]; }
 .show-inkigayo { --show-color: var(--show-inkigayo); }

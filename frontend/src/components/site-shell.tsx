@@ -23,7 +23,7 @@ export function SiteHeader() {
         </Link>
         <nav aria-label="Primary navigation" className="hidden items-center gap-1 md:flex">
           {links.map(([label, href]) => (
-            <Link key={label} href={href} className="px-3 py-2 text-sm font-semibold text-muted-foreground transition-colors hover:bg-accent hover:text-foreground">
+            <Link key={label} href={href} prefetch={href === "/artists" || href === "/songs" || href === "/wins" || href === "/shows" ? true : undefined} className="px-3 py-2 text-sm font-semibold text-muted-foreground transition-colors hover:bg-accent hover:text-foreground">
               {label}
             </Link>
           ))}

@@ -314,6 +314,29 @@ def test_command_defaults_to_current_previous_year_and_active_shows(
 
 
 @pytest.mark.django_db
+def test_command_invalidates_public_cache_when_wins_are_added(monkeypatch, capsys):
+    MusicShow.objects.create(slug="music-bank", name="Music Bank", active=True)
+    import main.management.commands.sync_wikipedia as command_module
+
+    class ChangedImporter:
+        def sync(self, **kwargs):
+            return ImportSummary(wins_added=1)
+
+    invalidated = []
+    monkeypatch.setattr(command_module, "WikipediaImporter", ChangedImporter)
+    monkeypatch.setattr(
+        command_module,
+        "invalidate_public_archive_cache",
+        lambda: invalidated.append(True),
+    )
+
+    call_command("sync_wikipedia", years=[2026], shows=["music-bank"])
+
+    assert invalidated == [True]
+    capsys.readouterr()
+
+
+@pytest.mark.django_db
 def test_command_accepts_repeatable_filters_and_rejects_invalid_values(monkeypatch):
     MusicShow.objects.create(slug="music-bank", name="Music Bank", active=True)
     MusicShow.objects.create(slug="inkigayo", name="Inkigayo", active=False)

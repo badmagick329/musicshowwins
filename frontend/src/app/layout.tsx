@@ -29,8 +29,6 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 };
 
-export const dynamic = "force-dynamic";
-
 export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
   return (
     <html lang="en">

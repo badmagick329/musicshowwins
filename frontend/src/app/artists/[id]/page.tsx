@@ -10,8 +10,6 @@ import { JsonLd } from "@/components/json-ld";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { noIndexFollow, pageMetadata, siteUrl } from "@/lib/seo";
 
-export const dynamic = "force-dynamic";
-
 function artistId(value: string) {
   return /^\d+$/.test(value) && Number(value) > 0 ? Number(value) : null;
 }

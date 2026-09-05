@@ -15,6 +15,7 @@ function context(...path: string[]) {
 describe("backend API proxy", () => {
   it("proxies GET requests with query strings and preserves status and content type", async () => {
     vi.stubEnv("DJANGO_API_BASE_URL", "http://backend:8000/api/v1");
+    vi.stubEnv("INTERNAL_API_SECRET", "internal-secret");
     const fetchMock = vi.fn(async (input: string | URL | Request, init?: RequestInit) => {
       void input;
       void init;
@@ -47,8 +48,10 @@ describe("backend API proxy", () => {
     expect(options.method).toBe("GET");
     expect(options.credentials).toBe("omit");
     expect(headers.get("X-Forwarded-Proto")).toBe("https");
-    expect(headers.get("X-Forwarded-For")).toBe("203.0.113.25");
-    expect(headers.get("X-Real-IP")).toBe("203.0.113.25");
+    expect(headers.get("X-KpopWins-Internal-Key")).toBe("internal-secret");
+    expect(headers.has("X-Forwarded-For")).toBe(false);
+    expect(headers.has("X-Real-IP")).toBe(false);
+    expect(options.next).toEqual({ revalidate: 86400, tags: ["public-archive"] });
     expect(headers.has("cookie")).toBe(false);
     expect(headers.has("host")).toBe(false);
     expect(response.status).toBe(206);
@@ -65,6 +68,10 @@ describe("backend API proxy", () => {
     vi.stubEnv("DJANGO_API_BASE_URL", "http://backend:8000/api/v1");
     const fetchMock = vi.fn(async (_url: URL, options: RequestInit) => {
       expect(options.headers instanceof Headers && options.headers.get("Content-Type")).toBe("application/json");
+      expect(options.headers instanceof Headers && options.headers.has("X-KpopWins-Internal-Key")).toBe(false);
+      expect(options.headers instanceof Headers && options.headers.get("X-Forwarded-For")).toBe("203.0.113.25");
+      expect(options.headers instanceof Headers && options.headers.get("X-Real-IP")).toBe("203.0.113.25");
+      expect(options.cache).toBe("no-store");
       expect(new TextDecoder().decode(options.body as ArrayBuffer)).toBe('{"record":"fixed"}');
       return new Response('{"detail":"accepted"}', {
         status: 202,
@@ -76,7 +83,12 @@ describe("backend API proxy", () => {
     const response = await POST(
       new NextRequest("https://kpopwins.info/backend-api/corrections", {
         method: "POST",
-        headers: { "Content-Type": "application/json", Cookie: "private=value" },
+        headers: {
+          "Content-Type": "application/json",
+          Cookie: "private=value",
+          "X-Forwarded-For": "203.0.113.25",
+          "X-Real-IP": "203.0.113.25",
+        },
         body: '{"record":"fixed"}',
       }),
       context("corrections"),

@@ -7,6 +7,10 @@ from pathlib import Path
 from django.core.management.base import BaseCommand, CommandError
 from django.db import DatabaseError
 
+from main.cache_invalidation import (
+    CacheInvalidationError,
+    invalidate_public_archive_cache,
+)
 from main.win_reference_io import ReferenceDocumentError, import_document
 
 
@@ -40,6 +44,12 @@ class Command(BaseCommand):
             raise CommandError(str(exc)) from exc
         except DatabaseError as exc:
             raise CommandError("The reference import could not be saved.") from exc
+
+        if not options["dry_run"]:
+            try:
+                invalidate_public_archive_cache()
+            except CacheInvalidationError as exc:
+                raise CommandError(str(exc)) from exc
 
         prefix = "Dry run: " if options["dry_run"] else ""
         self.stdout.write(

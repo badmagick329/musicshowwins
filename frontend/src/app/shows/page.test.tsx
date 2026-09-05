@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const { getShows } = vi.hoisted(() => ({ getShows: vi.fn() }));
 vi.mock("@/lib/api", () => ({ getShows }));
+vi.mock("next/server", () => ({ connection: vi.fn(async () => undefined) }));
 
 import ShowsPage from "./page";
 

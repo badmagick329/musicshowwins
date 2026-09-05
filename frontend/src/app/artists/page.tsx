@@ -7,7 +7,6 @@ import { getArtists, parsePositivePage } from "@/lib/api";
 import { artistSortLabels, artistSorts, artistsUrl, parseArtistSort } from "@/lib/artist-list";
 import { noIndexFollow, pageMetadata } from "@/lib/seo";
 
-export const dynamic = "force-dynamic";
 const description = "Find artists by name or win total, then view their songs and full win history.";
 type ArtistsSearchParams = { search?: string | string[]; page?: string | string[]; sort?: string | string[] };
 

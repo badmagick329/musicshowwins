@@ -10,7 +10,7 @@ vi.mock("@/lib/api", async (importOriginal) => ({
   ...apiMocks,
 }));
 
-import { dynamic as rootDynamic, metadata as rootMetadata } from "./layout";
+import { metadata as rootMetadata } from "./layout";
 import { generateMetadata as artistsMetadata } from "./artists/page";
 import { generateMetadata as songsMetadata } from "./songs/page";
 import { generateMetadata as winsMetadata } from "./wins/page";
@@ -38,7 +38,6 @@ describe("page metadata", () => {
     });
     expect(rootMetadata.description).toBe("Search K-pop music show wins by artist, song, show, or date. Coverage starts in 2014.");
     expect(JSON.stringify(rootMetadata)).not.toContain("clearly kept");
-    expect(rootDynamic).toBe("force-dynamic");
   });
 
   it.each(staticRoutes)("sets the page title and description without adding the brand", (metadata, title, description) => {

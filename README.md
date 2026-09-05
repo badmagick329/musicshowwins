@@ -110,6 +110,22 @@ Collection endpoints use page-number pagination (100 by default) and support
 search, artist, song, show, year, date range, ordering, and leaderboard filters
 where applicable. Anonymous requests are throttled at 60 per minute.
 
+### Public archive caching
+
+The Next.js frontend caches public API GET responses for 24 hours under one
+`public-archive` tag. Cache keys include the full URL, so pages, searches,
+filters, pagination, and detail records are cached independently. The Wikipedia
+sync and win-reference import commands invalidate the shared tag after every
+successful non-dry-run execution. The 24-hour lifetime is a fallback if an
+invalidation callback is missed.
+
+Production must set the same `INTERNAL_API_SECRET` for Django and Next.js. This
+authenticates cacheable frontend GETs, which bypass Django's public anonymous
+throttle. It must also set the same `CACHE_REVALIDATION_SECRET` for both
+services, and configure Django's `CACHE_REVALIDATION_URL` to the frontend's
+`/api/revalidate` endpoint. Public POSTs remain uncached and retain their
+per-visitor throttling.
+
 ## Checks
 
 Tests use an isolated in-memory SQLite database; local development and deployed

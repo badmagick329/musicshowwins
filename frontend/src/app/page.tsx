@@ -12,8 +12,6 @@ import {
 import { getHomeData } from "@/lib/api";
 import { noIndexFollow, siteDescription, siteUrl } from "@/lib/seo";
 
-export const dynamic = "force-dynamic";
-
 export async function generateMetadata({ searchParams }: { searchParams: Promise<{ search?: string | string[] }> }): Promise<Metadata> {
   const search = (await searchParams).search;
   if (typeof search !== "string" || !search.trim()) return { alternates: { canonical: "/" } };

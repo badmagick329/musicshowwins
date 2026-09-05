@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { connection } from "next/server";
 import { ErrorState } from "@/components/data-display";
 import { ShowCards } from "@/components/show-cards";
 import { getShows } from "@/lib/api";
@@ -10,9 +11,8 @@ export const metadata: Metadata = pageMetadata({
   path: "/shows",
 });
 
-export const dynamic = "force-dynamic";
-
 export default async function ShowsPage() {
+  await connection();
   let shows: Awaited<ReturnType<typeof getShows>>["results"] = [];
   let failed = false;
   try {
