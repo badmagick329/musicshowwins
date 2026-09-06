@@ -98,7 +98,8 @@ def test_read_only_collections_and_contracts(archive):
         "date",
         "show",
         "song",
-        "references",
+            "references",
+            "moment",
     }
     assert wins.data["results"][0]["references"] == []
 
@@ -276,7 +277,7 @@ def test_wins_serialization_has_no_per_row_song_count_queries(
             url=f"https://example.com/references/{win.pk}",
         )
 
-    with django_assert_num_queries(4):
+    with django_assert_num_queries(5):
         response = client.get("/api/v1/wins")
 
     assert response.status_code == 200

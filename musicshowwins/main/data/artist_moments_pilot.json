@@ -1,0 +1,60 @@
+{
+  "version": 1,
+  "moments": [
+    {
+      "state": "matched",
+      "event": {"show": "m-countdown", "date": "2026-04-30", "artist": "CORTIS", "song": "REDRED"},
+      "heading": "CORTIS's first music show win",
+      "body": "CORTIS earned their first music show trophy with “REDRED” on April 30, 2026. The group won M Countdown with 8,902 points, and the broadcast included their first winning encore.",
+      "citations": [{"provider": "soompi", "publisher_name": "Soompi", "title": "Watch: CORTIS Takes 1st-Ever Win On M Countdown With REDRED", "url": "https://www.soompi.com/article/1837470wpp/watch-cortis-takes-1st-ever-win-on-m-countdown-with-redred-performances-by-illit-katseye-and-more"}]
+    },
+    {
+      "state": "matched",
+      "event": {"show": "inkigayo", "date": "2021-01-17", "artist": "Aespa", "song": "Black Mamba"},
+      "heading": "aespa's first music show win",
+      "body": "aespa earned their first music show trophy with “Black Mamba” on Inkigayo on January 17, 2021, without appearing on the show. Contemporary coverage reports that hosts Minhyuk, Naeun and Jaehyun filled in for the encore.",
+      "citations": [
+        {"provider": "soompi", "publisher_name": "Soompi", "title": "aespa Takes 1st-Ever Win With Black Mamba On Inkigayo", "url": "https://www.soompi.com/article/1449110wpp/aespa-takes-1st-ever-win-with-black-mamba-on-inkigayo"},
+        {"provider": "kstyle", "publisher_name": "Kstyle", "title": "aespa wins first place on Inkigayo without appearing", "url": "https://kstyle.com/article.ksn?articleNo=2160415"},
+        {"provider": "matamata", "publisher_name": "MataMata", "title": "aespa earns first win with Black Mamba", "url": "https://www.matamata.com/kpop/2021/01/18/083816/2-bulan-debut-aespa-raih-kemenangan-pertama-dengan-lagu-black-mamba"}
+      ]
+    },
+    {
+      "state": "matched",
+      "event": {"show": "the-show", "date": "2015-05-05", "artist": "BTS", "song": "I Need U"},
+      "heading": "BTS's first music show win",
+      "body": "BTS earned their first music show trophy with “I Need U” on May 5, 2015. Reflecting on their first week of wins, Jimin said the recognition made their practice feel worthwhile, while Suga described a new responsibility to keep improving.",
+      "citations": [
+        {"provider": "soompi", "publisher_name": "Soompi", "title": "BTS Takes First-Ever Music Show Win on The Show", "url": "https://www.soompi.com/article/728319wpp/bts-takes-first-ever-music-show-win-on-the-show-with%20-j%27ai%20besoin%20de%20toi"},
+        {"provider": "soompi", "publisher_name": "Soompi", "title": "BTS Sincerely Open Up About the Meaning of Winning 1st on a Music Show", "url": "https://www.soompi.com/article/730053wpp/bts-sincerely-open-up-about-the-meaning-of-winning-1st-on-a-music-show"}
+      ]
+    },
+    {
+      "state": "matched",
+      "event": {"show": "show-champion", "date": "2021-12-08", "artist": "Ive", "song": "Eleven"},
+      "heading": "IVE's first music show win",
+      "body": "Just one week after debut, IVE won their first music show trophy with “ELEVEN” on Show Champion. Their first victory became an emotional moment for the group, captured in the broadcast's winner announcement and encore.",
+      "citations": [{"provider": "soompi", "publisher_name": "Soompi", "title": "IVE Takes Tearful 1st-Ever Win On Show Champion With ELEVEN", "url": "https://www.soompi.com/article/1502797wpp/watch-ive-takes-tearful-1st-ever-win-on-show-champion-with-eleven-performances-by-everglow-oneus-and-more"}]
+    },
+    {
+      "state": "matched",
+      "event": {"show": "music-bank", "date": "2015-03-27", "artist": "Red Velvet", "song": "Ice Cream Cake"},
+      "heading": "Red Velvet's first music show win",
+      "body": "Red Velvet won their first music show trophy with “Ice Cream Cake” on Music Bank, a day after finishing second on M Countdown. The members celebrated with a tearful acceptance speech and encore.",
+      "citations": [
+        {"provider": "soompi", "publisher_name": "Soompi", "title": "Red Velvet Gets First-Ever Music Show Win on Music Bank", "url": "https://www.soompi.com/article/714439wpp/red-velvet-gets-first-ever-music-show-win-on-music-bank-with-ice-cream-cake?mobile-app=true&theme=dark%2F1000"},
+        {"provider": "tenasia", "publisher_name": "TenAsia", "title": "Red Velvet takes first music-show win", "url": "https://www.tenasia.co.kr/article/2015032783824"}
+      ]
+    },
+    {
+      "state": "matched",
+      "event": {"show": "the-show", "date": "2017-06-20", "artist": "T-ara", "song": "What's My Name?"},
+      "heading": "T-ara's first win in over five years",
+      "body": "“What's My Name” brought T-ara their first Korean music show win in over five years. Hyomin, Qri and Jiyeon cried on stage and struggled to give an acceptance speech. Eunjung later recalled crying when she heard the news by phone while filming a drama.",
+      "citations": [
+        {"provider": "soompi", "publisher_name": "Soompi", "title": "T-ara Breaks Down After 1st Win For What's My Name", "url": "https://www.soompi.com/article/1000581wpp/watch-t-ara-breaks-down-1st-win-whats-name-show-performances-ftisland-9muses-more"},
+        {"provider": "soompi", "publisher_name": "Soompi", "title": "T-ara's Eunjung Talks About Emotional 1st Place Win", "url": "https://www.soompi.com/article/1077723wpp/t-aras-eunjung-talks-love-members-emotional-1st-place-win"}
+      ]
+    }
+  ]
+}

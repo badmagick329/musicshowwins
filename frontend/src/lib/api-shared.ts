@@ -49,7 +49,8 @@ export type WinReference = {
   published_at: string | null;
   last_verified_at: string | null;
 };
-export type Win = { id: number; date: string; show: ShowSummary; song: Song; references: WinReference[] };
+export type WinMoment = { heading: string; body: string; citations: WinReference[] };
+export type Win = { id: number; date: string; show: ShowSummary; song: Song; references: WinReference[]; moment?: WinMoment | null };
 export type ArtistLeaderboardRow = { rank: number; wins: number; artist: Pick<Artist, "id" | "name"> };
 export type SongLeaderboardRow = { rank: number; wins: number; song: Pick<Song, "id" | "title" | "artist"> };
 export type HomeData = {
