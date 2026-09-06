@@ -14,4 +14,7 @@ DATABASES = {
     }
 }
 CSRF_TRUSTED_ORIGINS = []
+# Import-command tests must never contact a developer's running frontend.
+CACHE_REVALIDATION_URL = ""
+CACHE_REVALIDATION_SECRET = ""
 PASSWORD_HASHERS = ["django.contrib.auth.hashers.MD5PasswordHasher"]

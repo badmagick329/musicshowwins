@@ -174,6 +174,42 @@ def refresh_catalogue(
                 updated += 1
             else:
                 unchanged += 1
+            if previous is not None and (
+                previous["artist_name"] != record.artist_name
+                or previous["song_title"] != record.song_title
+            ):
+                # Approval belongs to the reviewed winner, not merely its show/date.
+                connection.execute(
+                    """
+                    INSERT INTO candidate_review_events (
+                        candidate_id, previous_status, decision, reviewer, reason,
+                        reviewed_at, artist_name, song_title
+                    )
+                    SELECT id, review_status, 'pending', 'catalogue-refresh',
+                           'Winner changed; approval requires review again.', ?, ?, ?
+                    FROM reference_candidates
+                    WHERE show_slug=? AND win_date=? AND review_status='approved'
+                    """,
+                    (
+                        timestamp,
+                        previous["artist_name"],
+                        previous["song_title"],
+                        record.show_slug,
+                        record.win_date,
+                    ),
+                )
+                connection.execute(
+                    """UPDATE reference_candidates SET review_status='pending',
+                       updated_at=? WHERE show_slug=? AND win_date=?
+                       AND review_status='approved'""",
+                    (timestamp, record.show_slug, record.win_date),
+                )
+                connection.execute(
+                    """UPDATE search_state SET status='pending', next_attempt_at=NULL,
+                       last_error='', updated_at=? WHERE show_slug=? AND win_date=?
+                       AND status='matched'""",
+                    (timestamp, record.show_slug, record.win_date),
+                )
             connection.execute(
                 """
                 INSERT INTO wins (

@@ -56,7 +56,8 @@ def validate_document(document: Any) -> dict[str, Any]:
                     "win_date": win.get("date"),
                     **{field: reference[field] for field in MANIFEST_FIELDS},
                     "review_status": "approved",
-                }
+                },
+                allow_withdrawn=True,
             )
         except CandidateValidationError as exc:
             raise ManifestError(str(exc)) from exc
@@ -98,7 +99,8 @@ def approved_document(connection: sqlite3.Connection) -> dict[str, Any]:
         JOIN wins
           ON wins.show_slug = candidate.show_slug
          AND wins.win_date = candidate.win_date
-        WHERE candidate.review_status = 'approved' AND wins.is_current = 1
+        WHERE (candidate.review_status = 'approved' AND wins.is_current = 1)
+           OR candidate.withdrawn = 1
         ORDER BY candidate.show_slug, candidate.win_date, candidate.provider,
                  candidate.external_id, candidate.url
         """
@@ -119,7 +121,7 @@ def approved_document(connection: sqlite3.Connection) -> dict[str, Any]:
                 "publisher_name": row["publisher_name"],
                 "publisher_external_id": row["publisher_external_id"],
                 "is_official": bool(row["is_official"]),
-                "status": row["status"],
+                "status": "withdrawn" if row["withdrawn"] else row["status"],
                 "published_at": row["published_at"],
                 "last_verified_at": row["last_verified_at"],
                 "metadata": metadata,
