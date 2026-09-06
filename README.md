@@ -46,6 +46,13 @@ dated wins view. It is intentionally small while the backend is being revived.
 
 The public Next.js frontend lives in [`frontend/`](frontend/README.md).
 
+## YouTube reference workflow
+
+From the repository root, use `./operator.ps1 prepare` to discover and match
+videos, then `./operator.ps1 review batch` to prepare an agent review assignment.
+Follow the [short video workflow](operator-tools/WORKFLOW.md) for applying agent
+decisions, exporting references and verifying the import locally.
+
 ## Wikipedia synchronization
 
 Synchronization runs sequentially through Wikimedia's Action API. It retries

@@ -1,146 +1,163 @@
-# Operator workflow
+# Video reference workflow
 
-Run these commands from `operator-tools/`.
+Run everything below from the repository root in PowerShell. `operator.ps1`
+selects the right Python environment. Agents make the review decisions.
 
-## One-time setup
+## Routine update
 
-```console
-uv sync --frozen
-uv run kpopwins-operator init
-uv run kpopwins-operator refresh-wins
-uv run kpopwins-operator youtube verify-channels
-uv run kpopwins-operator youtube verify-channels --apply
+**1. Prepare candidates.** Start the local Django API, then run:
+
+```powershell
+./operator.ps1 prepare
 ```
 
-Review the channel names printed by `verify-channels` before using `--apply`.
+This updates the offline win catalogue, ingests official uploads and matches
+videos. Add `--reddit` to also audit Reddit, fetch missing YouTube metadata,
+reclassify links and import official links as pending candidates:
 
-## Initial YouTube backfill
-
-```console
-uv run kpopwins-operator youtube ingest --max-pages 10
+```powershell
+./operator.ps1 prepare --reddit
 ```
 
-Repeat that command until it reports `more-remaining=no`. Progress is saved after
-each page. If YouTube reports exhausted quota, continue the next day.
+If discovery pauses, repeat the same command. Completed pages are saved. The
+YouTube request budget is shared across ingestion and Reddit hydration. Default
+limits are 10 upload pages per channel and 100 Reddit episode pages. Override
+with `--max-pages` and `--reddit-max-pages`. YouTube quota exhaustion requires
+waiting for its reset. Candidates already found can be reviewed during backfill.
+The latest stage and counts are saved in `.ignore/operator-tools/reports/prepare.json`.
 
-Match the downloaded videos after the backfill finishes:
+**2. Ask an agent to review the next batch.** Copy this message into a task in
+this project. Reuse it unchanged each time; the agent selects the batch and
+handles its file paths:
 
-```console
-uv run kpopwins-operator youtube match --dry-run
-uv run kpopwins-operator youtube match
+```text
+Review and apply the next batch of YouTube video candidates in this project.
+
+Follow .ignore/docs/operator-workflow/AGENT_REVIEW_PLAYBOOK.md. Run
+./operator.ps1 review batch to create or resume an assignment. Read every
+candidate in the batch.json file printed as Agent evidence, check the evidence,
+and fill decisions.json with approve, reject or defer decisions, your reviewer
+identity, and specific reasons and evidence.
+
+Apply the completed file through ./operator.ps1 review apply. If the batch is
+stale, cancel it, create a fresh batch and review the current evidence. Stop
+after one batch and report approved, rejected and deferred counts, with reasons
+for unresolved cases. If no candidates are ready, report that and stop.
+Do not export references, import into Django or contact production.
 ```
 
-## Review candidates
+You can use this prompt in the current task or give it to another agent working
+in this repository. The [agent playbook](../.ignore/docs/operator-workflow/AGENT_REVIEW_PLAYBOOK.md)
+contains the review criteria and recovery instructions.
 
-```console
-uv run kpopwins-operator candidates list --status pending --limit 100
-uv run kpopwins-operator candidates show 12
-uv run kpopwins-operator candidates approve 12 18 --reviewer agent-name --reason "Exact show, winner and episode confirmed"
-uv run kpopwins-operator candidates reject 21 --reviewer agent-name --reason "Wrong episode confirmed"
+Each batch gets a generated ID, such as `bbf708c4630446348e893f2a8e428bd9`.
+That ID is the name of its subfolder inside `.ignore/operator-tools/reviews`:
+
+```text
+.ignore/operator-tools/reviews/
+  bbf708c4630446348e893f2a8e428bd9/
+    batch.json       # Evidence the agent reads
+    decisions.json   # Decisions the agent fills in
+    applied.json     # Log created after applying decisions
 ```
 
-Replace the example IDs with the candidates you reviewed. Continue through the queue; leave uncertain candidates pending.
+There is no directory literally named `batch`. The output prints full paths
+to `batch.json` and `decisions.json` inside the batch-ID subfolder.
 
-## Audit the r/kpop wiki (read-only)
+The batch includes up to 25 candidates, latest wins first, with video metadata,
+official-channel mappings, matching evidence, cached Reddit winner text and
+other candidates for the same win.
 
-```console
-uv run kpopwins-operator reddit audit --max-pages 100
+The agent fills `decisions.json` with approve, reject or defer, plus its identity,
+reason and specific evidence for each candidate. Blank templates cannot be applied.
+
+**3. Check the agent's result.** The prompt above includes applying the decisions;
+you do not need to run a separate command. The agent uses:
+
+```powershell
+./operator.ps1 review apply ".ignore/operator-tools/reviews/<batch-id>/decisions.json"
 ```
 
-Repeat that command until it reports `more-remaining=no`. Cached episode pages
-are reused, so reruns resume instead of refetching. Use `--refresh-indexes`
-after new episodes are added on Reddit and `--show <slug>` to scope one show.
-Once the audit reports complete collection, hydrate the unverified YouTube links:
+The whole batch is validated and saved atomically. Add `--dry-run` for validation
+only. `applied.json` records the result; the database retains the decision history.
+Rerunning the same applied file is harmless.
 
-```console
-uv run kpopwins-operator reddit hydrate-youtube
+Reuse the same prompt for the next batch. Deferred candidates remain pending but are skipped until
+their evidence changes. Use `review batch --include-deferred` to reconsider them.
+
+**4. Export and verify locally.**
+
+```powershell
+./operator.ps1 export-approved
+./operator.ps1 verify
+./operator.ps1 import
 ```
 
-Repeat hydration until it reports `more-remaining=no`, then rerun the audit to
-reclassify links using the downloaded metadata:
+`verify` dry-runs the manifest against Django; `import` applies it using the
+repository's Django settings and refreshes the frontend cache. Use the local
+configuration and running frontend for local verification. Neither command is
+part of preparation or agent review.
 
-```console
-uv run kpopwins-operator reddit audit --max-pages 100
-```
+**5. Import the same manifest into production.** A local import updates only the
+database configured in your local Django settings. Deploying application code
+does not copy that database or the ignored manifest to production.
 
-Review the refreshed JSON/TSV report under `.ignore/operator-tools/reports/`.
-Preview and import the official links as pending candidates, then review them:
-
-```console
-uv run kpopwins-operator reddit import-official --dry-run
-uv run kpopwins-operator reddit import-official
-uv run kpopwins-operator candidates list --status pending --provider youtube
-```
-
-Audit and hydration do not change candidates. Importing never approves a
-candidate or overwrites an existing review decision.
-
-## Correct a previous decision
-
-Approve/reject require `--reviewer` and `--reason`; group only candidates sharing
-that reason. Add `--revise` when deliberately changing a previous review. History
-is stored locally and displayed by `candidates show`.
-
-For a reference that should be removed from the public site, use an explicit
-withdrawal, then export and import the manifest through the normal steps:
-
-```console
-uv run kpopwins-operator candidates withdraw 12 --reviewer agent-name --reason "Wrong episode confirmed"
-```
-
-Rejecting or omitting a candidate does not remove an imported reference.
-Withdrawals survive rematching. Restoring one requires `approve --revise` after
-review, followed by another manifest import.
-
-After upgrading to schema 4, run `uv run kpopwins-operator init` once. Winner
-artist/song corrections during `refresh-wins` return approvals to pending and
-record why. Review them again before export. Existing public references require
-an explicit withdrawal if the review establishes they are wrong.
-
-## Export and test locally
-
-```console
-uv run kpopwins-operator export-approved
-```
-
-This writes `.ignore/operator-tools/manifests/win-references-v1.json`. From the
-repository root, import it into local Django:
-
-```console
-uv run python manage.py import_win_references .ignore/operator-tools/manifests/win-references-v1.json
-```
-
-Do not commit the manifest.
-
-## Import approved references into production
-
-The host-specific import helper lives in the ignored deployment directory. From
-the repository root, run its production dry run:
+From the repository root, validate against the running production backend:
 
 ```powershell
 ./.ignore/deployment/import-win-references.ps1
 ```
 
-If the dry run passes, import the same manifest:
+Check the production dry-run counts, then apply:
 
 ```powershell
 ./.ignore/deployment/import-win-references.ps1 -Apply
 ```
 
-The helper streams the manifest into the running backend. It does not copy the
-file onto the server. See `.ignore/deployment/runbook.md` for the private details.
+The helper repeats validation and streams the manifest to the running backend.
+The import refreshes the public cache. Check the affected wins on the public site.
+Routine video updates need no new deployment. Deploy backend changes and their
+migrations first when required, such as support for withdrawn references.
+See [the deployment runbook](../.ignore/deployment/runbook.md) for code releases.
+Exported files stay ignored and are never included in the application image.
 
-## Later updates
+## Resume or narrow review
 
-For later runs, refresh the wins, ingest new uploads, match them, review the new
-candidates, and export again:
+- `review batch` resumes an open batch for the same filters without replacing
+  the agent's decision file.
+- `review status` lists open batch IDs and their subfolder paths inside `reviews`.
+- `review cancel <batch-id>` releases an abandoned or stale batch. Then create
+  a fresh batch. Previous decisions are unchanged.
+- `review batch --show music-bank` or `--source reddit_audit` narrows selection.
+  The other source is `youtube_match`. `--limit 10` makes a smaller batch.
+- If apply reports changed evidence, cancel and regenerate the batch, then
+  review it again. Editing the exported evidence file cannot bypass this check.
 
-```console
-uv run kpopwins-operator refresh-wins
-uv run kpopwins-operator youtube ingest --max-pages 10
-uv run kpopwins-operator youtube match --dry-run
-uv run kpopwins-operator youtube match
+## First-time setup
+
+1. Install with `uv sync --project operator-tools --frozen`.
+2. Create `.ignore/operator-tools/.env` from `operator-tools/.env.example` and
+   supply the YouTube API key. Reddit credentials are needed only with `--reddit`.
+3. Run `./operator.ps1 init`, then `./operator.ps1 youtube verify-channels`.
+   Check the resolved channels, then run
+   `./operator.ps1 youtube verify-channels --apply` to save them.
+4. Start the local Django API. Apply Django migrations after updating backend code.
+
+`prepare` and `review` automatically initialize or migrate offline operator
+state. Channel verification remains explicit. For later runs, go straight to
+`prepare`; initial history scanning uses the same resumable command.
+
+## Correct a published reference
+
+```powershell
+./operator.ps1 candidates withdraw 12 --reviewer agent-name --reason "Wrong episode confirmed"
 ```
 
-Do not rerun `init`, channel verification, or `--restart` unless the local schema
-or official channel registry changes.
+Export and import afterward to withdraw it from Django. Rejection or omission
+alone does not remove a published reference. Withdrawals survive rematching.
+Restoration requires an explicitly reviewed `candidates approve 12 --revise`
+with `--reviewer` and `--reason`, followed by another export/import.
+
+Artist or song corrections during catalogue refresh return previous approvals
+to pending. Review them again; explicitly withdraw any published reference found
+wrong. Use `candidates show <id>` to inspect its review history.
