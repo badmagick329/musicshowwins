@@ -169,3 +169,9 @@ docker run --rm kpopwins:0123456789ab node --version
 Production orchestration and host configuration are intentionally kept outside
 version control. The public repository only defines and verifies the portable
 application image.
+
+When the image starts with `gunicorn`, its entrypoint applies database migrations
+and idempotently publishes the committed artist-moment content before starting
+the API. Starting the same image as the Next.js process does not perform database
+setup. New committed moments therefore deploy with the backend without a manual
+production import.
