@@ -26,7 +26,7 @@ const staticRoutes = [
 
 beforeEach(() => {
   vi.clearAllMocks();
-  apiMocks.getArtist.mockResolvedValue({ id: 3, name: "aespa", total_wins: 12 });
+  apiMocks.getArtist.mockResolvedValue({ id: 3, name: "aespa", total_wins: 12, winning_songs: 3 });
   apiMocks.getSong.mockResolvedValue({ id: 7, title: "Supernova", artist: { id: 3, name: "aespa" }, total_wins: 3 });
 });
 
@@ -64,7 +64,7 @@ describe("page metadata", () => {
     const song = await songMetadata({ params: Promise.resolve({ id: "7" }) });
     expect(artist).toMatchObject({
       title: "aespa Music Show Wins",
-      description: "See aespa's winning songs and complete music show win history.",
+      description: "Explore aespa's 12 recorded music-show wins across 3 songs, with totals by song and show and a dated win history.",
       alternates: { canonical: "/artists/3" },
     });
     expect(song).toMatchObject({

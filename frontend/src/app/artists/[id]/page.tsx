@@ -27,7 +27,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
     const artist = await getArtist(id);
     return pageMetadata({
       title: `${artist.name} Music Show Wins`,
-      description: `See ${artist.name}'s winning songs and complete music show win history.`,
+      description: `Explore ${artist.name}'s ${artist.total_wins} recorded music-show ${artist.total_wins === 1 ? "win" : "wins"} across ${artist.winning_songs} ${artist.winning_songs === 1 ? "song" : "songs"}, with totals by song and show and a dated win history.`,
       path: `/artists/${id}`,
     });
   } catch { return { title: "Artist not found", description: "The requested artist could not be found in KpopWins.", robots: noIndexFollow }; }
@@ -62,7 +62,13 @@ export default async function ArtistPage({ params }: { params: Promise<{ id: str
         <dl className="grid border border-border bg-card sm:grid-cols-2 lg:grid-cols-4">
           <Metric label="Total wins" value={String(summary.totalWins)} />
           <Metric label="Winning songs" value={String(summary.winningSongs)} />
-          <Metric label="First win" value={summary.firstWin ? formatDate(summary.firstWin) : "Not recorded"} />
+          <Metric label="Earliest recorded win" value={summary.earliestWin ? <>
+            <Link prefetch={false} href={`/songs/${summary.earliestWin.song.id}`} className="compact-link-target text-lg leading-snug underline underline-offset-4">{summary.earliestWin.song.title}</Link>
+            <span className="mt-1 block font-sans text-sm font-normal leading-relaxed">
+              {summary.earliestWin.show.name}<br />
+              <time dateTime={summary.earliestWin.date}>{formatDate(summary.earliestWin.date)}</time>
+            </span>
+          </> : "Not recorded"} />
           <Metric label="Latest win" value={summary.latestWin ? formatDate(summary.latestWin) : "Not recorded"} />
         </dl>
       </section>
@@ -89,6 +95,6 @@ export default async function ArtistPage({ params }: { params: Promise<{ id: str
   );
 }
 
-function Metric({ label, value }: { label: string; value: string }) {
-  return <div className="border-b border-border p-4 last:border-b-0 sm:border-r sm:[&:nth-child(2)]:border-r-0 lg:border-b-0 lg:[&:nth-child(2)]:border-r"><dt className="text-sm text-muted-foreground">{label}</dt><dd className="mt-1 font-heading text-2xl font-bold tabular-nums">{value}</dd></div>;
+function Metric({ label, value }: { label: string; value: React.ReactNode }) {
+  return <div className="min-w-0 border-b border-border p-4 last:border-b-0 sm:border-r sm:[&:nth-child(2)]:border-r-0 lg:border-b-0 lg:[&:nth-child(2)]:border-r"><dt className="text-sm text-muted-foreground">{label}</dt><dd className="mt-1 break-words font-heading text-2xl font-bold tabular-nums">{value}</dd></div>;
 }

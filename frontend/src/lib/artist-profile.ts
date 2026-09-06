@@ -4,6 +4,7 @@ export type ArtistSummary = {
   totalWins: number;
   winningSongs: number;
   firstWin: string | null;
+  earliestWin: Win | null;
   latestWin: string | null;
 };
 
@@ -15,12 +16,14 @@ export type ShowBreakdown = {
 };
 
 export function summarizeArtist(wins: Win[]): ArtistSummary {
-  const dates = wins.map((win) => win.date).sort();
+  const chronological = [...wins].sort((a, b) => a.date.localeCompare(b.date) || a.id - b.id);
   return {
     totalWins: wins.length,
     winningSongs: new Set(wins.map((win) => win.song.id)).size,
-    firstWin: dates[0] ?? null,
-    latestWin: dates.at(-1) ?? null,
+    firstWin: chronological[0]?.date ?? null,
+    // Catalogue order, moments, and reference checks do not verify a career first.
+    earliestWin: chronological[0] ?? null,
+    latestWin: chronological.at(-1)?.date ?? null,
   };
 }
 
