@@ -42,11 +42,9 @@ COPY --from=python-builder --chown=kpopwins:kpopwins /build/manage.py ./manage.p
 COPY --from=python-builder --chown=kpopwins:kpopwins /build/musicshowwins ./musicshowwins
 COPY --from=frontend-builder --chown=kpopwins:kpopwins /build/frontend/.next/standalone ./frontend
 COPY --from=frontend-builder --chown=kpopwins:kpopwins /build/frontend/.next/static ./frontend/.next/static
-COPY --chmod=0755 --chown=kpopwins:kpopwins docker-entrypoint.sh /app/docker-entrypoint.sh
 ENV PATH="/opt/venv/bin:${PATH}" \
     PYTHONPATH=/app/musicshowwins \
     NODE_ENV=production \
     HOSTNAME=0.0.0.0
 USER kpopwins
-ENTRYPOINT ["/app/docker-entrypoint.sh"]
 CMD ["node", "/app/frontend/server.js"]

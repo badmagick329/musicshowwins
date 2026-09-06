@@ -18,7 +18,8 @@ class Command(BaseCommand):
         parser.add_argument("path")
         parser.add_argument("--artist", action="append", dest="artists")
         parser.add_argument("--dry-run", action="store_true")
-        parser.add_argument("--publish", action="store_true")
+        parser.add_argument("--update-existing", action="store_true")
+        parser.add_argument("--skip-cache-revalidation", action="store_true")
 
     def handle(self, *args, **options):
         try:
@@ -28,11 +29,11 @@ class Command(BaseCommand):
                 if options["artists"]
                 else None
             )
-            created, updated = import_moments(
+            created, updated, unchanged = import_moments(
                 document,
                 artists=artists,
                 dry_run=options["dry_run"],
-                publish=options["publish"],
+                update_existing=options["update_existing"],
             )
         except (
             OSError,
@@ -41,10 +42,16 @@ class Command(BaseCommand):
             MomentDocumentError,
         ) as exc:
             raise CommandError(str(exc)) from exc
-        if not options["dry_run"] and (created or updated):
+        if (
+            not options["dry_run"]
+            and not options["skip_cache_revalidation"]
+            and (created or updated)
+        ):
             try:
                 invalidate_public_archive_cache()
             except CacheInvalidationError as exc:
                 raise CommandError(str(exc)) from exc
         prefix = "Dry run: " if options["dry_run"] else ""
-        self.stdout.write(f"{prefix}created {created}, updated {updated}.")
+        self.stdout.write(
+            f"{prefix}created {created}, updated {updated}, unchanged {unchanged}."
+        )

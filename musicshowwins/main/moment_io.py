@@ -21,7 +21,15 @@ class ResolvedMoment:
     win: Win
 
 
-MOMENT_FIELDS = {"state", "pending_reason", "event", "heading", "body", "citations"}
+MOMENT_FIELDS = {
+    "matching_state",
+    "status",
+    "pending_reason",
+    "event",
+    "heading",
+    "body",
+    "citations",
+}
 CITATION_FIELDS = {"provider", "publisher_name", "title", "url"}
 TEXT_LIMITS = {
     "heading": 300,
@@ -70,9 +78,11 @@ def _validate_shape(raw: Any, index: int) -> dict[str, Any]:
         raise MomentDocumentError(
             f"Entry {index}: contains unknown field {sorted(unknown)[0]}."
         )
-    state = raw.get("state")
-    if state not in {"matched", "pending"}:
+    matching_state = raw.get("matching_state")
+    if matching_state not in {"matched", "pending"}:
         raise MomentDocumentError(f"Entry {index}: state must be matched or pending.")
+    if raw.get("status") not in WinMoment.Status.values:
+        raise MomentDocumentError(f"Entry {index}: status must be draft or published.")
     event = raw.get("event")
     if not isinstance(event, dict) or set(event) != {
         "show",
@@ -118,7 +128,7 @@ def _validate_shape(raw: Any, index: int) -> dict[str, Any]:
                 f"Entry {index}, citation {citation_index}: "
                 "url must be a valid HTTP or HTTPS URL."
             ) from exc
-    if state == "pending" and (
+    if matching_state == "pending" and (
         not isinstance(raw.get("pending_reason"), str)
         or not raw["pending_reason"].strip()
     ):
@@ -159,7 +169,7 @@ def import_moments(
     *,
     artists: set[str] | None = None,
     dry_run: bool = False,
-    publish: bool = False,
+    update_existing: bool = False,
 ):
     if (
         not isinstance(document, dict)
@@ -177,7 +187,9 @@ def import_moments(
         if unknown:
             raise MomentDocumentError(f"Unknown selected artist: {sorted(unknown)[0]}.")
         pending = [
-            by_artist[name] for name in artists if by_artist[name]["state"] == "pending"
+            by_artist[name]
+            for name in artists
+            if by_artist[name]["matching_state"] == "pending"
         ]
         if pending:
             entry = pending[0]
@@ -188,24 +200,39 @@ def import_moments(
     chosen = [
         entry
         for entry in entries
-        if entry["state"] == "matched"
+        if entry["matching_state"] == "matched"
         and (not artists or normalize_key(entry["event"]["artist"]) in artists)
     ]
     resolved = [_resolve(entry, entries.index(entry) + 1) for entry in chosen]
+    existing_win_ids = set(
+        WinMoment.objects.filter(
+            win_id__in=[item.win.pk for item in resolved]
+        ).values_list("win_id", flat=True)
+    )
     if dry_run:
-        return len(resolved), 0
-    created = updated = 0
+        created = sum(item.win.pk not in existing_win_ids for item in resolved)
+        updated = len(resolved) - created if update_existing else 0
+        unchanged = len(resolved) - created - updated
+        return created, updated, unchanged
+    created = updated = unchanged = 0
     with transaction.atomic():
         for item in resolved:
             entry, win = item.entry, item.win
-            moment, was_created = WinMoment.objects.update_or_create(
-                win=win,
-                defaults={
-                    "heading": entry["heading"].strip(),
-                    "body": entry["body"].strip(),
-                    "status": WinMoment.Status.DRAFT,
-                },
-            )
+            moment = WinMoment.objects.select_for_update().filter(win=win).first()
+            if moment is not None and not update_existing:
+                unchanged += 1
+                continue
+            was_created = moment is None
+            if was_created:
+                moment = WinMoment.objects.create(
+                    win=win,
+                    heading=entry["heading"].strip(),
+                    body=entry["body"].strip(),
+                )
+            else:
+                moment.heading = entry["heading"].strip()
+                moment.body = entry["body"].strip()
+                moment.save(update_fields=("heading", "body", "updated_at"))
             refs = []
             for citation in entry["citations"]:
                 ref, _ = WinReference.objects.update_or_create(
@@ -221,15 +248,17 @@ def import_moments(
                 )
                 refs.append(ref)
             moment.citations.set(refs)
-            if publish:
+            desired_status = entry["status"]
+            if desired_status == WinMoment.Status.PUBLISHED:
                 validate_selected_citations(
                     win.pk,
-                    WinMoment.Status.PUBLISHED,
+                    desired_status,
                     refs,
                     require_active=True,
                 )
-                moment.status = WinMoment.Status.PUBLISHED
+            if moment.status != desired_status:
+                moment.status = desired_status
                 moment.save(update_fields=("status", "updated_at"))
             created += int(was_created)
             updated += int(not was_created)
-    return created, updated
+    return created, updated, unchanged
