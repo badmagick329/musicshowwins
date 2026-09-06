@@ -25,99 +25,16 @@ prints the key.
 In Google Cloud, create a project, enable YouTube Data API v3, create an API key,
 and restrict that key to the YouTube Data API before placing it in the local file.
 
-## Use
+## Routine workflow
 
-The complete workflow is:
+Use [WORKFLOW.md](WORKFLOW.md) for the short root-level workflow:
+`prepare`, agent `review batch` / `review apply`, then export and local verification.
+Preparation and review automatically migrate offline state. Preparation never
+approves a candidate or writes to Django; review applies only explicit agent
+decisions. Exported manifests remain the boundary to the public database.
 
-1. Create a Google Cloud project.
-2. Enable YouTube Data API v3.
-3. Create an API key restricted to that API.
-4. Store the key in `.ignore/operator-tools/.env`.
-5. Initialize or migrate state with `kpopwins-operator init`.
-6. Refresh the local KpopWins catalogue with `refresh-wins`.
-7. Resolve the configured handles with `youtube verify-channels`.
-8. Review every returned channel title and ID.
-9. Save the mappings with `youtube verify-channels --apply`.
-10. Run `youtube ingest` over one or more bounded runs.
-11. Preview and run local matching.
-12. List and inspect candidates individually.
-13. Approve selected candidates; reject unsuitable candidates.
-14. Run `export-approved`.
-15. Import the manifest into local Django for final verification.
-
-The tool reads metadata only: it does not download videos, auto-approve matches,
-or write to production.
-
-Initialize local state:
-
-```console
-uv run kpopwins-operator init
-```
-
-Refresh the complete win catalogue from a local KpopWins API:
-
-```console
-uv run kpopwins-operator refresh-wins
-```
-
-Resolve the tracked handles and inspect the result before storing it:
-
-```console
-uv run kpopwins-operator youtube verify-channels
-uv run kpopwins-operator youtube verify-channels --apply
-```
-
-`--handle @KBSKpop` limits verification or ingestion to one configured handle.
-Handle resolution uses `channels.list(forHandle=...)` and stores the stable channel
-ID and uploads playlist ID. The registry is
-`official-youtube-channels.toml`; edit it only when an official channel changes.
-
-Ingest uploads, then match them locally against current wins:
-
-```console
-uv run kpopwins-operator youtube ingest --max-pages 10
-uv run kpopwins-operator youtube match --min-score 75 --dry-run
-uv run kpopwins-operator youtube match --min-score 75
-```
-
-The initial scan resumes from its last completed page and stops at uploads older
-than 1 December 2013. Later runs start at the newest uploads and stop after the
-first fully known page. `youtube ingest --restart` discards an initial-scan
-checkpoint. Each playlist page and its video details are stored atomically.
-
-List and inspect pending candidates, then make explicit review decisions:
-
-```console
-uv run kpopwins-operator candidates list --status pending --min-score 75
-uv run kpopwins-operator candidates show 12
-uv run kpopwins-operator candidates approve 12 18 --reviewer agent-name --reason "Exact show, winner and episode confirmed"
-uv run kpopwins-operator candidates reject 21 --reviewer agent-name --reason "Wrong episode confirmed"
-```
-
-Matching uses only locally ingested videos. It requires artist and winner signals,
-uses show, song, date, and negative-title evidence for scoring, and never writes a
-`no_match` search state. Rejected decisions survive later matching runs.
-
-View local counts or list due work for a provider:
-
-```console
-uv run kpopwins-operator status
-uv run kpopwins-operator due --provider youtube --limit 100
-```
-
-Export approved candidates for current wins:
-
-```console
-uv run kpopwins-operator export-approved
-```
-
-The default manifest is written to
-`.ignore/operator-tools/manifests/win-references-v1.json`. Import it into a local
-Django environment from the repository root:
-
-```console
-uv run python manage.py import_win_references .ignore/operator-tools/manifests/win-references-v1.json
-```
+The commands below are individual discovery tools for audits and troubleshooting.
+They are not additional steps after `prepare --reddit`.
 
 ## Reddit wiki audit
 
