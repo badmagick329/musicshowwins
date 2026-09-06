@@ -188,15 +188,15 @@
     {
       "matching_state": "pending",
       "status": "draft",
-      "pending_reason": "The catalogue lists EXO’s Miracles in December win on 2014-01-02, while the contemporary M Countdown report dates that broadcast 2013-12-19. Confirm the catalogue date before publishing.",
+      "pending_reason": "The kisses pledge belongs to the verified M Countdown broadcast on 2013-12-19, which has no catalogue row. The existing 2014-01-02 win is a separate, verified event and must be retained. Pre-2014 coverage is outside the current importer.",
       "event": {
         "show": "m-countdown",
-        "date": "2014-01-02",
+        "date": "2013-12-19",
         "artist": "Exo",
         "song": "Miracles in December"
       },
       "heading": "EXO kept its promise after the winter win",
-      "body": "A contemporary M Countdown report says EXO won with “Miracles in December” and then carried out a pre-announced promise to blow kisses to fans and the camera.",
+      "body": "EXO won with “Miracles in December” on M Countdown on December 19, 2013. After the result, each member kept their pledge to blow kisses to the camera and the fans present.",
       "citations": [
         {
           "provider": "soompi",
@@ -1133,9 +1133,8 @@
       ]
     },
     {
-      "matching_state": "pending",
+      "matching_state": "matched",
       "status": "draft",
-      "pending_reason": "The catalogue records a Girls’ Generation Mr. Mr. Inkigayo win on 2014-03-09, but the researched contemporary article confirms only the comeback stage and the earlier M Countdown win. Find a direct winner report before publishing.",
       "event": {
         "show": "inkigayo",
         "date": "2014-03-09",
@@ -1143,13 +1142,13 @@
         "song": "Mr. Mr."
       },
       "heading": "Mr. Mr. continued Girls’ Generation’s comeback week",
-      "body": "Girls’ Generation appeared on Inkigayo with “Mr. Mr.” on March 9, 2014 during the group’s comeback week. A direct report of the catalogue’s listed win is still needed.",
+      "body": "Girls’ Generation won with “Mr.Mr.” on Inkigayo on March 9, 2014, during the group’s comeback week.",
       "citations": [
         {
           "provider": "soompi",
           "publisher_name": "Soompi",
-          "title": "2NE1 And Girls’ Generation Have Their Comeback Stages On Inkigayo",
-          "url": "https://www.soompi.com/article/587985wpp/2ne1-and-girls-generation-have-their-comeback-stages-on-inkigayo-03-09-14"
+          "title": "Girls' Generation Wins No.1 Against CNBLUE and Soyu x Junggigo on Inkigayo 03.09.14",
+          "url": "https://www.soompi.com/article/588027wpp/girls-generation-takes-the-win-against-cnblue-and-soyu-x-junggigo-on-inkigayo-03-09-14"
         }
       ]
     },
@@ -1663,7 +1662,7 @@
     {
       "matching_state": "pending",
       "status": "draft",
-      "pending_reason": "The catalogue records an AKMU 200% Music Core win on 2014-04-19, but the located Soompi source covers M Countdown and later online announcements. Find a direct Music Core report before publishing.",
+      "pending_reason": "The imported 2014-04-19 Music Core row has no verified contemporaneous winner announcement. That broadcast was cancelled. The former citation reports M Countdown on 2014-05-01, published 2014-05-02; MBC’s accessible chart search returned no 2014 entries. Retain draft pending historical Music Core chart evidence.",
       "event": {
         "show": "music-core",
         "date": "2014-04-19",
@@ -1671,13 +1670,13 @@
         "song": "200%"
       },
       "heading": "AKMU’s 200% run continued while shows were suspended",
-      "body": "AKMU’s “200%” is listed in the catalogue as a Music Core win on April 19, 2014 during the Sewol broadcast suspension. A direct report for that listed event is still needed.",
+      "body": "The catalogue lists AKMU’s “200%” for Music Core on April 19, 2014, but that broadcast was cancelled during the Sewol mourning period. An award for that chart week has not been independently verified.",
       "citations": [
         {
           "provider": "soompi",
           "publisher_name": "Soompi",
-          "title": "Akdong Musician Wins 1st Place For Third Week In A Row On M Countdown",
-          "url": "https://www.soompi.com/article/602779wpp/akdong-musician-wins-1st-place-for-third-week-in-a-row-on-m-countdown"
+          "title": "All Music Shows Canceled This Week, Affecting Comeback Stages of Block B, EXO, and More",
+          "url": "https://www.soompi.com/article/599051wpp/all-music-shows-canceled-this-week-affecting-comeback-stages-of-block-b-exo-and-more"
         }
       ]
     },
