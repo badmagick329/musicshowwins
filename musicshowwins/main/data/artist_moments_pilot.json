@@ -4,428 +4,2420 @@
     {
       "matching_state": "matched",
       "status": "published",
-      "event": {"show": "m-countdown", "date": "2026-04-30", "artist": "CORTIS", "song": "REDRED"},
-      "heading": "CORTIS's first music show win",
-      "body": "CORTIS earned their first music show trophy with “REDRED” on April 30, 2026. The group won M Countdown with 8,902 points, and the broadcast included their first winning encore.",
-      "citations": [{"provider": "soompi", "publisher_name": "Soompi", "title": "Watch: CORTIS Takes 1st-Ever Win On M Countdown With REDRED", "url": "https://www.soompi.com/article/1837470wpp/watch-cortis-takes-1st-ever-win-on-m-countdown-with-redred-performances-by-illit-katseye-and-more"}]
-    },
-    {
-      "matching_state": "matched",
-      "status": "published",
-      "event": {"show": "inkigayo", "date": "2021-01-17", "artist": "Aespa", "song": "Black Mamba"},
-      "heading": "aespa's first music show win",
-      "body": "aespa earned their first music show trophy with “Black Mamba” on Inkigayo on January 17, 2021, without appearing on the show. Contemporary coverage reports that hosts Minhyuk, Naeun and Jaehyun filled in for the encore.",
+      "event": {
+        "show": "m-countdown",
+        "date": "2026-04-30",
+        "artist": "CORTIS",
+        "song": "REDRED"
+      },
+      "heading": "CORTIS won REDRED for its first trophy",
+      "body": "CORTIS earned its first music-show trophy with “REDRED” on M Countdown on April 30, 2026.",
       "citations": [
-        {"provider": "soompi", "publisher_name": "Soompi", "title": "aespa Takes 1st-Ever Win With Black Mamba On Inkigayo", "url": "https://www.soompi.com/article/1449110wpp/aespa-takes-1st-ever-win-with-black-mamba-on-inkigayo"},
-        {"provider": "kstyle", "publisher_name": "Kstyle", "title": "aespa wins first place on Inkigayo without appearing", "url": "https://kstyle.com/article.ksn?articleNo=2160415"},
-        {"provider": "matamata", "publisher_name": "MataMata", "title": "aespa earns first win with Black Mamba", "url": "https://www.matamata.com/kpop/2021/01/18/083816/2-bulan-debut-aespa-raih-kemenangan-pertama-dengan-lagu-black-mamba"}
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "Watch: CORTIS Takes 1st-Ever Win On M Countdown With REDRED",
+          "url": "https://www.soompi.com/article/1837470wpp/watch-cortis-takes-1st-ever-win-on-m-countdown-with-redred-performances-by-illit-katseye-and-more"
+        }
       ]
     },
     {
       "matching_state": "matched",
       "status": "published",
-      "event": {"show": "the-show", "date": "2015-05-05", "artist": "BTS", "song": "I Need U"},
-      "heading": "BTS's first music show win",
-      "body": "BTS earned their first music show trophy with “I Need U” on May 5, 2015. Reflecting on their first week of wins, Jimin said the recognition made their practice feel worthwhile, while Suga described a new responsibility to keep improving.",
+      "event": {
+        "show": "inkigayo",
+        "date": "2021-01-17",
+        "artist": "Aespa",
+        "song": "Black Mamba"
+      },
+      "heading": "aespa’s first win came without a performance",
+      "body": "aespa’s debut single “Black Mamba” won the group’s first music-show trophy on Inkigayo on January 17, 2021, while aespa did not perform on that episode.",
       "citations": [
-        {"provider": "soompi", "publisher_name": "Soompi", "title": "BTS Takes First-Ever Music Show Win on The Show", "url": "https://www.soompi.com/article/728319wpp/bts-takes-first-ever-music-show-win-on-the-show-with%20-j%27ai%20besoin%20de%20toi"},
-        {"provider": "soompi", "publisher_name": "Soompi", "title": "BTS Sincerely Open Up About the Meaning of Winning 1st on a Music Show", "url": "https://www.soompi.com/article/730053wpp/bts-sincerely-open-up-about-the-meaning-of-winning-1st-on-a-music-show"}
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "aespa Takes 1st-Ever Win With Black Mamba On Inkigayo",
+          "url": "https://www.soompi.com/article/1449110wpp/aespa-takes-1st-ever-win-with-black-mamba-on-inkigayo"
+        },
+        {
+          "provider": "kstyle",
+          "publisher_name": "Kstyle",
+          "title": "aespa wins first place on Inkigayo without appearing",
+          "url": "https://kstyle.com/article.ksn?articleNo=2160415"
+        },
+        {
+          "provider": "kpopping",
+          "publisher_name": "Kpopping",
+          "title": "Inkigayo (January 17, 2021)",
+          "url": "https://kpopping.com/musicshows/2021-January-Inkigayo3"
+        }
       ]
     },
     {
       "matching_state": "matched",
       "status": "published",
-      "event": {"show": "show-champion", "date": "2021-12-08", "artist": "Ive", "song": "Eleven"},
-      "heading": "IVE's first music show win",
-      "body": "Just one week after debut, IVE won their first music show trophy with “ELEVEN” on Show Champion. Their first victory became an emotional moment for the group, captured in the broadcast's winner announcement and encore.",
-      "citations": [{"provider": "soompi", "publisher_name": "Soompi", "title": "IVE Takes Tearful 1st-Ever Win On Show Champion With ELEVEN", "url": "https://www.soompi.com/article/1502797wpp/watch-ive-takes-tearful-1st-ever-win-on-show-champion-with-eleven-performances-by-everglow-oneus-and-more"}]
-    },
-    {
-      "matching_state": "matched",
-      "status": "published",
-      "event": {"show": "music-bank", "date": "2015-03-27", "artist": "Red Velvet", "song": "Ice Cream Cake"},
-      "heading": "Red Velvet's first music show win",
-      "body": "Red Velvet won their first music show trophy with “Ice Cream Cake” on Music Bank, a day after finishing second on M Countdown. The members celebrated with a tearful acceptance speech and encore.",
+      "event": {
+        "show": "the-show",
+        "date": "2015-05-05",
+        "artist": "BTS",
+        "song": "I Need U"
+      },
+      "heading": "BTS’s first win made the work feel worthwhile",
+      "body": "BTS earned its first music-show trophy with “I Need U” on The Show on May 5, 2015, two years after debut. Afterward, Jimin said the win made the group’s hard work feel worthwhile, while Suga described the trophy as a responsibility to keep improving.",
       "citations": [
-        {"provider": "soompi", "publisher_name": "Soompi", "title": "Red Velvet Gets First-Ever Music Show Win on Music Bank", "url": "https://www.soompi.com/article/714439wpp/red-velvet-gets-first-ever-music-show-win-on-music-bank-with-ice-cream-cake?mobile-app=true&theme=dark%2F1000"},
-        {"provider": "tenasia", "publisher_name": "TenAsia", "title": "Red Velvet takes first music-show win", "url": "https://www.tenasia.co.kr/article/2015032783824"}
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "BTS Takes First-Ever Music Show Win on The Show",
+          "url": "https://www.soompi.com/article/728319wpp/bts-takes-first-ever-music-show-win-on-the-show-with%20-j%27ai%20besoin%20de%20toi"
+        },
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "BTS Sincerely Open Up About the Meaning of Winning 1st on a Music Show",
+          "url": "https://www.soompi.com/article/730053wpp/bts-sincerely-open-up-about-the-meaning-of-winning-1st-on-a-music-show"
+        }
       ]
     },
     {
       "matching_state": "matched",
       "status": "published",
-      "event": {"show": "the-show", "date": "2017-06-20", "artist": "T-ara", "song": "What's My Name?"},
+      "event": {
+        "show": "show-champion",
+        "date": "2021-12-08",
+        "artist": "Ive",
+        "song": "Eleven"
+      },
+      "heading": "IVE won ELEVEN one week after debut",
+      "body": "IVE won its first music-show trophy with debut song “ELEVEN” on Show Champion on December 8, 2021, one week after debut; coverage describes the first win as emotional.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "IVE Takes Tearful 1st-Ever Win On Show Champion With ELEVEN",
+          "url": "https://www.soompi.com/article/1502797wpp/watch-ive-takes-tearful-1st-ever-win-on-show-champion-with-eleven-performances-by-everglow-oneus-and-more"
+        }
+      ]
+    },
+    {
+      "matching_state": "matched",
+      "status": "published",
+      "event": {
+        "show": "music-bank",
+        "date": "2015-03-27",
+        "artist": "Red Velvet",
+        "song": "Ice Cream Cake"
+      },
+      "heading": "Red Velvet’s first win followed a close M Countdown finish",
+      "body": "Red Velvet’s first music-show trophy came with “Ice Cream Cake” on Music Bank on March 27, 2015, after a close second-place finish on M Countdown. The members delivered a tearful speech and encore.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "Red Velvet Gets First-Ever Music Show Win on Music Bank",
+          "url": "https://www.soompi.com/article/714439wpp/red-velvet-gets-first-ever-music-show-win-on-music-bank-with-ice-cream-cake?mobile-app=true&theme=dark%2F1000"
+        }
+      ]
+    },
+    {
+      "matching_state": "matched",
+      "status": "published",
+      "event": {
+        "show": "the-show",
+        "date": "2017-06-20",
+        "artist": "T-ara",
+        "song": "What's My Name?"
+      },
       "heading": "T-ara's first win in over five years",
       "body": "“What's My Name” brought T-ara their first Korean music show win in over five years. Hyomin, Qri and Jiyeon cried on stage and struggled to give an acceptance speech. Eunjung later recalled crying when she heard the news by phone while filming a drama.",
       "citations": [
-        {"provider": "soompi", "publisher_name": "Soompi", "title": "T-ara Breaks Down After 1st Win For What's My Name", "url": "https://www.soompi.com/article/1000581wpp/watch-t-ara-breaks-down-1st-win-whats-name-show-performances-ftisland-9muses-more"},
-        {"provider": "soompi", "publisher_name": "Soompi", "title": "T-ara's Eunjung Talks About Emotional 1st Place Win", "url": "https://www.soompi.com/article/1077723wpp/t-aras-eunjung-talks-love-members-emotional-1st-place-win"}
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "T-ara Breaks Down After 1st Win For What's My Name",
+          "url": "https://www.soompi.com/article/1000581wpp/watch-t-ara-breaks-down-1st-win-whats-name-show-performances-ftisland-9muses-more"
+        },
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "T-ara's Eunjung Talks About Emotional 1st Place Win",
+          "url": "https://www.soompi.com/article/1077723wpp/t-aras-eunjung-talks-love-members-emotional-1st-place-win"
+        }
       ]
     },
     {
       "matching_state": "matched",
       "status": "published",
-      "event": {"show": "m-countdown", "date": "2016-05-05", "artist": "Twice", "song": "Cheer Up"},
-      "heading": "TWICE's first trophy came with tears",
-      "body": "TWICE won their first music-show trophy with “Cheer Up” on M Countdown on May 5, 2016. Jihyo looked back on the members’ appearance on SIXTEEN a year earlier, while the group cried through its acceptance speech.",
-      "citations": [{"provider": "soompi", "publisher_name": "Soompi", "title": "TWICE Sheds Tears At First Ever Win With Cheer Up On M!Countdown", "url": "https://www.soompi.com/article/851663wpp/watch-twice-sheds-tears-at-first-ever-win-with-cheer-up-on-mcountdown"}]
+      "event": {
+        "show": "m-countdown",
+        "date": "2016-05-05",
+        "artist": "Twice",
+        "song": "Cheer Up"
+      },
+      "heading": "TWICE’s first win recalled SIXTEEN",
+      "body": "TWICE won its first music-show trophy with “Cheer Up” on M Countdown on May 5, 2016. Jihyo connected the win to the members’ appearance on SIXTEEN a year earlier and said the award made the group’s work feel worthwhile.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "TWICE Sheds Tears At First Ever Win With Cheer Up On M!Countdown",
+          "url": "https://www.soompi.com/article/851663wpp/watch-twice-sheds-tears-at-first-ever-win-with-cheer-up-on-mcountdown"
+        }
+      ]
     },
     {
       "matching_state": "matched",
-      "status": "published",
-      "event": {"show": "music-bank", "date": "2016-05-06", "artist": "Twice", "song": "Cheer Up"},
+      "status": "draft",
+      "event": {
+        "show": "music-bank",
+        "date": "2016-05-06",
+        "artist": "Twice",
+        "song": "Cheer Up"
+      },
       "heading": "TWICE followed its first win the next day",
       "body": "One day after their M Countdown breakthrough, TWICE took a second trophy and its first Music Bank win with “Cheer Up” on May 6, 2016, scoring 8,079 points.",
-      "citations": [{"provider": "soompi", "publisher_name": "Soompi", "title": "TWICE Gets 2nd Win With Cheer Up On Music Bank", "url": "https://www.soompi.com/article/852101wpp/watch-twice-gets-2nd-win-with-cheer-up-on-music-bank"}]
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "TWICE Gets 2nd Win With Cheer Up On Music Bank",
+          "url": "https://www.soompi.com/article/852101wpp/watch-twice-gets-2nd-win-with-cheer-up-on-music-bank"
+        }
+      ]
     },
     {
       "matching_state": "pending",
       "status": "draft",
       "pending_reason": "The catalogue lists EXO’s Miracles in December win on 2014-01-02, while the contemporary M Countdown report dates that broadcast 2013-12-19. Confirm the catalogue date before publishing.",
-      "event": {"show": "m-countdown", "date": "2014-01-02", "artist": "Exo", "song": "Miracles in December"},
+      "event": {
+        "show": "m-countdown",
+        "date": "2014-01-02",
+        "artist": "Exo",
+        "song": "Miracles in December"
+      },
       "heading": "EXO kept its promise after the winter win",
       "body": "A contemporary M Countdown report says EXO won with “Miracles in December” and then carried out a pre-announced promise to blow kisses to fans and the camera.",
-      "citations": [{"provider": "soompi", "publisher_name": "Soompi", "title": "EXO Wins at M!Countdown, Members Blow Kisses at Fans", "url": "https://www.soompi.com/article/562151wpp/exo-wins-at-m-countdown-members-blow-kisses-at-fans"}]
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "EXO Wins at M!Countdown, Members Blow Kisses at Fans",
+          "url": "https://www.soompi.com/article/562151wpp/exo-wins-at-m-countdown-members-blow-kisses-at-fans"
+        }
+      ]
     },
     {
       "matching_state": "matched",
-      "status": "published",
-      "event": {"show": "music-bank", "date": "2015-01-02", "artist": "Exo", "song": "December, 2014 (The Winter's Tale)"},
+      "status": "draft",
+      "event": {
+        "show": "music-bank",
+        "date": "2015-01-02",
+        "artist": "Exo",
+        "song": "December, 2014 (The Winter's Tale)"
+      },
       "heading": "EXO won Music Bank without performing",
       "body": "EXO took the Music Bank trophy with “December, 2014 (The Winter’s Tale)” on January 2, 2015, even though the group did not perform on the programme.",
-      "citations": [{"provider": "soompi", "publisher_name": "Soompi", "title": "EXO Wins on Music Bank This Week With December 2014", "url": "https://www.soompi.com/article/686307wpp/exo-wins-on-music-bank-this-week-with-december-2014"}]
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "EXO Wins on Music Bank This Week With December 2014",
+          "url": "https://www.soompi.com/article/686307wpp/exo-wins-on-music-bank-this-week-with-december-2014"
+        }
+      ]
     },
     {
       "matching_state": "matched",
       "status": "published",
-      "event": {"show": "show-champion", "date": "2016-05-04", "artist": "Seventeen", "song": "Pretty U"},
-      "heading": "SEVENTEEN's first win left the members in tears",
-      "body": "SEVENTEEN earned its first music-show trophy with “Pretty U” on Show Champion on May 4, 2016. The members became emotional during the win and encore after thanking fans, parents and staff.",
-      "citations": [{"provider": "soompi", "publisher_name": "Soompi", "title": "SEVENTEEN Tears Up Over 1st Ever Music Show Win On Show Champion For Pretty U", "url": "https://www.soompi.com/article/851307wpp/seventeen-tears-up-over-1st-ever-music-show-win-on-show-champion-for-pretty-u-performances-by-vixx-lovelyz-and-more"}]
+      "event": {
+        "show": "show-champion",
+        "date": "2016-05-04",
+        "artist": "Seventeen",
+        "song": "Pretty U"
+      },
+      "heading": "SEVENTEEN formed a human pyramid after its first win",
+      "body": "SEVENTEEN’s first music-show trophy came with “Pretty U” on Show Champion on May 4, 2016. During the encore, the members formed a human pyramid while some were still crying.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "SEVENTEEN Tears Up Over 1st Ever Music Show Win On Show Champion For Pretty U",
+          "url": "https://www.soompi.com/article/851307wpp/seventeen-tears-up-over-1st-ever-music-show-win-on-show-champion-for-pretty-u-performances-by-vixx-lovelyz-and-more"
+        }
+      ]
     },
     {
       "matching_state": "matched",
-      "status": "published",
-      "event": {"show": "show-champion", "date": "2016-05-11", "artist": "Seventeen", "song": "Pretty U"},
+      "status": "draft",
+      "event": {
+        "show": "show-champion",
+        "date": "2016-05-11",
+        "artist": "Seventeen",
+        "song": "Pretty U"
+      },
       "heading": "SEVENTEEN made it two in a row with Pretty U",
       "body": "On May 11, 2016, SEVENTEEN won its second trophy for “Pretty U” on Show Champion. The report says the members were visibly thrilled and thanked fans, parents, staff and host Kim Shin Young.",
-      "citations": [{"provider": "soompi", "publisher_name": "Soompi", "title": "SEVENTEEN Takes 2nd Win For Pretty U On Show Champion", "url": "https://www.soompi.com/article/854139wpp/seventeen-takes-2nd-win-for-pretty-u-on-show-champion-performances-by-lovelyz-crush-and-more"}]
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "SEVENTEEN Takes 2nd Win For Pretty U On Show Champion",
+          "url": "https://www.soompi.com/article/854139wpp/seventeen-takes-2nd-win-for-pretty-u-on-show-champion-performances-by-lovelyz-crush-and-more"
+        }
+      ]
     },
     {
       "matching_state": "matched",
-      "status": "published",
-      "event": {"show": "music-bank", "date": "2014-01-03", "artist": "IU", "song": "Friday"},
-      "heading": "IU's self-written Friday opened the new year with a win",
-      "body": "IU won Music Bank on January 3, 2014 with “Friday,” a self-written and composed song from the Modern Times – Epilogue repackage. She was not actively promoting the song live, and EXO finished only ten points behind.",
-      "citations": [{"provider": "soompi", "publisher_name": "Soompi", "title": "IU Wins on Music Bank With Friday", "url": "https://www.soompi.com/article/567085wpp/iu-wins-on-music-bank-with-friday?mobile-app=true&theme=false"}]
+      "status": "draft",
+      "event": {
+        "show": "music-bank",
+        "date": "2014-01-03",
+        "artist": "IU",
+        "song": "Friday"
+      },
+      "heading": "IU won Friday without appearing live",
+      "body": "IU won “Friday” on Music Bank on January 3, 2014 without appearing live; EXO also did not appear and finished second.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "IU Wins on Music Bank With Friday",
+          "url": "https://www.soompi.com/article/567085wpp/iu-wins-on-music-bank-with-friday?mobile-app=true&theme=false"
+        }
+      ]
     },
     {
       "matching_state": "matched",
-      "status": "published",
-      "event": {"show": "music-core", "date": "2014-01-04", "artist": "IU", "song": "Friday"},
+      "status": "draft",
+      "event": {
+        "show": "music-core",
+        "date": "2014-01-04",
+        "artist": "IU",
+        "song": "Friday"
+      },
       "heading": "Friday won again on Music Core",
       "body": "The day after her Music Bank result, IU’s “Friday” also won on Music Core on January 4, 2014, overcoming songs by EXO and Brown Eyed Soul.",
-      "citations": [{"provider": "soompi", "publisher_name": "Soompi", "title": "IU's Friday Wins on Music Core", "url": "https://www.soompi.com/article/567293wpp/ius-friday-wins-on-music-core"}]
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "IU's Friday Wins on Music Core",
+          "url": "https://www.soompi.com/article/567293wpp/ius-friday-wins-on-music-core"
+        }
+      ]
     },
     {
       "matching_state": "matched",
       "status": "published",
-      "event": {"show": "the-show", "date": "2016-02-02", "artist": "GFriend", "song": "Rough"},
+      "event": {
+        "show": "the-show",
+        "date": "2016-02-02",
+        "artist": "GFriend",
+        "song": "Rough"
+      },
       "heading": "GFRIEND's first win arrived on Yerin's first regular week as MC",
-      "body": "GFRIEND won its first music-show No. 1 with “Rough” on The Show on February 2, 2016. The members cried while thanking fans, and the broadcast was also Yerin’s first week as a regular MC.",
-      "citations": [{"provider": "soompi", "publisher_name": "Soompi", "title": "GFRIEND Takes Home First Ever Music Show Win on The Show", "url": "https://www.soompi.com/article/816563wpp/gfriend-takes-home-first-ever-music-show-win-on-the-show"}]
+      "body": "GFRIEND’s first music-show win came with “Rough” on The Show on February 2, 2016. It was also Yerin’s first week as a regular MC, making the win unusually personal to that broadcast.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "GFRIEND Takes Home First Ever Music Show Win on The Show",
+          "url": "https://www.soompi.com/article/816563wpp/gfriend-takes-home-first-ever-music-show-win-on-the-show"
+        }
+      ]
     },
     {
       "matching_state": "matched",
-      "status": "published",
-      "event": {"show": "show-champion", "date": "2016-02-03", "artist": "GFriend", "song": "Rough"},
+      "status": "draft",
+      "event": {
+        "show": "show-champion",
+        "date": "2016-02-03",
+        "artist": "GFriend",
+        "song": "Rough"
+      },
       "heading": "GFRIEND followed its breakthrough with a second Rough win",
       "body": "GFRIEND followed its first-ever trophy on The Show with a second “Rough” win on Show Champion on February 3, 2016. Each member had a chance to speak during the thank-you messages.",
-      "citations": [{"provider": "soompi", "publisher_name": "Soompi", "title": "GFRIEND Wins On Show Champion With Rough", "url": "https://www.soompi.com/article/816921wpp/gfriend-wins-on-show-champion-with-rough-performances-by-4minute-ryeowook-and-more"}]
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "GFRIEND Wins On Show Champion With Rough",
+          "url": "https://www.soompi.com/article/816921wpp/gfriend-wins-on-show-champion-with-rough-performances-by-4minute-ryeowook-and-more"
+        }
+      ]
     },
     {
       "matching_state": "matched",
-      "status": "published",
-      "event": {"show": "inkigayo", "date": "2016-08-21", "artist": "BLACKPINK", "song": "Whistle"},
+      "status": "draft",
+      "event": {
+        "show": "inkigayo",
+        "date": "2016-08-21",
+        "artist": "BLACKPINK",
+        "song": "Whistle"
+      },
       "heading": "BLACKPINK's debut song Whistle won on Inkigayo",
-      "body": "BLACKPINK earned its first Inkigayo trophy with debut song “Whistle” on August 21, 2016. The win arrived during the group’s debut promotions and was reported alongside the week’s winner announcement and stages.",
-      "citations": [{"provider": "soompi", "publisher_name": "Soompi", "title": "BLACKPINK Wins Inkigayo", "url": "https://www.soompi.com/article/888703wpp/blackpink-wins-inkigayo-performances-by-exo-nct-vixx-and-more"}]
+      "body": "BLACKPINK’s debut song “Whistle” gave the group its first Inkigayo trophy on August 21, 2016, during its debut promotions.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "BLACKPINK Wins Inkigayo",
+          "url": "https://www.soompi.com/article/888703wpp/blackpink-wins-inkigayo-performances-by-exo-nct-vixx-and-more"
+        }
+      ]
     },
     {
       "matching_state": "matched",
       "status": "published",
-      "event": {"show": "m-countdown", "date": "2016-09-08", "artist": "BLACKPINK", "song": "Whistle"},
-      "heading": "BLACKPINK won M Countdown without a stage",
-      "body": "“Whistle” gave BLACKPINK its second trophy on September 8, 2016, when the group won M Countdown despite having no physical sales or performance on that episode.",
-      "citations": [{"provider": "soompi", "publisher_name": "Soompi", "title": "BLACKPINK Wins M Countdown With Whistle", "url": "https://www.soompi.com/article/894621wpp/blackpink-wins-mcountdown-whistle-comeback-performances-red-velvet?mobile-app=true&theme=false"}]
+      "event": {
+        "show": "m-countdown",
+        "date": "2016-09-08",
+        "artist": "BLACKPINK",
+        "song": "Whistle"
+      },
+      "heading": "BLACKPINK won Whistle without sales or a stage",
+      "body": "“Whistle” gave BLACKPINK its first M Countdown trophy on September 8, 2016, despite the group having no physical sales or performance on that episode.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "BLACKPINK Wins M Countdown With Whistle",
+          "url": "https://www.soompi.com/article/894621wpp/blackpink-wins-mcountdown-whistle-comeback-performances-red-velvet?mobile-app=true&theme=false"
+        }
+      ]
     },
     {
       "matching_state": "matched",
       "status": "published",
-      "event": {"show": "the-show", "date": "2018-05-22", "artist": "(G)I-dle", "song": "Latata"},
+      "event": {
+        "show": "the-show",
+        "date": "2018-05-22",
+        "artist": "(G)I-dle",
+        "song": "Latata"
+      },
       "heading": "(G)I-DLE reached its first trophy only weeks after debut",
       "body": "(G)I-DLE won its first music-show trophy with “LATATA” on The Show on May 22, 2018, only a few weeks after debut. Jeon Soyeon promised the group would become idols worthy of the award.",
-      "citations": [{"provider": "soompi", "publisher_name": "Soompi", "title": "(G)I-DLE Takes 1st Ever Win With LATATA On The Show", "url": "https://www.soompi.com/article/1174135wpp/watch-gi-dle-takes-1st-ever-win-latata-show"}]
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "(G)I-DLE Takes 1st Ever Win With LATATA On The Show",
+          "url": "https://www.soompi.com/article/1174135wpp/watch-gi-dle-takes-1st-ever-win-latata-show"
+        }
+      ]
     },
     {
       "matching_state": "matched",
-      "status": "published",
-      "event": {"show": "m-countdown", "date": "2018-05-24", "artist": "(G)I-dle", "song": "Latata"},
+      "status": "draft",
+      "event": {
+        "show": "m-countdown",
+        "date": "2018-05-24",
+        "artist": "(G)I-dle",
+        "song": "Latata"
+      },
       "heading": "LATATA's second trophy came on M Countdown",
       "body": "Two days after its debut win, (G)I-DLE took a second “LATATA” trophy on M Countdown on May 24, 2018, beating WINNER’s “Everyday” by 8,183 to 7,394 points.",
-      "citations": [{"provider": "soompi", "publisher_name": "Soompi", "title": "(G)I-DLE Takes 2nd Win For LATATA On M Countdown", "url": "https://www.soompi.com/article/1175209wpp/watch-gi-dle-takes-2nd-win-latata-mcountdown-performances?mobile-app=true&theme=false"}]
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "(G)I-DLE Takes 2nd Win For LATATA On M Countdown",
+          "url": "https://www.soompi.com/article/1175209wpp/watch-gi-dle-takes-2nd-win-latata-mcountdown-performances?mobile-app=true&theme=false"
+        }
+      ]
     },
     {
       "matching_state": "matched",
       "status": "published",
-      "event": {"show": "m-countdown", "date": "2019-04-04", "artist": "Stray Kids", "song": "Miroh"},
-      "heading": "Stray Kids' first trophy with Miroh was emotional",
-      "body": "Stray Kids won its first music-show trophy with “MIROH” on M Countdown on April 4, 2019. The report describes the win as emotional and notes it came after the group’s debut the previous year.",
-      "citations": [{"provider": "soompi", "publisher_name": "Soompi", "title": "Stray Kids Takes Emotional 1st-Ever Music Show Win With Miroh", "url": "https://www.soompi.com/article/1315179wpp/watch-stray-kids-takes-emotional-1st-ever-music-show-win-on-m-countdown-with-miroh-performances-by-izone-and-more"}]
+      "event": {
+        "show": "m-countdown",
+        "date": "2019-04-04",
+        "artist": "Stray Kids",
+        "song": "Miroh"
+      },
+      "heading": "MIROH ended Stray Kids’ wait for a first win",
+      "body": "Stray Kids won its first music-show trophy with “MIROH” on April 4, 2019, after debuting in March 2018. The report describes the win as tearful.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "Stray Kids Takes Emotional 1st-Ever Music Show Win With Miroh",
+          "url": "https://www.soompi.com/article/1315179wpp/watch-stray-kids-takes-emotional-1st-ever-music-show-win-on-m-countdown-with-miroh-performances-by-izone-and-more"
+        }
+      ]
     },
     {
       "matching_state": "matched",
-      "status": "published",
-      "event": {"show": "m-countdown", "date": "2019-12-19", "artist": "Stray Kids", "song": "Levanter"},
+      "status": "draft",
+      "event": {
+        "show": "m-countdown",
+        "date": "2019-12-19",
+        "artist": "Stray Kids",
+        "song": "Levanter"
+      },
       "heading": "Stray Kids won Levanter on a no-performance M Countdown",
       "body": "On December 19, 2019, M Countdown announced Stray Kids as the winner with “Levanter” even though that episode had no new performances. A video of the group thanking viewers was shown instead.",
-      "citations": [{"provider": "soompi", "publisher_name": "Soompi", "title": "Stray Kids Wins With Levanter On M Countdown", "url": "https://www.soompi.com/article/1372483wpp/stray-kids-wins-with-levanter-on-m-countdown?mobile-app=true&theme=false"}]
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "Stray Kids Wins With Levanter On M Countdown",
+          "url": "https://www.soompi.com/article/1372483wpp/stray-kids-wins-with-levanter-on-m-countdown?mobile-app=true&theme=false"
+        }
+      ]
     },
     {
       "matching_state": "matched",
       "status": "published",
-      "event": {"show": "show-champion", "date": "2014-04-09", "artist": "Apink", "song": "Mr. Chu"},
+      "event": {
+        "show": "show-champion",
+        "date": "2014-04-09",
+        "artist": "Apink",
+        "song": "Mr. Chu"
+      },
       "heading": "Apink's Mr. Chu win started with surprise",
       "body": "Apink earned its first “Mr. Chu” music-show win on Show Champion on April 9, 2014. The members looked surprised during the announcement, with some close to tears, and Eunji posted a thank-you message afterward.",
-      "citations": [{"provider": "soompi", "publisher_name": "Soompi", "title": "A Pink Takes Their First Mr. Chu Win on Show Champion", "url": "https://www.soompi.com/article/597195wpp/a-pink-takes-their-first-mr-chu-win-on-show-champion"}]
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "A Pink Takes Their First Mr. Chu Win on Show Champion",
+          "url": "https://www.soompi.com/article/597195wpp/a-pink-takes-their-first-mr-chu-win-on-show-champion"
+        }
+      ]
     },
     {
       "matching_state": "matched",
-      "status": "published",
-      "event": {"show": "m-countdown", "date": "2014-04-10", "artist": "Apink", "song": "Mr. Chu"},
+      "status": "draft",
+      "event": {
+        "show": "m-countdown",
+        "date": "2014-04-10",
+        "artist": "Apink",
+        "song": "Mr. Chu"
+      },
       "heading": "Apink carried Mr. Chu to a second win",
       "body": "Apink followed its Show Champion result with a second “Mr. Chu” win on M Countdown on April 10, 2014. The article also records that this was the group’s first M Countdown performance for the promotions.",
-      "citations": [{"provider": "soompi", "publisher_name": "Soompi", "title": "A Pink Wins on M Countdown This Week With Mr. Chu", "url": "https://www.soompi.com/article/597415wpp/a-pink-wins-on-mcountdown-this-week-with-mr-chu"}]
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "A Pink Wins on M Countdown This Week With Mr. Chu",
+          "url": "https://www.soompi.com/article/597415wpp/a-pink-wins-on-mcountdown-this-week-with-mr-chu"
+        }
+      ]
     },
     {
       "matching_state": "matched",
       "status": "published",
-      "event": {"show": "m-countdown", "date": "2019-02-21", "artist": "Itzy", "song": "Dalla Dalla"},
-      "heading": "ITZY won its first trophy nine days after debut",
-      "body": "ITZY won its first music-show trophy with “DALLA DALLA” on M Countdown on February 21, 2019, only nine days after debut. The group scored 8,527 points against Hwasa’s 7,882.",
-      "citations": [{"provider": "soompi", "publisher_name": "Soompi", "title": "ITZY Takes 1st Ever Win On M Countdown With DALLA DALLA", "url": "https://www.soompi.com/article/1305299wpp/watch-itzy-grabs-1st-ever-win-on-m-countdown-with-dalla-dalla-performances-by-hwasa-monsta-x-and-more"}]
+      "event": {
+        "show": "m-countdown",
+        "date": "2019-02-21",
+        "artist": "Itzy",
+        "song": "Dalla Dalla"
+      },
+      "heading": "ITZY won DALLA DALLA nine days after debut",
+      "body": "ITZY won its first music-show trophy with “DALLA DALLA” on M Countdown on February 21, 2019, only nine days after debut.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "ITZY Takes 1st Ever Win On M Countdown With DALLA DALLA",
+          "url": "https://www.soompi.com/article/1305299wpp/watch-itzy-grabs-1st-ever-win-on-m-countdown-with-dalla-dalla-performances-by-hwasa-monsta-x-and-more"
+        }
+      ]
     },
     {
       "matching_state": "matched",
       "status": "published",
-      "event": {"show": "music-core", "date": "2019-02-23", "artist": "Itzy", "song": "Dalla Dalla"},
-      "heading": "ITZY's second win was its first on a major network",
-      "body": "ITZY took its second “DALLA DALLA” win on Music Core on February 23, 2019. The 7,164-point result was also the rookie group’s first win on a major network music show.",
-      "citations": [{"provider": "soompi", "publisher_name": "Soompi", "title": "ITZY Takes 2nd Win For DALLA DALLA On Music Core", "url": "https://www.soompi.com/article/1305712wpp/watch-live-monsta-x-sf9-shinees-"}]
+      "event": {
+        "show": "music-core",
+        "date": "2019-02-23",
+        "artist": "Itzy",
+        "song": "Dalla Dalla"
+      },
+      "heading": "ITZY’s first major-network win came with DALLA DALLA",
+      "body": "ITZY’s second “DALLA DALLA” win on Music Core on February 23, 2019 was also the rookie group’s first trophy on a major-network music show.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "ITZY Takes 2nd Win For DALLA DALLA On Music Core",
+          "url": "https://www.soompi.com/article/1305712wpp/watch-live-monsta-x-sf9-shinees-"
+        }
+      ]
     },
     {
       "matching_state": "matched",
       "status": "published",
-      "event": {"show": "the-show", "date": "2017-02-14", "artist": "NCT Dream", "song": "My First and Last"},
-      "heading": "NCT Dream's first win was also The Show's 100th episode",
-      "body": "NCT Dream won its first music-show trophy with “My First and Last” on The Show on February 14, 2017. The episode was the programme’s 100th edition, and the members became teary during the encore.",
-      "citations": [{"provider": "soompi", "publisher_name": "Soompi", "title": "NCT Dream Takes 1st Ever Win With My First And Last On The Show", "url": "https://www.soompi.com/article/949797wpp/watch-nct-dream-takes-1st-ever-win-first-last-show"}]
+      "event": {
+        "show": "the-show",
+        "date": "2017-02-14",
+        "artist": "NCT Dream",
+        "song": "My First and Last"
+      },
+      "heading": "NCT Dream’s first win came with a teary encore",
+      "body": "NCT Dream won its first music-show trophy with “My First and Last” on The Show on February 14, 2017. The members became teary during the encore.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "NCT Dream Takes 1st Ever Win With My First And Last On The Show",
+          "url": "https://www.soompi.com/article/949797wpp/watch-nct-dream-takes-1st-ever-win-first-last-show"
+        }
+      ]
     },
     {
       "matching_state": "matched",
-      "status": "published",
-      "event": {"show": "the-show", "date": "2017-02-21", "artist": "NCT Dream", "song": "My First and Last"},
+      "status": "draft",
+      "event": {
+        "show": "the-show",
+        "date": "2017-02-21",
+        "artist": "NCT Dream",
+        "song": "My First and Last"
+      },
       "heading": "NCT Dream won My First and Last two weeks running",
       "body": "NCT Dream took a second consecutive The Show trophy with “My First and Last” on February 21, 2017, scoring 8,248 points and beating fellow NCT unit NCT 127.",
-      "citations": [{"provider": "soompi", "publisher_name": "Soompi", "title": "NCT Dream Takes 2nd Win For My First And Last On The Show", "url": "https://www.soompi.com/article/952453wpp/watch-nct-dream-takes-2nd-win-first-last-show"}]
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "NCT Dream Takes 2nd Win For My First And Last On The Show",
+          "url": "https://www.soompi.com/article/952453wpp/watch-nct-dream-takes-2nd-win-first-last-show"
+        }
+      ]
     },
     {
       "matching_state": "matched",
       "status": "published",
-      "event": {"show": "show-champion", "date": "2017-08-16", "artist": "Wanna One", "song": "Energetic"},
-      "heading": "Wanna One won within nine days of debut",
-      "body": "Wanna One won its first music-show trophy with “Energetic” on Show Champion on August 16, 2017, only nine days after debut. Every member had a chance to thank fans, and Ong Sung Woo said the result felt like a dream.",
-      "citations": [{"provider": "soompi", "publisher_name": "Soompi", "title": "Wanna One Takes 1st Ever Win With Energetic On Show Champion", "url": "https://www.soompi.com/article/1028623wpp/watch-wanna-one-takes-1st-ever-win-energetic-show-champion-performances-by-jj-project-gfriend"}]
+      "event": {
+        "show": "show-champion",
+        "date": "2017-08-16",
+        "artist": "Wanna One",
+        "song": "Energetic"
+      },
+      "heading": "Wanna One won Energetic nine days after debut",
+      "body": "Wanna One won its first music-show trophy with “Energetic” on Show Champion on August 16, 2017, nine days after its official debut. Ong Sung Woo said the result felt like a dream.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "Wanna One Takes 1st Ever Win With Energetic On Show Champion",
+          "url": "https://www.soompi.com/article/1028623wpp/watch-wanna-one-takes-1st-ever-win-energetic-show-champion-performances-by-jj-project-gfriend"
+        }
+      ]
     },
     {
       "matching_state": "matched",
       "status": "published",
-      "event": {"show": "m-countdown", "date": "2017-08-17", "artist": "Wanna One", "song": "Energetic"},
+      "event": {
+        "show": "m-countdown",
+        "date": "2017-08-17",
+        "artist": "Wanna One",
+        "song": "Energetic"
+      },
       "heading": "Wanna One's second win came with a fan love letter",
-      "body": "Wanna One won a second “Energetic” trophy on M Countdown on August 17, 2017. The members followed their promise by holding placards that together read, “Since we’ve received a lot, there’s a lot we’re going to give too.”",
-      "citations": [{"provider": "soompi", "publisher_name": "Soompi", "title": "Wanna One Grabs 2nd Win For Energetic On M Countdown", "url": "https://www.soompi.com/article/1029197wpp/watch-wanna-one-grabs-2nd-win-energetic-mcountdown-performances"}]
+      "body": "Wanna One’s second “Energetic” trophy on M Countdown on August 17, 2017 came with the promised fan message: the members held placards that formed a thank-you when read together.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "Wanna One Grabs 2nd Win For Energetic On M Countdown",
+          "url": "https://www.soompi.com/article/1029197wpp/watch-wanna-one-grabs-2nd-win-energetic-mcountdown-performances"
+        }
+      ]
     },
     {
       "matching_state": "matched",
       "status": "published",
-      "event": {"show": "inkigayo", "date": "2016-03-06", "artist": "Mamamoo", "song": "You're The Best"},
-      "heading": "MAMAMOO's first career win was tearful",
-      "body": "MAMAMOO earned its first career music-show win with “You’re The Best” on Inkigayo on March 6, 2016. The group edged Taeyeon’s “Rain” and Taemin’s “Press Your Number,” then thanked parents, its agency and fans through tears.",
-      "citations": [{"provider": "soompi", "publisher_name": "Soompi", "title": "MAMAMOO Takes 1st Career Music Show Win on Inkigayo", "url": "https://www.soompi.com/article/829923wpp/mamamoo-takes-1st-career-music-show-win-on-inkigayo-performances-by-taemin-b-a-p-winner-and-more"}]
+      "event": {
+        "show": "inkigayo",
+        "date": "2016-03-06",
+        "artist": "Mamamoo",
+        "song": "You're The Best"
+      },
+      "heading": "MAMAMOO’s first win came with You’re The Best",
+      "body": "MAMAMOO earned its first career music-show win with “You’re The Best” on Inkigayo on March 6, 2016. The members were overcome with emotion as they thanked their parents, agency and fans.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "MAMAMOO Takes 1st Career Music Show Win on Inkigayo",
+          "url": "https://www.soompi.com/article/829923wpp/mamamoo-takes-1st-career-music-show-win-on-inkigayo-performances-by-taemin-b-a-p-winner-and-more"
+        }
+      ]
     },
     {
       "matching_state": "matched",
-      "status": "published",
-      "event": {"show": "show-champion", "date": "2016-03-09", "artist": "Mamamoo", "song": "You're The Best"},
+      "status": "draft",
+      "event": {
+        "show": "show-champion",
+        "date": "2016-03-09",
+        "artist": "Mamamoo",
+        "song": "You're The Best"
+      },
       "heading": "MAMAMOO followed its first win with another trophy",
       "body": "MAMAMOO took its second music-show trophy for “You’re The Best” on Show Champion on March 9, 2016. The members thanked family, agency and fans again and posed with the trophy after the show.",
-      "citations": [{"provider": "soompi", "publisher_name": "Soompi", "title": "MAMAMOO Takes 2nd Win for You're The Best on Show Champion", "url": "https://www.soompi.com/article/831073wpp/mamamoo-takes-2nd-win-for-youre-the-best-on-show-champion"}]
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "MAMAMOO Takes 2nd Win for You're The Best on Show Champion",
+          "url": "https://www.soompi.com/article/831073wpp/mamamoo-takes-2nd-win-for-youre-the-best-on-show-champion"
+        }
+      ]
     },
     {
       "matching_state": "matched",
       "status": "published",
-      "event": {"show": "music-core", "date": "2015-05-09", "artist": "Big Bang", "song": "Loser"},
-      "heading": "BIGBANG's Loser began its win streak without the group present",
-      "body": "BIGBANG won Music Core with “Loser” on May 9, 2015. The group was not present for the broadcast, which nevertheless marked the first trophy of the song’s run.",
-      "citations": [{"provider": "soompi", "publisher_name": "Soompi", "title": "BIGBANG Takes Their First Win on Music Core With Loser", "url": "https://www.soompi.com/article/729959wpp/bigbang-takes-their-first-win-on-music-core-with-loser"}]
+      "event": {
+        "show": "music-core",
+        "date": "2015-05-09",
+        "artist": "Big Bang",
+        "song": "Loser"
+      },
+      "heading": "BIGBANG’s first Music Core trophy came with Loser",
+      "body": "BIGBANG earned its first Music Core trophy with “Loser” on May 9, 2015.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "BIGBANG Takes Their First Win on Music Core With Loser",
+          "url": "https://www.soompi.com/article/729959wpp/bigbang-takes-their-first-win-on-music-core-with-loser"
+        }
+      ]
     },
     {
       "matching_state": "matched",
-      "status": "published",
-      "event": {"show": "inkigayo", "date": "2015-05-10", "artist": "Big Bang", "song": "Loser"},
+      "status": "draft",
+      "event": {
+        "show": "inkigayo",
+        "date": "2015-05-10",
+        "artist": "Big Bang",
+        "song": "Loser"
+      },
       "heading": "BIGBANG's Loser won again with Daesung as special MC",
       "body": "The day after its Music Core breakthrough, BIGBANG won a second “Loser” trophy on Inkigayo on May 10, 2015, with 10,909 points. Daesung was also a special MC for the broadcast.",
-      "citations": [{"provider": "soompi", "publisher_name": "Soompi", "title": "BIGBANG Takes 2nd Music Show Win on Inkigayo", "url": "https://www.soompi.com/article/730181wpp/bigbang-takes-2nd-music-show-win-on-inkigayo"}]
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "BIGBANG Takes 2nd Music Show Win on Inkigayo",
+          "url": "https://www.soompi.com/article/730181wpp/bigbang-takes-2nd-music-show-win-on-inkigayo"
+        }
+      ]
     },
     {
       "matching_state": "matched",
       "status": "published",
-      "event": {"show": "m-countdown", "date": "2017-06-22", "artist": "NCT 127", "song": "Cherry Bomb"},
+      "event": {
+        "show": "m-countdown",
+        "date": "2017-06-22",
+        "artist": "NCT 127",
+        "song": "Cherry Bomb"
+      },
       "heading": "NCT 127 finally broke through with Cherry Bomb",
-      "body": "NCT 127 earned its first music-show win since debut with “Cherry Bomb” on M Countdown on June 22, 2017. The winning speech thanked Lee Soo Man, SM staff and NCTzens.",
-      "citations": [{"provider": "soompi", "publisher_name": "Soompi", "title": "NCT 127 Takes Their 1st Music Show Win Ever With Cherry Bomb", "url": "https://www.soompi.com/article/1001467wpp/watch-nct-127-takes-1st-music-show-win-ever-cherry-bomb"}]
+      "body": "“Cherry Bomb” gave NCT 127 its first music-show trophy since debut on M Countdown on June 22, 2017. In the winning speech, the members thanked Lee Soo Man, SM staff and NCTzens.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "NCT 127 Takes Their 1st Music Show Win Ever With Cherry Bomb",
+          "url": "https://www.soompi.com/article/1001467wpp/watch-nct-127-takes-1st-music-show-win-ever-cherry-bomb"
+        }
+      ]
     },
     {
       "matching_state": "matched",
-      "status": "published",
-      "event": {"show": "the-show", "date": "2018-03-27", "artist": "NCT 127", "song": "Touch"},
+      "status": "draft",
+      "event": {
+        "show": "the-show",
+        "date": "2018-03-27",
+        "artist": "NCT 127",
+        "song": "Touch"
+      },
       "heading": "NCT 127 won Touch without accepting in person",
-      "body": "NCT 127’s “Touch” won The Show on March 27, 2018 with 8,500 points. The group could not accept the trophy in person because of its schedule.",
-      "citations": [{"provider": "soompi", "publisher_name": "Soompi", "title": "NCT 127 Takes 1st Win For Touch On The Show", "url": "https://www.soompi.com/article/1146323wpp/nct-127-takes-1st-win-touch-show"}]
+      "body": "NCT 127’s “Touch” won The Show on March 27, 2018, but the group could not accept the trophy in person because of its schedule.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "NCT 127 Takes 1st Win For Touch On The Show",
+          "url": "https://www.soompi.com/article/1146323wpp/nct-127-takes-1st-win-touch-show"
+        }
+      ]
     },
     {
       "matching_state": "matched",
       "status": "published",
-      "event": {"show": "the-show", "date": "2022-05-10", "artist": "Le Sserafim", "song": "Fearless"},
-      "heading": "LE SSERAFIM won Fearless eight days after debut",
-      "body": "LE SSERAFIM earned the first music-show trophy of its career with “FEARLESS” on The Show on May 10, 2022, eight days after debut. The group scored 8,456 points.",
-      "citations": [{"provider": "soompi", "publisher_name": "Soompi", "title": "LE SSERAFIM Takes 1st-Ever Win On The Show With FEARLESS", "url": "https://www.soompi.com/article/1525674wpp/watch-le-sserafim-takes-1st-ever-win-on-the-show-with-fearless-performances-by-woodz-classy-and-more"}]
+      "event": {
+        "show": "the-show",
+        "date": "2022-05-10",
+        "artist": "Le Sserafim",
+        "song": "Fearless"
+      },
+      "heading": "LE SSERAFIM won FEARLESS eight days after debut",
+      "body": "LE SSERAFIM earned its first music-show trophy with “FEARLESS” on The Show on May 10, 2022, eight days after debut.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "LE SSERAFIM Takes 1st-Ever Win On The Show With FEARLESS",
+          "url": "https://www.soompi.com/article/1525674wpp/watch-le-sserafim-takes-1st-ever-win-on-the-show-with-fearless-performances-by-woodz-classy-and-more"
+        }
+      ]
     },
     {
       "matching_state": "matched",
-      "status": "published",
-      "event": {"show": "music-bank", "date": "2022-05-13", "artist": "Le Sserafim", "song": "Fearless"},
+      "status": "draft",
+      "event": {
+        "show": "music-bank",
+        "date": "2022-05-13",
+        "artist": "Le Sserafim",
+        "song": "Fearless"
+      },
       "heading": "LE SSERAFIM took Fearless to Music Bank",
       "body": "Three days after its first trophy, LE SSERAFIM won a second “FEARLESS” award on Music Bank on May 13, 2022, beating Lim Young Woong by 7,881 to 7,035 points.",
-      "citations": [{"provider": "soompi", "publisher_name": "Soompi", "title": "LE SSERAFIM Takes 2nd Win For FEARLESS On Music Bank", "url": "https://www.soompi.com/article/1526206wpp/watch-le-sserafim-takes-2nd-win-for-fearless-on-music-bank-performances-by-txt-classy-lim-young-woong-and-more"}]
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "LE SSERAFIM Takes 2nd Win For FEARLESS On Music Bank",
+          "url": "https://www.soompi.com/article/1526206wpp/watch-le-sserafim-takes-2nd-win-for-fearless-on-music-bank-performances-by-txt-classy-lim-young-woong-and-more"
+        }
+      ]
     },
     {
       "matching_state": "matched",
       "status": "published",
-      "event": {"show": "music-bank", "date": "2015-05-08", "artist": "BTS", "song": "I Need U"},
+      "event": {
+        "show": "music-bank",
+        "date": "2015-05-08",
+        "artist": "BTS",
+        "song": "I Need U"
+      },
       "heading": "BTS's first public-broadcast win came with a parts-swapping encore promise",
-      "body": "BTS won Music Bank with “I Need U” on May 8, 2015, its first public-broadcast music-show trophy. Before the result, the members had promised to swap rapper and vocalist parts if they won.",
-      "citations": [{"provider": "soompi", "publisher_name": "Soompi", "title": "BTS's I Need U Wins First Place on Music Bank", "url": "https://www.soompi.com/article/729671wpp/btss-i-need-u-wins-first-place-on-music-bank"}, {"provider": "soompi", "publisher_name": "Soompi", "title": "BTS Sincerely Open Up About the Meaning of Winning 1st on a Music Show", "url": "https://www.soompi.com/article/730053wpp/bts-sincerely-open-up-about-the-meaning-of-winning-1st-on-a-music-show"}]
+      "body": "BTS’s first public-broadcast trophy with “I Need U” came on Music Bank on May 8, 2015. Before the result, the members had promised to swap rapper and vocalist parts if they won.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "BTS's I Need U Wins First Place on Music Bank",
+          "url": "https://www.soompi.com/article/729671wpp/btss-i-need-u-wins-first-place-on-music-bank"
+        },
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "BTS Sincerely Open Up About the Meaning of Winning 1st on a Music Show",
+          "url": "https://www.soompi.com/article/730053wpp/bts-sincerely-open-up-about-the-meaning-of-winning-1st-on-a-music-show"
+        }
+      ]
     },
     {
       "matching_state": "matched",
-      "status": "published",
-      "event": {"show": "music-bank", "date": "2026-06-05", "artist": "Aespa", "song": "WDA (Whole Different Animal)"},
+      "status": "draft",
+      "event": {
+        "show": "music-bank",
+        "date": "2026-06-05",
+        "artist": "Aespa",
+        "song": "WDA (Whole Different Animal)"
+      },
       "heading": "aespa won with WDA featuring G-Dragon",
       "body": "aespa won Music Bank with “WDA (Whole Different Animal)” on June 5, 2026. The broadcast report identifies the track as featuring BIGBANG’s G-Dragon and records a 6,934-point win.",
-      "citations": [{"provider": "soompi", "publisher_name": "Soompi", "title": "aespa Takes 1st Win For WDA (Whole Different Animal) On Music Bank", "url": "https://www.soompi.com/article/1845845wpp/watch-aespa-takes-1st-win-for-wda-whole-different-animal-on-music-bank-performances-by-mamamoo-meovv-and-more"}]
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "aespa Takes 1st Win For WDA (Whole Different Animal) On Music Bank",
+          "url": "https://www.soompi.com/article/1845845wpp/watch-aespa-takes-1st-win-for-wda-whole-different-animal-on-music-bank-performances-by-mamamoo-meovv-and-more"
+        }
+      ]
     },
     {
       "matching_state": "matched",
-      "status": "published",
-      "event": {"show": "the-show", "date": "2021-12-14", "artist": "Ive", "song": "Eleven"},
+      "status": "draft",
+      "event": {
+        "show": "the-show",
+        "date": "2021-12-14",
+        "artist": "Ive",
+        "song": "Eleven"
+      },
       "heading": "IVE followed its debut win with another ELEVEN trophy",
       "body": "IVE won its second career music-show trophy with “ELEVEN” on The Show on December 14, 2021, scoring 7,376 points against ATEEZ and EVERGLOW.",
-      "citations": [{"provider": "soompi", "publisher_name": "Soompi", "title": "IVE Takes 2nd Win For ELEVEN On The Show", "url": "https://www.soompi.com/article/1503697wpp/watch-ive-takes-2nd-win-for-eleven-on-the-show-performances-by-ateez-everglow-billlie-and-more"}]
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "IVE Takes 2nd Win For ELEVEN On The Show",
+          "url": "https://www.soompi.com/article/1503697wpp/watch-ive-takes-2nd-win-for-eleven-on-the-show-performances-by-ateez-everglow-billlie-and-more"
+        }
+      ]
+    },
+    {
+      "matching_state": "matched",
+      "status": "draft",
+      "event": {
+        "show": "inkigayo",
+        "date": "2015-03-29",
+        "artist": "Red Velvet",
+        "song": "Ice Cream Cake"
+      },
+      "heading": "Red Velvet's Ice Cream Cake won again on Inkigayo",
+      "body": "Red Velvet followed its first Music Bank trophy with a second “Ice Cream Cake” win on Inkigayo on March 29, 2015. The group thanked SM Entertainment, its families and fans.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "Red Velvet Takes Second Music Show Win This Week on Inkigayo",
+          "url": "https://www.soompi.com/article/715051wpp/red-velvet-takes-second-music-show-win-this-week-on-inkigayo"
+        }
+      ]
     },
     {
       "matching_state": "matched",
       "status": "published",
-      "event": {"show": "inkigayo", "date": "2015-03-29", "artist": "Red Velvet", "song": "Ice Cream Cake"},
-      "heading": "Red Velvet's Ice Cream Cake won again on Inkigayo",
-      "body": "Red Velvet followed its first Music Bank trophy with a second “Ice Cream Cake” win on Inkigayo on March 29, 2015. The group thanked SM Entertainment, its families and fans.",
-      "citations": [{"provider": "soompi", "publisher_name": "Soompi", "title": "Red Velvet Takes Second Music Show Win This Week on Inkigayo", "url": "https://www.soompi.com/article/715051wpp/red-velvet-takes-second-music-show-win-this-week-on-inkigayo"}]
+      "event": {
+        "show": "m-countdown",
+        "date": "2019-06-20",
+        "artist": "Ateez",
+        "song": "Wave"
+      },
+      "heading": "ATEEZ’s first win came with Wave",
+      "body": "ATEEZ won its first music-show trophy with “Wave” on M Countdown on June 20, 2019. Hongjoong said the group was happy simply to be on stage each day and thanked ATINY and the staff.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "ATEEZ Takes 1st Ever Win On M Countdown With Wave",
+          "url": "https://www.soompi.com/article/1333529wpp/watch-ateez-takes-1st-ever-win-on-m-countdown-with-wave-performances-by-jeon-somi-leo-stray-kids-and-more.html"
+        }
+      ]
+    },
+    {
+      "matching_state": "matched",
+      "status": "draft",
+      "event": {
+        "show": "the-show",
+        "date": "2019-06-25",
+        "artist": "Ateez",
+        "song": "Wave"
+      },
+      "heading": "ATEEZ edged out a close second Wave race",
+      "body": "Five days later, ATEEZ won “Wave” again on The Show with 6,207 points, only 17 points ahead of WJSN. The result was their second music-show trophy.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "ATEEZ Grabs 2nd Win For Wave On The Show",
+          "url": "https://www.soompi.com/article/1334563wpp/watch-ateez-grabs-2nd-win-for-wave-on-the-show-performances-by-wjsn-sf9-and-more"
+        }
+      ]
+    },
+    {
+      "matching_state": "matched",
+      "status": "published",
+      "event": {
+        "show": "m-countdown",
+        "date": "2022-08-18",
+        "artist": "NewJeans",
+        "song": "Attention"
+      },
+      "heading": "NewJeans accepted its first win by video",
+      "body": "NewJeans’s first music-show win came on a summer-special M Countdown episode with no live broadcast. The members accepted by video and thanked their debut team and fans.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "NewJeans Takes 1st-Ever Win With Attention",
+          "url": "https://www.soompi.com/article/1541202wpp/watch-newjeans-takes-1st-ever-win-with-a"
+        }
+      ]
+    },
+    {
+      "matching_state": "matched",
+      "status": "draft",
+      "event": {
+        "show": "music-bank",
+        "date": "2022-08-19",
+        "artist": "NewJeans",
+        "song": "Attention"
+      },
+      "heading": "NewJeans followed Attention with a Music Bank win",
+      "body": "The next day, NewJeans won “Attention” again on Music Bank with 11,150 points, beating Girls’ Generation’s “FOREVER 1.” It was the group’s second trophy for the song.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "NewJeans Takes 2nd Win For Attention On Music Bank",
+          "url": "https://www.soompi.com/article/1541403wpp/watch-newjeans-takes-2nd-win-for-attention-on-music-bank-performances-by-girls-generation-the-boyz-golden-child-and-more"
+        }
+      ]
+    },
+    {
+      "matching_state": "matched",
+      "status": "published",
+      "event": {
+        "show": "show-champion",
+        "date": "2015-10-14",
+        "artist": "Taeyeon",
+        "song": "I"
+      },
+      "heading": "Taeyeon’s solo debut won its first trophy",
+      "body": "Taeyeon’s first solo music-show trophy came with “I” on Show Champion on October 14, 2015, one week after the solo album’s release; she was not present at the broadcast.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "Girls’ Generation’s Taeyeon Takes First Win For I On Show Champion",
+          "url": "https://www.soompi.com/article/778601wpp/girls-generations-taeyeon-takes-first-win-for-i-on-show-champion"
+        }
+      ]
+    },
+    {
+      "matching_state": "matched",
+      "status": "draft",
+      "event": {
+        "show": "music-core",
+        "date": "2015-10-24",
+        "artist": "Taeyeon",
+        "song": "I"
+      },
+      "heading": "I became Taeyeon’s first Music Core solo win",
+      "body": "On October 24, 2015, Taeyeon’s “I” won on Music Core. The report identifies it as the song’s seventh music-show victory and Taeyeon’s first solo win on that programme.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "Taeyeon Gets 7th Win For I On Music Core",
+          "url": "https://www.soompi.com/article/781769wpp/taeyeon-gets-7th-win-for-i-on-music-core-performances-by-kyuhyun-twice-btob-and-more"
+        }
+      ]
+    },
+    {
+      "matching_state": "matched",
+      "status": "published",
+      "event": {
+        "show": "the-show",
+        "date": "2015-10-06",
+        "artist": "Got7",
+        "song": "If You Do"
+      },
+      "heading": "GOT7’s first music-show win arrived nearly two years after debut",
+      "body": "GOT7 won its first music-show trophy with “If You Do” on The Show on October 6, 2015, nearly two years after debut. The members followed the win with a short V Live celebration.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "GOT7 Takes First-Ever Music Show Win With If You Do",
+          "url": "https://www.soompi.com/article/776211wpp/got7-takes-first-ever-music-show-win-with-if-you-do-on-the-show"
+        }
+      ]
+    },
+    {
+      "matching_state": "matched",
+      "status": "draft",
+      "event": {
+        "show": "the-show",
+        "date": "2015-10-20",
+        "artist": "Got7",
+        "song": "If You Do"
+      },
+      "heading": "GOT7 made If You Do a three-week The Show run",
+      "body": "GOT7 won “If You Do” for the third consecutive week on The Show on October 20, 2015. Yugyeom was that day’s special MC, and the members thanked fans in four languages.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "GOT7 Takes Home Third Win For If You Do On The Show",
+          "url": "https://www.soompi.com/article/780351wpp/got7-takes-home-third-win-for-if-you-do-on-the-show"
+        }
+      ]
+    },
+    {
+      "matching_state": "matched",
+      "status": "published",
+      "event": {
+        "show": "the-show",
+        "date": "2019-03-12",
+        "artist": "Tomorrow X Together",
+        "song": "Crown"
+      },
+      "heading": "TXT won Crown about a week after debut",
+      "body": "TXT won its first music-show trophy with “Crown” on The Show on March 12, 2019, about a week after debut. Soobin thanked fans and staff, while Beomgyu promised the group would keep improving.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "TXT Takes First Ever Win With Crown On The Show",
+          "url": "https://www.soompi.com/article/1309780wpp/undefined"
+        }
+      ]
+    },
+    {
+      "matching_state": "matched",
+      "status": "draft",
+      "event": {
+        "show": "m-countdown",
+        "date": "2019-03-14",
+        "artist": "Tomorrow X Together",
+        "song": "Crown"
+      },
+      "heading": "TXT took a second Crown trophy on M Countdown",
+      "body": "Two days after its debut win, TXT took “Crown” to a second trophy on M Countdown with 7,612 points. The article describes it as the rookie group’s second-ever music-show win.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "TXT Grabs 2nd Win For Crown On M Countdown",
+          "url": "https://www.soompi.com/article/1310358wpp/watch-txt-grabs-2nd-win-for-crown-on-m-countdown-performances-by-park-bom-mamamoo-jus2-and-more"
+        }
+      ]
+    },
+    {
+      "matching_state": "matched",
+      "status": "draft",
+      "event": {
+        "show": "the-show",
+        "date": "2019-05-07",
+        "artist": "The Boyz",
+        "song": "Bloom Bloom"
+      },
+      "heading": "The Boyz’s first win came when the members were away",
+      "body": "The Boyz won its first music-show trophy with “Bloom Bloom” on The Show on May 7, 2019. The members were unable to accept in person, so they shared photos and a thank-you video promising this was only the beginning.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "The Boyz Takes 1st Ever Win On The Show With Bloom Bloom",
+          "url": "https://www.soompi.com/article/1322779wpp/watch-the-boyz-takes-1st-ever-win-on-the-show-with-bloom-bloom-performances-by-park-bom-n-flying-and-more"
+        }
+      ]
+    },
+    {
+      "matching_state": "matched",
+      "status": "draft",
+      "event": {
+        "show": "show-champion",
+        "date": "2020-09-30",
+        "artist": "The Boyz",
+        "song": "The Stealer"
+      },
+      "heading": "The Boyz’s Stealer win came on a Chuseok highlight special",
+      "body": "The Boyz won “The Stealer” on Show Champion on September 30, 2020. Because the episode was a Chuseok highlight special with no new performances, the group shared its thanks by video.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "The Boyz Wins With The Stealer On Show Champion",
+          "url": "https://www.soompi.com/article/1428807wpp/the-boyz-wins-with-the-stealer-on-show-champion"
+        }
+      ]
+    },
+    {
+      "matching_state": "matched",
+      "status": "published",
+      "event": {
+        "show": "m-countdown",
+        "date": "2014-03-06",
+        "artist": "Girls' Generation",
+        "song": "Mr.Mr."
+      },
+      "heading": "Girls’ Generation returned with Mr.Mr. after preparation problems",
+      "body": "After complications during album preparation, Girls’ Generation won “Mr.Mr.” on M Countdown on March 6, 2014. The members thanked fans for their consistent support and promised to repay it with good music and performances.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "Girls’ Generation Takes Home Trophy With Mr.Mr. On M Countdown",
+          "url": "https://www.soompi.com/article/587301wpp/girls-generation-takes-home-trophy-with-mr-mr-on-mcountdown"
+        }
+      ]
+    },
+    {
+      "matching_state": "pending",
+      "status": "draft",
+      "pending_reason": "The catalogue records a Girls’ Generation Mr. Mr. Inkigayo win on 2014-03-09, but the researched contemporary article confirms only the comeback stage and the earlier M Countdown win. Find a direct winner report before publishing.",
+      "event": {
+        "show": "inkigayo",
+        "date": "2014-03-09",
+        "artist": "Girls' Generation",
+        "song": "Mr. Mr."
+      },
+      "heading": "Mr. Mr. continued Girls’ Generation’s comeback week",
+      "body": "Girls’ Generation appeared on Inkigayo with “Mr. Mr.” on March 9, 2014 during the group’s comeback week. A direct report of the catalogue’s listed win is still needed.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "2NE1 And Girls’ Generation Have Their Comeback Stages On Inkigayo",
+          "url": "https://www.soompi.com/article/587985wpp/2ne1-and-girls-generation-have-their-comeback-stages-on-inkigayo-03-09-14"
+        }
+      ]
+    },
+    {
+      "matching_state": "matched",
+      "status": "draft",
+      "event": {
+        "show": "inkigayo",
+        "date": "2014-06-08",
+        "artist": "VIXX",
+        "song": "Eternity"
+      },
+      "heading": "VIXX’s “Eternity” was its first win for the song",
+      "body": "VIXX won its first trophy for “Eternity” on Inkigayo on June 8, 2014. The group’s career-first music-show win had come earlier with “Voodoo Doll” on Music Bank in December 2013.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "VIXX’s 1st Win With Eternity On SBS Inkigayo",
+          "url": "https://www.soompi.com/article/617607wpp/vixxs-1st-win-with-eternity-on-sbs-inkigayo-performances-from-taeyang-exo-zea-boyfriend-u-kiss-and-more"
+        },
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "VIXX Wins Their First Ever Music Show on Music Bank with Voodoo Doll",
+          "url": "https://www.soompi.com/article/557675wpp/vixx-wins-their-first-ever-music-show-on-music-bank-with-voodoo-doll"
+        }
+      ]
+    },
+    {
+      "matching_state": "matched",
+      "status": "draft",
+      "event": {
+        "show": "show-champion",
+        "date": "2014-06-11",
+        "artist": "VIXX",
+        "song": "Eternity"
+      },
+      "heading": "VIXX’s first Show Champion win followed Eternity",
+      "body": "Three days later, VIXX won “Eternity” on Show Champion. Contemporary coverage describes it as the group’s first win on that programme and says the members wiped away tears after the encore.",
+      "citations": [
+        {
+          "provider": "allkpop",
+          "publisher_name": "allkpop",
+          "title": "VIXX Win Their Next Trophy On Show Champion With Eternity",
+          "url": "https://www.allkpop.com/article/2014/06/vixx-win-their-next-trophy-on-show-champion-with-eternity"
+        }
+      ]
+    },
+    {
+      "matching_state": "matched",
+      "status": "published",
+      "event": {
+        "show": "show-champion",
+        "date": "2015-05-27",
+        "artist": "Shinee",
+        "song": "View"
+      },
+      "heading": "SHINee’s View win landed two days after its seventh anniversary",
+      "body": "SHINee’s first “View” trophy on Show Champion arrived two days after the group’s seventh debut anniversary. The members said they had not expected the award.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "SHINee Takes Home First Trophy For View On Show Champion",
+          "url": "https://www.soompi.com/article/735869wpp/shinee-takes-home-first-trophy-for-view-on-show-champion"
+        }
+      ]
+    },
+    {
+      "matching_state": "matched",
+      "status": "draft",
+      "event": {
+        "show": "m-countdown",
+        "date": "2015-05-28",
+        "artist": "Shinee",
+        "song": "View"
+      },
+      "heading": "SHINee turned View into a second trophy",
+      "body": "SHINee won “View” again on M Countdown on May 28, 2015, making it the song’s second music-show win. The result came as the group’s comeback promotions continued across the weekly shows.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "SHINee’s 2nd Win With View Through M Countdown",
+          "url": "https://www.soompi.com/article/736217wpp/its-shinees-2nd-win-with-view-through-mcountdown-performances-from-kara-seventeen-clc-and-more"
+        }
+      ]
+    },
+    {
+      "matching_state": "pending",
+      "status": "draft",
+      "pending_reason": "The catalogue’s earliest BEAST row is No More on 2014-06-21; the researched career-first Shock win is dated 2010-03-25 and has no matching catalogue row.",
+      "event": {
+        "show": "m-countdown",
+        "date": "2010-03-25",
+        "artist": "Beast",
+        "song": "Shock"
+      },
+      "heading": "BEAST’s first trophy came with Shock",
+      "body": "BEAST won its first music-show trophy with “Shock” on M Countdown on March 25, 2010. The members cried happy tears when the result was announced.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "BEAST Gets First Music Show Win On M Countdown",
+          "url": "https://www.soompi.com/article/360065wpp/beast-gets-first-music-show-win-on-m-contdown"
+        }
+      ]
+    },
+    {
+      "matching_state": "matched",
+      "status": "draft",
+      "event": {
+        "show": "music-core",
+        "date": "2014-06-21",
+        "artist": "Beast",
+        "song": "No More"
+      },
+      "heading": "BEAST opened Good Luck promotions with No More",
+      "body": "BEAST won Music Core with pre-release track “No More” on June 21, 2014, during the group’s special comeback stage for “Good Luck.” The same report notes that Taeyang finished second.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "BEAST Wins On Music Core This Week With Good Luck",
+          "url": "https://www.soompi.com/article/621461wpp/beast-wins-on-music-core-this-week-with-good-luck"
+        }
+      ]
+    },
+    {
+      "matching_state": "matched",
+      "status": "published",
+      "event": {
+        "show": "music-core",
+        "date": "2015-09-26",
+        "artist": "iKon",
+        "song": "My Type"
+      },
+      "heading": "iKON won My Type without music-show promotions",
+      "body": "iKON earned its first music-show win with “My Type” on Music Core on September 26, 2015, despite not promoting the song on music shows.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "iKON Gets Very 1st Win With My Type On Music Core",
+          "url": "https://www.soompi.com/article/773615wpp/ikon-gets-very-1st-win-with-my-type-on-music-core-performances-by-cnblue-red-velvet-and-more"
+        }
+      ]
+    },
+    {
+      "matching_state": "matched",
+      "status": "draft",
+      "event": {
+        "show": "inkigayo",
+        "date": "2015-09-27",
+        "artist": "iKon",
+        "song": "My Type"
+      },
+      "heading": "iKON’s second My Type win came on a prerecorded Chuseok special",
+      "body": "iKON won its second “My Type” trophy on Inkigayo’s prerecorded Chuseok special on September 27, 2015; the winner was announced on the show’s homepage.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "iKON Takes 2nd Win For My Type On Chuseok Special Of Inkigayo",
+          "url": "https://www.soompi.com/article/773871wpp/ikon-takes-2nd-win-for-my-type-on-chuseok-special-of-inkigayo"
+        }
+      ]
+    },
+    {
+      "matching_state": "matched",
+      "status": "published",
+      "event": {
+        "show": "m-countdown",
+        "date": "2018-11-08",
+        "artist": "Iz*One",
+        "song": "La Vie en Rose"
+      },
+      "heading": "IZ*ONE thanked Produce 48’s national producers",
+      "body": "IZ*ONE’s first music-show trophy came with “La Vie en Rose” on M Countdown on November 8, 2018. Leader Kwon Eun Bi thanked WIZ*ONE and the national producers from Produce 48.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "IZ*ONE Takes 1st Ever Win On M Countdown With La Vie En Rose",
+          "url": "https://www.soompi.com/article/1259899wpp/watch-izone-takes-1st-ever-win-m-countdown-la-vie-en-rose-performances-twice-monsta-x"
+        }
+      ]
+    },
+    {
+      "matching_state": "matched",
+      "status": "draft",
+      "event": {
+        "show": "the-show",
+        "date": "2018-11-13",
+        "artist": "Iz*One",
+        "song": "La Vie en Rose"
+      },
+      "heading": "IZ*ONE made La Vie en Rose two wins in five days",
+      "body": "Five days after its first trophy, IZ*ONE won “La Vie en Rose” on The Show with 8,918 points on November 13, 2018. MONSTA X and gugudan were the other nominees.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "IZ*ONE Takes 2nd Win For La Vie En Rose On The Show",
+          "url": "https://www.soompi.com/article/1262471wpp/watch-izone-takes-2nd-win-la-"
+        }
+      ]
+    },
+    {
+      "matching_state": "matched",
+      "status": "published",
+      "event": {
+        "show": "m-countdown",
+        "date": "2014-08-21",
+        "artist": "Winner",
+        "song": "Empty"
+      },
+      "heading": "WINNER won in its first week of debut promotions",
+      "body": "WINNER won its first music-show trophy with “Empty” on M Countdown on August 21, 2014, about a week into debut promotions; the episode also carried the group’s debut stages.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "WINNER Grabs First Music Show Win On M Countdown",
+          "url": "https://www.soompi.com/article/642659wpp/winner-grabs-first-music-show-win-on-mcountdown"
+        }
+      ]
+    },
+    {
+      "matching_state": "matched",
+      "status": "draft",
+      "event": {
+        "show": "music-bank",
+        "date": "2014-08-22",
+        "artist": "Winner",
+        "song": "Empty"
+      },
+      "heading": "WINNER took Empty to Music Bank",
+      "body": "WINNER won “Empty” on Music Bank on August 22, 2014, beating SISTAR for the episode’s top spot. It was the rookie group’s second music-show trophy in as many days.",
+      "citations": [
+        {
+          "provider": "allkpop",
+          "publisher_name": "allkpop",
+          "title": "WINNER Win #1 + Performances From August 22nd Music Bank",
+          "url": "https://www.allkpop.com/article/2014/08/performances-from-august-22nd-music-bank/1579472"
+        }
+      ]
+    },
+    {
+      "matching_state": "matched",
+      "status": "published",
+      "event": {
+        "show": "the-show",
+        "date": "2021-05-04",
+        "artist": "Enhypen",
+        "song": "Drunk-Dazed"
+      },
+      "heading": "ENHYPEN’s first trophy came six months after debut",
+      "body": "ENHYPEN won its first music-show trophy with “Drunk-Dazed” on The Show on May 4, 2021, roughly six months after debut in November 2020.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "ENHYPEN Takes 1st-Ever Win On The Show With Drunk-Dazed",
+          "url": "https://www.soompi.com/article/1467353wpp/enhypen-takes-1st-ever-win-on-the-show-with-drunk-dazed-performances-by-onf-ab6ix-and-more"
+        }
+      ]
+    },
+    {
+      "matching_state": "matched",
+      "status": "draft",
+      "event": {
+        "show": "show-champion",
+        "date": "2021-05-05",
+        "artist": "Enhypen",
+        "song": "Drunk-Dazed"
+      },
+      "heading": "ENHYPEN made Drunk-Dazed two in a row",
+      "body": "ENHYPEN won “Drunk-Dazed” again on Show Champion on May 5, 2021. The report calls it the group’s second-ever music trophy and includes the full encore.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "ENHYPEN Earns 2nd Win For Drunk-Dazed On Show Champion",
+          "url": "https://www.soompi.com/article/1467543wpp/watch-enhypen-earns-2nd-win-for-drunk-dazed-on-show-champion-performances-by-onf-ab6ix-and-more"
+        }
+      ]
+    },
+    {
+      "matching_state": "matched",
+      "status": "draft",
+      "event": {
+        "show": "m-countdown",
+        "date": "2014-07-31",
+        "artist": "Sistar",
+        "song": "Touch My Body"
+      },
+      "heading": "SISTAR opened its summer run with Touch My Body",
+      "body": "SISTAR won “Touch My Body” on M Countdown on July 31, 2014, beating INFINITE in the first-place nominees. The result opened the song’s summer music-show run.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "SISTAR Wins #1 on This Week’s M!Countdown",
+          "url": "https://www.soompi.com/article/635151wpp/sistar-wins-1-on-this-weeks-mcountdown-performances-by-hafelt-henry-block-b-and-more"
+        }
+      ]
+    },
+    {
+      "matching_state": "matched",
+      "status": "draft",
+      "event": {
+        "show": "music-bank",
+        "date": "2014-08-01",
+        "artist": "Sistar",
+        "song": "Touch My Body"
+      },
+      "heading": "Touch My Body kept SISTAR at No. 1",
+      "body": "SISTAR followed with a Music Bank win for “Touch My Body” on August 1, 2014. Contemporary coverage described the comeback track as a summer jam after the group’s long break.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "SISTAR Takes 1 On Music Bank",
+          "url": "https://www.soompi.com/article/635577wpp/sistar-takes-1-on-music-bank-performances-by-hatfelt-red-velvet-infinite-b1a4-henry-and-more"
+        }
+      ]
+    },
+    {
+      "matching_state": "matched",
+      "status": "published",
+      "event": {
+        "show": "music-bank",
+        "date": "2019-08-09",
+        "artist": "Kang Daniel",
+        "song": "What Are You Up To"
+      },
+      "heading": "Kang Daniel’s first solo trophy was accepted by video",
+      "body": "Kang Daniel won his first solo music-show trophy with “What Are You Up To” on Music Bank on August 9, 2019. He was practicing at his agency and sent a video saying the support gave him energy and promising to stay humble.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "Kang Daniel Takes 1st Win For What Are You Up To",
+          "url": "https://www.soompi.com/article/1344324wpp/watch-seventeen-itzy-nct-dream-and-more-perform-on-music-bank?mobile-app=true&theme=dark%2F1000"
+        }
+      ]
+    },
+    {
+      "matching_state": "matched",
+      "status": "published",
+      "event": {
+        "show": "the-show",
+        "date": "2019-12-03",
+        "artist": "Kang Daniel",
+        "song": "Touchin'"
+      },
+      "heading": "Kang Daniel’s Touchin’ win was queried and confirmed",
+      "body": "Kang Daniel’s “Touchin’” win on The Show on December 3, 2019 drew questions from fans who compared it with Melon’s real-time chart. The Show and Gaon later said the result followed the show’s digital-data rules.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "The Show And Gaon Chart Confirm And Explain Kang Daniel’s Win",
+          "url": "https://www.soompi.com/article/1369444wpp/the-show-confirms-explains-kang-daniels-win-on-recent-episode"
+        }
+      ]
+    },
+    {
+      "matching_state": "matched",
+      "status": "published",
+      "event": {
+        "show": "the-show",
+        "date": "2017-11-14",
+        "artist": "Monsta X",
+        "song": "Dramarama"
+      },
+      "heading": "MONSTA X’s first win followed its first world tour",
+      "body": "MONSTA X’s first music-show trophy came with “Dramarama” on The Show on November 14, 2017, after debuting in 2015. Jooheon said they had reached the award after their first world tour.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "MONSTA X Takes Emotional 1st Ever Win On The Show",
+          "url": "https://www.soompi.com/article/1077579wpp/watch-monsta-x-takes-emotional-1st-ever-win-show-"
+        }
+      ]
+    },
+    {
+      "matching_state": "matched",
+      "status": "draft",
+      "event": {
+        "show": "the-show",
+        "date": "2018-04-17",
+        "artist": "Monsta X",
+        "song": "Jealousy"
+      },
+      "heading": "MONSTA X’s Jealousy win became its second career trophy",
+      "body": "MONSTA X won “Jealousy” on The Show on April 17, 2018. The 7,550-point result was the group’s second-ever music-show win, ahead of EXID and The Boyz.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "MONSTA X Takes 1st Win For Jealousy On The Show",
+          "url": "https://www.soompi.com/article/1156719wpp/monsta-x-takes-1st-win-jealousy-show"
+        }
+      ]
+    },
+    {
+      "matching_state": "matched",
+      "status": "published",
+      "event": {
+        "show": "show-champion",
+        "date": "2023-03-29",
+        "artist": "Nmixx",
+        "song": "Love Me Like This"
+      },
+      "heading": "NMIXX’s first win came with Love Me Like This",
+      "body": "NMIXX earned its first music-show trophy with “Love Me Like This” on Show Champion on March 29, 2023, about a year after debut.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "NMIXX Takes Tearful 1st-Ever Win On Show Champion",
+          "url": "https://www.soompi.com/article/1575999wpp/watch-nmixx-takes-tearful-1st-ever-win-on-show-champion-performances-by-billlie-tempest-and-more?mobile-app=true&theme=false%29"
+        }
+      ]
+    },
+    {
+      "matching_state": "matched",
+      "status": "draft",
+      "event": {
+        "show": "show-champion",
+        "date": "2024-01-24",
+        "artist": "Nmixx",
+        "song": "Dash"
+      },
+      "heading": "NMIXX’s DASH win was a new title-track milestone",
+      "body": "NMIXX won “DASH” on Show Champion on January 24, 2024, about a year after its first career trophy with “Love Me Like This.” The win marked the group’s return to No. 1 with a new title track.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "NMIXX Takes 1st Win For DASH On Show Champion",
+          "url": "https://www.soompi.com/article/1639039wpp/watch-nmixx-takes-1st-win-for-dash-on-show-champion"
+        }
+      ]
+    },
+    {
+      "matching_state": "matched",
+      "status": "published",
+      "event": {
+        "show": "the-show",
+        "date": "2023-07-18",
+        "artist": "Zerobaseone",
+        "song": "In Bloom"
+      },
+      "heading": "ZEROBASEONE won its debut trophy on The Show",
+      "body": "ZEROBASEONE took its first music-show trophy with debut song “In Bloom” on The Show on July 18, 2023, during the group’s first week of promotions.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "ZEROBASEONE Takes 1st-Ever Win On The Show With In Bloom",
+          "url": "https://www.soompi.com/article/1601425wpp/watch-zerobaseone-takes-1st-ever-win-on-the-show-with-in-bloom-performances-by-ikons-jinhwan-jay-odd-eye-circle-and-more"
+        }
+      ]
+    },
+    {
+      "matching_state": "matched",
+      "status": "draft",
+      "event": {
+        "show": "show-champion",
+        "date": "2023-07-19",
+        "artist": "Zerobaseone",
+        "song": "In Bloom"
+      },
+      "heading": "ZEROBASEONE followed its debut win the next day",
+      "body": "The day after its debut trophy, ZEROBASEONE won “In Bloom” again on Show Champion on July 19, 2023. EXO, NMIXX, SHINee and Jungkook were among the nominees.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "ZEROBASEONE Takes 2nd Win For In Bloom On Show Champion",
+          "url": "https://www.soompi.com/article/1601713wpp/watch-zerobaseone-takes-2nd-win-for-in-bloom-on-show-champion-performances-by-nmixx-odd-eye-circle-and-more"
+        }
+      ]
+    },
+    {
+      "matching_state": "matched",
+      "status": "published",
+      "event": {
+        "show": "m-countdown",
+        "date": "2014-04-17",
+        "artist": "AKMU",
+        "song": "200%"
+      },
+      "heading": "AKMU’s first live music-program award was posted online",
+      "body": "AKMU received its first live music-program award with “200%” on M Countdown on April 17, 2014, during the Sewol broadcast pause; the result was posted online instead of aired live.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "Akdong Musician’s M Countdown Win Posted Online Due To Sewol Ferry Tragedy",
+          "url": "https://www.soompi.com/article/599499wpp/akdong-musicians-m-countdown-win-posted-online-due-to-sewol-ferry-tragedy"
+        }
+      ]
+    },
+    {
+      "matching_state": "pending",
+      "status": "draft",
+      "pending_reason": "The catalogue records an AKMU 200% Music Core win on 2014-04-19, but the located Soompi source covers M Countdown and later online announcements. Find a direct Music Core report before publishing.",
+      "event": {
+        "show": "music-core",
+        "date": "2014-04-19",
+        "artist": "AKMU",
+        "song": "200%"
+      },
+      "heading": "AKMU’s 200% run continued while shows were suspended",
+      "body": "AKMU’s “200%” is listed in the catalogue as a Music Core win on April 19, 2014 during the Sewol broadcast suspension. A direct report for that listed event is still needed.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "Akdong Musician Wins 1st Place For Third Week In A Row On M Countdown",
+          "url": "https://www.soompi.com/article/602779wpp/akdong-musician-wins-1st-place-for-third-week-in-a-row-on-m-countdown"
+        }
+      ]
+    },
+    {
+      "matching_state": "matched",
+      "status": "published",
+      "event": {
+        "show": "m-countdown",
+        "date": "2015-01-08",
+        "artist": "EXID",
+        "song": "Up & Down"
+      },
+      "heading": "EXID’s viral fancam revival finally produced a win",
+      "body": "EXID’s “Up & Down” was released in August 2014, then surged back up the charts after performance fancams went viral. The song finally won on M Countdown on January 8, 2015, with staff delivering the trophy to the group’s practice room; its Music Bank win the next day was the first time the members received it on stage.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "EXID Wins First Ever Music Show On M Countdown",
+          "url": "https://www.soompi.com/article/688553wpp/exid-wins-first-ever-music-show-on-mcountdown"
+        },
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "EXID Wins on Music Bank With Up & Down",
+          "url": "https://www.soompi.com/article/688913wpp/exid-wins-on-music-bank-with-up-down"
+        }
+      ]
+    },
+    {
+      "matching_state": "matched",
+      "status": "draft",
+      "event": {
+        "show": "music-bank",
+        "date": "2015-01-09",
+        "artist": "EXID",
+        "song": "Up & Down"
+      },
+      "heading": "EXID’s first on-stage trophy came at Music Bank",
+      "body": "EXID won “Up & Down” on Music Bank on January 9, 2015. Because the previous day’s M Countdown result was not a live broadcast, this was the first time the members received the trophy on stage.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "EXID Wins On Music Bank With Up & Down",
+          "url": "https://www.soompi.com/article/688913wpp/exid-wins-on-music-bank-with-up-down"
+        }
+      ]
+    },
+    {
+      "matching_state": "matched",
+      "status": "draft",
+      "event": {
+        "show": "music-core",
+        "date": "2017-06-17",
+        "artist": "G-Dragon",
+        "song": "Untitled, 2014"
+      },
+      "heading": "G-Dragon won Untitled, 2014 without promoting it on shows",
+      "body": "G-Dragon’s “Untitled, 2014” won Music Core on June 17, 2017. The song was competing with SISTAR and TWICE, and the win came even though he had not promoted the track on music shows.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "G-Dragon Grabs 1st Win With Untitled, 2014 On Music Core",
+          "url": "https://www.soompi.com/article/999299wpp/watch-g-dragon-grabs-1st-win-untitled-2014-music-core-performances-nct-127-day6"
+        }
+      ]
+    },
+    {
+      "matching_state": "matched",
+      "status": "draft",
+      "event": {
+        "show": "inkigayo",
+        "date": "2017-06-18",
+        "artist": "G-Dragon",
+        "song": "Untitled, 2014"
+      },
+      "heading": "Untitled, 2014 won again with Mark as special MC",
+      "body": "G-Dragon took a second trophy for “Untitled, 2014” on Inkigayo on June 18, 2017. NCT’s Mark served as special MC for the episode while G-Dragon’s song topped the chart.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "G-Dragon Gets 2nd Win With Untitled, 2014 On Inkigayo",
+          "url": "https://www.soompi.com/article/999631wpp/watch-g-dragon-gets-2nd-win-untitled-2014-inkigayo"
+        }
+      ]
+    },
+    {
+      "matching_state": "matched",
+      "status": "published",
+      "event": {
+        "show": "the-show",
+        "date": "2024-04-02",
+        "artist": "Illit",
+        "song": "Magnetic"
+      },
+      "heading": "ILLIT’s first trophy came with Magnetic",
+      "body": "ILLIT won its first music-show trophy with “Magnetic” on The Show on April 2, 2024. The members became emotional during the first win.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "ILLIT Takes Tearful 1st-Ever Win On The Show With Magnetic",
+          "url": "https://www.soompi.com/article/1652694wpp/watch-illit-takes-tearful-1st-ever-win-on-the-show-with-magnetic-performances-by-lucas-unis-and-more?mobile-app=true&theme=false%29"
+        }
+      ]
+    },
+    {
+      "matching_state": "matched",
+      "status": "draft",
+      "event": {
+        "show": "the-show",
+        "date": "2024-04-09",
+        "artist": "Illit",
+        "song": "Magnetic"
+      },
+      "heading": "ILLIT’s Magnetic win doubled the following week",
+      "body": "ILLIT won “Magnetic” again on The Show on April 9, 2024, with 8,990 points. The result was the group’s second music-show trophy.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "ILLIT Takes 2nd Win For Magnetic On The Show",
+          "url": "https://www.soompi.com/article/1654053wpp/watch-illit-takes-2nd-win-for-magnetic-on-the-show-performances-by-kiss-of-life-nowadays-and-more"
+        }
+      ]
+    },
+    {
+      "matching_state": "matched",
+      "status": "published",
+      "event": {
+        "show": "show-champion",
+        "date": "2014-05-28",
+        "artist": "Infinite",
+        "song": "Last Romeo"
+      },
+      "heading": "INFINITE’s Last Romeo win came with a fan promise",
+      "body": "INFINITE’s first “Last Romeo” win on Show Champion on May 28, 2014 came with a fan promise: L had said Sungyeol and Dongwoo would dress as Romeo and Juliet if the song won.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "Infinite Wins This Week’s Show Champion For Last Romeo",
+          "url": "https://www.soompi.com/article/614213wpp/infinite-wins-this-weeks-show-champion-for-last-romeo"
+        }
+      ]
+    },
+    {
+      "matching_state": "matched",
+      "status": "published",
+      "event": {
+        "show": "m-countdown",
+        "date": "2014-05-29",
+        "artist": "Infinite",
+        "song": "Last Romeo"
+      },
+      "heading": "INFINITE’s second Last Romeo win became a Juliet transformation",
+      "body": "INFINITE’s second “Last Romeo” win on M Countdown on May 29, 2014 delivered the promised encore gag, with Dongwoo putting on red lipstick and transforming into Juliet.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "Infinite Takes Home Second Win With Last Romeo On M Countdown",
+          "url": "https://www.soompi.com/article/614567wpp/infinite-takes-home-second-win-with-last-romeo-on-mcountdown"
+        }
+      ]
+    },
+    {
+      "matching_state": "matched",
+      "status": "published",
+      "event": {
+        "show": "the-show",
+        "date": "2018-01-23",
+        "artist": "Oh My Girl",
+        "song": "Secret Garden"
+      },
+      "heading": "Oh My Girl’s first win came 1,009 days after debut",
+      "body": "Oh My Girl’s first music-show win with “Secret Garden” came 1,009 days after debut. In a follow-up interview, the members said they had grown with each album and felt the song’s hopeful lyrics reflected their own story.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "Oh My Girl Takes 1st Ever Win With Secret Garden On The Show",
+          "url": "https://www.soompi.com/article/1113203wpp/watch-oh-girl-takes-1st-ever-win-secret-garden-show-performances-jbj-chungha"
+        },
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "Oh My Girl Opens Up About 1st Music Show Win, Love For Fans, And Success Of Secret Garden",
+          "url": "https://www.soompi.com/article/1114261wpp/oh-girl-opens-1st-music-show-win-love-fans-success-secret-garden"
+        }
+      ]
+    },
+    {
+      "matching_state": "matched",
+      "status": "draft",
+      "event": {
+        "show": "show-champion",
+        "date": "2018-01-24",
+        "artist": "Oh My Girl",
+        "song": "Secret Garden"
+      },
+      "heading": "Secret Garden won again the next day",
+      "body": "The day after its breakthrough, Oh My Girl took a second “Secret Garden” trophy on Show Champion. In an interview, the members said they had focused on growing with every album and never stopped being grateful simply to perform.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "Oh My Girl Opens Up About 1st Music Show Win And Success Of Secret Garden",
+          "url": "https://www.soompi.com/article/1114261wpp/oh-girl-opens-1st-music-show-win-love-fans-success-secret-garden"
+        }
+      ]
+    },
+    {
+      "matching_state": "matched",
+      "status": "published",
+      "event": {
+        "show": "the-show",
+        "date": "2021-09-14",
+        "artist": "STAYC",
+        "song": "Stereotype"
+      },
+      "heading": "STAYC’s first win came less than a year after debut",
+      "body": "STAYC won its first music-show trophy with “STEREOTYPE” on The Show on September 14, 2021, less than a year after debut.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "STAYC Takes Tearful 1st-Ever Win On The Show With STEREOTYPE",
+          "url": "https://www.soompi.com/article/1488636wpp/watch-stayc-takes-tearful-1st-ever-win-on-the-show-with-stereotype-performances-by-fromis_9-purple-kiss-and-more"
+        }
+      ]
+    },
+    {
+      "matching_state": "matched",
+      "status": "draft",
+      "event": {
+        "show": "show-champion",
+        "date": "2021-09-15",
+        "artist": "STAYC",
+        "song": "Stereotype"
+      },
+      "heading": "STAYC won Stereotype again on a replay-special episode",
+      "body": "STAYC’s “STEREOTYPE” won Show Champion on September 15, 2021. The episode used replayed performances instead of a normal live broadcast, and the group’s second trophy was announced at the end.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "STAYC Takes 2nd Win For STEREOTYPE On Show Champion",
+          "url": "https://www.soompi.com/article/1488808wpp/watch-stayc-takes-2nd-win-for-stereotype-on-show-champion"
+        }
+      ]
+    },
+    {
+      "matching_state": "matched",
+      "status": "published",
+      "event": {
+        "show": "the-show",
+        "date": "2017-03-28",
+        "artist": "Highlight",
+        "song": "Plz Don't Be Sad"
+      },
+      "heading": "Highlight’s first win under its new name was Plz Don’t Be Sad",
+      "body": "Highlight’s first trophy under its new name came with “Plz Don’t Be Sad” on The Show on March 28, 2017, after the former BEAST members began releasing music through their own label Around Us Entertainment.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "Highlight Celebrates Views Milestone With Performance Version Of Plz Don’t Be Sad",
+          "url": "https://www.soompi.com/article/966337wpp/watch-highlight-celebrates-views-milestone-performance-version-plz-dont-sad-mv"
+        }
+      ]
+    },
+    {
+      "matching_state": "matched",
+      "status": "draft",
+      "event": {
+        "show": "show-champion",
+        "date": "2017-03-29",
+        "artist": "Highlight",
+        "song": "Plz Don't Be Sad"
+      },
+      "heading": "Highlight made Plz Don’t Be Sad two wins in two days",
+      "body": "Highlight won a second “Plz Don’t Be Sad” trophy on Show Champion on March 29, 2017. The report identifies it as the group’s second win for the new hit track.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "Highlight Wins 2nd Trophy For Plz Don’t Be Sad On Show Champion",
+          "url": "https://www.soompi.com/article/966789wpp/highlight-wins-show-champion-trophy-plz-dont-sad-performances"
+        }
+      ]
+    },
+    {
+      "matching_state": "matched",
+      "status": "published",
+      "event": {
+        "show": "the-show",
+        "date": "2021-09-07",
+        "artist": "Fromis 9",
+        "song": "Talk & Talk"
+      },
+      "heading": "fromis_9’s first win came after its 2018 debut",
+      "body": "fromis_9 won its first music-show trophy with “Talk & Talk” on The Show on September 7, 2021, after debuting in 2018.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "fromis_9 Takes Tearful 1st-Ever Win On The Show With Talk & Talk",
+          "url": "https://www.soompi.com/article/1487614wpp/fromis_9-takes-tearful-1st-ever-win-on-the-show-with-talk-performances-by-kwon-eun-bi-omega-x-and-more?mobile-app=true&theme=dark%2F1000"
+        }
+      ]
+    },
+    {
+      "matching_state": "matched",
+      "status": "published",
+      "event": {
+        "show": "the-show",
+        "date": "2022-01-25",
+        "artist": "Fromis 9",
+        "song": "DM"
+      },
+      "heading": "fromis_9 wrote thank-you messages in DM’s encore",
+      "body": "fromis_9’s “DM” win on The Show on January 25, 2022 was their second overall trophy. During the encore, the members held up sketchbooks containing thank-you messages for Flover.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "fromis_9 Takes First Win For DM On The Show",
+          "url": "https://www.soompi.com/article/1510113wpp/watch-fromis_9-takes-first-win-for-dm-on-the-show-performances-by-yuju-victon-choi-ye-na-and-more?mobile-app=true&theme=falseCampfire"
+        }
+      ]
+    },
+    {
+      "matching_state": "matched",
+      "status": "published",
+      "event": {
+        "show": "m-countdown",
+        "date": "2023-07-20",
+        "artist": "Jungkook",
+        "song": "Seven"
+      },
+      "heading": "Jungkook’s solo debut won its first trophy",
+      "body": "Jungkook earned his first solo music-show trophy with “Seven” on M Countdown on July 20, 2023.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "Jungkook Takes 1st Win For Seven On M Countdown",
+          "url": "https://www.soompi.com/article/1601989wpp/watch-btss-jungkook-takes-1st-win-for-seven-on-m-countdown-performances-by-nct-dream-zerobaseone-and-more?mobile-app=true&theme=false%29"
+        }
+      ]
+    },
+    {
+      "matching_state": "matched",
+      "status": "draft",
+      "event": {
+        "show": "m-countdown",
+        "date": "2023-07-27",
+        "artist": "Jungkook",
+        "song": "Seven"
+      },
+      "heading": "Seven became Jungkook’s second trophy the next week",
+      "body": "Jungkook won “Seven” again on M Countdown on July 27, 2023, with 7,606 points. NewJeans’ “Super Shy” was the other first-place nominee.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "Jungkook Takes 2nd Win For Seven On M Countdown",
+          "url": "https://www.soompi.com/article/1603366wpp/watch-btss-jungkook-takes-2nd-win-for-seven-on-m-countdown-performances-by-shownu-x-hyungwon-oh-my-girl-and-more"
+        }
+      ]
+    },
+    {
+      "matching_state": "matched",
+      "status": "published",
+      "event": {
+        "show": "the-show",
+        "date": "2023-09-12",
+        "artist": "BoyNextDoor",
+        "song": "But Sometimes"
+      },
+      "heading": "BOYNEXTDOOR’s first trophy came with But Sometimes",
+      "body": "BOYNEXTDOOR took its first-ever music-show trophy with “But Sometimes” on The Show on September 12, 2023, its first win since debut.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "BOYNEXTDOOR Takes 1st-Ever Win On The Show With But Sometimes",
+          "url": "https://www.soompi.com/article/1613291wpp/watch-boynextdoor-takes-1st-ever-win-on-the-show-with-but-sometimes-performances-by-kim-sejeong-lee-chae-yeon-dkzs-jaechan-and-more"
+        }
+      ]
+    },
+    {
+      "matching_state": "matched",
+      "status": "draft",
+      "event": {
+        "show": "show-champion",
+        "date": "2023-09-13",
+        "artist": "BoyNextDoor",
+        "song": "But Sometimes"
+      },
+      "heading": "BOYNEXTDOOR doubled its first win on Show Champion",
+      "body": "BOYNEXTDOOR won “But Sometimes” again on Show Champion on September 13, 2023, its second career music-show trophy. The nominees included AKMU, RIIZE, BTS’s V and MAMAMOO’s Hwasa.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "BOYNEXTDOOR Takes 2nd Win For But Sometimes On Show Champion",
+          "url": "https://www.soompi.com/article/1613604wpp/watch-boynextdoor-takes-2nd-win-for-but-sometimes-on-show-champion-performances-by-kim-sejeong-lee-chae-yeon-and-more?mobile-app=true&theme=falseCampfire"
+        }
+      ]
+    },
+    {
+      "matching_state": "matched",
+      "status": "draft",
+      "event": {
+        "show": "music-core",
+        "date": "2020-08-29",
+        "artist": "BTS",
+        "song": "Dynamite"
+      },
+      "heading": "Dynamite’s first Music Core trophy",
+      "body": "BTS won “Dynamite” for the first time on Music Core on August 29, 2020, beating SSAK3’s “Beach Again” and ITZY’s “Not Shy.”",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "BTS Takes 1st Win For Dynamite On Music Core",
+          "url": "https://www.soompi.com/article/1422326wpp/watch-bts-takes-1st-win-for-dynamite-on-music-core-performances-by-itzy-kard-cravity-and-more"
+        }
+      ]
+    },
+    {
+      "matching_state": "matched",
+      "status": "published",
+      "event": {
+        "show": "music-core",
+        "date": "2020-10-31",
+        "artist": "BTS",
+        "song": "Dynamite"
+      },
+      "heading": "Dynamite reached 20 wins after its first trophy",
+      "body": "“Dynamite” began its music-show run with a Music Core win over SSAK3 and ITZY on August 29, 2020. By October 31, it had reached its 20th overall trophy on the same programme.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "BTS Takes 20th Win For Dynamite On Music Core",
+          "url": "https://www.soompi.com/article/1434942wpp/watch-bts-takes-20th-win-for-dynamite-on-music-core-performances-by-b1a4-twice-p1harmony-and-more"
+        },
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "BTS Takes 1st Win For Dynamite On Music Core",
+          "url": "https://www.soompi.com/article/1422326wpp/watch-bts-takes-1st-win-for-dynamite-on-music-core-performances-by-itzy-kard-cravity-and-more"
+        }
+      ]
+    },
+    {
+      "matching_state": "matched",
+      "status": "draft",
+      "event": {
+        "show": "music-bank",
+        "date": "2019-04-19",
+        "artist": "BTS",
+        "song": "Boy with Luv"
+      },
+      "heading": "Boy with Luv opened with an 11,231-point win",
+      "body": "BTS took its first “Boy With Luv” trophy on Music Bank on April 19, 2019, scoring 11,231 points over BOL4’s “Bom.”",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "BTS’s Boy With Luv Grabs 1st Win On Music Bank",
+          "url": "https://www.soompi.com/article/1318690wpp/watch-live-bts-izone-stray-kids-and-more-to-perform-on-music-bank"
+        }
+      ]
+    },
+    {
+      "matching_state": "matched",
+      "status": "draft",
+      "event": {
+        "show": "music-core",
+        "date": "2019-04-20",
+        "artist": "BTS",
+        "song": "Boy with Luv"
+      },
+      "heading": "Boy with Luv won again the next day",
+      "body": "BTS followed its Music Bank result with a second “Boy With Luv” win on Music Core on April 20, 2019. The song scored 6,743 points over BOL4 and BLACKPINK.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "BTS Takes 2nd Win For Boy With Luv On Music Core",
+          "url": "https://www.soompi.com/article/1318950wpp/watch-bts-takes-2nd-win-for-boy-with-luv-on-mbcs-music-core-performances-by-super-junior-de-izone-and-more"
+        }
+      ]
+    },
+    {
+      "matching_state": "matched",
+      "status": "published",
+      "event": {
+        "show": "inkigayo",
+        "date": "2015-04-05",
+        "artist": "Exo",
+        "song": "Call Me Baby"
+      },
+      "heading": "EXO dedicated Call Me Baby’s first win to Tao",
+      "body": "EXO’s first “Call Me Baby” trophy came on Inkigayo on April 5, 2015, while Tao was sidelined by an injury. The members thanked Lee Soo Man and fans, then sent their injured bandmate love.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "EXO Takes First Music Show Win With Call Me Baby On SBS Inkigayo",
+          "url": "https://www.soompi.com/article/717359wpp/exo-takes-first-music-show-win-with-call-me-baby-on-sbs-inkigayo"
+        }
+      ]
+    },
+    {
+      "matching_state": "matched",
+      "status": "published",
+      "event": {
+        "show": "music-bank",
+        "date": "2015-04-10",
+        "artist": "Exo",
+        "song": "Call Me Baby"
+      },
+      "heading": "Call Me Baby’s fourth win came without Tao and Lay",
+      "body": "When EXO collected its fourth “Call Me Baby” trophy on Music Bank on April 10, 2015, Tao was absent with an injury and Lay was filming a movie. The group thanked both members in the winning moment.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "EXO Takes 4th Win For Call Me Baby Through Music Bank",
+          "url": "https://www.soompi.com/article/719293wpp/exo-takes-4th-win-for-call-me-baby-through-music-bank"
+        }
+      ]
+    },
+    {
+      "matching_state": "matched",
+      "status": "draft",
+      "event": {
+        "show": "the-show",
+        "date": "2014-12-02",
+        "artist": "Apink",
+        "song": "Luv"
+      },
+      "heading": "Apink began LUV’s 17-win run on The Show",
+      "body": "Apink’s “LUV” won on The Show on December 2, 2014, starting the song’s 17-win catalogue run. Contemporary coverage later noted that the group’s first Music Bank win followed this earlier-week result.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "A Pink Wins On Music Bank This Week With LUV",
+          "url": "https://www.soompi.com/article/675971wpp/a-pink-wins-on-music-bank-this-week-with-luv"
+        }
+      ]
+    },
+    {
+      "matching_state": "matched",
+      "status": "published",
+      "event": {
+        "show": "music-core",
+        "date": "2015-01-03",
+        "artist": "Apink",
+        "song": "Luv"
+      },
+      "heading": "LUV set Music Core’s revived-chart record",
+      "body": "Apink’s January 3, 2015 “LUV” win was the group’s fourth consecutive Music Core trophy for the song. Soompi reported that it was the first four-win streak since the show restored its chart the previous year.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "A Pink Wins On Music Core With LUV For A Record Setting Fourth Time",
+          "url": "https://www.soompi.com/article/686487wpp/a-pink-wins-on-music-core-with-luv-for-a-record-setting-fourth-time"
+        }
+      ]
+    },
+    {
+      "matching_state": "matched",
+      "status": "draft",
+      "event": {
+        "show": "music-bank",
+        "date": "2020-02-28",
+        "artist": "BTS",
+        "song": "On"
+      },
+      "heading": "ON beat Zico for its first trophy",
+      "body": "BTS won “ON” on Music Bank on February 28, 2020 with 7,465 points over Zico’s “Any Song.” It was the song’s first music-show win.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "BTS Takes 1st Win For ON On Music Bank",
+          "url": "https://www.soompi.com/article/1385583wpp/watch-bts-takes-1st-win-for-on-on-music-bank-performances-by-ravi-pentagon-loona-and-more"
+        }
+      ]
+    },
+    {
+      "matching_state": "matched",
+      "status": "draft",
+      "event": {
+        "show": "music-core",
+        "date": "2020-02-29",
+        "artist": "BTS",
+        "song": "On"
+      },
+      "heading": "ON doubled its total on Music Core",
+      "body": "The following day, BTS won “ON” again on Music Core with 8,288 points. The February 29, 2020 broadcast put BTS ahead of IZ*ONE and Zico for the song’s second trophy.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "BTS Takes 2nd Win For ON On Music Core",
+          "url": "https://www.soompi.com/article/1385742wpp/watch-bts-takes-2nd-win-for-on-on-music-core-performances-by-vixxs-ravi-elris-weki-meki-and-more"
+        }
+      ]
+    },
+    {
+      "matching_state": "matched",
+      "status": "published",
+      "event": {
+        "show": "the-show",
+        "date": "2016-07-19",
+        "artist": "GFriend",
+        "song": "Navillera"
+      },
+      "heading": "Navillera’s first win ended Yerin’s hosting week in tears",
+      "body": "GFRIEND’s first “Navillera” trophy came on The Show on July 19, 2016. Yerin became choked up as she wrapped her hosting duties, while Umji hid her face in her hands during the win.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "GFRIEND Takes 1st Win For Navillera On The Show",
+          "url": "https://www.soompi.com/article/877975wpp/gfriend-takes-1st-win-navillera-show-performances-wonder-girls-eric-nam-more"
+        }
+      ]
+    },
+    {
+      "matching_state": "matched",
+      "status": "draft",
+      "event": {
+        "show": "show-champion",
+        "date": "2016-07-20",
+        "artist": "GFriend",
+        "song": "Navillera"
+      },
+      "heading": "Navillera made it two wins in two days",
+      "body": "GFRIEND won “Navillera” again on Show Champion on July 20, 2016. After the tears of the previous day, the members were able to thank their staff, parents, hosts and fans through a calmer encore.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "GFRIEND Grabs 2nd Win For Navillera On Show Champion",
+          "url": "https://www.soompi.com/article/878363wpp/watch-gfriend-grabs-2nd-win-navillera-show-champion-performances-beast-seventeen"
+        }
+      ]
+    },
+    {
+      "matching_state": "matched",
+      "status": "draft",
+      "event": {
+        "show": "the-show",
+        "date": "2015-08-25",
+        "artist": "Girls' Generation",
+        "song": "Lion Heart"
+      },
+      "heading": "Girls’ Generation accepted Lion Heart’s first win by video",
+      "body": "Girls’ Generation won “Lion Heart” on The Show on August 25, 2015, but the members were unavailable to accept in person because the performance had been pre-recorded. The show shared their acceptance by video.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "Girls Generation Takes 1st Win With Lion Heart On The Show",
+          "url": "https://www.soompi.com/article/763969wpp/girls-generation-takes-1st-win-with-lion-heart-on-the-show"
+        }
+      ]
+    },
+    {
+      "matching_state": "matched",
+      "status": "draft",
+      "event": {
+        "show": "show-champion",
+        "date": "2015-08-26",
+        "artist": "Girls' Generation",
+        "song": "Lion Heart"
+      },
+      "heading": "Lion Heart followed with a second trophy",
+      "body": "Girls’ Generation won “Lion Heart” again on Show Champion on August 26, 2015, one day after its first trophy. The report identifies it as the song’s second win.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "Girls Generation Takes 2nd Win With Lion Heart On Show Champion",
+          "url": "https://www.soompi.com/article/764349wpp/girls-generation-takes-2nd-win-with-lion-heart-on-show-champion-performances-from-girls-generation-sg-wannabe-hyuna-vixx-lr-and-more"
+        }
+      ]
+    },
+    {
+      "matching_state": "matched",
+      "status": "draft",
+      "event": {
+        "show": "the-show",
+        "date": "2022-08-30",
+        "artist": "Ive",
+        "song": "After Like"
+      },
+      "heading": "IVE opened After LIKE with 8,734 points",
+      "body": "IVE won “After LIKE” on The Show on August 30, 2022 with 8,734 points. It was the song’s first music-show trophy, ahead of CIX and DKB.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "IVE Takes 1st Win For After LIKE On The Show",
+          "url": "https://www.soompi.com/article/1542928wpp/watch-ive-takes-1st-win-for-after-like-on-the-show-performances-by-cix-bae173-dkb-and-more"
+        }
+      ]
+    },
+    {
+      "matching_state": "matched",
+      "status": "draft",
+      "event": {
+        "show": "show-champion",
+        "date": "2022-08-31",
+        "artist": "Ive",
+        "song": "After Like"
+      },
+      "heading": "After LIKE doubled its trophy count the next day",
+      "body": "IVE took a second “After LIKE” trophy on Show Champion on August 31, 2022. The nominees included BLACKPINK, CIX, TWICE and NewJeans before the trophy went to IVE.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "IVE Takes 2nd Win For After LIKE On Show Champion",
+          "url": "https://www.soompi.com/article/1543102wpp/watch-ive-takes-2nd-win-for-after-like-on-show-champion-performances-by-cix-tri-be-and-more"
+        }
+      ]
     }
-    ,{"matching_state":"matched","status":"published","event":{"show":"m-countdown","date":"2019-06-20","artist":"Ateez","song":"Wave"},"heading":"ATEEZ’s first win came with Wave","body":"ATEEZ took its first-ever music-show trophy with “Wave” on M Countdown on June 20, 2019. Hongjoong said the group was happy and touched simply to be on stage each day, then thanked ATINY and the staff.","citations":[{"provider":"soompi","publisher_name":"Soompi","title":"ATEEZ Takes 1st Ever Win On M Countdown With Wave","url":"https://www.soompi.com/article/1333529wpp/watch-ateez-takes-1st-ever-win-on-m-countdown-with-wave-performances-by-jeon-somi-leo-stray-kids-and-more.html"}]}
-    ,{"matching_state":"matched","status":"published","event":{"show":"the-show","date":"2019-06-25","artist":"Ateez","song":"Wave"},"heading":"ATEEZ edged out a close second Wave race","body":"Five days later, ATEEZ won “Wave” again on The Show with 6,207 points, only 17 points ahead of WJSN. The result was their second music-show trophy.","citations":[{"provider":"soompi","publisher_name":"Soompi","title":"ATEEZ Grabs 2nd Win For Wave On The Show","url":"https://www.soompi.com/article/1334563wpp/watch-ateez-grabs-2nd-win-for-wave-on-the-show-performances-by-wjsn-sf9-and-more"}]}
-    ,{"matching_state":"matched","status":"published","event":{"show":"m-countdown","date":"2022-08-18","artist":"NewJeans","song":"Attention"},"heading":"NewJeans received its first trophy without a live stage","body":"NewJeans earned its first music-show win with “Attention” on M Countdown on August 18, 2022. The summer-special broadcast did not have a live episode, so the group’s acceptance was shared by video.","citations":[{"provider":"soompi","publisher_name":"Soompi","title":"NewJeans Takes 1st-Ever Win With Attention","url":"https://www.soompi.com/article/1541202wpp/watch-newjeans-takes-1st-ever-win-with-a"}]}
-    ,{"matching_state":"matched","status":"published","event":{"show":"music-bank","date":"2022-08-19","artist":"NewJeans","song":"Attention"},"heading":"NewJeans followed Attention with a Music Bank win","body":"The next day, NewJeans won “Attention” again on Music Bank with 11,150 points, beating Girls’ Generation’s “FOREVER 1.” It was the group’s second trophy for the song.","citations":[{"provider":"soompi","publisher_name":"Soompi","title":"NewJeans Takes 2nd Win For Attention On Music Bank","url":"https://www.soompi.com/article/1541403wpp/watch-newjeans-takes-2nd-win-for-attention-on-music-bank-performances-by-girls-generation-the-boyz-golden-child-and-more"}]}
-    ,{"matching_state":"matched","status":"published","event":{"show":"show-champion","date":"2015-10-14","artist":"Taeyeon","song":"I"},"heading":"Taeyeon’s solo debut won on Show Champion","body":"Taeyeon took her first solo music-show trophy with “I” on Show Champion on October 14, 2015. Contemporary coverage calls it her first win as a soloist and notes that she was not present at the broadcast.","citations":[{"provider":"soompi","publisher_name":"Soompi","title":"Girls’ Generation’s Taeyeon Takes First Win For I On Show Champion","url":"https://www.soompi.com/article/778601wpp/girls-generations-taeyeon-takes-first-win-for-i-on-show-champion"}]}
-    ,{"matching_state":"matched","status":"published","event":{"show":"music-core","date":"2015-10-24","artist":"Taeyeon","song":"I"},"heading":"I became Taeyeon’s first Music Core solo win","body":"On October 24, 2015, Taeyeon’s “I” won on Music Core. The report identifies it as the song’s seventh music-show victory and Taeyeon’s first solo win on that programme.","citations":[{"provider":"soompi","publisher_name":"Soompi","title":"Taeyeon Gets 7th Win For I On Music Core","url":"https://www.soompi.com/article/781769wpp/taeyeon-gets-7th-win-for-i-on-music-core-performances-by-kyuhyun-twice-btob-and-more"}]}
-    ,{"matching_state":"matched","status":"published","event":{"show":"the-show","date":"2015-10-06","artist":"Got7","song":"If You Do"},"heading":"GOT7’s first music-show win arrived nearly two years after debut","body":"GOT7 won its first music-show trophy with “If You Do” on The Show on October 6, 2015. The members thanked their agency, staff, fans and families, then held a short V Live celebration.","citations":[{"provider":"soompi","publisher_name":"Soompi","title":"GOT7 Takes First-Ever Music Show Win With If You Do","url":"https://www.soompi.com/article/776211wpp/got7-takes-first-ever-music-show-win-with-if-you-do-on-the-show"}]}
-    ,{"matching_state":"matched","status":"published","event":{"show":"the-show","date":"2015-10-20","artist":"Got7","song":"If You Do"},"heading":"GOT7 made If You Do a three-week The Show run","body":"GOT7 won “If You Do” for the third consecutive week on The Show on October 20, 2015. Yugyeom was that day’s special MC, and the members thanked fans in four languages.","citations":[{"provider":"soompi","publisher_name":"Soompi","title":"GOT7 Takes Home Third Win For If You Do On The Show","url":"https://www.soompi.com/article/780351wpp/got7-takes-home-third-win-for-if-you-do-on-the-show"}]}
-    ,{"matching_state":"matched","status":"published","event":{"show":"the-show","date":"2019-03-12","artist":"Tomorrow X Together","song":"Crown"},"heading":"TXT won Crown about a week after debut","body":"TXT earned its first music-show trophy with “Crown” on The Show on March 12, 2019, only about a week after debut. Soobin thanked fans and staff, while Beomgyu promised the group would keep improving.","citations":[{"provider":"soompi","publisher_name":"Soompi","title":"TXT Takes First Ever Win With Crown On The Show","url":"https://www.soompi.com/article/1309780wpp/undefined"}]}
-    ,{"matching_state":"matched","status":"published","event":{"show":"m-countdown","date":"2019-03-14","artist":"Tomorrow X Together","song":"Crown"},"heading":"TXT took a second Crown trophy on M Countdown","body":"Two days after its debut win, TXT took “Crown” to a second trophy on M Countdown with 7,612 points. The article describes it as the rookie group’s second-ever music-show win.","citations":[{"provider":"soompi","publisher_name":"Soompi","title":"TXT Grabs 2nd Win For Crown On M Countdown","url":"https://www.soompi.com/article/1310358wpp/watch-txt-grabs-2nd-win-for-crown-on-m-countdown-performances-by-park-bom-mamamoo-jus2-and-more"}]}
-    ,{"matching_state":"matched","status":"published","event":{"show":"the-show","date":"2019-05-07","artist":"The Boyz","song":"Bloom Bloom"},"heading":"The Boyz’s first win came when the members were away","body":"The Boyz won its first music-show trophy with “Bloom Bloom” on The Show on May 7, 2019. The members were unable to accept in person, so they shared photos and a thank-you video promising this was only the beginning.","citations":[{"provider":"soompi","publisher_name":"Soompi","title":"The Boyz Takes 1st Ever Win On The Show With Bloom Bloom","url":"https://www.soompi.com/article/1322779wpp/watch-the-boyz-takes-1st-ever-win-on-the-show-with-bloom-bloom-performances-by-park-bom-n-flying-and-more"}]}
-    ,{"matching_state":"matched","status":"published","event":{"show":"show-champion","date":"2020-09-30","artist":"The Boyz","song":"The Stealer"},"heading":"The Boyz’s Stealer win came on a Chuseok highlight special","body":"The Boyz won “The Stealer” on Show Champion on September 30, 2020. Because the episode was a Chuseok highlight special with no new performances, the group shared its thanks by video.","citations":[{"provider":"soompi","publisher_name":"Soompi","title":"The Boyz Wins With The Stealer On Show Champion","url":"https://www.soompi.com/article/1428807wpp/the-boyz-wins-with-the-stealer-on-show-champion"}]}
-    ,{"matching_state":"matched","status":"published","event":{"show":"m-countdown","date":"2014-03-06","artist":"Girls' Generation","song":"Mr.Mr."},"heading":"Girls’ Generation returned with a delayed Mr.Mr. win","body":"Girls’ Generation won “Mr.Mr.” on M Countdown on March 6, 2014 after album and music-video production problems had delayed the comeback. The members said they were grateful for fans’ consistent love and promised to repay it with good music.","citations":[{"provider":"soompi","publisher_name":"Soompi","title":"Girls’ Generation Takes Home Trophy With Mr.Mr. On M Countdown","url":"https://www.soompi.com/article/587301wpp/girls-generation-takes-home-trophy-with-mr-mr-on-mcountdown"}]}
-    ,{"matching_state":"pending","status":"draft","pending_reason":"The catalogue records a Girls’ Generation Mr. Mr. Inkigayo win on 2014-03-09, but the researched contemporary article confirms only the comeback stage and the earlier M Countdown win. Find a direct winner report before publishing.","event":{"show":"inkigayo","date":"2014-03-09","artist":"Girls' Generation","song":"Mr. Mr."},"heading":"Mr. Mr. continued Girls’ Generation’s comeback week","body":"Girls’ Generation appeared on Inkigayo with “Mr. Mr.” on March 9, 2014 during the group’s comeback week. A direct report of the catalogue’s listed win is still needed.","citations":[{"provider":"soompi","publisher_name":"Soompi","title":"2NE1 And Girls’ Generation Have Their Comeback Stages On Inkigayo","url":"https://www.soompi.com/article/587985wpp/2ne1-and-girls-generation-have-their-comeback-stages-on-inkigayo-03-09-14"}]}
-    ,{"matching_state":"matched","status":"published","event":{"show":"inkigayo","date":"2014-06-08","artist":"VIXX","song":"Eternity"},"heading":"VIXX’s Eternity win brought a river of tears","body":"VIXX won “Eternity” on Inkigayo on June 8, 2014, beating Infinite and Gary and Jung In. The members cried through their thank-you speech while thanking Starlights, staff, parents and one another.","citations":[{"provider":"soompi","publisher_name":"Soompi","title":"VIXX’s 1st Win With Eternity On SBS Inkigayo","url":"https://www.soompi.com/article/617607wpp/vixxs-1st-win-with-eternity-on-sbs-inkigayo-performances-from-taeyang-exo-zea-boyfriend-u-kiss-and-more"}]}
-    ,{"matching_state":"matched","status":"published","event":{"show":"show-champion","date":"2014-06-11","artist":"VIXX","song":"Eternity"},"heading":"VIXX’s first Show Champion win followed Eternity","body":"Three days later, VIXX won “Eternity” on Show Champion. Contemporary coverage describes it as the group’s first win on that programme and says the members wiped away tears after the encore.","citations":[{"provider":"allkpop","publisher_name":"allkpop","title":"VIXX Win Their Next Trophy On Show Champion With Eternity","url":"https://www.allkpop.com/article/2014/06/vixx-win-their-next-trophy-on-show-champion-with-eternity"}]}
-    ,{"matching_state":"matched","status":"published","event":{"show":"show-champion","date":"2015-05-27","artist":"Shinee","song":"View"},"heading":"SHINee’s View win landed two days after its seventh anniversary","body":"SHINee took its first “View” trophy on Show Champion on May 27, 2015, two days after the group’s seventh debut anniversary. The members said they had not expected the award and thanked SHINee World.","citations":[{"provider":"soompi","publisher_name":"Soompi","title":"SHINee Takes Home First Trophy For View On Show Champion","url":"https://www.soompi.com/article/735869wpp/shinee-takes-home-first-trophy-for-view-on-show-champion"}]}
-    ,{"matching_state":"matched","status":"published","event":{"show":"m-countdown","date":"2015-05-28","artist":"Shinee","song":"View"},"heading":"SHINee turned View into a second trophy","body":"SHINee won “View” again on M Countdown on May 28, 2015, making it the song’s second music-show win. The result came as the group’s comeback promotions continued across the weekly shows.","citations":[{"provider":"soompi","publisher_name":"Soompi","title":"SHINee’s 2nd Win With View Through M Countdown","url":"https://www.soompi.com/article/736217wpp/its-shinees-2nd-win-with-view-through-mcountdown-performances-from-kara-seventeen-clc-and-more"}]}
-    ,{"matching_state":"pending","status":"draft","pending_reason":"The catalogue’s earliest BEAST row is No More on 2014-06-21; the researched career-first Shock win is dated 2010-03-25 and has no matching catalogue row.","event":{"show":"m-countdown","date":"2010-03-25","artist":"Beast","song":"Shock"},"heading":"BEAST’s first trophy came with Shock","body":"Soompi reports that BEAST’s first music-show win was “Shock” on M Countdown on March 25, 2010, with members crying happy tears. The catalogue needs a matching 2010 row before this can publish.","citations":[{"provider":"soompi","publisher_name":"Soompi","title":"BEAST Gets First Music Show Win On M Countdown","url":"https://www.soompi.com/article/360065wpp/beast-gets-first-music-show-win-on-m-contdown"}]}
-    ,{"matching_state":"matched","status":"published","event":{"show":"music-core","date":"2014-06-21","artist":"Beast","song":"No More"},"heading":"BEAST opened Good Luck promotions with No More","body":"BEAST won Music Core with pre-release track “No More” on June 21, 2014, during the group’s special comeback stage for “Good Luck.” The same report notes that Taeyang finished second.","citations":[{"provider":"soompi","publisher_name":"Soompi","title":"BEAST Wins On Music Core This Week With Good Luck","url":"https://www.soompi.com/article/621461wpp/beast-wins-on-music-core-this-week-with-good-luck"}]}
-    ,{"matching_state":"matched","status":"published","event":{"show":"music-core","date":"2015-09-26","artist":"iKon","song":"My Type"},"heading":"iKON won My Type without music-show promotions","body":"iKON earned its first music-show win with “My Type” on Music Core on September 26, 2015, despite not promoting on music shows. Red Velvet and Fly to the Sky were the other contenders.","citations":[{"provider":"soompi","publisher_name":"Soompi","title":"iKON Gets Very 1st Win With My Type On Music Core","url":"https://www.soompi.com/article/773615wpp/ikon-gets-very-1st-win-with-my-type-on-music-core-performances-by-cnblue-red-velvet-and-more"}]}
-    ,{"matching_state":"matched","status":"published","event":{"show":"inkigayo","date":"2015-09-27","artist":"iKon","song":"My Type"},"heading":"iKON’s second My Type win was a Chuseok special","body":"On September 27, 2015, iKON won “My Type” again on Inkigayo’s Chuseok special. Performances were prerecorded and the winner was announced online; the group scored 9,273 votes.","citations":[{"provider":"soompi","publisher_name":"Soompi","title":"iKON Takes 2nd Win For My Type On Chuseok Special Of Inkigayo","url":"https://www.soompi.com/article/773871wpp/ikon-takes-2nd-win-for-my-type-on-chuseok-special-of-inkigayo"}]}
-    ,{"matching_state":"matched","status":"published","event":{"show":"m-countdown","date":"2018-11-08","artist":"Iz*One","song":"La Vie en Rose"},"heading":"IZ*ONE thanked Produce 48’s national producers","body":"IZ*ONE won its first music-show trophy with “La Vie en Rose” on M Countdown on November 8, 2018. Leader Kwon Eun Bi thanked WIZ*ONE and the national producers from Produce 48, while Sakura promised they would keep working hard.","citations":[{"provider":"soompi","publisher_name":"Soompi","title":"IZ*ONE Takes 1st Ever Win On M Countdown With La Vie En Rose","url":"https://www.soompi.com/article/1259899wpp/watch-izone-takes-1st-ever-win-m-countdown-la-vie-en-rose-performances-twice-monsta-x"}]}
-    ,{"matching_state":"matched","status":"published","event":{"show":"the-show","date":"2018-11-13","artist":"Iz*One","song":"La Vie en Rose"},"heading":"IZ*ONE made La Vie en Rose two wins in five days","body":"Five days after its first trophy, IZ*ONE won “La Vie en Rose” on The Show with 8,918 points on November 13, 2018. MONSTA X and gugudan were the other nominees.","citations":[{"provider":"soompi","publisher_name":"Soompi","title":"IZ*ONE Takes 2nd Win For La Vie En Rose On The Show","url":"https://www.soompi.com/article/1262471wpp/watch-izone-takes-2nd-win-la-"}]}
-    ,{"matching_state":"matched","status":"published","event":{"show":"m-countdown","date":"2014-08-21","artist":"Winner","song":"Empty"},"heading":"WINNER won in its first week of debut promotions","body":"WINNER took its first music-show trophy with “Empty” on M Countdown on August 21, 2014, about a week after debut. The rookie group competed against Block B.","citations":[{"provider":"soompi","publisher_name":"Soompi","title":"WINNER Grabs First Music Show Win On M Countdown","url":"https://www.soompi.com/article/642659wpp/winner-grabs-first-music-show-win-on-mcountdown"}]}
-    ,{"matching_state":"matched","status":"published","event":{"show":"music-bank","date":"2014-08-22","artist":"Winner","song":"Empty"},"heading":"WINNER took Empty to Music Bank","body":"WINNER won “Empty” on Music Bank on August 22, 2014, beating SISTAR for the episode’s top spot. It was the rookie group’s second music-show trophy in as many days.","citations":[{"provider":"allkpop","publisher_name":"allkpop","title":"WINNER Win #1 + Performances From August 22nd Music Bank","url":"https://www.allkpop.com/article/2014/08/performances-from-august-22nd-music-bank/1579472"}]}
-    ,{"matching_state":"matched","status":"published","event":{"show":"the-show","date":"2021-05-04","artist":"Enhypen","song":"Drunk-Dazed"},"heading":"ENHYPEN’s first trophy came after its first year","body":"ENHYPEN won its first music-show trophy with “Drunk-Dazed” on The Show on May 4, 2021. The 6,790-point result came roughly six months after the group’s debut.","citations":[{"provider":"soompi","publisher_name":"Soompi","title":"ENHYPEN Takes 1st-Ever Win On The Show With Drunk-Dazed","url":"https://www.soompi.com/article/1467353wpp/enhypen-takes-1st-ever-win-on-the-show-with-drunk-dazed-performances-by-onf-ab6ix-and-more"}]}
-    ,{"matching_state":"matched","status":"published","event":{"show":"show-champion","date":"2021-05-05","artist":"Enhypen","song":"Drunk-Dazed"},"heading":"ENHYPEN made Drunk-Dazed two in a row","body":"ENHYPEN won “Drunk-Dazed” again on Show Champion on May 5, 2021. The report calls it the group’s second-ever music trophy and includes the full encore.","citations":[{"provider":"soompi","publisher_name":"Soompi","title":"ENHYPEN Earns 2nd Win For Drunk-Dazed On Show Champion","url":"https://www.soompi.com/article/1467543wpp/watch-enhypen-earns-2nd-win-for-drunk-dazed-on-show-champion-performances-by-onf-ab6ix-and-more"}]}
-    ,{"matching_state":"matched","status":"published","event":{"show":"m-countdown","date":"2014-07-31","artist":"Sistar","song":"Touch My Body"},"heading":"SISTAR opened its summer run with Touch My Body","body":"SISTAR won “Touch My Body” on M Countdown on July 31, 2014, beating INFINITE in the first-place nominees. The result opened the song’s summer music-show run.","citations":[{"provider":"allkpop","publisher_name":"allkpop","title":"SISTAR Win #1 + Performances From July 31st M Countdown","url":"https://www.allkpop.com/article/2014/07/performances-from-july-31st-m-countdown/bind"}]}
-    ,{"matching_state":"matched","status":"published","event":{"show":"music-bank","date":"2014-08-01","artist":"Sistar","song":"Touch My Body"},"heading":"Touch My Body kept SISTAR at No. 1","body":"SISTAR followed with a Music Bank win for “Touch My Body” on August 1, 2014. Contemporary coverage described the comeback track as a summer jam after the group’s long break.","citations":[{"provider":"soompi","publisher_name":"Soompi","title":"SISTAR Takes 1 On Music Bank","url":"https://www.soompi.com/article/635577wpp/sistar-takes-1-on-music-bank-performances-by-hatfelt-red-velvet-infinite-b1a4-henry-and-more"}]}
-    ,{"matching_state":"matched","status":"published","event":{"show":"music-bank","date":"2019-08-09","artist":"Kang Daniel","song":"What Are You Up To"},"heading":"Kang Daniel’s first solo trophy was accepted by video","body":"Kang Daniel won his first solo music-show trophy with “What Are You Up To” on Music Bank on August 9, 2019. He was practicing at his agency rather than attending, so he posted a video thanking fans and promising better performances.","citations":[{"provider":"soompi","publisher_name":"Soompi","title":"Kang Daniel Takes 1st Win For What Are You Up To","url":"https://www.soompi.com/article/1344324wpp/watch-seventeen-itzy-nct-dream-and-more-perform-on-music-bank?mobile-app=true&theme=dark%2F1000"}]}
-    ,{"matching_state":"matched","status":"published","event":{"show":"the-show","date":"2019-12-03","artist":"Kang Daniel","song":"Touchin'"},"heading":"Kang Daniel’s Touchin’ win was queried and confirmed","body":"Kang Daniel won “Touchin’” on The Show on December 3, 2019 with 6,195 points. After fans questioned the score, The Show and Gaon explained that the digital-data calculation was valid.","citations":[{"provider":"soompi","publisher_name":"Soompi","title":"The Show And Gaon Chart Confirm And Explain Kang Daniel’s Win","url":"https://www.soompi.com/article/1369444wpp/the-show-confirms-explains-kang-daniels-win-on-recent-episode"}]}
-    ,{"matching_state":"matched","status":"published","event":{"show":"the-show","date":"2017-11-14","artist":"Monsta X","song":"Dramarama"},"heading":"MONSTA X’s first win followed its first world tour","body":"MONSTA X won its first music-show trophy with “Dramarama” on The Show on November 14, 2017, after debuting in 2015. Shownu became too emotional to speak, and Jooheon said the group had won after its first world tour.","citations":[{"provider":"soompi","publisher_name":"Soompi","title":"MONSTA X Takes Emotional 1st Ever Win On The Show","url":"https://www.soompi.com/article/1077579wpp/watch-monsta-x-takes-emotional-1st-ever-win-show-"}]}
-    ,{"matching_state":"matched","status":"published","event":{"show":"the-show","date":"2018-04-17","artist":"Monsta X","song":"Jealousy"},"heading":"MONSTA X’s Jealousy win became its second career trophy","body":"MONSTA X won “Jealousy” on The Show on April 17, 2018. The 7,550-point result was the group’s second-ever music-show win, ahead of EXID and The Boyz.","citations":[{"provider":"soompi","publisher_name":"Soompi","title":"MONSTA X Takes 1st Win For Jealousy On The Show","url":"https://www.soompi.com/article/1156719wpp/monsta-x-takes-1st-win-jealousy-show"}]}
-    ,{"matching_state":"matched","status":"published","event":{"show":"show-champion","date":"2023-03-29","artist":"Nmixx","song":"Love Me Like This"},"heading":"NMIXX’s first win came with Love Me Like This","body":"NMIXX earned its first music-show trophy with “Love Me Like This” on Show Champion on March 29, 2023. The members’ first win since debut was reported as a tearful one.","citations":[{"provider":"soompi","publisher_name":"Soompi","title":"NMIXX Takes Tearful 1st-Ever Win On Show Champion","url":"https://www.soompi.com/article/1575999wpp/watch-nmixx-takes-tearful-1st-ever-win-on-show-champion-performances-by-billlie-tempest-and-more?mobile-app=true&theme=false%29"}]}
-    ,{"matching_state":"matched","status":"published","event":{"show":"show-champion","date":"2024-01-24","artist":"Nmixx","song":"Dash"},"heading":"NMIXX returned to the top with Dash","body":"NMIXX won “DASH” on Show Champion on January 24, 2024, one year after the group’s first trophy. The result opened the win run for the new title track.","citations":[{"provider":"soompi","publisher_name":"Soompi","title":"NMIXX Takes 1st Win For DASH On Show Champion","url":"https://www.soompi.com/article/1639039wpp/watch-nmixx-takes-1st-win-for-dash-on-show-champion"}]}
-    ,{"matching_state":"matched","status":"published","event":{"show":"the-show","date":"2023-07-18","artist":"Zerobaseone","song":"In Bloom"},"heading":"ZEROBASEONE won its debut trophy on The Show","body":"ZEROBASEONE took its first music-show trophy with debut song “In Bloom” on The Show on July 18, 2023, scoring 9,350 points. The result came during the group’s first week of promotions.","citations":[{"provider":"soompi","publisher_name":"Soompi","title":"ZEROBASEONE Takes 1st-Ever Win On The Show With In Bloom","url":"https://www.soompi.com/article/1601425wpp/watch-zerobaseone-takes-1st-ever-win-on-the-show-with-in-bloom-performances-by-ikons-jinhwan-jay-odd-eye-circle-and-more"}]}
-    ,{"matching_state":"matched","status":"published","event":{"show":"show-champion","date":"2023-07-19","artist":"Zerobaseone","song":"In Bloom"},"heading":"ZEROBASEONE followed its debut win the next day","body":"The day after its debut trophy, ZEROBASEONE won “In Bloom” again on Show Champion on July 19, 2023. EXO, NMIXX, SHINee and Jungkook were among the nominees.","citations":[{"provider":"soompi","publisher_name":"Soompi","title":"ZEROBASEONE Takes 2nd Win For In Bloom On Show Champion","url":"https://www.soompi.com/article/1601713wpp/watch-zerobaseone-takes-2nd-win-for-in-bloom-on-show-champion-performances-by-nmixx-odd-eye-circle-and-more"}]}
-    ,{"matching_state":"matched","status":"published","event":{"show":"m-countdown","date":"2014-04-17","artist":"AKMU","song":"200%"},"heading":"AKMU’s first award was posted online during the Sewol pause","body":"AKMU won its first live music-program award with “200%” on M Countdown on April 17, 2014. The episode was not broadcast out of respect for the Sewol ferry victims, so Mnet posted the result online.","citations":[{"provider":"soompi","publisher_name":"Soompi","title":"Akdong Musician’s M Countdown Win Posted Online Due To Sewol Ferry Tragedy","url":"https://www.soompi.com/article/599499wpp/akdong-musicians-m-countdown-win-posted-online-due-to-sewol-ferry-tragedy"}]}
-    ,{"matching_state":"pending","status":"draft","pending_reason":"The catalogue records an AKMU 200% Music Core win on 2014-04-19, but the located Soompi source covers M Countdown and later online announcements. Find a direct Music Core report before publishing.","event":{"show":"music-core","date":"2014-04-19","artist":"AKMU","song":"200%"},"heading":"AKMU’s 200% run continued while shows were suspended","body":"AKMU’s “200%” is listed in the catalogue as a Music Core win on April 19, 2014 during the Sewol broadcast suspension. A direct report for that listed event is still needed.","citations":[{"provider":"soompi","publisher_name":"Soompi","title":"Akdong Musician Wins 1st Place For Third Week In A Row On M Countdown","url":"https://www.soompi.com/article/602779wpp/akdong-musician-wins-1st-place-for-third-week-in-a-row-on-m-countdown"}]}
-    ,{"matching_state":"matched","status":"published","event":{"show":"m-countdown","date":"2015-01-08","artist":"EXID","song":"Up & Down"},"heading":"EXID’s viral fancam revival finally produced a win","body":"EXID won its first music-show trophy with “Up & Down” on M Countdown on January 8, 2015. The song had been released months earlier, then surged after performance fancams went viral; staff delivered the trophy to the group’s practice room.","citations":[{"provider":"soompi","publisher_name":"Soompi","title":"EXID Wins First Ever Music Show On M Countdown","url":"https://www.soompi.com/article/688553wpp/exid-wins-first-ever-music-show-on-mcountdown"}]}
-    ,{"matching_state":"matched","status":"published","event":{"show":"music-bank","date":"2015-01-09","artist":"EXID","song":"Up & Down"},"heading":"EXID’s first on-stage trophy came at Music Bank","body":"EXID won “Up & Down” on Music Bank on January 9, 2015. Because the previous day’s M Countdown result was not a live broadcast, this was the first time the members received the trophy on stage.","citations":[{"provider":"soompi","publisher_name":"Soompi","title":"EXID Wins On Music Bank With Up & Down","url":"https://www.soompi.com/article/688913wpp/exid-wins-on-music-bank-with-up-down"}]}
-    ,{"matching_state":"matched","status":"published","event":{"show":"music-core","date":"2017-06-17","artist":"G-Dragon","song":"Untitled, 2014"},"heading":"G-Dragon won Untitled, 2014 without promoting it on shows","body":"G-Dragon’s “Untitled, 2014” won Music Core on June 17, 2017. The song was competing with SISTAR and TWICE, and the win came even though he had not promoted the track on music shows.","citations":[{"provider":"soompi","publisher_name":"Soompi","title":"G-Dragon Grabs 1st Win With Untitled, 2014 On Music Core","url":"https://www.soompi.com/article/999299wpp/watch-g-dragon-grabs-1st-win-untitled-2014-music-core-performances-nct-127-day6"}]}
-    ,{"matching_state":"matched","status":"published","event":{"show":"inkigayo","date":"2017-06-18","artist":"G-Dragon","song":"Untitled, 2014"},"heading":"Untitled, 2014 won again with Mark as special MC","body":"G-Dragon took a second trophy for “Untitled, 2014” on Inkigayo on June 18, 2017. NCT’s Mark served as special MC for the episode while G-Dragon’s song topped the chart.","citations":[{"provider":"soompi","publisher_name":"Soompi","title":"G-Dragon Gets 2nd Win With Untitled, 2014 On Inkigayo","url":"https://www.soompi.com/article/999631wpp/watch-g-dragon-gets-2nd-win-untitled-2014-inkigayo"}]}
-    ,{"matching_state":"matched","status":"published","event":{"show":"the-show","date":"2024-04-02","artist":"Illit","song":"Magnetic"},"heading":"ILLIT’s Magnetic became a first-week trophy","body":"ILLIT won its first music-show trophy with “Magnetic” on The Show on April 2, 2024, scoring 6,904 points. The members became emotional during the first win.","citations":[{"provider":"soompi","publisher_name":"Soompi","title":"ILLIT Takes Tearful 1st-Ever Win On The Show With Magnetic","url":"https://www.soompi.com/article/1652694wpp/watch-illit-takes-tearful-1st-ever-win-on-the-show-with-magnetic-performances-by-lucas-unis-and-more?mobile-app=true&theme=false%29"}]}
-    ,{"matching_state":"matched","status":"published","event":{"show":"the-show","date":"2024-04-09","artist":"Illit","song":"Magnetic"},"heading":"ILLIT’s Magnetic win doubled the following week","body":"ILLIT won “Magnetic” again on The Show on April 9, 2024, with 8,990 points. The result was the group’s second music-show trophy.","citations":[{"provider":"soompi","publisher_name":"Soompi","title":"ILLIT Takes 2nd Win For Magnetic On The Show","url":"https://www.soompi.com/article/1654053wpp/watch-illit-takes-2nd-win-for-magnetic-on-the-show-performances-by-kiss-of-life-nowadays-and-more"}]}
-    ,{"matching_state":"matched","status":"published","event":{"show":"show-champion","date":"2014-05-28","artist":"Infinite","song":"Last Romeo"},"heading":"INFINITE’s Last Romeo win came with a fan promise","body":"INFINITE won “Last Romeo” on Show Champion on May 28, 2014. L had promised that Sungyeol and Dongwoo would dress as Romeo and Juliet if the song won, turning the trophy into a playful encore challenge.","citations":[{"provider":"soompi","publisher_name":"Soompi","title":"Infinite Wins This Week’s Show Champion For Last Romeo","url":"https://www.soompi.com/article/614213wpp/infinite-wins-this-weeks-show-champion-for-last-romeo"}]}
-    ,{"matching_state":"matched","status":"published","event":{"show":"m-countdown","date":"2014-05-29","artist":"Infinite","song":"Last Romeo"},"heading":"INFINITE’s second Last Romeo win became a Juliet transformation","body":"INFINITE won “Last Romeo” again on M Countdown on May 29, 2014. Dongwoo completed the promised gag by putting on red lipstick and transforming into Juliet for the encore.","citations":[{"provider":"soompi","publisher_name":"Soompi","title":"Infinite Takes Home Second Win With Last Romeo On M Countdown","url":"https://www.soompi.com/article/614567wpp/infinite-takes-home-second-win-with-last-romeo-on-mcountdown"}]}
-    ,{"matching_state":"matched","status":"published","event":{"show":"the-show","date":"2018-01-23","artist":"Oh My Girl","song":"Secret Garden"},"heading":"Oh My Girl’s first win came 1,009 days after debut","body":"Oh My Girl earned its first music-show win with “Secret Garden” on The Show on January 23, 2018, 1,009 days after debut. The members thanked Miracle, their parents, staff and one another through tears.","citations":[{"provider":"soompi","publisher_name":"Soompi","title":"Oh My Girl Takes 1st Ever Win With Secret Garden On The Show","url":"https://www.soompi.com/article/1113203wpp/watch-oh-girl-takes-1st-ever-win-secret-garden-show-performances-jbj-chungha"}]}
-    ,{"matching_state":"matched","status":"published","event":{"show":"show-champion","date":"2018-01-24","artist":"Oh My Girl","song":"Secret Garden"},"heading":"Secret Garden won again the next day","body":"The day after its breakthrough, Oh My Girl took a second “Secret Garden” trophy on Show Champion. In an interview, the members said they had focused on growing with every album and never stopped being grateful simply to perform.","citations":[{"provider":"soompi","publisher_name":"Soompi","title":"Oh My Girl Opens Up About 1st Music Show Win And Success Of Secret Garden","url":"https://www.soompi.com/article/1114261wpp/oh-girl-opens-1st-music-show-win-love-fans-success-secret-garden"}]}
-    ,{"matching_state":"matched","status":"published","event":{"show":"the-show","date":"2021-09-14","artist":"STAYC","song":"Stereotype"},"heading":"STAYC’s Stereotype ended its first year with a first win","body":"STAYC won its first music-show trophy with “STEREOTYPE” on The Show on September 14, 2021, less than a year after debut. The group scored 8,760 points and accepted the award through tears.","citations":[{"provider":"soompi","publisher_name":"Soompi","title":"STAYC Takes Tearful 1st-Ever Win On The Show With STEREOTYPE","url":"https://www.soompi.com/article/1488636wpp/watch-stayc-takes-tearful-1st-ever-win-on-the-show-with-stereotype-performances-by-fromis_9-purple-kiss-and-more"}]}
-    ,{"matching_state":"matched","status":"published","event":{"show":"show-champion","date":"2021-09-15","artist":"STAYC","song":"Stereotype"},"heading":"STAYC won Stereotype again on a replay-special episode","body":"STAYC’s “STEREOTYPE” won Show Champion on September 15, 2021. The episode used replayed performances instead of a normal live broadcast, and the group’s second trophy was announced at the end.","citations":[{"provider":"soompi","publisher_name":"Soompi","title":"STAYC Takes 2nd Win For STEREOTYPE On Show Champion","url":"https://www.soompi.com/article/1488808wpp/watch-stayc-takes-2nd-win-for-stereotype-on-show-champion"}]}
-    ,{"matching_state":"matched","status":"published","event":{"show":"the-show","date":"2017-03-28","artist":"Highlight","song":"Plz Don't Be Sad"},"heading":"Highlight’s first win under its new name was Plz Don’t Be Sad","body":"Highlight won “Plz Don’t Be Sad” on The Show on March 28, 2017, its first music-show trophy under the new name after leaving BEAST behind. The group marked the moment with a performance-version video after the win.","citations":[{"provider":"soompi","publisher_name":"Soompi","title":"Highlight Celebrates Views Milestone With Performance Version Of Plz Don’t Be Sad","url":"https://www.soompi.com/article/966337wpp/watch-highlight-celebrates-views-milestone-performance-version-plz-dont-sad-mv"}]}
-    ,{"matching_state":"matched","status":"published","event":{"show":"show-champion","date":"2017-03-29","artist":"Highlight","song":"Plz Don't Be Sad"},"heading":"Highlight made Plz Don’t Be Sad two wins in two days","body":"Highlight won a second “Plz Don’t Be Sad” trophy on Show Champion on March 29, 2017. The report identifies it as the group’s second win for the new hit track.","citations":[{"provider":"soompi","publisher_name":"Soompi","title":"Highlight Wins 2nd Trophy For Plz Don’t Be Sad On Show Champion","url":"https://www.soompi.com/article/966789wpp/highlight-wins-show-champion-trophy-plz-dont-sad-performances"}]}
-    ,{"matching_state":"matched","status":"published","event":{"show":"the-show","date":"2021-09-07","artist":"Fromis 9","song":"Talk & Talk"},"heading":"fromis_9’s first win arrived after a four-year wait","body":"fromis_9 won its first music-show trophy with “Talk & Talk” on The Show on September 7, 2021, after debuting in 2018. The group scored 8,470 points and celebrated an emotional first win.","citations":[{"provider":"soompi","publisher_name":"Soompi","title":"fromis_9 Takes Tearful 1st-Ever Win On The Show With Talk & Talk","url":"https://www.soompi.com/article/1487614wpp/fromis_9-takes-tearful-1st-ever-win-on-the-show-with-talk-performances-by-kwon-eun-bi-omega-x-and-more?mobile-app=true&theme=dark%2F1000"}]}
-    ,{"matching_state":"matched","status":"published","event":{"show":"the-show","date":"2022-01-25","artist":"Fromis 9","song":"DM"},"heading":"fromis_9 returned quickly with a second win for DM","body":"fromis_9 won “DM” on The Show on January 25, 2022, its second overall music-show trophy after “Talk & Talk.” The members thanked Flover with messages written in sketchbooks during the encore.","citations":[{"provider":"soompi","publisher_name":"Soompi","title":"fromis_9 Takes First Win For DM On The Show","url":"https://www.soompi.com/article/1510113wpp/watch-fromis_9-takes-first-win-for-dm-on-the-show-performances-by-yuju-victon-choi-ye-na-and-more?mobile-app=true&theme=falseCampfire"}]}
-    ,{"matching_state":"matched","status":"published","event":{"show":"m-countdown","date":"2023-07-20","artist":"Jungkook","song":"Seven"},"heading":"Jungkook’s solo debut won on M Countdown","body":"Jungkook earned his first solo music-show trophy with “Seven” on M Countdown on July 20, 2023, scoring 6,068 points over NewJeans’ “Super Shy.” The episode also marked Joohoney’s last day as MC.","citations":[{"provider":"soompi","publisher_name":"Soompi","title":"Jungkook Takes 1st Win For Seven On M Countdown","url":"https://www.soompi.com/article/1601989wpp/watch-btss-jungkook-takes-1st-win-for-seven-on-m-countdown-performances-by-nct-dream-zerobaseone-and-more?mobile-app=true&theme=false%29"}]}
-    ,{"matching_state":"matched","status":"published","event":{"show":"m-countdown","date":"2023-07-27","artist":"Jungkook","song":"Seven"},"heading":"Seven became Jungkook’s second trophy the next week","body":"Jungkook won “Seven” again on M Countdown on July 27, 2023, with 7,606 points. NewJeans’ “Super Shy” was the other first-place nominee.","citations":[{"provider":"soompi","publisher_name":"Soompi","title":"Jungkook Takes 2nd Win For Seven On M Countdown","url":"https://www.soompi.com/article/1603366wpp/watch-btss-jungkook-takes-2nd-win-for-seven-on-m-countdown-performances-by-shownu-x-hyungwon-oh-my-girl-and-more"}]}
-    ,{"matching_state":"matched","status":"published","event":{"show":"the-show","date":"2023-09-12","artist":"BoyNextDoor","song":"But Sometimes"},"heading":"BOYNEXTDOOR’s first trophy came with But Sometimes","body":"BOYNEXTDOOR took its first-ever music-show trophy with “But Sometimes” on The Show on September 12, 2023, scoring 9,080 points. The result was the group’s first win since debut.","citations":[{"provider":"soompi","publisher_name":"Soompi","title":"BOYNEXTDOOR Takes 1st-Ever Win On The Show With But Sometimes","url":"https://www.soompi.com/article/1613291wpp/watch-boynextdoor-takes-1st-ever-win-on-the-show-with-but-sometimes-performances-by-kim-sejeong-lee-chae-yeon-dkzs-jaechan-and-more"}]}
-    ,{"matching_state":"matched","status":"published","event":{"show":"show-champion","date":"2023-09-13","artist":"BoyNextDoor","song":"But Sometimes"},"heading":"BOYNEXTDOOR doubled its first win on Show Champion","body":"BOYNEXTDOOR won “But Sometimes” again on Show Champion on September 13, 2023, its second career music-show trophy. The nominees included AKMU, RIIZE, BTS’s V and MAMAMOO’s Hwasa.","citations":[{"provider":"soompi","publisher_name":"Soompi","title":"BOYNEXTDOOR Takes 2nd Win For But Sometimes On Show Champion","url":"https://www.soompi.com/article/1613604wpp/watch-boynextdoor-takes-2nd-win-for-but-sometimes-on-show-champion-performances-by-kim-sejeong-lee-chae-yeon-and-more?mobile-app=true&theme=falseCampfire"}]}
-    ,{"matching_state":"matched","status":"published","event":{"show":"music-core","date":"2020-08-29","artist":"BTS","song":"Dynamite"},"heading":"Dynamite’s first trophy came on Music Core","body":"BTS won “Dynamite” on Music Core on August 29, 2020, with 8,882 points over SSAK3 and ITZY. The result was the song’s first music-show win.","citations":[{"provider":"soompi","publisher_name":"Soompi","title":"BTS Takes 1st Win For Dynamite On Music Core","url":"https://www.soompi.com/article/1422326wpp/watch-bts-takes-1st-win-for-dynamite-on-music-core-performances-by-itzy-kard-cravity-and-more"}]}
-    ,{"matching_state":"matched","status":"published","event":{"show":"music-core","date":"2020-10-31","artist":"BTS","song":"Dynamite"},"heading":"Dynamite reached 20 wins on Music Core","body":"On October 31, 2020, BTS took “Dynamite” to its 20th overall music-show trophy on Music Core. The 9,864-point win came over BLACKPINK’s “Lovesick Girls” and Refund Sisters’ “Don’t Touch Me.”","citations":[{"provider":"soompi","publisher_name":"Soompi","title":"BTS Takes 20th Win For Dynamite On Music Core","url":"https://www.soompi.com/article/1434942wpp/watch-bts-takes-20th-win-for-dynamite-on-music-core-performances-by-b1a4-twice-p1harmony-and-more"}]}
-    ,{"matching_state":"matched","status":"published","event":{"show":"music-bank","date":"2019-04-19","artist":"BTS","song":"Boy with Luv"},"heading":"Boy with Luv opened with an 11,231-point win","body":"BTS took its first “Boy With Luv” trophy on Music Bank on April 19, 2019, scoring 11,231 points over BOL4’s “Bom.”","citations":[{"provider":"soompi","publisher_name":"Soompi","title":"BTS’s Boy With Luv Grabs 1st Win On Music Bank","url":"https://www.soompi.com/article/1318690wpp/watch-live-bts-izone-stray-kids-and-more-to-perform-on-music-bank"}]}
-    ,{"matching_state":"matched","status":"published","event":{"show":"music-core","date":"2019-04-20","artist":"BTS","song":"Boy with Luv"},"heading":"Boy with Luv won again the next day","body":"BTS followed its Music Bank result with a second “Boy With Luv” win on Music Core on April 20, 2019. The song scored 6,743 points over BOL4 and BLACKPINK.","citations":[{"provider":"soompi","publisher_name":"Soompi","title":"BTS Takes 2nd Win For Boy With Luv On Music Core","url":"https://www.soompi.com/article/1318950wpp/watch-bts-takes-2nd-win-for-boy-with-luv-on-mbcs-music-core-performances-by-super-junior-de-izone-and-more"}]}
-    ,{"matching_state":"matched","status":"published","event":{"show":"inkigayo","date":"2015-04-05","artist":"Exo","song":"Call Me Baby"},"heading":"EXO opened Call Me Baby with a 10,000-point win","body":"EXO won “Call Me Baby” on Inkigayo on April 5, 2015 with 10,000 points. The members thanked fans and sent love to Tao, who was sidelined by an injury.","citations":[{"provider":"soompi","publisher_name":"Soompi","title":"EXO Takes First Music Show Win With Call Me Baby On SBS Inkigayo","url":"https://www.soompi.com/article/717359wpp/exo-takes-first-music-show-win-with-call-me-baby-on-sbs-inkigayo"}]}
-    ,{"matching_state":"matched","status":"published","event":{"show":"music-bank","date":"2015-04-10","artist":"Exo","song":"Call Me Baby"},"heading":"Call Me Baby’s fourth win came without Tao or Lay","body":"EXO earned its fourth “Call Me Baby” trophy on Music Bank on April 10, 2015. The report notes that Tao and Lay could not attend, so the group thanked them alongside fans and staff.","citations":[{"provider":"soompi","publisher_name":"Soompi","title":"EXO Takes 4th Win For Call Me Baby Through Music Bank","url":"https://www.soompi.com/article/719293wpp/exo-takes-4th-win-for-call-me-baby-through-music-bank"}]}
-    ,{"matching_state":"matched","status":"published","event":{"show":"the-show","date":"2014-12-02","artist":"Apink","song":"Luv"},"heading":"Apink began LUV’s 17-win run on The Show","body":"Apink’s “LUV” won on The Show on December 2, 2014, starting the song’s 17-win catalogue run. Contemporary coverage later noted that the group’s first Music Bank win followed this earlier-week result.","citations":[{"provider":"soompi","publisher_name":"Soompi","title":"A Pink Wins On Music Bank This Week With LUV","url":"https://www.soompi.com/article/675971wpp/a-pink-wins-on-music-bank-this-week-with-luv"}]}
-    ,{"matching_state":"matched","status":"published","event":{"show":"music-core","date":"2015-01-03","artist":"Apink","song":"Luv"},"heading":"LUV set a Music Core consecutive-win record","body":"Apink took its fourth consecutive Music Core trophy for “LUV” on January 3, 2015. The result was the song’s 16th music-show win and the first four-win Music Core streak since the chart returned in 2014.","citations":[{"provider":"soompi","publisher_name":"Soompi","title":"A Pink Wins On Music Core With LUV For A Record Setting Fourth Time","url":"https://www.soompi.com/article/686487wpp/a-pink-wins-on-music-core-with-luv-for-a-record-setting-fourth-time"}]}
-    ,{"matching_state":"matched","status":"published","event":{"show":"music-bank","date":"2020-02-28","artist":"BTS","song":"On"},"heading":"ON beat Zico for its first trophy","body":"BTS won “ON” on Music Bank on February 28, 2020 with 7,465 points over Zico’s “Any Song.” It was the song’s first music-show win.","citations":[{"provider":"soompi","publisher_name":"Soompi","title":"BTS Takes 1st Win For ON On Music Bank","url":"https://www.soompi.com/article/1385583wpp/watch-bts-takes-1st-win-for-on-on-music-bank-performances-by-ravi-pentagon-loona-and-more"}]}
-    ,{"matching_state":"matched","status":"published","event":{"show":"music-core","date":"2020-02-29","artist":"BTS","song":"On"},"heading":"ON doubled its total on Music Core","body":"The following day, BTS won “ON” again on Music Core with 8,288 points. The February 29, 2020 broadcast put BTS ahead of IZ*ONE and Zico for the song’s second trophy.","citations":[{"provider":"soompi","publisher_name":"Soompi","title":"BTS Takes 2nd Win For ON On Music Core","url":"https://www.soompi.com/article/1385742wpp/watch-bts-takes-2nd-win-for-on-on-music-core-performances-by-vixxs-ravi-elris-weki-meki-and-more"}]}
-    ,{"matching_state":"matched","status":"published","event":{"show":"the-show","date":"2016-07-19","artist":"GFriend","song":"Navillera"},"heading":"GFRIEND’s Navillera first win brought tears","body":"GFRIEND won “Navillera” on The Show on July 19, 2016 with 8,404 points. Yerin became emotional as she wrapped up her hosting duties, while Umji hid her face in her hands.","citations":[{"provider":"soompi","publisher_name":"Soompi","title":"GFRIEND Takes 1st Win For Navillera On The Show","url":"https://www.soompi.com/article/877975wpp/gfriend-takes-1st-win-navillera-show-performances-wonder-girls-eric-nam-more"}]}
-    ,{"matching_state":"matched","status":"published","event":{"show":"show-champion","date":"2016-07-20","artist":"GFriend","song":"Navillera"},"heading":"Navillera made it two wins in two days","body":"GFRIEND won “Navillera” again on Show Champion on July 20, 2016. After the tears of the previous day, the members were able to thank their staff, parents, hosts and fans through a calmer encore.","citations":[{"provider":"soompi","publisher_name":"Soompi","title":"GFRIEND Grabs 2nd Win For Navillera On Show Champion","url":"https://www.soompi.com/article/878363wpp/watch-gfriend-grabs-2nd-win-navillera-show-champion-performances-beast-seventeen"}]}
-    ,{"matching_state":"matched","status":"published","event":{"show":"the-show","date":"2015-08-25","artist":"Girls' Generation","song":"Lion Heart"},"heading":"Lion Heart’s first win was accepted by video","body":"Girls’ Generation won “Lion Heart” on The Show on August 25, 2015. The performance had been pre-recorded and the members were unavailable to accept the award in person.","citations":[{"provider":"soompi","publisher_name":"Soompi","title":"Girls Generation Takes 1st Win With Lion Heart On The Show","url":"https://www.soompi.com/article/763969wpp/girls-generation-takes-1st-win-with-lion-heart-on-the-show"}]}
-    ,{"matching_state":"matched","status":"published","event":{"show":"show-champion","date":"2015-08-26","artist":"Girls' Generation","song":"Lion Heart"},"heading":"Lion Heart followed with a second trophy","body":"Girls’ Generation won “Lion Heart” again on Show Champion on August 26, 2015, one day after its first trophy. The report identifies it as the song’s second win.","citations":[{"provider":"soompi","publisher_name":"Soompi","title":"Girls Generation Takes 2nd Win With Lion Heart On Show Champion","url":"https://www.soompi.com/article/764349wpp/girls-generation-takes-2nd-win-with-lion-heart-on-show-champion-performances-from-girls-generation-sg-wannabe-hyuna-vixx-lr-and-more"}]}
-    ,{"matching_state":"matched","status":"published","event":{"show":"the-show","date":"2022-08-30","artist":"Ive","song":"After Like"},"heading":"IVE opened After LIKE with 8,734 points","body":"IVE won “After LIKE” on The Show on August 30, 2022 with 8,734 points. It was the song’s first music-show trophy, ahead of CIX and DKB.","citations":[{"provider":"soompi","publisher_name":"Soompi","title":"IVE Takes 1st Win For After LIKE On The Show","url":"https://www.soompi.com/article/1542928wpp/watch-ive-takes-1st-win-for-after-like-on-the-show-performances-by-cix-bae173-dkb-and-more"}]}
-    ,{"matching_state":"matched","status":"published","event":{"show":"show-champion","date":"2022-08-31","artist":"Ive","song":"After Like"},"heading":"After LIKE doubled its trophy count the next day","body":"IVE took a second “After LIKE” trophy on Show Champion on August 31, 2022. The nominees included BLACKPINK, CIX, TWICE and NewJeans before the trophy went to IVE.","citations":[{"provider":"soompi","publisher_name":"Soompi","title":"IVE Takes 2nd Win For After LIKE On Show Champion","url":"https://www.soompi.com/article/1543102wpp/watch-ive-takes-2nd-win-for-after-like-on-show-champion-performances-by-cix-tri-be-and-more"}]}
   ]
 }
