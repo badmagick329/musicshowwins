@@ -170,8 +170,8 @@ Production orchestration and host configuration are intentionally kept outside
 version control. The public repository only defines and verifies the portable
 application image.
 
-When the image starts with `gunicorn`, its entrypoint applies database migrations
-and idempotently publishes the committed artist-moment content before starting
-the API. Starting the same image as the Next.js process does not perform database
-setup. New committed moments therefore deploy with the backend without a manual
-production import.
+Deployment orchestration runs migrations and synchronizes the committed
+artist-moment content before starting the API. The content file declares each
+moment's draft or published state and is authoritative for copy and citations;
+omitted entries are not deleted. Cache refresh runs separately after the API and
+frontend are healthy, and a refresh failure does not stop the application.

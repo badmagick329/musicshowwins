@@ -1,8 +1,10 @@
 import json
 from datetime import date
+from unittest.mock import patch
 
 import pytest
 from django.core.exceptions import ValidationError
+from django.core.management import call_command
 
 from main.models import Artist, MusicShow, Song, Win, WinMoment, WinReference
 from main.moment_io import MomentDocumentError, import_moments
@@ -18,7 +20,8 @@ def moment_document(db):
         "version": 1,
         "moments": [
             {
-                "state": "matched",
+                "matching_state": "matched",
+                "status": "published",
                 "event": {
                     "show": "the-show",
                     "date": "2015-05-05",
@@ -43,10 +46,10 @@ def moment_document(db):
 @pytest.mark.django_db
 def test_import_is_dry_run_idempotent_and_publishable(moment_document):
     win, document = moment_document
-    assert import_moments(document, dry_run=True) == (1, 0)
+    assert import_moments(document, dry_run=True) == (1, 0, 0)
     assert WinMoment.objects.count() == 0
-    assert import_moments(document) == (1, 0)
-    assert import_moments(document, publish=True) == (0, 1)
+    assert import_moments(document) == (1, 0, 0)
+    assert import_moments(document) == (0, 0, 1)
     assert WinMoment.objects.get(win=win).status == "published"
     assert WinReference.objects.count() == 1
 
@@ -73,11 +76,13 @@ def test_wrong_event_and_cross_win_citations_are_rejected(moment_document):
 @pytest.mark.django_db
 def test_public_api_hides_drafts_and_unsupported_published_moments(moment_document):
     win, document = moment_document
+    document["moments"][0]["status"] = "draft"
     import_moments(document)
     from rest_framework.test import APIClient
 
     assert APIClient().get("/api/v1/wins").data["results"][0]["moment"] is None
-    import_moments(document, publish=True)
+    document["moments"][0]["status"] = "published"
+    import_moments(document, update_existing=True)
     assert (
         APIClient().get("/api/v1/wins").data["results"][0]["moment"]["heading"]
         == "BTS's first win"
@@ -98,9 +103,81 @@ def test_import_rejects_invalid_urls_and_explicit_pending_or_unknown_artists(
 
     pending = json.loads(json.dumps(document))
     pending["moments"][0]["citations"][0]["url"] = "https://example.com/report"
-    pending["moments"][0]["state"] = "pending"
+    pending["moments"][0]["matching_state"] = "pending"
     pending["moments"][0]["pending_reason"] = "Catalogue event is absent."
     with pytest.raises(MomentDocumentError, match="BTS is pending"):
         import_moments(pending, artists={"bts"}, dry_run=True)
     with pytest.raises(MomentDocumentError, match="Unknown selected artist"):
         import_moments(pending, artists={"unknown"}, dry_run=True)
+
+
+@pytest.mark.django_db
+def test_deployment_sync_replaces_editorial_changes_and_reference_state(
+    moment_document,
+):
+    win, document = moment_document
+    import_moments(document)
+    moment = WinMoment.objects.get(win=win)
+    reference = moment.citations.get()
+    moment.heading = "Editor heading"
+    moment.body = "Editor body"
+    moment.status = WinMoment.Status.DRAFT
+    moment.save()
+    reference.title = "Editor reference title"
+    reference.status = WinReference.Status.UNAVAILABLE
+    reference.save()
+
+    assert import_moments(document, update_existing=True) == (0, 1, 0)
+    moment.refresh_from_db()
+    reference.refresh_from_db()
+    assert (moment.heading, moment.body, moment.status) == (
+        "BTS's first win",
+        "A sourced story.",
+        WinMoment.Status.PUBLISHED,
+    )
+    assert reference.title == "Report"
+    assert reference.status == WinReference.Status.ACTIVE
+    assert list(moment.citations.values_list("pk", flat=True)) == [reference.pk]
+
+    assert import_moments(document, update_existing=True) == (0, 1, 0)
+    assert WinMoment.objects.count() == 1
+    assert WinReference.objects.count() == 1
+
+    document["moments"][0]["status"] = "draft"
+    assert import_moments(document, update_existing=True) == (0, 1, 0)
+    moment.refresh_from_db()
+    reference.refresh_from_db()
+    assert moment.heading == "BTS's first win"
+    assert moment.status == WinMoment.Status.DRAFT
+    assert reference.title == "Report"
+    assert reference.status == WinReference.Status.ACTIVE
+
+    assert import_moments({"version": 1, "moments": []}, update_existing=True) == (
+        0,
+        0,
+        0,
+    )
+    assert WinMoment.objects.filter(pk=moment.pk).exists()
+
+
+@pytest.mark.django_db
+def test_deployment_sync_skips_unavailable_cache_revalidation(
+    moment_document, tmp_path
+):
+    _, document = moment_document
+    path = tmp_path / "moments.json"
+    path.write_text(json.dumps(document), encoding="utf-8")
+
+    with patch(
+        "main.management.commands.import_win_moments.invalidate_public_archive_cache",
+        side_effect=RuntimeError("frontend and API are unavailable"),
+    ) as invalidate:
+        call_command(
+            "import_win_moments",
+            str(path),
+            update_existing=True,
+            skip_cache_revalidation=True,
+        )
+
+    invalidate.assert_not_called()
+    assert WinMoment.objects.get().status == WinMoment.Status.PUBLISHED

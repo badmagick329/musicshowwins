@@ -15,7 +15,9 @@ From the repository root, validate without writes:
 
 `python manage.py import_win_moments musicshowwins/main/data/artist_moments_pilot.json --dry-run`
 
-Add `--publish` for the explicit publication step. Use repeated `--artist NAME` options to select a subset.
+Use repeated `--artist NAME` options to select a subset. Each entry's `status`
+controls publication. Deployment supplies `--update-existing`, making the
+committed file authoritative without deleting omitted records.
 
 ## Checks
 

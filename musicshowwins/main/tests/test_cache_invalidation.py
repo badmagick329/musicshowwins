@@ -1,7 +1,9 @@
+from io import StringIO
 from unittest.mock import Mock, patch
 
 import pytest
 import requests
+from django.core.management import call_command
 
 from main.cache_invalidation import (
     CacheInvalidationError,
@@ -46,3 +48,14 @@ def test_cache_invalidation_reports_configuration_and_request_failures(settings)
         pytest.raises(CacheInvalidationError, match="Could not invalidate"),
     ):
         invalidate_public_archive_cache()
+
+
+def test_deployment_cache_refresh_reports_failure_without_raising():
+    stderr = StringIO()
+    with patch(
+        "main.management.commands.refresh_public_cache.invalidate_public_archive_cache",
+        side_effect=CacheInvalidationError("frontend unavailable"),
+    ):
+        call_command("refresh_public_cache", stderr=stderr)
+
+    assert "Cache refresh failed: frontend unavailable" in stderr.getvalue()
