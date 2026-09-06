@@ -1,17 +1,9 @@
-## Coding
+# Repository instructions
 
-- Do not consider backward compatibility. Ignore legacy code/libraries
-- Prefer simplicity over complexity
- 
-## Response Discipline
-
-Keep answers tightly scoped to the user's actual question.
-
-- Do not add extra framing, justification, or side commentary unless it directly answers the request.
-- Do not introduce cautions, alternatives, or edge-case advice unless the user asked for them or they are necessary to avoid a meaningful mistake.
-- Prefer short prose over bullets when the question is simple.
-- Do not pad responses with reasons why something is good, bad, or sensible unless the user explicitly asks for evaluation.
-- Optimize for directness: answer first, stop when the user's question has been satisfied.
-- Sacrifice grammar for concision.
-- No motivational fluff.
-
+- Put agent-created documents under `./.ignore/docs`; follow its `README.md` for placement and lifecycle. Keep the docs root for the index only.
+- For public UI changes, follow `frontend/style.md`.
+- Preserve exact credited collaboration names as one artist. Keep undated aggregate history out of dated wins; quarantine conflicting imported winners and retain historical rows missing from a source.
+- Edit notable moments in `musicshowwins/main/data/artist_moments_pilot.json`. Deployment sync treats copy, citations, and publication status as authoritative; use `draft` to withdraw a moment, not omission. Keep pending catalogue matches unpublished.
+- Verify moment claims against article bodies. Distinguish career-first from song-first or show-first wins; catalogue order alone does not establish a career-first. Prefer meaningful sourced context over routine results or score recaps.
+- Keep `operator-tools` offline from public database writes: reviewed references reach Django through exported manifests, not automatic candidate approval or direct production writes.
+- For deployment work, read `.ignore/deployment/runbook.md`. Production orchestration stays outside version control; building/loading an image and deploying it are separate steps. Keep pre-start content sync independent of frontend availability; refresh caches after readiness.
