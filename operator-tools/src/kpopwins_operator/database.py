@@ -2,14 +2,16 @@ from __future__ import annotations
 
 import json
 import sqlite3
+from contextlib import contextmanager
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
+from uuid import uuid4
 
 from .config import Config
 from .validation import normalize_candidate
 
-SCHEMA_VERSION = 4
+SCHEMA_VERSION = 5
 
 
 class DatabaseError(RuntimeError):
@@ -178,7 +180,53 @@ CREATE TABLE candidate_review_events (
 );
 """
 
-SCHEMA = SCHEMA_V1 + MIGRATION_1_TO_2 + MIGRATION_2_TO_3 + MIGRATION_3_TO_4
+MIGRATION_4_TO_5 = """
+CREATE TABLE review_batches (
+    batch_id TEXT PRIMARY KEY,
+    scope TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    status TEXT NOT NULL DEFAULT 'open'
+        CHECK (status IN ('open', 'applied', 'cancelled')),
+    snapshot TEXT NOT NULL CHECK (json_valid(snapshot)),
+    decisions TEXT CHECK (decisions IS NULL OR json_valid(decisions)),
+    applied_at TEXT
+);
+CREATE TABLE review_batch_items (
+    batch_id TEXT NOT NULL REFERENCES review_batches(batch_id),
+    candidate_id INTEGER NOT NULL REFERENCES reference_candidates(id),
+    PRIMARY KEY (batch_id, candidate_id)
+);
+CREATE TABLE candidate_deferrals (
+    candidate_id INTEGER PRIMARY KEY REFERENCES reference_candidates(id),
+    fingerprint TEXT NOT NULL,
+    reason TEXT NOT NULL,
+    reviewed_at TEXT NOT NULL
+);
+"""
+
+SCHEMA = (
+    SCHEMA_V1
+    + MIGRATION_1_TO_2
+    + MIGRATION_2_TO_3
+    + MIGRATION_3_TO_4
+    + MIGRATION_4_TO_5
+)
+
+
+@contextmanager
+def review_transaction(connection: sqlite3.Connection):
+    """Allow single decisions and whole batches to share one atomic write boundary."""
+    name = "review_" + uuid4().hex
+    connection.execute(f"SAVEPOINT {name}")
+    try:
+        connection.execute("UPDATE reference_candidates SET id=id WHERE 0")
+        yield
+    except BaseException:
+        connection.execute(f"ROLLBACK TO {name}")
+        connection.execute(f"RELEASE {name}")
+        raise
+    else:
+        connection.execute(f"RELEASE {name}")
 
 
 def _connect(path: Path) -> sqlite3.Connection:
@@ -212,6 +260,10 @@ def initialize_database(config: Config) -> int:
         if version == 3:
             connection.executescript(MIGRATION_3_TO_4)
             connection.execute("PRAGMA user_version = 4")
+            version = 4
+        if version == 4:
+            connection.executescript(MIGRATION_4_TO_5)
+            connection.execute("PRAGMA user_version = 5")
     return SCHEMA_VERSION
 
 

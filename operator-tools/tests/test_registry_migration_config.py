@@ -8,11 +8,51 @@ from kpopwins_operator import config as config_module
 from kpopwins_operator.config import load_config
 from kpopwins_operator.database import (
     MIGRATION_1_TO_2,
+    MIGRATION_2_TO_3,
+    MIGRATION_3_TO_4,
     SCHEMA_V1,
     initialize_database,
     open_database,
 )
 from kpopwins_operator.registry import SUPPORTED_SHOWS, RegistryError, load_registry
+
+
+def test_version_four_upgrade_preserves_existing_review_history(config):
+    config.home.mkdir(parents=True)
+    with sqlite3.connect(config.database_path) as old:
+        old.executescript(
+            SCHEMA_V1 + MIGRATION_1_TO_2 + MIGRATION_2_TO_3 + MIGRATION_3_TO_4
+        )
+        old.execute("PRAGMA user_version=4")
+        old.execute(
+            "INSERT INTO wins VALUES ('music-bank', '2026-01-02', "
+            "1, 'Alpha', 'First', 1, 'now')"
+        )
+        old.execute("""INSERT INTO reference_candidates (
+            show_slug, win_date, reference_type, provider, url, review_status,
+            created_at, updated_at
+        ) VALUES ('music-bank', '2026-01-02', 'video', 'youtube',
+                  'https://youtube.com/watch?v=v1', 'approved', 'now', 'now')""")
+        old.execute("""INSERT INTO candidate_review_events (
+            candidate_id, previous_status, decision, reviewer, reason,
+            reviewed_at, artist_name, song_title
+        ) VALUES (1, 'pending', 'approved', 'agent', 'Verified episode',
+                  'now', 'Alpha', 'First')""")
+    initialize_database(config)
+    with open_database(config) as upgraded:
+        assert (
+            upgraded.execute(
+                "SELECT review_status FROM reference_candidates"
+            ).fetchone()[0]
+            == "approved"
+        )
+        assert (
+            upgraded.execute("SELECT reason FROM candidate_review_events").fetchone()[0]
+            == "Verified episode"
+        )
+        assert (
+            upgraded.execute("SELECT COUNT(*) FROM review_batches").fetchone()[0] == 0
+        )
 
 
 def test_env_file_loads_before_process_overrides(tmp_path):
@@ -91,7 +131,7 @@ def test_real_version_one_to_two_migration_preserves_rows(config):
     connection.commit()
     connection.close()
 
-    assert initialize_database(config) == 4
+    assert initialize_database(config) == 5
     with open_database(config) as migrated:
         assert migrated.execute("SELECT COUNT(*) FROM wins").fetchone()[0] == 1
         assert (
@@ -121,7 +161,7 @@ def test_version_two_to_three_migration_preserves_videos_and_adds_lookup_state(c
     connection.commit()
     connection.close()
 
-    assert initialize_database(config) == 4
+    assert initialize_database(config) == 5
     with open_database(config) as migrated:
         row = migrated.execute(
             "SELECT title, channel_title FROM youtube_videos WHERE video_id='v1'"

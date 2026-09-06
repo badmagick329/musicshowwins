@@ -5,6 +5,8 @@ import sqlite3
 from collections.abc import Sequence
 from typing import TextIO
 
+from .database import review_transaction
+
 
 def list_candidates(
     connection: sqlite3.Connection,
@@ -116,16 +118,14 @@ def review_candidates(
     revise: bool = False,
 ) -> int:
     """Prevent silent decision reversals and retain the evidence behind revisions."""
-    if decision not in {"approved", "rejected", "withdrawn"}:
+    if decision not in {"approved", "rejected", "withdrawn", "deferred"}:
         raise ValueError("Invalid review decision.")
     if not candidate_ids or len(set(candidate_ids)) != len(candidate_ids):
         raise ValueError("Supply unique candidate IDs.")
     if not reviewer.strip() or not reason.strip():
         raise ValueError("Reviewer and reason must not be blank.")
     placeholders = ",".join("?" for _ in candidate_ids)
-    with connection:
-        # Acquire the writer lock before reading statuses used to authorize changes.
-        connection.execute("UPDATE reference_candidates SET id=id WHERE 0")
+    with review_transaction(connection):
         rows = list(
             connection.execute(
                 f"""
@@ -177,7 +177,9 @@ def review_candidates(
                 """UPDATE reference_candidates
                    SET review_status=?, withdrawn=?, updated_at=? WHERE id=?""",
                 (
-                    "rejected" if decision == "withdrawn" else decision,
+                    {"withdrawn": "rejected", "deferred": "pending"}.get(
+                        decision, decision
+                    ),
                     int(decision == "withdrawn"),
                     timestamp,
                     row["id"],
@@ -200,7 +202,7 @@ def review_candidates(
                     (row["show_slug"], row["win_date"], timestamp, timestamp),
                 )
         for row in rows:
-            if decision == "approved" or row["provider"] != "youtube":
+            if decision in {"approved", "deferred"} or row["provider"] != "youtube":
                 continue
             connection.execute(
                 """

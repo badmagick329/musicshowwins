@@ -450,6 +450,24 @@ def _read_cached_page(config: Config, page_path: str) -> str | None:
     return path.read_text(encoding="utf-8") if path.is_file() else None
 
 
+def cached_winner_context(config: Config, episode_url: str) -> str | None:
+    """Supply cached winner evidence without fetching or trusting URL paths."""
+    if not isinstance(episode_url, str):
+        return None
+    parsed = urlsplit(episode_url)
+    prefix = "/r/kpop/wiki/"
+    if parsed.hostname not in {
+        "reddit.com",
+        "www.reddit.com",
+    } or not parsed.path.startswith(prefix):
+        return None
+    markdown = _read_cached_page(config, parsed.path[len(prefix) :])
+    if markdown is None:
+        return None
+    found, section = extract_winner_section(markdown)
+    return section if found else None
+
+
 def _store_page(config: Config, page_path: str, content: str) -> None:
     write_atomic(_page_cache_path(config, page_path), content)
 

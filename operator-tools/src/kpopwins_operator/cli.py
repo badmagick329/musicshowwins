@@ -24,6 +24,7 @@ from .database import (
 from .ingestion import ingest_channels
 from .manifest import ManifestError, approved_document, serialize_document, write_atomic
 from .matching import match_videos
+from .preparation import prepare_candidates
 from .reddit import RedditError, run_reddit_audit
 from .reddit_hydration import (
     RedditHydrationError,
@@ -36,6 +37,7 @@ from .reddit_import import (
     load_official_audit_links,
 )
 from .registry import SUPPORTED_SHOWS, RegistryError, load_registry
+from .review_batches import apply_batch, batch_directory, cancel_batch, create_batch
 from .youtube import YouTubeClient, YouTubeError
 
 
@@ -76,6 +78,47 @@ def build_parser() -> argparse.ArgumentParser:
     subparsers.add_parser("init", help="Initialize local operator state")
     subparsers.add_parser("refresh-wins", help="Refresh the public win catalogue")
     subparsers.add_parser("status", help="Show compact local state counts")
+    prepare_parser = subparsers.add_parser(
+        "prepare", help="Refresh wins, discover videos and match pending candidates"
+    )
+    prepare_parser.add_argument(
+        "--reddit",
+        action="store_true",
+        help="Include resumable Reddit discovery and hydration",
+    )
+    prepare_parser.add_argument(
+        "--max-pages",
+        type=_positive_integer,
+        default=10,
+        help="YouTube pages per channel",
+    )
+    prepare_parser.add_argument(
+        "--reddit-max-pages", type=_positive_integer, default=100
+    )
+    prepare_parser.add_argument("--min-score", type=_nonnegative_integer, default=75)
+    review_parser = subparsers.add_parser(
+        "review", help="Exchange validated review batches with agents"
+    )
+    review_commands = review_parser.add_subparsers(dest="review_command", required=True)
+    batch_parser = review_commands.add_parser(
+        "batch", help="Export or resume a batch and blank decision template"
+    )
+    batch_parser.add_argument("--show", choices=sorted(SUPPORTED_SHOWS))
+    batch_parser.add_argument("--source", choices=("youtube_match", "reddit_audit"))
+    batch_parser.add_argument("--limit", type=_positive_integer, default=25)
+    batch_parser.add_argument("--include-deferred", action="store_true")
+    apply_parser = review_commands.add_parser(
+        "apply", help="Validate and apply an agent decision file atomically"
+    )
+    apply_parser.add_argument("path")
+    apply_parser.add_argument("--dry-run", action="store_true")
+    cancel_parser = review_commands.add_parser(
+        "cancel", help="Release an abandoned or stale batch without changing decisions"
+    )
+    cancel_parser.add_argument("batch_id")
+    review_commands.add_parser(
+        "status", help="List open batches and saved decision files"
+    )
     due_parser = subparsers.add_parser("due", help="List searches currently due")
     due_parser.add_argument("--provider", required=True)
     due_parser.add_argument("--limit", type=_positive_integer, default=100)
@@ -287,9 +330,113 @@ def main(
             print(f"Schema version: {version}", file=output)
             return 0
 
+        if args.command in {"prepare", "review"}:
+            initialize_database(config)
+
         connection = open_database(config)
         try:
-            if args.command == "refresh-wins":
+            if args.command == "prepare":
+                prepare_candidates(
+                    connection,
+                    config,
+                    include_reddit=args.reddit,
+                    max_pages=args.max_pages,
+                    reddit_max_pages=args.reddit_max_pages,
+                    min_score=args.min_score,
+                    timestamp=now or _now(),
+                    stdout=output,
+                    session=session,
+                    sleep=sleep,
+                )
+            elif args.command == "review":
+                if args.review_command == "batch":
+                    packet = create_batch(
+                        connection,
+                        config,
+                        show=args.show,
+                        source=args.source,
+                        limit=args.limit,
+                        include_deferred=args.include_deferred,
+                        timestamp=now or _now(),
+                    )
+                    if packet is None:
+                        print(
+                            "No candidates ready. Check review status, "
+                            "or use --include-deferred.",
+                            file=output,
+                        )
+                    else:
+                        directory = batch_directory(config, packet["batch_id"])
+                        print(
+                            f"Batch {packet['batch_id']}: "
+                            f"{len(packet['candidates'])} candidates",
+                            file=output,
+                        )
+                        print(
+                            f"Agent evidence: {directory / 'batch.json'}", file=output
+                        )
+                        print(
+                            f"Agent decisions: {directory / 'decisions.json'}",
+                            file=output,
+                        )
+                        print(
+                            f'Next: review apply "{directory / "decisions.json"}"',
+                            file=output,
+                        )
+                elif args.review_command == "apply":
+                    result = apply_batch(
+                        connection,
+                        config,
+                        Path(args.path),
+                        dry_run=args.dry_run,
+                        timestamp=now or _now(),
+                    )
+                    mode = (
+                        "Already applied"
+                        if result["already_applied"]
+                        else "Dry run"
+                        if args.dry_run
+                        else "Applied"
+                    )
+                    counts = result["counts"]
+                    print(
+                        f"{mode}: approved={counts['approve']} "
+                        f"rejected={counts['reject']} deferred={counts['defer']}",
+                        file=output,
+                    )
+                    if not args.dry_run:
+                        log = (
+                            batch_directory(config, result["batch_id"]) / "applied.json"
+                        )
+                        print(
+                            f"Log: {log}",
+                            file=output,
+                        )
+                        print(
+                            "Next: review batch or export-approved.",
+                            file=output,
+                        )
+                elif args.review_command == "cancel":
+                    cancel_batch(connection, args.batch_id)
+                    print(
+                        "Batch cancelled; candidates released. Next: review batch",
+                        file=output,
+                    )
+                else:
+                    rows = list(
+                        connection.execute(
+                            "SELECT batch_id, created_at FROM review_batches "
+                            "WHERE status='open' ORDER BY created_at"
+                        )
+                    )
+                    for row in rows:
+                        print(
+                            f"{row['batch_id']}  {row['created_at']}  "
+                            f"{batch_directory(config, row['batch_id'])}",
+                            file=output,
+                        )
+                    print(f"Open batches: {len(rows)}", file=output)
+            elif args.command == "refresh-wins":
                 counts = refresh_catalogue(
                     connection,
                     config.api_base_url,
