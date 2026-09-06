@@ -90,8 +90,8 @@ List and inspect pending candidates, then make explicit review decisions:
 ```console
 uv run kpopwins-operator candidates list --status pending --min-score 75
 uv run kpopwins-operator candidates show 12
-uv run kpopwins-operator candidates approve 12 18
-uv run kpopwins-operator candidates reject 21
+uv run kpopwins-operator candidates approve 12 18 --reviewer agent-name --reason "Exact show, winner and episode confirmed"
+uv run kpopwins-operator candidates reject 21 --reviewer agent-name --reason "Wrong episode confirmed"
 ```
 
 Matching uses only locally ingested videos. It requires artist and winner signals,

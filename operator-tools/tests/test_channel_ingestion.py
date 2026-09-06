@@ -271,6 +271,31 @@ def test_historical_cutoff_marks_initial_scan_complete(connection):
     assert state["next_page_token"] is None
 
 
+def test_incremental_page_limit_resumes_before_starting_another_scan(connection):
+    add_channel(connection)
+    connection.execute("UPDATE youtube_ingestion_state SET initial_scan_complete=1")
+    connection.commit()
+    first = IngestClient(
+        [PlaylistPage(("new1",), {"new1": "2026-01-02T00:00:00Z"}, "PAGE2")],
+        [[video("new1")]],
+    )
+    options = dict(handle=None, max_pages=1, restart=False, timestamp="now")
+    assert ingest_channels(connection, first, **options).more_remaining
+    second = IngestClient(
+        [PlaylistPage(("new2",), {"new2": "2026-01-01T00:00:00Z"}, None)],
+        [[video("new2")]],
+    )
+    assert not ingest_channels(connection, second, **options).more_remaining
+    assert second.tokens == ["PAGE2"]
+    assert connection.execute("SELECT COUNT(*) FROM youtube_videos").fetchone()[0] == 2
+    third = IngestClient(
+        [PlaylistPage(("new1",), {"new1": "2026-01-02T00:00:00Z"}, "PAGE2")],
+        [[video("new1")]],
+    )
+    assert not ingest_channels(connection, third, **options).more_remaining
+    assert third.tokens == [None]
+
+
 def test_ingestion_batches_video_lookups_at_fifty_ids(connection):
     add_channel(connection)
     identifiers = tuple(f"v{index}" for index in range(51))

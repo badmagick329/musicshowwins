@@ -149,6 +149,7 @@ class WinReference(models.Model):
     class Status(models.TextChoices):
         ACTIVE = "active", "Active"
         UNAVAILABLE = "unavailable", "Unavailable"
+        WITHDRAWN = "withdrawn", "Withdrawn"
 
     win = models.ForeignKey(Win, on_delete=models.CASCADE, related_name="references")
     reference_type = models.CharField(max_length=20, choices=ReferenceType.choices)

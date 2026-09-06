@@ -132,7 +132,7 @@ def ingest_channels(
                 (channel_id,),
             ).fetchone()
         initial = not bool(state["initial_scan_complete"])
-        token = state["next_page_token"] if initial else None
+        token = state["next_page_token"]
         channel_pages = 0
         while channel_pages < max_pages:
             with connection:
@@ -226,7 +226,7 @@ def ingest_channels(
                     WHERE channel_id = ?
                     """,
                     (
-                        next_token if initial and not complete else None,
+                        None if complete or incremental_done else next_token,
                         int(complete or not initial),
                         timestamp,
                         channel_id,

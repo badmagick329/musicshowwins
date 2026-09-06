@@ -9,6 +9,7 @@ from django.core.management import call_command
 from django.core.management.base import CommandError
 
 from main.models import Artist, MusicShow, Song, Win, WinReference
+from main.services import wins_queryset
 
 
 @pytest.fixture
@@ -105,6 +106,23 @@ def test_identical_reimport_is_unchanged(reference_win, reference_document, tmp_
     original.refresh_from_db()
     assert original.updated_at == original_updated_at
     assert "created 0, updated 0, unchanged 1" in output
+
+
+def test_explicit_withdrawal_hides_reference_and_is_idempotent(
+    reference_win, reference_document, tmp_path
+):
+    _import_file(tmp_path, reference_document)
+    assert len(wins_queryset().get(pk=reference_win.pk).active_references) == 1
+    reference_document["references"][0]["status"] = "withdrawn"
+    assert "updated 1" in _import_file(tmp_path, reference_document, dry_run=True)
+    assert WinReference.objects.get().status == "active"
+    assert "updated 1" in _import_file(tmp_path, reference_document)
+    assert WinReference.objects.get().status == "withdrawn"
+    assert wins_queryset().get(pk=reference_win.pk).active_references == []
+    assert "unchanged 1" in _import_file(tmp_path, reference_document)
+    # An omitted record is retained; only an explicit status changes publication.
+    _import_file(tmp_path, {"version": 1, "references": []})
+    assert WinReference.objects.get().status == "withdrawn"
 
 
 def test_updates_by_url_and_by_provider_external_id(

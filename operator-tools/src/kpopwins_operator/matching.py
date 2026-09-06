@@ -208,7 +208,7 @@ def match_videos(
         counts.accepted += 1
         existing = connection.execute(
             """
-            SELECT id FROM reference_candidates
+            SELECT id, metadata FROM reference_candidates
             WHERE show_slug = ? AND win_date = ? AND provider = 'youtube'
               AND external_id = ?
             """,
@@ -221,12 +221,13 @@ def match_videos(
                 counts.created += 1
             continue
         metadata = {
+            **(json.loads(existing["metadata"]) if existing else {}),
             "youtube_match": {
                 "score": score,
                 "reasons": reasons,
                 "show_mapping": row["show_slug"],
                 "korean_publication_date": publication_date.isoformat(),
-            }
+            },
         }
         values = _candidate_values(row, metadata, timestamp)
         with connection:

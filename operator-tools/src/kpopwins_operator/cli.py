@@ -150,6 +150,13 @@ def build_parser() -> argparse.ArgumentParser:
     approve_parser.add_argument("ids", nargs="+", type=_positive_integer)
     reject_parser = candidate_commands.add_parser("reject")
     reject_parser.add_argument("ids", nargs="+", type=_positive_integer)
+    withdraw_parser = candidate_commands.add_parser("withdraw")
+    withdraw_parser.add_argument("ids", nargs="+", type=_positive_integer)
+    for review_parser in (approve_parser, reject_parser, withdraw_parser):
+        review_parser.add_argument("--reviewer", required=True)
+        review_parser.add_argument("--reason", required=True)
+    for review_parser in (approve_parser, reject_parser):
+        review_parser.add_argument("--revise", action="store_true")
     return parser
 
 
@@ -471,13 +478,19 @@ def main(
                 elif args.candidate_command == "show":
                     show_candidate(connection, output, args.id)
                 else:
-                    decision = (
-                        "approved"
-                        if args.candidate_command == "approve"
-                        else "rejected"
-                    )
+                    decision = {
+                        "approve": "approved",
+                        "reject": "rejected",
+                        "withdraw": "withdrawn",
+                    }[args.candidate_command]
                     total = review_candidates(
-                        connection, args.ids, decision=decision, timestamp=timestamp
+                        connection,
+                        args.ids,
+                        decision=decision,
+                        timestamp=timestamp,
+                        reviewer=args.reviewer,
+                        reason=args.reason,
+                        revise=getattr(args, "revise", False),
                     )
                     print(f"{decision}: {total} candidate(s)", file=output)
         finally:

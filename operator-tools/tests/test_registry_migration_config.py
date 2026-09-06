@@ -91,7 +91,7 @@ def test_real_version_one_to_two_migration_preserves_rows(config):
     connection.commit()
     connection.close()
 
-    assert initialize_database(config) == 3
+    assert initialize_database(config) == 4
     with open_database(config) as migrated:
         assert migrated.execute("SELECT COUNT(*) FROM wins").fetchone()[0] == 1
         assert (
@@ -121,7 +121,7 @@ def test_version_two_to_three_migration_preserves_videos_and_adds_lookup_state(c
     connection.commit()
     connection.close()
 
-    assert initialize_database(config) == 3
+    assert initialize_database(config) == 4
     with open_database(config) as migrated:
         row = migrated.execute(
             "SELECT title, channel_title FROM youtube_videos WHERE video_id='v1'"

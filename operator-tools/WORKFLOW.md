@@ -35,12 +35,11 @@ uv run kpopwins-operator youtube match
 ```console
 uv run kpopwins-operator candidates list --status pending --limit 100
 uv run kpopwins-operator candidates show 12
-uv run kpopwins-operator candidates approve 12 18
-uv run kpopwins-operator candidates reject 21
+uv run kpopwins-operator candidates approve 12 18 --reviewer agent-name --reason "Exact show, winner and episode confirmed"
+uv run kpopwins-operator candidates reject 21 --reviewer agent-name --reason "Wrong episode confirmed"
 ```
 
-Replace the example IDs with the candidates you reviewed. Keep listing pending
-candidates until none remain.
+Replace the example IDs with the candidates you reviewed. Continue through the queue; leave uncertain candidates pending.
 
 ## Audit the r/kpop wiki (read-only)
 
@@ -75,6 +74,28 @@ uv run kpopwins-operator candidates list --status pending --provider youtube
 
 Audit and hydration do not change candidates. Importing never approves a
 candidate or overwrites an existing review decision.
+
+## Correct a previous decision
+
+Approve/reject require `--reviewer` and `--reason`; group only candidates sharing
+that reason. Add `--revise` when deliberately changing a previous review. History
+is stored locally and displayed by `candidates show`.
+
+For a reference that should be removed from the public site, use an explicit
+withdrawal, then export and import the manifest through the normal steps:
+
+```console
+uv run kpopwins-operator candidates withdraw 12 --reviewer agent-name --reason "Wrong episode confirmed"
+```
+
+Rejecting or omitting a candidate does not remove an imported reference.
+Withdrawals survive rematching. Restoring one requires `approve --revise` after
+review, followed by another manifest import.
+
+After upgrading to schema 4, run `uv run kpopwins-operator init` once. Winner
+artist/song corrections during `refresh-wins` return approvals to pending and
+record why. Review them again before export. Existing public references require
+an explicit withdrawal if the review establishes they are wrong.
 
 ## Export and test locally
 

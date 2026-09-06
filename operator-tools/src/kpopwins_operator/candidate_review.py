@@ -92,6 +92,17 @@ def show_candidate(
         if key in {"metadata", "reasons"} and value:
             value = json.dumps(json.loads(value), ensure_ascii=False, indent=2)
         print(f"{key}: {value if value is not None else '-'}", file=stdout)
+    events = [
+        dict(event)
+        for event in connection.execute(
+            "SELECT * FROM candidate_review_events WHERE candidate_id=? ORDER BY id",
+            (candidate_id,),
+        )
+    ]
+    print(
+        "review_history: " + json.dumps(events, ensure_ascii=False, indent=2),
+        file=stdout,
+    )
 
 
 def review_candidates(
@@ -100,38 +111,81 @@ def review_candidates(
     *,
     decision: str,
     timestamp: str,
+    reviewer: str,
+    reason: str,
+    revise: bool = False,
 ) -> int:
+    """Prevent silent decision reversals and retain the evidence behind revisions."""
+    if decision not in {"approved", "rejected", "withdrawn"}:
+        raise ValueError("Invalid review decision.")
+    if not candidate_ids or len(set(candidate_ids)) != len(candidate_ids):
+        raise ValueError("Supply unique candidate IDs.")
+    if not reviewer.strip() or not reason.strip():
+        raise ValueError("Reviewer and reason must not be blank.")
     placeholders = ",".join("?" for _ in candidate_ids)
-    select_sql = (
-        "SELECT id, show_slug, win_date, provider, review_status "
-        "FROM reference_candidates "
-        f"WHERE id IN ({placeholders})"
-    )
-    rows = list(
-        connection.execute(
-            select_sql,
-            candidate_ids,
-        )
-    )
-    found = {row["id"] for row in rows}
-    missing = [
-        candidate_id for candidate_id in candidate_ids if candidate_id not in found
-    ]
-    if missing:
-        raise ValueError(f"Candidate(s) not found: {', '.join(map(str, missing))}.")
     with connection:
-        update_sql = (
-            "UPDATE reference_candidates SET review_status = ?, updated_at = ? "
-            f"WHERE id IN ({placeholders})"
+        # Acquire the writer lock before reading statuses used to authorize changes.
+        connection.execute("UPDATE reference_candidates SET id=id WHERE 0")
+        rows = list(
+            connection.execute(
+                f"""
+            SELECT candidate.*, wins.artist_name, wins.song_title, wins.is_current
+            FROM reference_candidates AS candidate
+            JOIN wins USING (show_slug, win_date)
+            WHERE candidate.id IN ({placeholders})
+            """,
+                candidate_ids,
+            )
         )
-        connection.execute(
-            update_sql,
-            (decision, timestamp, *candidate_ids),
-        )
-        if decision == "approved":
-            for row in rows:
-                if row["provider"] != "youtube":
-                    continue
+        missing = set(candidate_ids) - {row["id"] for row in rows}
+        if missing:
+            raise ValueError(
+                f"Candidate(s) not found: {', '.join(map(str, sorted(missing)))}."
+            )
+        for row in rows:
+            if (
+                decision != "withdrawn"
+                and not revise
+                and (row["review_status"] != "pending" or row["withdrawn"])
+            ):
+                raise ValueError(
+                    f"Candidate {row['id']} was already reviewed; use --revise."
+                )
+            if decision == "approved" and not row["is_current"]:
+                raise ValueError(f"Candidate {row['id']} has no current win.")
+        for row in rows:
+            previous = "withdrawn" if row["withdrawn"] else row["review_status"]
+            connection.execute(
+                """
+                INSERT INTO candidate_review_events (
+                    candidate_id, previous_status, decision, reviewer, reason,
+                    reviewed_at, artist_name, song_title
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    row["id"],
+                    previous,
+                    decision,
+                    reviewer.strip(),
+                    reason.strip(),
+                    timestamp,
+                    row["artist_name"],
+                    row["song_title"],
+                ),
+            )
+            connection.execute(
+                """UPDATE reference_candidates
+                   SET review_status=?, withdrawn=?, updated_at=? WHERE id=?""",
+                (
+                    "rejected" if decision == "withdrawn" else decision,
+                    int(decision == "withdrawn"),
+                    timestamp,
+                    row["id"],
+                ),
+            )
+            if row["provider"] != "youtube":
+                continue
+            if decision == "approved":
                 connection.execute(
                     """
                     INSERT INTO search_state (
@@ -139,37 +193,33 @@ def review_candidates(
                         last_attempt_at, next_attempt_at, last_error, updated_at
                     ) VALUES (?, ?, 'youtube', 'matched', 0, ?, NULL, '', ?)
                     ON CONFLICT (show_slug, win_date, provider) DO UPDATE SET
-                        status = 'matched', last_attempt_at = excluded.last_attempt_at,
-                        next_attempt_at = NULL, last_error = '',
-                        updated_at = excluded.updated_at
+                        status='matched', last_attempt_at=excluded.last_attempt_at,
+                        next_attempt_at=NULL, last_error='',
+                        updated_at=excluded.updated_at
                     """,
                     (row["show_slug"], row["win_date"], timestamp, timestamp),
                 )
-        elif decision == "rejected":
-            affected_wins = {
-                (row["show_slug"], row["win_date"])
-                for row in rows
-                if row["provider"] == "youtube" and row["review_status"] == "approved"
-            }
-            for show_slug, win_date in affected_wins:
-                remaining = connection.execute(
-                    """
-                    SELECT 1 FROM reference_candidates
-                    WHERE show_slug = ? AND win_date = ?
-                      AND provider = 'youtube' AND review_status = 'approved'
-                    LIMIT 1
-                    """,
-                    (show_slug, win_date),
-                ).fetchone()
-                if remaining is None:
-                    connection.execute(
-                        """
-                        UPDATE search_state
-                        SET status = 'pending', next_attempt_at = NULL,
-                            last_error = '', updated_at = ?
-                        WHERE show_slug = ? AND win_date = ?
-                          AND provider = 'youtube'
-                        """,
-                        (timestamp, show_slug, win_date),
-                    )
+        for row in rows:
+            if decision == "approved" or row["provider"] != "youtube":
+                continue
+            connection.execute(
+                """
+                UPDATE search_state SET status='pending', next_attempt_at=NULL,
+                    last_error='', updated_at=?
+                WHERE show_slug=? AND win_date=? AND provider='youtube'
+                  AND status='matched'
+                  AND NOT EXISTS (
+                      SELECT 1 FROM reference_candidates
+                      WHERE show_slug=? AND win_date=? AND provider='youtube'
+                        AND review_status='approved' AND withdrawn=0
+                  )
+                """,
+                (
+                    timestamp,
+                    row["show_slug"],
+                    row["win_date"],
+                    row["show_slug"],
+                    row["win_date"],
+                ),
+            )
     return len(rows)

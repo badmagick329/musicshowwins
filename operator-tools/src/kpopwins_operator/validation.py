@@ -110,7 +110,9 @@ def validate_http_url(url: str) -> None:
         )
 
 
-def normalize_candidate(candidate: dict[str, Any]) -> dict[str, Any]:
+def normalize_candidate(
+    candidate: dict[str, Any], *, allow_withdrawn: bool = False
+) -> dict[str, Any]:
     if not isinstance(candidate, dict):
         raise CandidateValidationError("Candidate must be an object.")
     show_slug = _text(candidate, "show_slug", required=True)
@@ -125,7 +127,9 @@ def normalize_candidate(candidate: dict[str, Any]) -> dict[str, Any]:
     if reference_type not in REFERENCE_TYPES:
         raise CandidateValidationError("Candidate reference_type is invalid.")
     status = _text(candidate, "status", default="active", required=True)
-    if status not in REFERENCE_STATUSES:
+    if status not in REFERENCE_STATUSES and not (
+        allow_withdrawn and status == "withdrawn"
+    ):
         raise CandidateValidationError("Candidate status is invalid.")
     review_status = _text(candidate, "review_status", default="pending", required=True)
     if review_status not in REVIEW_STATUSES:

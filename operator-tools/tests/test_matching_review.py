@@ -162,6 +162,8 @@ def test_approve_and_reject_are_atomic_and_approval_marks_search_matched(connect
             connection,
             [candidate_id, 999],
             decision="approved",
+            reviewer="test-agent",
+            reason="Exact winner evidence",
             timestamp="2026-09-01T12:00:00Z",
         )
     assert (
@@ -175,6 +177,8 @@ def test_approve_and_reject_are_atomic_and_approval_marks_search_matched(connect
         connection,
         [candidate_id],
         decision="approved",
+        reviewer="test-agent",
+        reason="Exact winner evidence",
         timestamp="2026-09-01T12:00:00Z",
     )
     assert (
@@ -188,6 +192,9 @@ def test_approve_and_reject_are_atomic_and_approval_marks_search_matched(connect
         connection,
         [candidate_id],
         decision="rejected",
+        reviewer="test-agent",
+        reason="Wrong result",
+        revise=True,
         timestamp="2026-09-02T12:00:00Z",
     )
     assert (
@@ -238,12 +245,17 @@ def test_reject_keeps_matched_when_another_approved_youtube_candidate_exists(
         connection,
         [first_id],
         decision="approved",
+        reviewer="test-agent",
+        reason="Exact winner evidence",
         timestamp="2026-09-01T12:00:00Z",
     )
     review_candidates(
         connection,
         [first_id],
         decision="rejected",
+        reviewer="test-agent",
+        reason="Wrong result",
+        revise=True,
         timestamp="2026-09-02T12:00:00Z",
     )
     assert connection.execute("SELECT status FROM search_state").fetchone()[0] == (
@@ -279,6 +291,9 @@ def test_reject_never_approved_candidate_preserves_search_state(connection):
         connection,
         [candidate_id],
         decision="rejected",
+        reviewer="test-agent",
+        reason="Wrong result",
+        revise=True,
         timestamp="2026-09-02T12:00:00Z",
     )
     state = connection.execute("SELECT * FROM search_state").fetchone()
