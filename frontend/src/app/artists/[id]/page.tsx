@@ -53,9 +53,8 @@ export default async function ArtistPage({ params }: { params: Promise<{ id: str
         ],
       }} />
     <main className="page-enter mx-auto max-w-7xl px-5 pb-8 pt-10 lg:px-8 lg:pt-14">
-      <header className="grid gap-6 border-2 border-foreground bg-surface-berry p-6 text-surface-berry-foreground shadow-[4px_4px_0_var(--section-ink)] sm:p-8 lg:grid-cols-[1fr_auto] lg:items-end">
-        <div><h1 className="font-heading text-4xl font-bold tracking-tight sm:text-[44px]">{artist.name}</h1><p className="mt-2 text-surface-berry-foreground/75">Music show wins</p></div>
-        <div className="border-l-4 border-highlight-yellow bg-section-ink px-6 py-4"><p className="font-heading text-4xl font-bold tabular-nums">{artist.total_wins}</p><p className="text-sm text-surface-berry-foreground/75">total {artist.total_wins === 1 ? "win" : "wins"}</p></div>
+      <header className="border-2 border-foreground bg-surface-berry p-6 text-surface-berry-foreground shadow-[4px_4px_0_var(--section-ink)] sm:p-8">
+        <h1 className="font-heading text-4xl font-bold tracking-tight sm:text-[44px]">{artist.name}</h1><p className="mt-2 text-surface-berry-foreground/75">Music show wins</p>
       </header>
 
       <section className="mt-10" aria-labelledby="summary-title">
