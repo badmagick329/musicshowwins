@@ -3,10 +3,13 @@ from __future__ import annotations
 from collections.abc import Iterable
 from typing import Any
 
+from django import forms
 from django.contrib import admin
+from django.db import transaction
 from django.utils import timezone
 from django.utils.html import format_html, format_html_join
 
+from main.cache_invalidation import invalidate_public_archive_cache
 from main.models import (
     Artist,
     ArtistAlias,
@@ -17,8 +20,61 @@ from main.models import (
     SourceApproval,
     SourcePage,
     Win,
+    WinMoment,
     WinReference,
 )
+from main.moment_io import validate_selected_citations
+
+
+class WinMomentAdminForm(forms.ModelForm):
+    class Meta:
+        model = WinMoment
+        fields = "__all__"
+
+    def clean(self):
+        cleaned = super().clean()
+        win = cleaned.get("win")
+        citations = cleaned.get("citations")
+        status = cleaned.get("status")
+        if win is None or citations is None or status is None:
+            return cleaned
+        require_active = status == WinMoment.Status.PUBLISHED and (
+            not self.instance.pk or self.instance.status != WinMoment.Status.PUBLISHED
+        )
+        try:
+            validate_selected_citations(
+                win.pk, status, citations, require_active=require_active
+            )
+        except ValueError as exc:
+            self.add_error("citations", str(exc))
+        return cleaned
+
+
+class PublicCacheInvalidationAdminMixin:
+    def _invalidate_after_commit(self):
+        transaction.on_commit(invalidate_public_archive_cache)
+
+    def save_model(self, request, obj, form, change):
+        super().save_model(request, obj, form, change)
+        self._invalidate_after_commit()
+
+    def delete_model(self, request, obj):
+        super().delete_model(request, obj)
+        self._invalidate_after_commit()
+
+    def delete_queryset(self, request, queryset):
+        super().delete_queryset(request, queryset)
+        self._invalidate_after_commit()
+
+
+@admin.register(WinMoment)
+class WinMomentAdmin(PublicCacheInvalidationAdminMixin, admin.ModelAdmin):
+    form = WinMomentAdminForm
+    list_display = ("heading", "win", "status", "updated_at")
+    list_filter = ("status", "win__show")
+    search_fields = ("heading", "body", "win__song__artist__name", "win__song__title")
+    autocomplete_fields = ("win", "citations")
+    readonly_fields = ("created_at", "updated_at")
 
 
 @admin.register(MusicShow)
@@ -78,9 +134,14 @@ class WinAdmin(admin.ModelAdmin):
     date_hierarchy = "date"
     inlines = (WinReferenceInline,)
 
+    def save_formset(self, request, form, formset, change):
+        super().save_formset(request, form, formset, change)
+        if formset.model is WinReference:
+            transaction.on_commit(invalidate_public_archive_cache)
+
 
 @admin.register(WinReference)
-class WinReferenceAdmin(admin.ModelAdmin):
+class WinReferenceAdmin(PublicCacheInvalidationAdminMixin, admin.ModelAdmin):
     list_display = (
         "win_date",
         "music_show",

@@ -6,6 +6,7 @@ import { formatDate } from "@/lib/utils";
 import { ApiRequestError, getAllArtistSongs, getAllArtistWins, getArtist } from "@/lib/api";
 import { buildShowBreakdown, summarizeArtist } from "@/lib/artist-profile";
 import { ArtistWinHistory } from "@/components/artist-win-history";
+import { WinMoments } from "@/components/win-moments";
 import { JsonLd } from "@/components/json-ld";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { noIndexFollow, pageMetadata, siteUrl } from "@/lib/seo";
@@ -66,6 +67,8 @@ export default async function ArtistPage({ params }: { params: Promise<{ id: str
           <Metric label="Latest win" value={summary.latestWin ? formatDate(summary.latestWin) : "Not recorded"} />
         </dl>
       </section>
+
+      <WinMoments wins={wins} />
 
       <div className="mt-12 grid gap-12 lg:grid-cols-[0.75fr_1.25fr]">
         <section aria-labelledby="shows-title">

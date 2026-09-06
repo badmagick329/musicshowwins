@@ -1,8 +1,10 @@
 from datetime import date, timedelta
+from unittest.mock import Mock, patch
 
 import pytest
 from django.contrib.admin.sites import AdminSite
 from django.contrib.auth import get_user_model
+from django.db import transaction
 from django.test import Client, RequestFactory
 from django.urls import reverse
 from django.utils import timezone
@@ -10,10 +12,20 @@ from django.utils import timezone
 from main.admin import (
     ImportIssueAdmin,
     WinAdmin,
+    WinMomentAdmin,
+    WinMomentAdminForm,
     WinReferenceAdmin,
     WinReferenceInline,
 )
-from main.models import Artist, ImportIssue, MusicShow, Song, Win, WinReference
+from main.models import (
+    Artist,
+    ImportIssue,
+    MusicShow,
+    Song,
+    Win,
+    WinMoment,
+    WinReference,
+)
 
 
 def _admin_client() -> Client:
@@ -254,3 +266,104 @@ def test_win_admin_exposes_compact_reference_inline():
     content = response.content.decode()
     assert "Win references" in content
     assert "https://example.com/article" in content
+
+
+@pytest.mark.django_db
+def test_moment_admin_validates_submitted_citations_before_saving():
+    show = MusicShow.objects.create(slug="the-show", name="The Show")
+    artist = Artist.objects.create(name="BTS")
+    song = Song.objects.create(artist=artist, title="I Need U")
+    win = Win.objects.create(show=show, song=song, date=date(2015, 5, 5))
+    other = Win.objects.create(show=show, song=song, date=date(2015, 5, 6))
+    valid = WinReference.objects.create(
+        win=win,
+        reference_type="article",
+        provider="source",
+        url="https://example.com/valid",
+    )
+    wrong = WinReference.objects.create(
+        win=other,
+        reference_type="article",
+        provider="source",
+        url="https://example.com/wrong",
+    )
+
+    form = WinMomentAdminForm(
+        data={
+            "win": win.pk,
+            "heading": "First win",
+            "body": "Story",
+            "status": "published",
+            "citations": [valid.pk],
+        }
+    )
+    assert form.is_valid(), form.errors
+    invalid = WinMomentAdminForm(
+        data={
+            "win": win.pk,
+            "heading": "First win",
+            "body": "Story",
+            "status": "published",
+            "citations": [wrong.pk],
+        }
+    )
+    assert not invalid.is_valid()
+    assert "same win" in str(invalid.errors)
+
+    moment = WinMoment.objects.create(
+        win=win, heading="First win", body="Story", status="published"
+    )
+    valid.status = WinReference.Status.UNAVAILABLE
+    valid.save()
+    moment.citations.add(valid)
+    correction = WinMomentAdminForm(
+        data={
+            "win": win.pk,
+            "heading": "Corrected",
+            "body": "Story",
+            "status": "published",
+            "citations": [valid.pk],
+        },
+        instance=moment,
+    )
+    assert correction.is_valid(), correction.errors
+
+
+@pytest.mark.django_db(transaction=True)
+def test_admin_reference_and_moment_mutations_invalidate_only_after_commit():
+    show = MusicShow.objects.create(slug="the-show", name="The Show")
+    artist = Artist.objects.create(name="BTS")
+    song = Song.objects.create(artist=artist, title="I Need U")
+    win = Win.objects.create(show=show, song=song, date=date(2015, 5, 5))
+    reference = WinReference.objects.create(
+        win=win,
+        reference_type="article",
+        provider="source",
+        url="https://example.com/ref",
+    )
+    moment = WinMoment.objects.create(win=win, heading="First", body="Story")
+    request = RequestFactory().post("/")
+
+    with patch("main.admin.invalidate_public_archive_cache") as invalidate:
+        with pytest.raises(RuntimeError):
+            with transaction.atomic():
+                WinReferenceAdmin(WinReference, AdminSite()).delete_queryset(
+                    request, WinReference.objects.filter(pk=reference.pk)
+                )
+                raise RuntimeError
+        invalidate.assert_not_called()
+
+        WinMomentAdmin(WinMoment, AdminSite()).delete_queryset(
+            request, WinMoment.objects.filter(pk=moment.pk)
+        )
+        invalidate.assert_called_once_with()
+
+    class InlineFormset:
+        model = WinReference
+
+        def save(self):
+            return []
+
+    with patch("main.admin.invalidate_public_archive_cache") as invalidate:
+        WinAdmin(Win, AdminSite()).save_formset(request, Mock(), InlineFormset(), True)
+        invalidate.assert_called_once_with()

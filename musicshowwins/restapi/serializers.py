@@ -134,10 +134,23 @@ class WinSerializer(serializers.ModelSerializer):
     references = WinReferenceSerializer(
         source="active_references", many=True, read_only=True
     )
+    moment = serializers.SerializerMethodField()
+
+    def get_moment(self, instance):
+        moment = getattr(instance, "public_moment", None)
+        if moment is None:
+            return None
+        return {
+            "heading": moment.heading,
+            "body": moment.body,
+            "citations": WinReferenceSerializer(
+                moment.active_citations, many=True
+            ).data,
+        }
 
     class Meta:
         model = Win
-        fields = ("id", "date", "show", "song", "references")
+        fields = ("id", "date", "show", "song", "references", "moment")
 
 
 class ArtistLeaderboardSerializer(serializers.Serializer):

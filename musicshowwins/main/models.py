@@ -3,7 +3,10 @@ from __future__ import annotations
 import re
 import unicodedata
 
+from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.models.signals import m2m_changed
+from django.dispatch import receiver
 
 
 def normalize_text(value: str) -> str:
@@ -194,6 +197,38 @@ class WinReference(models.Model):
         return self.title or self.url
 
 
+class WinMoment(models.Model):
+    class Status(models.TextChoices):
+        DRAFT = "draft", "Draft"
+        PUBLISHED = "published", "Published"
+
+    win = models.OneToOneField(Win, on_delete=models.CASCADE, related_name="moment")
+    heading = models.CharField(max_length=300)
+    body = models.TextField()
+    status = models.CharField(
+        max_length=20, choices=Status.choices, default=Status.DRAFT
+    )
+    citations = models.ManyToManyField(WinReference, related_name="moments", blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ("win__date", "pk")
+
+    def clean(self):
+        super().clean()
+        if not self.pk:
+            return
+        citations = self.citations.all()
+        if citations.exclude(win_id=self.win_id).exists():
+            raise ValidationError(
+                {"citations": "Every citation must belong to this win."}
+            )
+
+    def __str__(self):
+        return self.heading
+
+
 class SourcePage(models.Model):
     show = models.ForeignKey(
         MusicShow, on_delete=models.CASCADE, related_name="source_pages"
@@ -307,3 +342,16 @@ class ImportIssue(models.Model):
 
     def __str__(self):
         return f"{self.get_issue_type_display()} ({self.resolution})"
+
+
+@receiver(m2m_changed, sender=WinMoment.citations.through)
+def validate_moment_citations(sender, instance, action, pk_set, **kwargs):
+    if (
+        action == "pre_add"
+        and WinReference.objects.filter(pk__in=pk_set)
+        .exclude(win_id=instance.win_id)
+        .exists()
+    ):
+        raise ValidationError(
+            "Every citation must belong to the same win as the moment."
+        )
