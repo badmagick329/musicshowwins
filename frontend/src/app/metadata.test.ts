@@ -16,6 +16,7 @@ import { generateMetadata as songsMetadata } from "./songs/page";
 import { generateMetadata as winsMetadata } from "./wins/page";
 import { metadata as showsMetadata } from "./shows/page";
 import { metadata as aboutMetadata } from "./about/page";
+import { generateMetadata as homeMetadata } from "./page";
 import { generateMetadata as artistMetadata } from "./artists/[id]/page";
 import { generateMetadata as songMetadata } from "./songs/[id]/page";
 
@@ -33,10 +34,19 @@ beforeEach(() => {
 describe("page metadata", () => {
   it("uses the required root title and description", () => {
     expect(rootMetadata.title).toEqual({
-      default: "KpopWins | K-pop Music Show Wins",
+      default: "K-pop Music Show Wins & Artist Rankings | KpopWins",
       template: "%s | KpopWins",
     });
-    expect(rootMetadata.description).toBe("Search K-pop music show wins by artist, song, show, or date. Coverage starts in 2014.");
+    expect(rootMetadata.description).toBe("Explore K-pop music show win counts for BTS, TWICE, EXO and more, with artist rankings and results from Inkigayo, Music Bank and other shows.");
+    expect(rootMetadata.openGraph).toMatchObject({
+      title: "K-pop Music Show Wins & Artist Rankings | KpopWins",
+      description: rootMetadata.description,
+      url: "/",
+    });
+    expect(rootMetadata.twitter).toMatchObject({
+      title: "K-pop Music Show Wins & Artist Rankings | KpopWins",
+      description: rootMetadata.description,
+    });
     expect(JSON.stringify(rootMetadata)).not.toContain("clearly kept");
   });
 
@@ -57,6 +67,14 @@ describe("page metadata", () => {
     await expect(artistsMetadata({ searchParams: Promise.resolve({ search: "aespa" }) })).resolves.toMatchObject({ robots: { index: false, follow: true } });
     await expect(songsMetadata({ searchParams: Promise.resolve({ sort: "title" }) })).resolves.toMatchObject({ robots: { index: false, follow: true } });
     await expect(winsMetadata({ searchParams: Promise.resolve({ show: "inkigayo" }) })).resolves.toMatchObject({ robots: { index: false, follow: true } });
+  });
+
+  it("keeps the homepage canonical and search-result pages out of the index", async () => {
+    await expect(homeMetadata({ searchParams: Promise.resolve({}) })).resolves.toMatchObject({ alternates: { canonical: "/" } });
+    await expect(homeMetadata({ searchParams: Promise.resolve({ search: "aespa" }) })).resolves.toMatchObject({
+      alternates: { canonical: "/" },
+      robots: { index: false, follow: true },
+    });
   });
 
   it("sets artist and song detail titles without duplicate branding", async () => {

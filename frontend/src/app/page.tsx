@@ -45,8 +45,8 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ s
       <div className="mx-auto max-w-7xl px-5 pb-8 pt-10 lg:px-8 lg:pt-14">
         <section className="border-2 border-foreground bg-surface-berry p-6 shadow-[4px_4px_0_var(--section-ink)] sm:p-8 lg:p-10">
           <div className="max-w-3xl">
-            <h1 className="font-heading text-4xl font-bold leading-[1.04] tracking-tight text-surface-berry-foreground sm:text-[44px]">K-pop music show wins since 2014.</h1>
-            <p className="mt-5 max-w-2xl text-base leading-relaxed text-surface-berry-foreground/80 sm:text-lg">Search by artist or song and browse results from six weekly shows.</p>
+            <h1 className="font-heading text-4xl font-bold leading-[1.04] tracking-tight text-surface-berry-foreground sm:text-[44px]">K-pop music show wins &amp; artist rankings</h1>
+            <p className="mt-5 max-w-2xl text-base leading-relaxed text-surface-berry-foreground/80 sm:text-lg">{siteDescription}</p>
           </div>
         </section>
 
