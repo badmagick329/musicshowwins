@@ -11,10 +11,9 @@ import Home from "./page";
 describe("homepage banner", () => {
   it("uses the simplified copy without the redundant archive panel", async () => {
     const html = renderToStaticMarkup(await Home({ searchParams: Promise.resolve({}) }));
-    expect(html).toContain("K-pop music show wins since 2014.");
-    expect(html).toContain("Search by artist or song and browse results from six weekly shows.");
+    expect(html).toContain("K-pop music show wins &amp; artist rankings");
+    expect(html).toContain("Explore K-pop music show win counts for BTS, TWICE, EXO and more, with artist rankings and results from Inkigayo, Music Bank and other shows.");
     expect(html).not.toContain("clearly kept");
-    expect(html).not.toContain("Explore K-pop");
     expect(html).toContain('href="/shows"');
     expect(html).toContain("All shows");
     expect(html).toContain('href="/artists"');

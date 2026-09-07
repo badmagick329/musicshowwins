@@ -8,7 +8,7 @@ export function ArtistSearch({ query, results, resultCount }: { query: string; r
   return (
     <section id="search" aria-labelledby="artist-search-title" className="border-2 border-foreground bg-search-surface p-5 shadow-[4px_4px_0_var(--section-ink)] sm:p-6">
       <div className="grid gap-5 lg:grid-cols-[0.38fr_1fr] lg:items-end">
-        <div>
+        <div data-nosnippet>
           <h2 id="artist-search-title" className="font-heading text-2xl font-bold tracking-tight">Find an artist</h2>
           <p className="mt-1 text-sm text-foreground/70">Search by artist name or known alias.</p>
         </div>

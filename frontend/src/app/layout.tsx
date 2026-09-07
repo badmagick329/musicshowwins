@@ -9,7 +9,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "KpopWins | K-pop Music Show Wins",
+    default: "K-pop Music Show Wins & Artist Rankings | KpopWins",
     template: "%s | KpopWins",
   },
   description: siteDescription,
@@ -18,12 +18,12 @@ export const metadata: Metadata = {
     type: "website",
     url: "/",
     siteName,
-    title: "KpopWins | K-pop Music Show Wins",
+    title: "K-pop Music Show Wins & Artist Rankings | KpopWins",
     description: siteDescription,
   },
   twitter: {
     card: "summary_large_image",
-    title: "KpopWins | K-pop Music Show Wins",
+    title: "K-pop Music Show Wins & Artist Rankings | KpopWins",
     description: siteDescription,
   },
   robots: { index: true, follow: true },
