@@ -99,9 +99,11 @@ their evidence changes. Use `review batch --include-deferred` to reconsider them
 ```
 
 `verify` dry-runs the manifest against Django; `import` applies it using the
-repository's Django settings and refreshes the frontend cache. Use the local
-configuration and running frontend for local verification. Neither command is
-part of preparation or agent review.
+repository's Django settings and then tries to refresh the frontend cache. If
+the local frontend is not running, the references are still imported and the
+command prints a warning that local cache refresh was skipped. Start the
+frontend and rerun `uv run python manage.py refresh_public_cache` when you want
+to warm the local pages.
 
 **5. Import the same manifest into production.** A local import updates only the
 database configured in your local Django settings. Deploying application code

@@ -8,6 +8,10 @@ class CacheInvalidationError(RuntimeError):
     pass
 
 
+class CacheInvalidationUnavailable(CacheInvalidationError):
+    """The frontend endpoint could not be reached."""
+
+
 def invalidate_public_archive_cache() -> None:
     url = settings.CACHE_REVALIDATION_URL
     secret = settings.CACHE_REVALIDATION_SECRET
@@ -23,6 +27,10 @@ def invalidate_public_archive_cache() -> None:
             timeout=10,
         )
         response.raise_for_status()
+    except (requests.ConnectionError, requests.Timeout) as exc:
+        raise CacheInvalidationUnavailable(
+            "The frontend cache endpoint is unavailable."
+        ) from exc
     except requests.RequestException as exc:
         raise CacheInvalidationError(
             "Could not invalidate the public archive cache."

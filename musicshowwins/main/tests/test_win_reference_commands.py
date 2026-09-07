@@ -8,6 +8,7 @@ import pytest
 from django.core.management import call_command
 from django.core.management.base import CommandError
 
+from main.cache_invalidation import CacheInvalidationError, CacheInvalidationUnavailable
 from main.models import Artist, MusicShow, Song, Win, WinReference
 from main.services import wins_queryset
 
@@ -85,6 +86,37 @@ def test_dry_run_does_not_invalidate_public_cache(
     ) as invalidate:
         _import_file(tmp_path, reference_document, dry_run=True)
     invalidate.assert_not_called()
+
+
+@pytest.mark.parametrize("failure", [
+    CacheInvalidationUnavailable("The frontend cache endpoint is unavailable."),
+    CacheInvalidationError("Could not invalidate the public archive cache."),
+])
+def test_import_keeps_saved_data_when_optional_cache_refresh_fails(
+    reference_win, reference_document, tmp_path, failure
+):
+    stderr = StringIO()
+    with patch(
+        "main.management.commands.import_win_references.invalidate_public_archive_cache",
+        side_effect=failure,
+    ):
+        stderr = StringIO()
+        output = _import_file(tmp_path, reference_document, stderr=stderr)
+    assert "created 1, updated 0, unchanged 0" in output
+    assert WinReference.objects.count() == 1
+    assert "References imported." in stderr.getvalue()
+
+
+def test_import_can_require_cache_refresh(reference_win, reference_document, tmp_path):
+    with patch(
+        "main.management.commands.import_win_references.invalidate_public_archive_cache",
+        side_effect=CacheInvalidationUnavailable(
+            "The frontend cache endpoint is unavailable."
+        ),
+    ):
+        with pytest.raises(CommandError, match="endpoint is unavailable"):
+            _import_file(tmp_path, reference_document, require_cache_refresh=True)
+    assert WinReference.objects.count() == 1
 
 
 def test_imports_from_stdin(reference_win, reference_document):
