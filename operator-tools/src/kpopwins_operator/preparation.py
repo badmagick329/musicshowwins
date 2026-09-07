@@ -17,6 +17,7 @@ from .reddit import RedditClient, run_reddit_audit
 from .reddit_hydration import hydrate_youtube_ids, load_reddit_youtube_ids
 from .reddit_import import import_official_links, load_official_audit_links
 from .registry import load_registry
+from .review_batches import _snapshot
 from .youtube import YouTubeClient
 
 
@@ -74,6 +75,41 @@ def prepare_candidates(
         write_atomic(report_path, json.dumps(report, indent=2) + "\n")
         print(f"Preparing: {name}", file=stdout, flush=True)
 
+    def review_queue_counts() -> dict[str, int]:
+        pending_rows = list(
+            connection.execute(
+                """SELECT candidate.id, deferred.fingerprint
+                   FROM reference_candidates AS candidate
+                   JOIN wins USING(show_slug, win_date)
+                   LEFT JOIN candidate_deferrals AS deferred
+                     ON deferred.candidate_id = candidate.id
+                   WHERE candidate.review_status='pending'
+                     AND candidate.withdrawn=0 AND wins.is_current=1
+                     AND candidate.provider='youtube'"""
+            )
+        )
+        ready = 0
+        deferred = 0
+        for row in pending_rows:
+            current = _snapshot(connection, config, row["id"])
+            if row["fingerprint"] == current["fingerprint"]:
+                deferred += 1
+            else:
+                ready += 1
+        return {"pending": len(pending_rows), "ready": ready, "deferred": deferred}
+
+    existing_pending_ids = {
+        row["id"]
+        for row in connection.execute(
+            """SELECT candidate.id
+               FROM reference_candidates AS candidate
+               JOIN wins USING(show_slug, win_date)
+               WHERE candidate.review_status='pending'
+                 AND candidate.withdrawn=0 AND wins.is_current=1
+                 AND candidate.provider='youtube'"""
+        )
+    }
+
     try:
         stage("refresh-wins")
         report["stages"]["catalogue"] = asdict(
@@ -95,17 +131,21 @@ def prepare_candidates(
         )
         report["stages"]["youtube"] = asdict(ingestion)
         stage("youtube-match")
-        report["stages"]["matching"] = asdict(
-            match_videos(
-                connection,
-                registry,
-                show=None,
-                min_score=min_score,
-                limit=None,
-                dry_run=False,
-                timestamp=timestamp,
-            )
+        matching = match_videos(
+            connection,
+            registry,
+            show=None,
+            min_score=min_score,
+            limit=None,
+            dry_run=False,
+            timestamp=timestamp,
         )
+        report["stages"]["matching"] = asdict(matching)
+        report["new_candidates"] = {
+            "youtube_match": matching.created,
+            "reddit_import": 0,
+            "total": matching.created,
+        }
 
         reddit_complete = not include_reddit
         if include_reddit:
@@ -155,14 +195,24 @@ def prepare_candidates(
                     )
                     if refreshed.collection_complete:
                         stage("reddit-import")
-                        report["stages"]["reddit_import"] = asdict(
-                            import_official_links(
-                                connection,
-                                load_official_audit_links(refreshed.report_path),
-                                limit=None,
-                                dry_run=False,
-                                timestamp=timestamp,
+                        reddit_import = import_official_links(
+                            connection,
+                            load_official_audit_links(refreshed.report_path),
+                            limit=None,
+                            dry_run=False,
+                            timestamp=timestamp,
+                        )
+                        report["stages"]["reddit_import"] = asdict(reddit_import)
+                        report["new_candidates"]["reddit_import"] = (
+                            reddit_import.created
+                        )
+                        report["new_candidates"]["total"] += reddit_import.created
+                        report["withheld_official_links"] = max(
+                            0,
+                            report["stages"]["reddit_audit"]["totals"].get(
+                                "new_official", 0
                             )
+                            - reddit_import.eligible,
                         )
                         reddit_complete = True
             report["reddit_pending"] = not reddit_complete
@@ -170,11 +220,21 @@ def prepare_candidates(
         report["complete"] = not ingestion.more_remaining and reddit_complete
         report["stage"] = "complete" if report["complete"] else "paused"
         report["youtube_api_calls"] = client.calls_used
-        report["pending_candidates"] = connection.execute(
-            """SELECT COUNT(*) FROM reference_candidates
-               JOIN wins USING(show_slug, win_date)
-               WHERE review_status='pending' AND withdrawn=0 AND is_current=1"""
-        ).fetchone()[0]
+        report["review_queue"] = review_queue_counts()
+        report["pending_candidates"] = report["review_queue"]["pending"]
+        report["existing_pending_candidates"] = sum(
+            1
+            for candidate_id in existing_pending_ids
+            if connection.execute(
+                """SELECT 1 FROM reference_candidates AS candidate
+                   JOIN wins USING(show_slug, win_date)
+                   WHERE candidate.id=? AND candidate.review_status='pending'
+                     AND candidate.withdrawn=0 AND wins.is_current=1
+                     AND candidate.provider='youtube'""",
+                (candidate_id,),
+            ).fetchone()
+        )
+        report.setdefault("withheld_official_links", 0)
     except Exception:
         report["failed_stage"] = report["stage"]
         report["stage"] = "failed"
@@ -182,12 +242,31 @@ def prepare_candidates(
     finally:
         write_atomic(report_path, json.dumps(report, indent=2) + "\n")
 
+    new_candidates = report["new_candidates"]["total"]
+    queue = report["review_queue"]
+    print(f"New candidates created: {new_candidates}", file=stdout)
     print(
-        f"Pending candidates: {report['pending_candidates']}. Report: {report_path}",
+        f"Existing pending candidates: {report['existing_pending_candidates']}",
+        file=stdout,
+    )
+    print(
+        f"Review queue: ready={queue['ready']} deferred={queue['deferred']}",
+        file=stdout,
+    )
+    print(f"Report: {report_path}", file=stdout)
+    print(
+        f"Official links withheld (no local win): {report['withheld_official_links']}",
         file=stdout,
     )
     if report["complete"]:
-        print("Discovery complete. Next: review batch", file=stdout)
+        if new_candidates or queue["ready"]:
+            print("Discovery complete. Next: review batch", file=stdout)
+        else:
+            print(
+                "Discovery complete. No candidates are ready for review. "
+                "Next: export-approved",
+                file=stdout,
+            )
     else:
         suffix = " --reddit" if include_reddit else ""
         suffix += f" --max-pages {max_pages} --min-score {min_score}"
@@ -197,8 +276,6 @@ def prepare_candidates(
             f"Discovery paused at a page/request limit. Resume: prepare{suffix}",
             file=stdout,
         )
-        print(
-            "Available candidates can already be reviewed with: review batch",
-            file=stdout,
-        )
+        if new_candidates or queue["ready"]:
+            print("Candidates are ready for review with: review batch", file=stdout)
     return report

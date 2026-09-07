@@ -24,7 +24,12 @@ YouTube request budget is shared across ingestion and Reddit hydration. Default
 limits are 10 upload pages per channel and 100 Reddit episode pages. Override
 with `--max-pages` and `--reddit-max-pages`. YouTube quota exhaustion requires
 waiting for its reset. Candidates already found can be reviewed during backfill.
-The latest stage and counts are saved in `.ignore/operator-tools/reports/prepare.json`.
+At the end, `prepare` reports new candidates created, candidates that were already
+pending, the ready/deferred review queue, and official links withheld because
+their episode has no local win. When discovery completes with no new or ready
+candidates, it says to continue with `export-approved` instead of sending you to
+another review batch. The same counts are saved in
+`.ignore/operator-tools/reports/prepare.json`.
 
 **2. Ask an agent to review the next batch.** Copy this message into a task in
 this project. Reuse it unchanged each time; the agent selects the batch and
