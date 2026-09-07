@@ -7,6 +7,7 @@ from django.core.management import call_command
 
 from main.cache_invalidation import (
     CacheInvalidationError,
+    CacheInvalidationUnavailable,
     invalidate_public_archive_cache,
 )
 
@@ -40,6 +41,15 @@ def test_cache_invalidation_reports_configuration_and_request_failures(settings)
         invalidate_public_archive_cache()
 
     settings.CACHE_REVALIDATION_SECRET = "revalidation-secret"
+    with (
+        patch(
+            "main.cache_invalidation.requests.post",
+            side_effect=requests.ConnectionError,
+        ),
+        pytest.raises(CacheInvalidationUnavailable, match="endpoint is unavailable"),
+    ):
+        invalidate_public_archive_cache()
+
     with (
         patch(
             "main.cache_invalidation.requests.post",

@@ -9,6 +9,7 @@ from django.db import DatabaseError
 
 from main.cache_invalidation import (
     CacheInvalidationError,
+    CacheInvalidationUnavailable,
     invalidate_public_archive_cache,
 )
 from main.win_reference_io import ReferenceDocumentError, import_document
@@ -20,6 +21,11 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument("path", help="JSON file path, or - to read stdin")
         parser.add_argument("--dry-run", action="store_true")
+        parser.add_argument(
+            "--require-cache-refresh",
+            action="store_true",
+            help="Fail if the frontend cache cannot be refreshed.",
+        )
 
     def handle(self, *args, **options):
         path = options["path"]
@@ -49,7 +55,21 @@ class Command(BaseCommand):
             try:
                 invalidate_public_archive_cache()
             except CacheInvalidationError as exc:
-                raise CommandError(str(exc)) from exc
+                if options["require_cache_refresh"]:
+                    raise CommandError(str(exc)) from exc
+                if isinstance(exc, CacheInvalidationUnavailable):
+                    self.stderr.write(
+                        self.style.WARNING(
+                            "References imported. Local cache refresh skipped "
+                            "because the frontend is unavailable."
+                        )
+                    )
+                else:
+                    self.stderr.write(
+                        self.style.WARNING(
+                            f"References imported. Cache refresh not completed: {exc}"
+                        )
+                    )
 
         prefix = "Dry run: " if options["dry_run"] else ""
         self.stdout.write(
