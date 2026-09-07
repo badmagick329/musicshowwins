@@ -5,12 +5,14 @@ from types import SimpleNamespace
 import pytest
 
 from kpopwins_operator import preparation
+from kpopwins_operator.candidate_review import review_candidates
 from kpopwins_operator.ingestion import IngestionCounts
+from kpopwins_operator.matching import MatchCounts, match_videos
 from kpopwins_operator.reddit_hydration import HydrationCounts
 from kpopwins_operator.reddit_import import ImportCounts
 
 from .test_catalogue import FakeSession, api_win, page
-from .test_matching_review import add_match_data
+from .test_matching_review import REGISTRY, add_match_data
 
 
 @pytest.fixture
@@ -46,6 +48,8 @@ def test_prepare_matches_available_data_even_when_ingestion_pauses(
     report = preparation.prepare_candidates(connection, config, **options)
     assert not report["complete"]
     assert report["pending_candidates"] == 1
+    assert report["new_candidates"]["total"] == 1
+    assert report["existing_pending_candidates"] == 0
     assert report["stage"] == "paused"
     assert "Resume: prepare" in options["stdout"].getvalue()
     assert (
@@ -54,6 +58,58 @@ def test_prepare_matches_available_data_even_when_ingestion_pauses(
         ]
         == "pending"
     )
+
+
+def test_prepare_moves_to_export_when_only_deferred_candidates_remain(
+    connection, config, monkeypatch, setup
+):
+    _, options = setup
+    match_videos(
+        connection,
+        REGISTRY,
+        show=None,
+        min_score=75,
+        limit=None,
+        dry_run=False,
+        timestamp="2026-09-06T00:00:00Z",
+    )
+    candidate_id = connection.execute("SELECT id FROM reference_candidates").fetchone()[
+        0
+    ]
+    review_candidates(
+        connection,
+        [candidate_id],
+        decision="deferred",
+        reviewer="review-agent",
+        reason="Episode evidence needs confirmation",
+        timestamp="2026-09-06T00:00:00Z",
+    )
+    fingerprint = preparation._snapshot(connection, config, candidate_id)["fingerprint"]
+    connection.execute(
+        "INSERT INTO candidate_deferrals VALUES (?, ?, ?, ?)",
+        (
+            candidate_id,
+            fingerprint,
+            "Episode evidence needs confirmation",
+            "2026-09-06T00:00:00Z",
+        ),
+    )
+    connection.commit()
+    monkeypatch.setattr(preparation, "match_videos", lambda *a, **k: MatchCounts())
+
+    report = preparation.prepare_candidates(connection, config, **options)
+
+    assert report["new_candidates"]["total"] == 0
+    assert report["existing_pending_candidates"] == 1
+    assert report["review_queue"] == {"pending": 1, "ready": 0, "deferred": 1}
+    output = options["stdout"].getvalue()
+    assert "New candidates created: 0" in output
+    assert "Existing pending candidates: 1" in output
+    assert "Review queue: ready=0 deferred=1" in output
+    assert (
+        "Discovery complete. No candidates are ready for review. Next: export-approved"
+    ) in output
+    assert "Next: review batch" not in output
 
 
 def test_incomplete_reddit_collection_stops_before_hydration(
@@ -91,7 +147,7 @@ def test_reddit_resumes_and_shares_youtube_budget(
         calls.append((kwargs["refresh_indexes"], kwargs["max_pages"]))
         return SimpleNamespace(
             collection_complete=True,
-            totals={},
+            totals={"new_official": 3},
             report_path=config.default_reddit_audit_path,
         )
 
@@ -105,13 +161,17 @@ def test_reddit_resumes_and_shares_youtube_budget(
     monkeypatch.setattr(preparation, "hydrate_youtube_ids", hydrate)
     monkeypatch.setattr(preparation, "load_official_audit_links", lambda p: [])
     monkeypatch.setattr(
-        preparation, "import_official_links", lambda *a, **k: ImportCounts()
+        preparation,
+        "import_official_links",
+        lambda *a, **k: ImportCounts(eligible=2, created=1),
     )
     report = preparation.prepare_candidates(connection, config, **options)
     assert report["complete"]
     assert not report["reddit_pending"]
     assert calls == [(False, 100), (False, 0)]
     assert "reddit_import" in report["stages"]
+    assert report["withheld_official_links"] == 1
+    assert "Official links withheld (no local win): 1" in options["stdout"].getvalue()
 
 
 def test_hydration_budget_stop_does_not_import_incomplete_results(
