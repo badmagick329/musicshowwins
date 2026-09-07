@@ -66,7 +66,7 @@ describe("Song detail page", () => {
     expect(apiMocks.getAllSongWins).toHaveBeenCalledWith(7);
 
     await expect(generateMetadata({ params: Promise.resolve({ id: "7" }) })).resolves.toMatchObject({
-      title: "Supernova by aespa",
+      title: "Supernova by aespa — Music Show Wins",
       description: expect.stringContaining("aespa"),
     });
   });

@@ -107,7 +107,7 @@ describe("WinsExplorer", () => {
     queryState.isPlaceholderData = true;
     const view = render(<WinsExplorer />);
     expect(screen.getByText("Page 1 of 3")).toBeTruthy();
-    fireEvent.click(screen.getByRole("button", { name: "Next" }));
+    fireEvent.click(screen.getByRole("link", { name: "Next" }));
     view.rerender(<WinsExplorer />);
     expect(Element.prototype.scrollIntoView).not.toHaveBeenCalled();
 

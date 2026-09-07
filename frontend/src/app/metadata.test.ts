@@ -10,6 +10,7 @@ vi.mock("@/lib/api", async (importOriginal) => ({
   ...apiMocks,
 }));
 
+import { ApiRequestError } from "@/lib/api";
 import { metadata as rootMetadata } from "./layout";
 import { generateMetadata as artistsMetadata } from "./artists/page";
 import { generateMetadata as songsMetadata } from "./songs/page";
@@ -86,8 +87,8 @@ describe("page metadata", () => {
       alternates: { canonical: "/artists/3" },
     });
     expect(song).toMatchObject({
-      title: "Supernova by aespa",
-      description: "See every recorded music show win for Supernova by aespa.",
+      title: "Supernova by aespa — Music Show Wins",
+      description: "Supernova by aespa has 3 recorded music-show wins. See win dates and a breakdown by show.",
       alternates: { canonical: "/songs/7" },
     });
 
@@ -102,9 +103,16 @@ describe("page metadata", () => {
     await expect(artistMetadata({ params: Promise.resolve({ id: "invalid" }) })).resolves.toMatchObject({ title: "Artist not found" });
     await expect(songMetadata({ params: Promise.resolve({ id: "invalid" }) })).resolves.toMatchObject({ title: "Song not found" });
 
-    apiMocks.getArtist.mockRejectedValueOnce(new Error("missing"));
-    apiMocks.getSong.mockRejectedValueOnce(new Error("missing"));
+    apiMocks.getArtist.mockRejectedValueOnce(new ApiRequestError(404));
+    apiMocks.getSong.mockRejectedValueOnce(new ApiRequestError(404));
     await expect(artistMetadata({ params: Promise.resolve({ id: "999" }) })).resolves.toMatchObject({ title: "Artist not found" });
     await expect(songMetadata({ params: Promise.resolve({ id: "999" }) })).resolves.toMatchObject({ title: "Song not found" });
+  });
+
+  it("does not turn temporary API failures into noindex metadata", async () => {
+    apiMocks.getArtist.mockRejectedValueOnce(new ApiRequestError(503));
+    apiMocks.getSong.mockRejectedValueOnce(new ApiRequestError(503));
+    await expect(artistMetadata({ params: Promise.resolve({ id: "3" }) })).rejects.toThrow();
+    await expect(songMetadata({ params: Promise.resolve({ id: "7" }) })).rejects.toThrow();
   });
 });

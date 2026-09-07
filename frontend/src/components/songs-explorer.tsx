@@ -6,11 +6,12 @@ import { useCallback, useEffect, useRef } from "react";
 import { EmptyState, LoadingState } from "@/components/data-display";
 import { SongResults } from "@/components/song-results";
 import { browserTransport } from "@/lib/api-browser";
-import { songSortLabels, songSorts, type SongFilters } from "@/lib/song-list";
+import { songSortLabels, songSorts, songsUrl, type SongFilters } from "@/lib/song-list";
 import { songFiltersFromSearchParams, writeSongHistory } from "@/lib/songs-navigation";
 import { songsQueryOptions } from "@/lib/song-queries";
 import { archivePageCount } from "@/lib/pagination";
 import { usePaginationScroll } from "@/lib/use-pagination-scroll";
+import { ArchivePageLink } from "@/components/archive-page-link";
 import { ArchiveResultsSummary } from "@/components/pagination";
 
 function SongSearchInput({ query, onApply }: { query: string; onApply: (value: string) => void }) {
@@ -59,7 +60,7 @@ export function SongsExplorer() {
     <section className="mt-7 border-2 border-foreground bg-search-surface p-4 sm:p-5" aria-label="Filter songs"><div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_15rem]"><SongSearchInput query={filters.search} onApply={applySearch} /><label className="text-sm font-bold">Sort songs<select value={filters.sort} onChange={(event) => apply({ sort: event.target.value as SongFilters["sort"] })} className="mt-1 min-h-11 w-full border-2 border-foreground bg-card px-3 font-normal">{songSorts.map((sort) => <option key={sort} value={sort}>{songSortLabels[sort]}</option>)}</select></label></div></section>
     <section className="mt-8" aria-labelledby="song-results-title"><div className="mb-4 flex flex-wrap items-end justify-between gap-3 border-b-2 border-foreground pb-3"><div><h2 id="song-results-title" className="scroll-mt-24 font-heading text-2xl font-bold">Results</h2>{songs.isFetching && data && <p role="status" className="mt-1 text-xs text-muted-foreground">Updating results…</p>}</div>{data && <ArchiveResultsSummary totalCount={data.count} page={filters.page} resultCount={data.results.length} singular="song" plural="songs" />}</div>
       {songs.isLoading && !data ? <LoadingState label="Loading songs…" /> : songs.isError ? <div role="alert" className="border border-destructive bg-danger-surface p-4"><p className="font-semibold">Songs couldn&apos;t load. Your search and sort settings are unchanged.</p><button type="button" onClick={() => songs.refetch()} className="mt-3 min-h-10 border-2 border-foreground bg-card px-3 text-sm font-bold">Try again</button></div> : data?.results.length ? <SongResults songs={data.results} empty="No songs match this search." /> : <EmptyState message="No songs match this search." />}
-      {data && (data.previous || data.next) && <nav aria-label="Song pages" className="mt-6 flex items-center justify-between gap-4">{data.previous ? <button type="button" onClick={() => paginate(filters.page - 1)} className="min-h-11 border-2 border-foreground bg-card px-4 text-sm font-bold shadow-[2px_2px_0_var(--foreground)]">Previous</button> : <span />}<span className="text-sm font-semibold tabular-nums">Page {filters.page} of {archivePageCount(data.count)}</span>{data.next ? <button type="button" onClick={() => paginate(filters.page + 1)} className="min-h-11 border-2 border-foreground bg-card px-4 text-sm font-bold shadow-[2px_2px_0_var(--foreground)]">Next</button> : <span />}</nav>}
+      {data && (data.previous || data.next) && <nav aria-label="Song pages" className="mt-6 flex items-center justify-between gap-4">{data.previous ? <ArchivePageLink href={songsUrl({ ...filters, page: filters.page - 1 })} onNavigate={() => paginate(filters.page - 1)}>Previous</ArchivePageLink> : <span />}<span className="text-sm font-semibold tabular-nums">Page {filters.page} of {archivePageCount(data.count)}</span>{data.next ? <ArchivePageLink href={songsUrl({ ...filters, page: filters.page + 1 })} onNavigate={() => paginate(filters.page + 1)}>Next</ArchivePageLink> : <span />}</nav>}
     </section>
   </main>;
 }

@@ -47,7 +47,7 @@ describe("SongsExplorer search", () => {
     const view = render(<SongsExplorer />);
     expect(screen.getByText("Page 1 of 2")).toBeTruthy();
     expect(screen.getByText("1–1 of 101 songs · Page 1 of 2")).toBeTruthy();
-    fireEvent.click(screen.getByRole("button", { name: "Next" }));
+    fireEvent.click(screen.getByRole("link", { name: "Next" }));
     view.rerender(<SongsExplorer />);
     expect(Element.prototype.scrollIntoView).not.toHaveBeenCalled();
 
@@ -107,7 +107,7 @@ describe("SongsExplorer search", () => {
     view.rerender(<SongsExplorer />);
     setUrl("/songs");
     view.rerender(<SongsExplorer />);
-    fireEvent.click(screen.getByRole("button", { name: "Next" }));
+    fireEvent.click(screen.getByRole("link", { name: "Next" }));
     expect(pushState).toHaveBeenLastCalledWith(null, "", "/songs?page=2");
   });
 

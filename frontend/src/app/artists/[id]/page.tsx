@@ -30,7 +30,10 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
       description: `Explore ${artist.name}'s ${artist.total_wins} recorded music-show ${artist.total_wins === 1 ? "win" : "wins"} across ${artist.winning_songs} ${artist.winning_songs === 1 ? "song" : "songs"}, with totals by song and show and a dated win history.`,
       path: `/artists/${id}`,
     });
-  } catch { return { title: "Artist not found", description: "The requested artist could not be found in KpopWins.", robots: noIndexFollow }; }
+  } catch (error) {
+    if (error instanceof ApiRequestError && error.status === 404) return { title: "Artist not found", description: "The requested artist could not be found in KpopWins.", robots: noIndexFollow };
+    throw error;
+  }
 }
 
 export default async function ArtistPage({ params }: { params: Promise<{ id: string }> }) {
