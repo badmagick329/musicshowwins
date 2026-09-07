@@ -26,11 +26,14 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   try {
     const song = await getSong(id);
     return pageMetadata({
-      title: `${song.title} by ${song.artist.name}`,
-      description: `See every recorded music show win for ${song.title} by ${song.artist.name}.`,
+      title: `${song.title} by ${song.artist.name} — Music Show Wins`,
+      description: `${song.title} by ${song.artist.name} has ${song.total_wins} recorded music-show ${song.total_wins === 1 ? "win" : "wins"}. See win dates and a breakdown by show.`,
       path: `/songs/${id}`,
     });
-  } catch { return { title: "Song not found", description: "The requested song could not be found in KpopWins.", robots: noIndexFollow }; }
+  } catch (error) {
+    if (error instanceof ApiRequestError && error.status === 404) return { title: "Song not found", description: "The requested song could not be found in KpopWins.", robots: noIndexFollow };
+    throw error;
+  }
 }
 
 export default async function SongPage({ params }: { params: Promise<{ id: string }> }) {

@@ -10,6 +10,7 @@ import { browserTransport } from "@/lib/api-browser";
 import type { Show, Win } from "@/lib/api-shared";
 import {
   archiveYears,
+  winsUrl,
   hasActiveWinsFilters,
   winsDateRangeError,
   type WinsFilters,
@@ -20,6 +21,7 @@ import { archivePageCount } from "@/lib/pagination";
 import { usePaginationScroll } from "@/lib/use-pagination-scroll";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { DesktopWinVideoRow, MobileWinVideoDisclosure } from "@/components/win-videos";
+import { ArchivePageLink } from "@/components/archive-page-link";
 import { ArchiveResultsSummary } from "@/components/pagination";
 
 function WinsSearchInput({ query, onApply }: { query: string; onApply: (value: string) => void }) {
@@ -149,9 +151,9 @@ export function WinsExplorer() {
           <div role="alert" className="border border-destructive bg-danger-surface p-4"><p className="font-semibold">Wins couldn&apos;t load. Your filters are unchanged.</p><button type="button" onClick={() => wins.refetch()} className="mt-3 min-h-10 border-2 border-foreground bg-card px-3 text-sm font-bold">Try again</button></div>
         ) : data?.results.length ? <WinsRows wins={data.results} /> : <EmptyState message="No wins match these filters." />}
         {data && !dateRangeError && (data.previous || data.next) && <nav aria-label="Wins pages" className="mt-6 flex items-center justify-between gap-4">
-          {data.previous ? <button type="button" onClick={() => paginate(filters.page - 1)} className="min-h-11 border-2 border-foreground bg-card px-4 text-sm font-bold shadow-[2px_2px_0_var(--foreground)]">Previous</button> : <span />}
+          {data.previous ? <ArchivePageLink href={winsUrl({ ...filters, page: filters.page - 1 })} onNavigate={() => paginate(filters.page - 1)}>Previous</ArchivePageLink> : <span />}
           <span className="text-sm font-semibold tabular-nums">Page {filters.page} of {archivePageCount(data.count)}</span>
-          {data.next ? <button type="button" onClick={() => paginate(filters.page + 1)} className="min-h-11 border-2 border-foreground bg-card px-4 text-sm font-bold shadow-[2px_2px_0_var(--foreground)]">Next</button> : <span />}
+          {data.next ? <ArchivePageLink href={winsUrl({ ...filters, page: filters.page + 1 })} onNavigate={() => paginate(filters.page + 1)}>Next</ArchivePageLink> : <span />}
         </nav>}
       </section>
     </main>
