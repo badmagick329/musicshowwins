@@ -37,7 +37,10 @@ describe("artist summary and metadata", () => {
     expect(summary).toContain("Inkigayo");
     expect(summary).toContain('<time dateTime="2021-01-17">17 Jan 2021</time>');
     expect(apiMocks.getAllArtistWins).toHaveBeenCalledWith(3);
-    expect(html).toBe(renderToStaticMarkup(await ArtistPage({ params })));
+    expect(html).toContain("Wins in 2024");
+    const allHtml = renderToStaticMarkup(await ArtistPage({ params }));
+    expect(allHtml.slice(allHtml.indexOf("<dl"), allHtml.indexOf("</dl>"))).toBe(summary);
+    expect(allHtml).toContain("Wins across all years");
   });
 
   it.each([null, "2026-09-06T00:00:00Z"])("does not treat a published moment or reference verification (%s) as career-first verification", async (lastVerified) => {
