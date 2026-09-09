@@ -56,6 +56,6 @@ describe("SEO and agent discovery routes", () => {
     expect(response.headers.get("content-type")).toContain("text/markdown");
     expect(body).toContain("# KpopWins");
     expect(body).toContain("https://kpopwins.info/sitemap.xml");
-    expect(body).toContain("Query-string URLs are filtered or sorted views");
+    expect(body).toContain("Query-string URLs are filtered, sorted, or year-specific views");
   });
 });
