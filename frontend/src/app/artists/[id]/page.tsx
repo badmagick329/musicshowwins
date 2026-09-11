@@ -58,9 +58,9 @@ export default async function ArtistPage({ params, searchParams = Promise.resolv
       </header>
 
       <section className="mt-10" aria-labelledby="summary-title">
-        <h2 id="summary-title" className="mb-4 border-b-2 border-foreground pb-3 font-heading text-2xl font-bold">Career summary</h2>
+        <h2 id="summary-title" className="mb-4 border-b-2 border-foreground pb-3 font-heading text-2xl font-bold">Win summary</h2>
         <dl className="grid border border-border bg-card sm:grid-cols-2 lg:grid-cols-4">
-          <Metric label="Total wins" value={String(summary.totalWins)} />
+          <Metric label="Recorded wins" value={String(summary.totalWins)} />
           <Metric label="Winning songs" value={String(summary.winningSongs)} />
           <Metric label="Earliest recorded win" value={summary.earliestWin ? <>
             <Link prefetch={false} href={`/songs/${summary.earliestWin.song.id}`} className="compact-link-target text-lg leading-snug underline underline-offset-4">{summary.earliestWin.song.title}</Link>
