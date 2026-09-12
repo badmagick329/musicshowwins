@@ -93,8 +93,15 @@ class ArtistSerializer(serializers.ModelSerializer):
         )
 
 
-class SongSerializer(serializers.ModelSerializer):
+class SongSummarySerializer(serializers.ModelSerializer):
     artist = ArtistSummarySerializer(read_only=True)
+
+    class Meta:
+        model = Song
+        fields = ("id", "title", "artist")
+
+
+class SongSerializer(SongSummarySerializer):
     total_wins = serializers.IntegerField(read_only=True)
     latest_win_date = serializers.DateField(read_only=True, allow_null=True)
     winning_shows = serializers.IntegerField(read_only=True)
@@ -158,27 +165,8 @@ class ArtistLeaderboardSerializer(serializers.Serializer):
     wins = serializers.IntegerField()
     artist = ArtistSummarySerializer(source="*")
 
-    def to_representation(self, instance):
-        return {
-            "rank": instance.rank,
-            "wins": instance.wins,
-            "artist": ArtistSummarySerializer(instance).data,
-        }
-
 
 class SongLeaderboardSerializer(serializers.Serializer):
     rank = serializers.IntegerField()
-    wins = serializers.IntegerField()
-    song = SongSerializer(source="*")
-
-    def to_representation(self, instance):
-        wins = instance.win_count if hasattr(instance, "win_count") else instance.wins
-        return {
-            "rank": instance.rank,
-            "wins": wins,
-            "song": {
-                "id": instance.pk,
-                "title": instance.title,
-                "artist": ArtistSummarySerializer(instance.artist).data,
-            },
-        }
+    wins = serializers.IntegerField(source="win_count")
+    song = SongSummarySerializer(source="*")

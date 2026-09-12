@@ -2,18 +2,23 @@ from __future__ import annotations
 
 from datetime import date
 
-from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.template.response import TemplateResponse
 
-from .services import all_artists_queryset, leaderboard_queryset, wins_queryset
+from .services import (
+    all_artists_queryset,
+    artist_name_query,
+    leaderboard_queryset,
+    wins_queryset,
+)
 
 
 def _year(value: str | None) -> int | None:
     try:
-        return int(value) if value else None
+        year = int(value) if value else None
     except (TypeError, ValueError):
         return None
+    return year if year is not None and 1900 <= year <= date.max.year else None
 
 
 def index(request):
@@ -35,9 +40,7 @@ def artist_search(request):
     search = request.GET.get("search", "").strip()
     artists = all_artists_queryset()
     if search:
-        artists = artists.filter(
-            Q(name__icontains=search) | Q(aliases__alias__icontains=search)
-        ).distinct()
+        artists = artists.filter(artist_name_query(search))
     else:
         artists = artists.none()
     return TemplateResponse(

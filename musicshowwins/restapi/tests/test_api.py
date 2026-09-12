@@ -7,7 +7,8 @@ import requests
 from django.apps import apps
 from django.conf import settings
 from django.core.cache import cache
-from main.models import Artist, MusicShow, Song, Win, WinReference
+from main.models import Artist, ArtistAlias, MusicShow, Song, Win, WinReference
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.test import APIClient
 
 
@@ -98,8 +99,8 @@ def test_read_only_collections_and_contracts(archive):
         "date",
         "show",
         "song",
-            "references",
-            "moment",
+        "references",
+        "moment",
     }
     assert wins.data["results"][0]["references"] == []
 
@@ -125,6 +126,77 @@ def test_filters_ordering_and_invalid_parameters(archive):
         client.get("/api/v1/wins?date_from=2025-02-01&date_to=2025-01-01").status_code
         == 400
     )
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "path,params,field",
+    [
+        ("wins", {"ordering": "--date"}, "ordering"),
+        ("artists", {"ordering": "---name"}, "ordering"),
+        ("wins", {"year": "10000"}, "year"),
+        ("leaderboards/songs", {"year": "10000"}, "year"),
+        ("wins", {"date_from": "20250101"}, "date_from"),
+    ],
+)
+def test_malformed_query_parameters_are_client_errors(archive, path, params, field):
+    response = APIClient().get(f"/api/v1/{path}", params)
+
+    assert response.status_code == 400
+    assert field in response.data
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("params", [{"search": "Alpha"}, {"artist": "Alpha"}])
+def test_aliases_do_not_duplicate_wins(archive, params):
+    for alias in ("Alpha One", "Alpha Two"):
+        ArtistAlias.objects.create(artist=archive[1], alias=alias)
+
+    response = APIClient().get("/api/v1/wins", params)
+
+    assert response.status_code == 200
+    assert response.data["count"] == 2
+    assert len({win["id"] for win in response.data["results"]}) == 2
+
+
+@pytest.mark.django_db
+def test_alias_search_filters_catalogue_totals(archive):
+    ArtistAlias.objects.create(artist=archive[1], alias="Alternate")
+    client = APIClient()
+
+    for collection in ("artists", "songs"):
+        response = client.get(
+            f"/api/v1/{collection}", {"artist": "Alternate", "year": 2025}
+        )
+        assert response.status_code == 200
+        assert response.data["count"] == 1
+        assert response.data["results"][0]["total_wins"] == 1
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("field", ["artist", "song", "show"])
+def test_non_decimal_numeric_names_are_searchable(archive, field):
+    response = APIClient().get("/api/v1/wins", {field: "²"})
+
+    assert response.status_code == 200
+    assert response.data["count"] == 0
+
+
+@pytest.mark.django_db
+def test_ordering_breaks_ties_by_id_for_pagination(archive, monkeypatch):
+    monkeypatch.setattr(PageNumberPagination, "page_size", 1)
+    second_show = MusicShow.objects.create(slug="the-show", name="The Show")
+    first = Win.objects.get(date=date(2025, 1, 2))
+    second = Win.objects.create(show=second_show, song=archive[3], date=first.date)
+
+    client = APIClient()
+    results = [
+        client.get("/api/v1/wins", {"ordering": "-date", "page": page}).data
+        for page in (1, 2)
+    ]
+
+    assert [page["results"][0]["id"] for page in results] == [first.pk, second.pk]
+    assert all(page["count"] == 4 for page in results)
 
 
 @pytest.mark.django_db
@@ -542,7 +614,10 @@ def test_trusted_internal_gets_bypass_anonymous_throttle(archive, settings):
 
 
 @pytest.mark.django_db
-def test_incorrect_internal_secret_does_not_bypass_throttle(archive, settings):
+@pytest.mark.parametrize("supplied", ["wrong-secret", "s\u00e9cret"])
+def test_incorrect_internal_secret_does_not_bypass_throttle(
+    archive, settings, supplied
+):
     cache.clear()
     settings.INTERNAL_API_SECRET = "internal-secret"
     client = APIClient()
@@ -551,7 +626,7 @@ def test_incorrect_internal_secret_does_not_bypass_throttle(archive, settings):
             client.get(
                 "/api/v1/shows",
                 REMOTE_ADDR="203.0.113.50",
-                HTTP_X_KPOPWINS_INTERNAL_KEY="wrong-secret",
+                HTTP_X_KPOPWINS_INTERNAL_KEY=supplied,
             ).status_code
             == 200
         )
@@ -559,7 +634,7 @@ def test_incorrect_internal_secret_does_not_bypass_throttle(archive, settings):
         client.get(
             "/api/v1/shows",
             REMOTE_ADDR="203.0.113.50",
-            HTTP_X_KPOPWINS_INTERNAL_KEY="wrong-secret",
+            HTTP_X_KPOPWINS_INTERNAL_KEY=supplied,
         ).status_code
         == 429
     )
@@ -580,6 +655,12 @@ def test_temporary_ui_pages(archive):
     assert b"First" in detail.content and b"Jan. 1, 2025" in detail.content
     assert wins.status_code == 200
     assert b"Music Bank" in wins.content and b"Second" in wins.content
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("path", ["/", "/wins"])
+def test_temporary_ui_ignores_years_outside_the_calendar(archive, path):
+    assert APIClient().get(path, {"year": "10000"}).status_code == 200
 
 
 @pytest.mark.django_db

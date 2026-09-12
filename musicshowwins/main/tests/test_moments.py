@@ -1,4 +1,5 @@
 import json
+from copy import deepcopy
 from datetime import date
 from unittest.mock import patch
 
@@ -52,6 +53,97 @@ def test_import_is_dry_run_idempotent_and_publishable(moment_document):
     assert import_moments(document) == (0, 0, 1)
     assert WinMoment.objects.get(win=win).status == "published"
     assert WinReference.objects.count() == 1
+
+
+@pytest.mark.django_db
+def test_import_normalizes_validated_text_without_mutating_document(moment_document):
+    win, document = moment_document
+    entry = document["moments"][0]
+    entry["event"] = {key: f" {value} " for key, value in entry["event"].items()}
+    entry["heading"] = "  A sourced heading  "
+    entry["citations"][0]["provider"] = "  SOOMPI  "
+    original = deepcopy(document)
+
+    assert import_moments(document, dry_run=True) == (1, 0, 0)
+    assert import_moments(document) == (1, 0, 0)
+    assert document == original
+    moment = WinMoment.objects.get(win=win)
+    assert moment.heading == "A sourced heading"
+    assert moment.citations.get().provider == "soompi"
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("version", [True, 1.0, "1"])
+def test_document_version_must_be_an_integer(moment_document, version):
+    _, document = moment_document
+    document["version"] = version
+
+    with pytest.raises(MomentDocumentError, match="version 1"):
+        import_moments(document, dry_run=True)
+
+
+@pytest.mark.django_db
+def test_malformed_matching_state_raises_a_document_error(moment_document):
+    _, document = moment_document
+    document["moments"][0]["matching_state"] = ["matched"]
+
+    with pytest.raises(MomentDocumentError, match="state must be matched or pending"):
+        import_moments(document, dry_run=True)
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("dry_run", [True, False])
+def test_duplicate_moment_events_are_rejected_before_writing(moment_document, dry_run):
+    _, document = moment_document
+    duplicate = deepcopy(document["moments"][0])
+    duplicate["heading"] = "Conflicting heading"
+    document["moments"].append(duplicate)
+
+    with pytest.raises(MomentDocumentError, match="Entry 2: duplicate event"):
+        import_moments(document, dry_run=dry_run, update_existing=True)
+
+    assert WinMoment.objects.count() == WinReference.objects.count() == 0
+
+
+@pytest.mark.django_db
+def test_selected_artist_cannot_hide_pending_entry_behind_matched_entry(
+    moment_document,
+):
+    _, document = moment_document
+    pending = deepcopy(document["moments"][0])
+    pending["event"]["date"] = "2015-05-06"
+    pending["matching_state"] = "pending"
+    pending["pending_reason"] = "Catalogue event is absent."
+    document["moments"].insert(0, pending)
+
+    with pytest.raises(MomentDocumentError, match="BTS is pending"):
+        import_moments(document, artists={"bts"})
+
+    assert WinMoment.objects.count() == 0
+
+
+@pytest.mark.django_db
+def test_reverse_citation_links_require_the_same_win(moment_document):
+    win, _ = moment_document
+    other = Win.objects.create(show=win.show, song=win.song, date=date(2015, 5, 6))
+    moment = WinMoment.objects.create(win=win, heading="Story", body="Body")
+    wrong_reference = WinReference.objects.create(
+        win=other,
+        reference_type="article",
+        provider="source",
+        url="https://example.com/other",
+    )
+    right_reference = WinReference.objects.create(
+        win=win,
+        reference_type="article",
+        provider="source",
+        url="https://example.com/right",
+    )
+
+    right_reference.moments.add(moment)
+    assert list(moment.citations.all()) == [right_reference]
+    with pytest.raises(ValidationError, match="same win"):
+        wrong_reference.moments.add(moment)
 
 
 @pytest.mark.django_db
