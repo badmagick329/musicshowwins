@@ -209,6 +209,8 @@ def test_import_creates_pending_candidate_with_current_metadata(connection, tmp_
         ),
     )
 
+    connection.execute("UPDATE youtube_videos SET last_seen_at='2026-09-04T12:00:00Z'")
+    connection.commit()
     before_report = path.read_bytes()
     entries = load_official_audit_links(path)
     counts = import_official_links(
@@ -236,7 +238,7 @@ def test_import_creates_pending_candidate_with_current_metadata(connection, tmp_
     assert row["is_official"] == 1
     assert row["status"] == "active"
     assert row["published_at"] == "2026-01-02T03:04:05Z"
-    assert row["last_verified_at"] == TIMESTAMP
+    assert row["last_verified_at"] == "2026-09-04T12:00:00Z"
     assert row["review_status"] == "pending"
     assert row["created_at"] == row["updated_at"] == TIMESTAMP
     assert json.loads(row["metadata"]) == {

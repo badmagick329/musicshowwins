@@ -325,20 +325,24 @@ def _plan_import(records: list[ValidatedReference]) -> list[PlannedReference]:
     return plans
 
 
-def import_document(document: Any, *, dry_run: bool = False) -> tuple[int, int, int]:
+def import_document(
+    document: Any, *, dry_run: bool = False
+) -> tuple[int, int, int, int]:
     with transaction.atomic():
         records = validate_document(document)
         plans = _plan_import(records)
-        created = updated = unchanged = 0
+        created = updated = unchanged = verification_refreshed = 0
         if dry_run:
             for plan in plans:
                 if plan.instance is None:
                     created += 1
+                elif plan.changed_fields == ("last_verified_at",):
+                    verification_refreshed += 1
                 elif plan.changed_fields:
                     updated += 1
                 else:
                     unchanged += 1
-            return created, updated, unchanged
+            return created, updated, unchanged, verification_refreshed
 
         for plan in plans:
             if plan.instance is None:
@@ -347,11 +351,17 @@ def import_document(document: Any, *, dry_run: bool = False) -> tuple[int, int, 
             elif plan.changed_fields:
                 for field in plan.changed_fields:
                     setattr(plan.instance, field, plan.record.values[field])
-                plan.instance.save(update_fields=(*plan.changed_fields, "updated_at"))
-                updated += 1
+                if plan.changed_fields == ("last_verified_at",):
+                    plan.instance.save(update_fields=plan.changed_fields)
+                    verification_refreshed += 1
+                else:
+                    plan.instance.save(
+                        update_fields=(*plan.changed_fields, "updated_at")
+                    )
+                    updated += 1
             else:
                 unchanged += 1
-        return created, updated, unchanged
+        return created, updated, unchanged, verification_refreshed
 
 
 def _export_datetime(value: datetime | None) -> str | None:
