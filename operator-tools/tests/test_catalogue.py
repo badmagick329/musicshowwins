@@ -228,3 +228,43 @@ def test_refresh_cli_reports_counts_and_returns_nonzero_on_failure(config, conne
     )
     assert "complete win catalogue" in errors.getvalue()
     assert [tuple(row) for row in connection.execute("SELECT * FROM wins")] == before
+
+
+def test_preparation_catalogue_requires_approved_win_coverage(connection):
+    from kpopwins_operator.database import insert_candidate
+
+    source = "http://127.0.0.1:8000/api/v1"
+    refresh_catalogue(
+        connection, source, session=FakeSession([page([api_win(1, "2026-01-02")])])
+    )
+    insert_candidate(
+        connection,
+        {
+            "show_slug": "music-bank",
+            "win_date": "2026-01-02",
+            "reference_type": "video",
+            "provider": "youtube",
+            "external_id": "v1",
+            "url": "https://www.youtube.com/watch?v=v1",
+        },
+    )
+    connection.execute("UPDATE reference_candidates SET review_status='approved'")
+    connection.commit()
+    with pytest.raises(CatalogueError) as exc:
+        refresh_catalogue(
+            connection,
+            source,
+            session=FakeSession([page([])]),
+            require_approved_coverage=True,
+        )
+    assert source in str(exc.value)
+    assert "music-bank/2026-01-02" in str(exc.value)
+    assert "sync-local" in str(exc.value)
+    assert connection.execute("SELECT is_current FROM wins").fetchone()[0] == 1
+    result = refresh_catalogue(
+        connection,
+        source,
+        session=FakeSession([page([api_win(1, "2026-01-02")])]),
+        require_approved_coverage=True,
+    )
+    assert result.unchanged == 1

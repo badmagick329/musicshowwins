@@ -28,7 +28,17 @@ and restrict that key to the YouTube Data API before placing it in the local fil
 ## Routine workflow
 
 Use [WORKFLOW.md](WORKFLOW.md) for the short root-level workflow:
-`prepare`, agent `review batch` / `review apply`, then export and local verification.
+`./operator.ps1 prepare` first synchronizes local Django wins from Wikipedia,
+then reads the local API into offline state. `./operator.ps1 sync-local` runs
+only synchronization; add `--year YYYY` for older wins. The launcher overrides
+the operator's API setting with the local endpoint for preparation.
+
+Next, run `review batch` and hand its printed paths to a review agent. The agent
+fills `decisions.json` and runs `review apply`; the blank file is not ready to
+apply. Finish all ready batches, then run `export-approved`, `verify`, and
+`import` through `operator.ps1` in that order. Export writes the full manifest;
+verify dry-runs it against local Django; import writes local references.
+Production verification and import remain separate.
 Preparation and review automatically migrate offline state. Preparation never
 approves a candidate or writes to Django; review applies only explicit agent
 decisions. Exported manifests remain the boundary to the public database.

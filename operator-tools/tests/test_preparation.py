@@ -10,6 +10,7 @@ from kpopwins_operator.ingestion import IngestionCounts
 from kpopwins_operator.matching import MatchCounts, match_videos
 from kpopwins_operator.reddit_hydration import HydrationCounts
 from kpopwins_operator.reddit_import import ImportCounts
+from kpopwins_operator.review_batches import _snapshot
 
 from .test_catalogue import FakeSession, api_win, page
 from .test_matching_review import REGISTRY, add_match_data
@@ -84,7 +85,7 @@ def test_prepare_moves_to_export_when_only_deferred_candidates_remain(
         reason="Episode evidence needs confirmation",
         timestamp="2026-09-06T00:00:00Z",
     )
-    fingerprint = preparation._snapshot(connection, config, candidate_id)["fingerprint"]
+    fingerprint = _snapshot(connection, config, candidate_id)["fingerprint"]
     connection.execute(
         "INSERT INTO candidate_deferrals VALUES (?, ?, ?, ?)",
         (
@@ -107,7 +108,7 @@ def test_prepare_moves_to_export_when_only_deferred_candidates_remain(
     assert "Existing pending candidates: 1" in output
     assert "Review queue: ready=0 deferred=1" in output
     assert (
-        "Discovery complete. No candidates are ready for review. Next: export-approved"
+        "No candidates are ready for review. Next: ./operator.ps1 export-approved"
     ) in output
     assert "Next: review batch" not in output
 

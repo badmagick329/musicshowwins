@@ -660,3 +660,28 @@ def test_approval_command_can_revoke_source(show):
 
     approval = SourceApproval.objects.get(show=show, year=2027)
     assert not approval.approved
+
+
+@pytest.mark.django_db
+def test_local_sync_skips_frontend_but_still_reports_source_failure(monkeypatch):
+    import main.management.commands.sync_wikipedia as command_module
+
+    importer = CapturingImporter()
+    monkeypatch.setattr(command_module, "WikipediaImporter", lambda: importer)
+
+    def unexpected_cache_refresh():
+        pytest.fail("Local preparation must not require frontend availability")
+
+    monkeypatch.setattr(
+        command_module, "invalidate_public_archive_cache", unexpected_cache_refresh
+    )
+    call_command("sync_wikipedia", skip_cache_refresh=True)
+    assert importer.calls[0]["dry_run"] is False
+
+    class FailedImporter:
+        def sync(self, **kwargs):
+            return ImportSummary(failures=["source unavailable"])
+
+    monkeypatch.setattr(command_module, "WikipediaImporter", FailedImporter)
+    with pytest.raises(CommandError, match="source unavailable"):
+        call_command("sync_wikipedia", skip_cache_refresh=True)

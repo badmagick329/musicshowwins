@@ -4,6 +4,7 @@ import hashlib
 import json
 import sqlite3
 from pathlib import Path
+from typing import TextIO
 from uuid import uuid4
 
 from .candidate_review import review_candidates
@@ -227,9 +228,10 @@ def _validate_decisions(document: object) -> dict:
         )
     if type(document["version"]) is not int or document["version"] != 1:
         raise ValueError("Decision file version must be 1.")
+    problems = []
     for field in ("batch_id", "reviewer"):
         if not isinstance(document[field], str) or not document[field].strip():
-            raise ValueError(f"Decision file {field} must not be blank.")
+            problems.append(f"Decision file {field} must not be blank.")
     entries = document["decisions"]
     if not isinstance(entries, list) or not 1 <= len(entries) <= 25:
         raise ValueError("Decision file requires 1 to 25 decisions.")
@@ -249,12 +251,25 @@ def _validate_decisions(document: object) -> dict:
             raise ValueError("Decision candidate IDs must be unique positive integers.")
         ids.add(identifier)
         if entry["decision"] not in ("approve", "reject", "defer"):
-            raise ValueError(
+            problems.append(
                 f"Candidate {identifier}: decision must be approve, reject or defer."
             )
         for field in ("reason", "evidence"):
             if not isinstance(entry[field], str) or not entry[field].strip():
-                raise ValueError(f"Candidate {identifier}: {field} must not be blank.")
+                problems.append(f"Candidate {identifier}: {field} must not be blank.")
+    if problems:
+        untouched = not document["reviewer"] and all(
+            all(entry[field] == "" for field in ("decision", "reason", "evidence"))
+            for entry in entries
+        )
+        label = (
+            "Unfilled agent template." if untouched else "Incomplete agent decisions."
+        )
+        raise ValueError(
+            label + " Give batch.json and decisions.json to a review agent. "
+            "The agent must complete every decision before review apply. "
+            + " ".join(problems)
+        )
     return document
 
 
@@ -380,4 +395,61 @@ def cancel_batch(connection: sqlite3.Connection, batch_id: str) -> None:
             raise ValueError("Only an open batch can be cancelled.")
         connection.execute(
             "UPDATE review_batches SET status='cancelled' WHERE batch_id=?", (batch_id,)
+        )
+
+
+def review_queue_counts(
+    connection: sqlite3.Connection, config: Config
+) -> dict[str, int]:
+    pending_rows = list(
+        connection.execute(
+            """SELECT candidate.id, deferred.fingerprint
+               FROM reference_candidates AS candidate
+               JOIN wins USING(show_slug, win_date)
+               LEFT JOIN candidate_deferrals AS deferred
+                 ON deferred.candidate_id = candidate.id
+               WHERE candidate.review_status='pending'
+                 AND candidate.withdrawn=0 AND wins.is_current=1
+                 AND candidate.provider='youtube'"""
+        )
+    )
+    ready = 0
+    deferred = 0
+    for row in pending_rows:
+        current = _snapshot(connection, config, row["id"])
+        if row["fingerprint"] == current["fingerprint"]:
+            deferred += 1
+        else:
+            ready += 1
+    return {"pending": len(pending_rows), "ready": ready, "deferred": deferred}
+
+
+def print_review_next_step(
+    connection: sqlite3.Connection, config: Config, stdout: TextIO
+) -> None:
+    """Keep command transitions consistent with the remaining review work."""
+    queue = review_queue_counts(connection, config)
+    print(
+        f"Review queue: ready={queue['ready']} deferred={queue['deferred']}",
+        file=stdout,
+    )
+    if queue["ready"]:
+        print(
+            "Next: ./operator.ps1 review batch, then give the printed batch.json "
+            "and decisions.json paths to a review agent. "
+            "Do not fill decisions.json yourself when using an agent reviewer.",
+            file=stdout,
+        )
+    else:
+        print(
+            "No candidates are ready for review. Next: ./operator.ps1 export-approved, "
+            "then ./operator.ps1 verify, then ./operator.ps1 import.",
+            file=stdout,
+        )
+    if queue["deferred"]:
+        print(
+            "Deferred candidates are intentionally skipped. Reconsider with "
+            "./operator.ps1 review batch --include-deferred "
+            "and hand the batch to a review agent.",
+            file=stdout,
         )

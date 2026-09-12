@@ -40,6 +40,11 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
+            "--skip-cache-refresh",
+            action="store_true",
+            help="Skip frontend cache refresh for local catalogue preparation.",
+        )
+        parser.add_argument(
             "--year",
             dest="years",
             action="append",
@@ -104,7 +109,7 @@ class Command(BaseCommand):
                 years=years,
                 dry_run=options["dry_run"],
             )
-        if not options["dry_run"]:
+        if not options["dry_run"] and not options["skip_cache_refresh"]:
             try:
                 invalidate_public_archive_cache()
             except CacheInvalidationError as exc:

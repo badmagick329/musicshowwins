@@ -37,7 +37,13 @@ from .reddit_import import (
     load_official_audit_links,
 )
 from .registry import SUPPORTED_SHOWS, RegistryError, load_registry
-from .review_batches import apply_batch, batch_directory, cancel_batch, create_batch
+from .review_batches import (
+    apply_batch,
+    batch_directory,
+    cancel_batch,
+    create_batch,
+    print_review_next_step,
+)
 from .youtube import YouTubeClient, YouTubeError
 
 
@@ -361,10 +367,12 @@ def main(
                     )
                     if packet is None:
                         print(
-                            "No candidates ready. Check review status, "
+                            "No available candidates in this scope. "
+                            "Check review status, "
                             "or use --include-deferred.",
                             file=output,
                         )
+                        print_review_next_step(connection, config, output)
                     else:
                         directory = batch_directory(config, packet["batch_id"])
                         print(
@@ -376,11 +384,26 @@ def main(
                             f"Agent evidence: {directory / 'batch.json'}", file=output
                         )
                         print(
-                            f"Agent decisions: {directory / 'decisions.json'}",
+                            f"Agent output template: {directory / 'decisions.json'}",
                             file=output,
                         )
                         print(
-                            f'Next: review apply "{directory / "decisions.json"}"',
+                            "Next: give these files to a review agent. "
+                            "Do not fill decisions.json yourself "
+                            "when using an agent reviewer. "
+                            "Do not apply until the review agent "
+                            "has completed every decision.\n"
+                            "Agent handoff: Follow .ignore/docs/operator-workflow/"
+                            "AGENT_REVIEW_PLAYBOOK.md. "
+                            f'Read "{directory / "batch.json"}" as evidence. '
+                            f'Fill "{directory / "decisions.json"}" '
+                            "with your reviewer identity, "
+                            "approve/reject/defer decisions, reasons and evidence "
+                            "for every candidate. "
+                            "Then run ./operator.ps1 review apply "
+                            f'"{directory / "decisions.json"}". '
+                            "Stop after this batch; "
+                            "do not export or import references.",
                             file=output,
                         )
                 elif args.review_command == "apply":
@@ -412,16 +435,11 @@ def main(
                             f"Log: {log}",
                             file=output,
                         )
-                        print(
-                            "Next: review batch or export-approved.",
-                            file=output,
-                        )
+                        print_review_next_step(connection, config, output)
                 elif args.review_command == "cancel":
                     cancel_batch(connection, args.batch_id)
-                    print(
-                        "Batch cancelled; candidates released. Next: review batch",
-                        file=output,
-                    )
+                    print("Batch cancelled; candidates released.", file=output)
+                    print_review_next_step(connection, config, output)
                 else:
                     rows = list(
                         connection.execute(
@@ -465,6 +483,7 @@ def main(
                     )
                     write_atomic(destination, content)
                     print(f"Wrote approved manifest: {destination}", file=output)
+                    print(f'Next: ./operator.ps1 verify "{destination}"', file=output)
             elif args.command == "youtube":
                 registry = load_registry(config.channel_registry_path)
                 timestamp = now or _now()
