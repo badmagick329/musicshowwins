@@ -1,8 +1,7 @@
 from __future__ import annotations
 
-import secrets
-
 from django.conf import settings
+from django.utils.crypto import constant_time_compare
 from rest_framework.throttling import AnonRateThrottle
 
 
@@ -13,7 +12,7 @@ class InternalAwareAnonRateThrottle(AnonRateThrottle):
         if (
             request.method == "GET"
             and configured
-            and secrets.compare_digest(supplied, configured)
+            and constant_time_compare(supplied, configured)
         ):
             return None
         return super().get_cache_key(request, view)

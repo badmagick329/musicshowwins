@@ -9,6 +9,7 @@ from drf_spectacular.utils import extend_schema
 from main.services import (
     all_artists_queryset,
     all_songs_queryset,
+    artist_name_query,
     leaderboard_queryset,
     show_queryset,
     wins_queryset,
@@ -56,7 +57,13 @@ class Sitemap(APIView):
         )
 
 
-def _integer(value: str | None, name: str, *, minimum: int | None = None) -> int | None:
+def _integer(
+    value: str | None,
+    name: str,
+    *,
+    minimum: int | None = None,
+    maximum: int | None = None,
+) -> int | None:
     if value in (None, ""):
         return None
     try:
@@ -65,6 +72,8 @@ def _integer(value: str | None, name: str, *, minimum: int | None = None) -> int
         raise ValidationError({name: "Must be an integer."})
     if minimum is not None and result < minimum:
         raise ValidationError({name: f"Must be at least {minimum}."})
+    if maximum is not None and result > maximum:
+        raise ValidationError({name: f"Must be no greater than {maximum}."})
     return result
 
 
@@ -72,14 +81,21 @@ def _date(value: str | None, name: str) -> date | None:
     if value in (None, ""):
         return None
     try:
-        return date.fromisoformat(value)
+        result = date.fromisoformat(value)
     except (TypeError, ValueError):
         raise ValidationError({name: "Use YYYY-MM-DD."})
+    if result.isoformat() != value:
+        raise ValidationError({name: "Use YYYY-MM-DD."})
+    return result
+
+
+def _year(value: str | None) -> int | None:
+    return _integer(value, "year", minimum=1900, maximum=date.max.year)
 
 
 def filters(request):
     params = request.query_params
-    year = _integer(params.get("year"), "year", minimum=1900)
+    year = _year(params.get("year"))
     date_from = _date(params.get("date_from"), "date_from")
     date_to = _date(params.get("date_to"), "date_to")
     if date_from and date_to and date_from > date_to:
@@ -98,10 +114,13 @@ def filters(request):
 def ordered(queryset, request, allowed: set[str], default: str):
     value = request.query_params.get("ordering", default)
     parts = [part.strip() for part in value.split(",") if part.strip()]
-    if not parts or any(part.lstrip("-") not in allowed for part in parts):
+    if not parts or any(part.removeprefix("-") not in allowed for part in parts):
         raise ValidationError(
             {"ordering": f"Allowed fields: {', '.join(sorted(allowed))}."}
         )
+    # A unique tie-breaker keeps records on the same page across repeated requests.
+    if not any(part.removeprefix("-") == "id" for part in parts):
+        parts.append("id")
     return queryset.order_by(*parts)
 
 
@@ -182,14 +201,9 @@ class ArtistList(generics.ListAPIView):
             params[key] not in (None, "")
             for key in ("artist", "song", "show", "year", "date_from", "date_to")
         ):
-            query = query.filter(
-                pk__in=wins_queryset(**params).values("song__artist_id")
-            )
+            query = query.filter(total_wins__gt=0)
         if params["search"]:
-            query = query.filter(
-                Q(name__icontains=params["search"])
-                | Q(aliases__alias__icontains=params["search"])
-            ).distinct()
+            query = query.filter(artist_name_query(params["search"]))
         return ordered(
             query,
             self.request,
@@ -215,7 +229,7 @@ class SongList(generics.ListAPIView):
             params[key] not in (None, "")
             for key in ("artist", "song", "show", "year", "date_from", "date_to")
         ):
-            query = query.filter(pk__in=wins_queryset(**params).values("song_id"))
+            query = query.filter(total_wins__gt=0)
         if params["search"]:
             query = query.filter(
                 Q(title__icontains=params["search"])
@@ -253,10 +267,8 @@ class LeaderboardList(generics.ListAPIView):
 
     def get_queryset(self):
         params = self.request.query_params
-        year = _integer(params.get("year"), "year", minimum=1900)
-        limit = _integer(params.get("limit"), "limit", minimum=1) or 100
-        if limit > 1000:
-            raise ValidationError({"limit": "Must be no greater than 1000."})
+        year = _year(params.get("year"))
+        limit = _integer(params.get("limit"), "limit", minimum=1, maximum=1000) or 100
         return leaderboard_queryset(
             self.leaderboard_kind,
             year=year,

@@ -70,7 +70,8 @@ def _required_text(data: dict[str, Any], field: str, index: int) -> str:
     return value
 
 
-def _validate_shape(raw: Any, index: int) -> dict[str, Any]:
+def _validate_entry(raw: Any, index: int) -> dict[str, Any]:
+    """Use the same normalized values for validation, resolution and persistence."""
     if not isinstance(raw, dict):
         raise MomentDocumentError(f"Entry {index}: must be an object.")
     unknown = set(raw) - MOMENT_FIELDS
@@ -79,7 +80,7 @@ def _validate_shape(raw: Any, index: int) -> dict[str, Any]:
             f"Entry {index}: contains unknown field {sorted(unknown)[0]}."
         )
     matching_state = raw.get("matching_state")
-    if matching_state not in {"matched", "pending"}:
+    if matching_state not in ("matched", "pending"):
         raise MomentDocumentError(f"Entry {index}: state must be matched or pending.")
     if raw.get("status") not in WinMoment.Status.values:
         raise MomentDocumentError(f"Entry {index}: status must be draft or published.")
@@ -96,38 +97,43 @@ def _validate_shape(raw: Any, index: int) -> dict[str, Any]:
     for field in ("show", "date", "artist", "song"):
         if not isinstance(event[field], str) or not event[field].strip():
             raise MomentDocumentError(f"Entry {index}: event.{field} is required.")
+    event = {field: value.strip() for field, value in event.items()}
     try:
-        event_date = date.fromisoformat(event["date"].strip())
+        event_date = date.fromisoformat(event["date"])
     except ValueError as exc:
         raise MomentDocumentError(
             f"Entry {index}: event.date must use YYYY-MM-DD."
         ) from exc
-    if event_date.isoformat() != event["date"].strip():
+    if event_date.isoformat() != event["date"]:
         raise MomentDocumentError(f"Entry {index}: event.date must use YYYY-MM-DD.")
     for field, limit in (("show", 80), ("artist", 200), ("song", 300)):
-        if len(event[field].strip()) > limit:
+        if len(event[field]) > limit:
             raise MomentDocumentError(f"Entry {index}: event.{field} is too long.")
-    _required_text(raw, "heading", index)
-    _required_text(raw, "body", index)
+    heading = _required_text(raw, "heading", index)
+    body = _required_text(raw, "body", index)
     citations = raw.get("citations")
     if not isinstance(citations, list) or not citations:
         raise MomentDocumentError(
             f"Entry {index}: citations must be a non-empty array."
         )
+    normalized_citations = []
     for citation_index, citation in enumerate(citations, 1):
         if not isinstance(citation, dict) or set(citation) != CITATION_FIELDS:
             raise MomentDocumentError(
                 f"Entry {index}, citation {citation_index}: invalid fields."
             )
-        for field in CITATION_FIELDS:
-            _required_text(citation, field, index)
+        citation = {
+            field: _required_text(citation, field, index) for field in CITATION_FIELDS
+        }
+        citation["provider"] = citation["provider"].lower()
         try:
-            URLValidator(schemes=("http", "https"))(citation["url"].strip())
+            URLValidator(schemes=("http", "https"))(citation["url"])
         except ValidationError as exc:
             raise MomentDocumentError(
                 f"Entry {index}, citation {citation_index}: "
                 "url must be a valid HTTP or HTTPS URL."
             ) from exc
+        normalized_citations.append(citation)
     if matching_state == "pending" and (
         not isinstance(raw.get("pending_reason"), str)
         or not raw["pending_reason"].strip()
@@ -135,17 +141,18 @@ def _validate_shape(raw: Any, index: int) -> dict[str, Any]:
         raise MomentDocumentError(
             f"Entry {index}: pending_reason is required for pending content."
         )
-    return raw
+    return {
+        **raw,
+        "event": {**event, "date": event_date},
+        "heading": heading,
+        "body": body,
+        "citations": normalized_citations,
+    }
 
 
 def _resolve(entry: dict[str, Any], index: int) -> ResolvedMoment:
     event = entry["event"]
-    try:
-        event_date = date.fromisoformat(event["date"])
-    except ValueError as exc:
-        raise MomentDocumentError(
-            f"Entry {index}: event.date must use YYYY-MM-DD."
-        ) from exc
+    event_date = event["date"]
     try:
         win = Win.objects.select_related("show", "song__artist").get(
             show__slug=event["show"], date=event_date
@@ -164,6 +171,39 @@ def _resolve(entry: dict[str, Any], index: int) -> ResolvedMoment:
     return ResolvedMoment(entry, win)
 
 
+def _resolve_entries(
+    entries: list[dict[str, Any]], artists: set[str] | None
+) -> list[ResolvedMoment]:
+    """Resolve all selected events before writes and reject competing moment copy."""
+    if artists:
+        known_artists = {normalize_key(entry["event"]["artist"]) for entry in entries}
+        unknown = artists - known_artists
+        if unknown:
+            raise MomentDocumentError(f"Unknown selected artist: {sorted(unknown)[0]}.")
+
+    resolved = []
+    seen_events = set()
+    for index, entry in enumerate(entries, 1):
+        event = entry["event"]
+        if artists and normalize_key(event["artist"]) not in artists:
+            continue
+        if entry["matching_state"] == "pending":
+            if artists:
+                raise MomentDocumentError(
+                    f"Selected artist {event['artist']} is pending: "
+                    f"{entry['pending_reason']}"
+                )
+            continue
+        identity = (event["show"], event["date"])
+        if identity in seen_events:
+            raise MomentDocumentError(
+                f"Entry {index}: duplicate event {event['show']} on {event['date']}."
+            )
+        seen_events.add(identity)
+        resolved.append(_resolve(entry, index))
+    return resolved
+
+
 def import_moments(
     document: Any,
     *,
@@ -174,42 +214,21 @@ def import_moments(
     if (
         not isinstance(document, dict)
         or set(document) != {"version", "moments"}
+        or type(document.get("version")) is not int
         or document.get("version") != 1
         or not isinstance(document.get("moments"), list)
     ):
         raise MomentDocumentError("Expected a version 1 moments document.")
     entries = [
-        _validate_shape(raw, index) for index, raw in enumerate(document["moments"], 1)
+        _validate_entry(raw, index) for index, raw in enumerate(document["moments"], 1)
     ]
-    by_artist = {normalize_key(entry["event"]["artist"]): entry for entry in entries}
-    if artists:
-        unknown = artists - set(by_artist)
-        if unknown:
-            raise MomentDocumentError(f"Unknown selected artist: {sorted(unknown)[0]}.")
-        pending = [
-            by_artist[name]
-            for name in artists
-            if by_artist[name]["matching_state"] == "pending"
-        ]
-        if pending:
-            entry = pending[0]
-            raise MomentDocumentError(
-                f"Selected artist {entry['event']['artist']} is pending: "
-                f"{entry['pending_reason']}"
-            )
-    chosen = [
-        entry
-        for entry in entries
-        if entry["matching_state"] == "matched"
-        and (not artists or normalize_key(entry["event"]["artist"]) in artists)
-    ]
-    resolved = [_resolve(entry, entries.index(entry) + 1) for entry in chosen]
-    existing_win_ids = set(
-        WinMoment.objects.filter(
-            win_id__in=[item.win.pk for item in resolved]
-        ).values_list("win_id", flat=True)
-    )
+    resolved = _resolve_entries(entries, artists)
     if dry_run:
+        existing_win_ids = set(
+            WinMoment.objects.filter(
+                win_id__in=[item.win.pk for item in resolved]
+            ).values_list("win_id", flat=True)
+        )
         created = sum(item.win.pk not in existing_win_ids for item in resolved)
         updated = len(resolved) - created if update_existing else 0
         unchanged = len(resolved) - created - updated
@@ -226,23 +245,23 @@ def import_moments(
             if was_created:
                 moment = WinMoment.objects.create(
                     win=win,
-                    heading=entry["heading"].strip(),
-                    body=entry["body"].strip(),
+                    heading=entry["heading"],
+                    body=entry["body"],
                 )
             else:
-                moment.heading = entry["heading"].strip()
-                moment.body = entry["body"].strip()
+                moment.heading = entry["heading"]
+                moment.body = entry["body"]
                 moment.save(update_fields=("heading", "body", "updated_at"))
             refs = []
             for citation in entry["citations"]:
                 ref, _ = WinReference.objects.update_or_create(
                     win=win,
-                    url=citation["url"].strip(),
+                    url=citation["url"],
                     defaults={
                         "reference_type": WinReference.ReferenceType.ARTICLE,
-                        "provider": citation["provider"].strip().lower(),
-                        "title": citation["title"].strip(),
-                        "publisher_name": citation["publisher_name"].strip(),
+                        "provider": citation["provider"],
+                        "title": citation["title"],
+                        "publisher_name": citation["publisher_name"],
                         "status": WinReference.Status.ACTIVE,
                     },
                 )

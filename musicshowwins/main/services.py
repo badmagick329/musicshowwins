@@ -7,12 +7,20 @@ from datetime import date
 from django.db.models import Count, F, Max, Min, OuterRef, Prefetch, Q, Subquery, Window
 from django.db.models.functions import DenseRank
 
-from .models import Artist, MusicShow, Song, Win, WinMoment, WinReference
+from .models import Artist, ArtistAlias, MusicShow, Song, Win, WinMoment, WinReference
+
+
+def artist_name_query(value: str, *, prefix: str = "", lookup: str = "icontains") -> Q:
+    """Match aliases without multiplying wins through a reverse-relation join."""
+    aliases = ArtistAlias.objects.filter(**{f"alias__{lookup}": value})
+    return Q(**{f"{prefix}name__{lookup}": value}) | Q(
+        **{f"{prefix}pk__in": aliases.values("artist_id")}
+    )
 
 
 def _show_query(value: str, prefix: str = "") -> Q:
     field = f"{prefix}show"
-    if value.isdigit():
+    if value.isdecimal():
         return Q(**{f"{field}__id": int(value)})
     return Q(**{f"{field}__slug__iexact": value}) | Q(
         **{f"{field}__name__iexact": value}
@@ -21,16 +29,14 @@ def _show_query(value: str, prefix: str = "") -> Q:
 
 def _artist_query(value: str, prefix: str = "") -> Q:
     field = f"{prefix}song__artist"
-    if value.isdigit():
+    if value.isdecimal():
         return Q(**{f"{field}__id": int(value)})
-    return Q(**{f"{field}__name__iexact": value}) | Q(
-        **{f"{field}__aliases__alias__iexact": value}
-    )
+    return artist_name_query(value, prefix=f"{field}__", lookup="iexact")
 
 
 def _song_query(value: str, prefix: str = "") -> Q:
     field = f"{prefix}song"
-    if value.isdigit():
+    if value.isdecimal():
         return Q(**{f"{field}__id": int(value)})
     return Q(**{f"{field}__title__iexact": value})
 
@@ -46,13 +52,12 @@ def win_filters(
     date_to: date | None = None,
     prefix: str = "",
 ) -> Q:
-    """Build a reusable Q object for win-related filters."""
+    """Keep collection filters and aggregate counts scoped to the same wins."""
     query = Q()
     if search:
         query &= (
             Q(**{f"{prefix}song__title__icontains": search})
-            | Q(**{f"{prefix}song__artist__name__icontains": search})
-            | Q(**{f"{prefix}song__artist__aliases__alias__icontains": search})
+            | artist_name_query(search, prefix=f"{prefix}song__artist__")
             | Q(**{f"{prefix}show__name__icontains": search})
         )
     if artist:

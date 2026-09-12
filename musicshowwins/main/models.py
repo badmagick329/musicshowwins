@@ -346,12 +346,11 @@ class ImportIssue(models.Model):
 
 
 @receiver(m2m_changed, sender=WinMoment.citations.through)
-def validate_moment_citations(sender, instance, action, pk_set, **kwargs):
+def validate_moment_citations(sender, instance, action, pk_set, model, **kwargs):
+    """Enforce event identity from either side of the citation relationship."""
     if (
         action == "pre_add"
-        and WinReference.objects.filter(pk__in=pk_set)
-        .exclude(win_id=instance.win_id)
-        .exists()
+        and model.objects.filter(pk__in=pk_set).exclude(win_id=instance.win_id).exists()
     ):
         raise ValidationError(
             "Every citation must belong to the same win as the moment."
