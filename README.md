@@ -48,8 +48,14 @@ The public Next.js frontend lives in [`frontend/`](frontend/README.md).
 
 ## YouTube reference workflow
 
-From the repository root, use `./operator.ps1 prepare` to discover and match
-videos, then `./operator.ps1 review batch` to prepare an agent review assignment.
+From the repository root, `./operator.ps1 prepare` synchronizes local Django
+wins from Wikipedia, then discovers and matches videos using the local API.
+Run `./operator.ps1 review batch` and give its printed evidence and decision
+template paths to a review agent. The agent fills and applies the decisions;
+do not apply the blank template. Finish all ready batches, then run
+`./operator.ps1 export-approved`, `./operator.ps1 verify` and
+`./operator.ps1 import` in that order. Verification is a local dry run; import
+writes to local Django. Production import is a separate step.
 Follow the [short video workflow](operator-tools/WORKFLOW.md) for applying agent
 decisions, exporting references and verifying the import locally.
 

@@ -143,6 +143,7 @@ def refresh_catalogue(
     *,
     session: requests.Session | None = None,
     seen_at: str | None = None,
+    require_approved_coverage: bool = False,
 ) -> RefreshCounts:
     existing = {
         (row["show_slug"], row["win_date"]): row
@@ -155,6 +156,27 @@ def refresh_catalogue(
         connection.execute("UPDATE wins SET is_current = 0 WHERE is_current = 1")
         records = fetch_catalogue(api_base_url, session=session)
         fetched_keys = {record.key for record in records}
+        if require_approved_coverage:
+            approved_keys = {
+                (row["show_slug"], row["win_date"])
+                for row in connection.execute(
+                    "SELECT DISTINCT show_slug, win_date FROM reference_candidates "
+                    "WHERE review_status='approved'"
+                )
+            }
+            missing = sorted(approved_keys - fetched_keys)
+            if missing:
+                raise CatalogueError(
+                    f"Catalogue source {api_base_url} "
+                    "is missing approved reference wins: "
+                    + ", ".join(f"{show}/{day}" for show, day in missing)
+                    + ". Run ./operator.ps1 sync-local --year YYYY "
+                    "for the missing years "
+                    "and resolve source conflicts or unapproved pages, "
+                    "then prepare again. "
+                    "Offline state was not changed; "
+                    "approved references were not removed."
+                )
         added = updated = unchanged = 0
         timestamp = seen_at or utc_now()
         for record in records:

@@ -5,14 +5,40 @@ selects the right Python environment. Agents make the review decisions.
 
 ## Routine update
 
-**1. Prepare candidates.** Start the local Django API, then run:
+**1. Synchronize and prepare candidates.** Start the local Django API using this
+repository's Django settings, then run:
 
 ```powershell
 ./operator.ps1 prepare
 ```
 
-This updates the offline win catalogue, ingests official uploads and matches
-videos. Add `--reddit` to also audit Reddit, fetch missing YouTube metadata,
+The launcher first runs `sync_wikipedia` against local Django for the current
+and previous years. It uses the same importer as production, including its
+source approvals, conflict quarantine and historical-row preservation. A sync
+failure stops preparation. Frontend cache refresh is skipped during this step;
+the later local reference import refreshes it.
+
+Preparation then refreshes the offline catalogue from
+`http://127.0.0.1:8000/api/v1`, ingests official uploads and matches videos.
+The launcher overrides `KPOPWINS_API_BASE_URL` for this run even if the operator
+`.env` points at production. For another local port, set the process variable
+`KPOPWINS_LOCAL_API_BASE_URL`. The API must use the same Django settings and
+database as the launcher. Both the source endpoint and local target are printed.
+Direct `kpopwins-operator prepare` remains an offline command using its configured
+API; use `operator.ps1 prepare` for the synchronized local workflow.
+
+To synchronize separately or repair older missing wins:
+
+```powershell
+./operator.ps1 sync-local
+./operator.ps1 sync-local --year 2024
+```
+
+Review any reported conflicts or unapproved source pages. Sync does not invent
+wins or override those decisions. Preparation stops if approved reference wins
+are absent from the refreshed catalogue, preserving the previous offline state.
+
+Add `--reddit` to also audit Reddit, fetch missing YouTube metadata,
 reclassify links and import official links as pending candidates:
 
 ```powershell
@@ -31,7 +57,13 @@ candidates, it says to continue with `export-approved` instead of sending you to
 another review batch. The same counts are saved in
 `.ignore/operator-tools/reports/prepare.json`.
 
-**2. Ask an agent to review the next batch.** Copy this message into a task in
+**2. Required agent handoff.** Do not fill `decisions.json` yourself when using
+an agent reviewer. `review batch` creates an evidence file and an unfilled agent
+output template; neither creating the batch nor applying the blank template
+performs a review. Give the printed paths and handoff prompt to Luna or another
+review agent.
+
+Ask an agent to review the next batch. Copy this message into a task in
 this project. Reuse it unchanged each time; the agent selects the batch and
 handles its file paths:
 
@@ -90,7 +122,11 @@ Rerunning the same applied file is harmless.
 Reuse the same prompt for the next batch. Deferred candidates remain pending but are skipped until
 their evidence changes. Use `review batch --include-deferred` to reconsider them.
 
-**4. Export and verify locally.**
+**4. Finish ready reviews, then export, verify and import locally.** Follow the
+queue printed after `review apply`. If ready candidates remain, give another
+batch to the agent. Deferred candidates are skipped until evidence changes or
+you explicitly include them. When no ready candidates remain, run these commands
+in order:
 
 ```powershell
 ./operator.ps1 export-approved
@@ -98,7 +134,14 @@ their evidence changes. Use `review batch --include-deferred` to reconsider them
 ./operator.ps1 import
 ```
 
-`verify` dry-runs the manifest against Django; `import` applies it using the
+Export writes the full approved manifest, not an incremental patch. `verify`
+requires that exported file and dry-runs it against local Django. If wins are
+missing, it reports target coverage and every missing show/date together. Run
+`sync-local` for those years, resolve source issues, then verify again. Do not
+remove approved references merely to pass validation. Local verification checks
+local Django only; the production dry run in step 5 checks production separately.
+
+`verify` makes no database writes; `import` applies it using the
 repository's Django settings and then tries to refresh the frontend cache. If
 the local frontend is not running, the references are still imported and the
 command prints a warning that local cache refresh was skipped. Start the

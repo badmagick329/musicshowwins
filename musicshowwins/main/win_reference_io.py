@@ -198,14 +198,20 @@ def validate_document(document: Any) -> list[ValidatedReference]:
     validated: list[ValidatedReference] = []
     url_keys: set[tuple[int, str]] = set()
     external_keys: set[tuple[int, str, str]] = set()
+    missing = []
     for index, raw in enumerate(references, start=1):
         show_slug, win_date, values = _validate_record(raw, index)
         show = MusicShow.objects.filter(slug=show_slug).first()
         if show is None:
-            raise _error(index, "music show does not exist.")
+            missing.append(
+                f"Reference {index}: {show_slug}/{win_date.isoformat()} "
+                "(music show does not exist)"
+            )
+            continue
         win = Win.objects.filter(show=show, date=win_date).first()
         if win is None:
-            raise _error(index, "win does not exist.")
+            missing.append(f"Reference {index}: {show_slug}/{win_date.isoformat()}")
+            continue
 
         url_key = (win.pk, values["url"])
         if url_key in url_keys:
@@ -224,6 +230,17 @@ def validate_document(document: Any) -> list[ValidatedReference]:
                 )
             external_keys.add(external_key)
         validated.append(ValidatedReference(index=index, win=win, values=values))
+    if missing:
+        raise ReferenceDocumentError(
+            f"Target catalogue coverage: {len(validated)}/{len(references)} references "
+            "have matching wins. Missing target wins: "
+            + "; ".join(missing)
+            + ". The source catalogue and target Django database differ. "
+            "For local Django, run ./operator.ps1 sync-local "
+            "(use --year YYYY for older wins), then verify again. "
+            "Resolve reported source conflicts or unapproved pages before continuing. "
+            "Do not remove approved references to bypass a stale target catalogue."
+        )
     return validated
 
 

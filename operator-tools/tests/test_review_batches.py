@@ -280,3 +280,61 @@ def test_cli_batch_template_cannot_be_applied_unreviewed(connection, config):
     assert main(["review", "apply", str(path)], **options) == 1
     assert "reviewer must not be blank" in errors.getvalue()
     assert "Agent evidence:" in output.getvalue()
+    assert "Agent output template:" in output.getvalue()
+    assert (
+        "Do not apply until the review agent has completed every decision"
+        in output.getvalue()
+    )
+    assert "Unfilled agent template" in errors.getvalue()
+    assert "reason must not be blank" in errors.getvalue()
+    assert "evidence must not be blank" in errors.getvalue()
+
+
+@pytest.mark.parametrize(
+    "limit,actions,ready", [(1, ["approve"], 2), (3, ["approve", "reject", "defer"], 0)]
+)
+def test_cli_next_step_uses_post_apply_queue(connection, config, limit, actions, ready):
+    add_candidates(connection)
+    packet = batch(connection, config, limit=limit)
+    path = decision_file(config, packet, actions)
+    output = StringIO()
+    options = {
+        "environ": {"KPOPWINS_OPERATOR_HOME": str(config.home)},
+        "stdout": output,
+    }
+    assert main(["review", "apply", str(path)], **options) == 0
+    text = output.getvalue()
+    assert f"ready={ready}" in text
+    if ready:
+        assert "give the printed batch.json" in text
+        assert "export-approved" not in text
+    else:
+        assert (
+            "export-approved, then ./operator.ps1 verify, then ./operator.ps1 import"
+            in text
+        )
+        assert "intentionally skipped" in text
+    output.seek(0)
+    output.truncate()
+    assert main(["review", "apply", str(path)], **options) == 0
+    assert "Already applied" in output.getvalue()
+    assert f"ready={ready}" in output.getvalue()
+
+
+def test_partial_decisions_report_all_missing_work(connection, config):
+    add_candidates(connection)
+    packet = batch(connection, config)
+    path = decision_file(config, packet, ["approve", "reject", "defer"])
+    document = json.loads(path.read_text())
+    document["decisions"][0]["reason"] = ""
+    document["decisions"][1]["evidence"] = ""
+    path.write_text(json.dumps(document))
+    with pytest.raises(ValueError) as exc:
+        apply_batch(connection, config, path, dry_run=False, timestamp=NOW)
+    assert "Incomplete agent decisions" in str(exc.value)
+    assert "reason must not be blank" in str(exc.value)
+    assert "evidence must not be blank" in str(exc.value)
+    assert (
+        connection.execute("SELECT COUNT(*) FROM candidate_review_events").fetchone()[0]
+        == 0
+    )

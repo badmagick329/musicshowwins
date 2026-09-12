@@ -88,10 +88,13 @@ def test_dry_run_does_not_invalidate_public_cache(
     invalidate.assert_not_called()
 
 
-@pytest.mark.parametrize("failure", [
-    CacheInvalidationUnavailable("The frontend cache endpoint is unavailable."),
-    CacheInvalidationError("Could not invalidate the public archive cache."),
-])
+@pytest.mark.parametrize(
+    "failure",
+    [
+        CacheInvalidationUnavailable("The frontend cache endpoint is unavailable."),
+        CacheInvalidationError("Could not invalidate the public archive cache."),
+    ],
+)
 def test_import_keeps_saved_data_when_optional_cache_refresh_fails(
     reference_win, reference_document, tmp_path, failure
 ):
@@ -198,7 +201,7 @@ def test_invalid_later_record_rolls_back_complete_import(
     ("win_data", "message"),
     [
         ({"show": "missing", "date": "2026-01-02"}, "music show"),
-        ({"show": "music-bank", "date": "2026-01-03"}, "win does not exist"),
+        ({"show": "music-bank", "date": "2026-01-03"}, "music-bank/2026-01-03"),
     ],
 )
 def test_missing_show_and_win_failures(
@@ -321,3 +324,26 @@ def test_export_import_round_trip(reference_win, reference_document, tmp_path):
 
     assert json.loads(round_tripped.getvalue()) == expected
     assert WinReference.objects.count() == 1
+
+
+@pytest.mark.parametrize("dry_run", [True, False])
+def test_missing_target_wins_are_reported_together_without_partial_import(
+    reference_win, reference_document, tmp_path, dry_run
+):
+    for day in ("2026-09-09", "2026-09-10"):
+        record = deepcopy(reference_document["references"][0])
+        record["win"]["date"] = day
+        reference_document["references"].append(record)
+    with pytest.raises(CommandError) as exc:
+        _import_file(tmp_path, reference_document, dry_run=dry_run)
+    message = str(exc.value)
+    assert "1/3 references" in message
+    assert "music-bank/2026-09-09" in message
+    assert "music-bank/2026-09-10" in message
+    assert "sync-local" in message
+    assert WinReference.objects.count() == 0
+    for day in (date(2026, 9, 9), date(2026, 9, 10)):
+        Win.objects.create(show=reference_win.show, song=reference_win.song, date=day)
+    output = _import_file(tmp_path, reference_document, dry_run=dry_run)
+    assert "created 3" in output
+    assert WinReference.objects.count() == (0 if dry_run else 3)

@@ -169,6 +169,10 @@ def test_default_export_path_stays_under_operator_home(config, connection):
     document = json.loads(config.default_manifest_path.read_text(encoding="utf-8"))
     assert document["version"] == 1
     assert str(config.default_manifest_path) in output.getvalue()
+    assert (
+        f'Next: ./operator.ps1 verify "{config.default_manifest_path}"'
+        in output.getvalue()
+    )
 
 
 def test_export_normalizes_identity_fields_from_existing_sqlite_data(connection):
