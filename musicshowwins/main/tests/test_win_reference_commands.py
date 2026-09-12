@@ -347,3 +347,30 @@ def test_missing_target_wins_are_reported_together_without_partial_import(
     output = _import_file(tmp_path, reference_document, dry_run=dry_run)
     assert "created 3" in output
     assert WinReference.objects.count() == (0 if dry_run else 3)
+
+
+@pytest.mark.parametrize("content_change", [False, True])
+def test_verification_refresh_is_saved_separately(
+    reference_win, reference_document, tmp_path, content_change
+):
+    _import_file(tmp_path, reference_document)
+    original = WinReference.objects.get()
+    reference_document["references"][0]["last_verified_at"] = "2026-09-02T12:00:00Z"
+    if content_change:
+        reference_document["references"][0]["title"] = "New title"
+    expected = (
+        "created 0, updated 1, unchanged 0, verification refreshed 0"
+        if content_change
+        else "created 0, updated 0, unchanged 0, verification refreshed 1"
+    )
+    assert expected in _import_file(tmp_path, reference_document, dry_run=True)
+    assert WinReference.objects.get().last_verified_at == original.last_verified_at
+    assert expected in _import_file(tmp_path, reference_document)
+    saved = WinReference.objects.get()
+    assert saved.last_verified_at.isoformat() == "2026-09-02T12:00:00+00:00"
+    if not content_change:
+        assert saved.updated_at == original.updated_at
+    assert (
+        "created 0, updated 0, unchanged 1, verification refreshed 0"
+        in _import_file(tmp_path, reference_document)
+    )

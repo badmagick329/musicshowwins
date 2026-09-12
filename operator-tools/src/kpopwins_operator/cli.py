@@ -553,6 +553,8 @@ def main(
                     print(
                         f"considered={counts.considered} accepted={counts.accepted} "
                         f"created={counts.created} updated={counts.updated} "
+                        f"unchanged={counts.unchanged} "
+                        f"verification-refreshed={counts.verification_refreshed} "
                         f"dry-run={'yes' if args.dry_run else 'no'}",
                         file=output,
                     )

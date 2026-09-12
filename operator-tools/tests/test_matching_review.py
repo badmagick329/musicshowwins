@@ -39,7 +39,8 @@ def add_match_data(connection, title="Alpha First Music Bank 1위"):
             privacy_status, embeddable, live_broadcast_state,
             availability_status, first_seen_at, last_seen_at
         ) VALUES ('v1', 'UC1', ?, '', '2026-01-02T01:00:00Z', 'PT3M',
-                  'public', 1, 'none', 'active', 'now', 'now')
+                  'public', 1, 'none', 'active',
+                  '2026-08-30T12:00:00Z', '2026-08-30T12:00:00Z')
         """,
         (title,),
     )
@@ -105,7 +106,8 @@ def test_matching_is_idempotent_preserves_review_and_dry_run_is_read_only(connec
         dry_run=False,
         timestamp="2026-09-01T12:00:00Z",
     )
-    assert second.updated == 1
+    assert second.updated == 0
+    assert second.unchanged == 1
     assert (
         connection.execute("SELECT review_status FROM reference_candidates").fetchone()[
             0
@@ -123,6 +125,8 @@ def test_matching_is_idempotent_preserves_review_and_dry_run_is_read_only(connec
         dry_run=True,
         timestamp="2026-09-02T12:00:00Z",
     )
+    assert dry.updated == 0
+    assert dry.unchanged == 1
     assert dry.accepted == 1
     assert connection.total_changes == before
 
@@ -327,7 +331,8 @@ def test_unavailable_video_updates_candidate_and_date_window_is_enforced(connect
             availability_status, first_seen_at, last_seen_at
         ) VALUES ('outside', 'UC1', 'Alpha First Music Bank winner', '',
                   '2026-01-20T00:00:00Z', '', 'public', 1, 'none',
-                  'active', 'now', 'now')
+                  'active',
+                  '2026-08-30T12:00:00Z', '2026-08-30T12:00:00Z')
         """
     )
     connection.commit()
@@ -370,7 +375,8 @@ def test_matching_query_excludes_videos_outside_korean_date_window(connection):
                 duration, privacy_status, embeddable, live_broadcast_state,
                 availability_status, first_seen_at, last_seen_at
             ) VALUES (?, 'UC1', 'Alpha First Music Bank winner', '', ?, '',
-                      'public', 1, 'none', 'active', 'now', 'now')
+                      'public', 1, 'none', 'active',
+                  '2026-08-30T12:00:00Z', '2026-08-30T12:00:00Z')
             """,
             (video_id, published_at),
         )
@@ -402,3 +408,81 @@ def test_local_match_cli_does_not_require_youtube_api_key(config, connection):
     )
     assert result == 0
     assert "dry-run=yes" in output.getvalue()
+
+
+@pytest.mark.parametrize("change", ["cached", "verification", "title", "unavailable"])
+def test_matching_distinguishes_content_from_verification(connection, change):
+    add_match_data(connection)
+
+    def run(dry_run=False):
+        return match_videos(
+            connection,
+            REGISTRY,
+            show=None,
+            min_score=75,
+            limit=None,
+            dry_run=dry_run,
+            timestamp="2026-09-02T12:00:00Z",
+        )
+
+    run()
+    connection.execute("UPDATE reference_candidates SET review_status='approved'")
+    connection.commit()
+    before = dict(connection.execute("SELECT * FROM reference_candidates").fetchone())
+    manifest = approved_document(connection)
+    if change != "cached":
+        connection.execute(
+            "UPDATE youtube_videos SET last_seen_at='2026-09-01T12:00:00Z'"
+        )
+    if change == "title":
+        connection.execute("UPDATE youtube_videos SET title=title || ' encore'")
+    if change == "unavailable":
+        connection.execute(
+            "UPDATE youtube_videos SET availability_status='unavailable'"
+        )
+    connection.commit()
+    changes = connection.total_changes
+    predicted = run(True)
+    assert connection.total_changes == changes
+    actual = run()
+    assert actual == predicted
+    assert actual.updated == int(change in {"title", "unavailable"})
+    assert actual.verification_refreshed == int(change == "verification")
+    after = dict(connection.execute("SELECT * FROM reference_candidates").fetchone())
+    assert after["review_status"] == "approved"
+    if change == "cached":
+        assert after == before
+        assert approved_document(connection) == manifest
+    if change == "verification":
+        assert after["updated_at"] == before["updated_at"]
+        assert after["last_verified_at"] == "2026-09-01T12:00:00Z"
+    assert run().updated == 0
+
+
+def test_changed_match_evidence_stays_out_of_manifest(connection):
+    add_match_data(connection)
+
+    def run():
+        return match_videos(
+            connection,
+            REGISTRY,
+            show=None,
+            min_score=75,
+            limit=None,
+            dry_run=False,
+            timestamp="2026-09-02T12:00:00Z",
+        )
+
+    run()
+    connection.execute("UPDATE reference_candidates SET review_status='approved'")
+    connection.commit()
+    before = approved_document(connection)
+    connection.execute("UPDATE youtube_videos SET description='winner'")
+    connection.commit()
+    assert run().updated == 1
+    assert approved_document(connection) == before
+    evidence = connection.execute(
+        "SELECT reasons FROM youtube_candidate_matches"
+    ).fetchone()
+    assert "win term: winner" in json.loads(evidence["reasons"])
+    assert run().updated == 0

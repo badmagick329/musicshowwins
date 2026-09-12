@@ -43,7 +43,7 @@ class Command(BaseCommand):
             raise CommandError("Invalid JSON input.") from exc
 
         try:
-            created, updated, unchanged = import_document(
+            created, updated, unchanged, verification_refreshed = import_document(
                 document, dry_run=options["dry_run"]
             )
         except ReferenceDocumentError as exc:
@@ -73,5 +73,6 @@ class Command(BaseCommand):
 
         prefix = "Dry run: " if options["dry_run"] else ""
         self.stdout.write(
-            f"{prefix}created {created}, updated {updated}, unchanged {unchanged}."
+            f"{prefix}created {created}, updated {updated}, unchanged {unchanged}, "
+            f"verification refreshed {verification_refreshed}."
         )

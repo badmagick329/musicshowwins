@@ -100,12 +100,12 @@ def load_official_audit_links(path: Path) -> list[OfficialAuditLink]:
 def _candidate_for_entry(
     connection: sqlite3.Connection,
     entry: OfficialAuditLink,
-    timestamp: str,
 ) -> dict:
     row = connection.execute(
         """
         SELECT wins.is_current, video.channel_id, video.channel_title,
                video.title, video.published_at, video.availability_status,
+               video.last_seen_at,
                (
                    SELECT channel.channel_title
                    FROM youtube_channels AS channel
@@ -161,7 +161,7 @@ def _candidate_for_entry(
             "is_official": True,
             "status": row["availability_status"],
             "published_at": row["published_at"],
-            "last_verified_at": timestamp,
+            "last_verified_at": row["last_seen_at"],
             "metadata": {
                 "reddit_audit": {
                     "episode_url": entry.episode_url,
@@ -182,9 +182,7 @@ def import_official_links(
     timestamp: str,
 ) -> ImportCounts:
     selected = entries if limit is None else entries[:limit]
-    candidates = [
-        _candidate_for_entry(connection, entry, timestamp) for entry in selected
-    ]
+    candidates = [_candidate_for_entry(connection, entry) for entry in selected]
     existing: list[bool] = []
     for candidate in candidates:
         row = connection.execute(

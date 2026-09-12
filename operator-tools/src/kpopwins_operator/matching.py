@@ -40,6 +40,8 @@ class MatchCounts:
     accepted: int = 0
     created: int = 0
     updated: int = 0
+    unchanged: int = 0
+    verification_refreshed: int = 0
 
 
 def normalize_text(value: str) -> str:
@@ -126,7 +128,7 @@ def _candidate_values(row: sqlite3.Row, metadata: dict, timestamp: str) -> dict:
         "is_official": 1,
         "status": row["availability_status"],
         "published_at": row["published_at"],
-        "last_verified_at": timestamp,
+        "last_verified_at": row["last_seen_at"],
         "metadata": json.dumps(metadata, ensure_ascii=False, sort_keys=True),
         "timestamp": timestamp,
     }
@@ -149,22 +151,38 @@ def match_videos(
         )
     if show and show not in by_show:
         raise ValueError(f"Unknown show slug: {show}.")
-    if not dry_run:
-        with connection:
-            connection.execute(
-                """
-                UPDATE reference_candidates SET
-                    status = (SELECT availability_status FROM youtube_videos
-                              WHERE video_id = reference_candidates.external_id),
-                    updated_at = ?
-                WHERE provider = 'youtube'
-                  AND EXISTS (SELECT 1 FROM youtube_videos
-                              WHERE video_id = reference_candidates.external_id)
-                  AND status <> (SELECT availability_status FROM youtube_videos
-                                 WHERE video_id = reference_candidates.external_id)
-                """,
-                (timestamp,),
-            )
+    updated_ids: set[int] = set()
+    refreshed_ids: set[int] = set()
+    # Availability checks apply even when a video no longer passes match scoring.
+    for candidate in connection.execute(
+        """SELECT candidate.id, candidate.status, candidate.last_verified_at,
+                  video.availability_status, video.last_seen_at
+           FROM reference_candidates AS candidate
+           JOIN youtube_videos AS video ON video.video_id = candidate.external_id
+           WHERE candidate.provider = 'youtube'"""
+    ).fetchall():
+        status_changed = candidate["status"] != candidate["availability_status"]
+        verified_changed = candidate["last_verified_at"] != candidate["last_seen_at"]
+        if not status_changed and not verified_changed:
+            continue
+        if status_changed:
+            updated_ids.add(candidate["id"])
+        else:
+            refreshed_ids.add(candidate["id"])
+        if not dry_run:
+            with connection:
+                connection.execute(
+                    """UPDATE reference_candidates SET status = ?, last_verified_at = ?,
+                       updated_at = CASE WHEN ? THEN ? ELSE updated_at END
+                       WHERE id = ?""",
+                    (
+                        candidate["availability_status"],
+                        candidate["last_seen_at"],
+                        status_changed,
+                        timestamp,
+                        candidate["id"],
+                    ),
+                )
     sql = """
         SELECT DISTINCT wins.show_slug, wins.win_date,
                wins.artist_name, wins.song_title,
@@ -208,18 +226,12 @@ def match_videos(
         counts.accepted += 1
         existing = connection.execute(
             """
-            SELECT id, metadata FROM reference_candidates
+            SELECT * FROM reference_candidates
             WHERE show_slug = ? AND win_date = ? AND provider = 'youtube'
               AND external_id = ?
             """,
             (row["show_slug"], row["win_date"], row["video_id"]),
         ).fetchone()
-        if dry_run:
-            if existing:
-                counts.updated += 1
-            else:
-                counts.created += 1
-            continue
         metadata = {
             **(json.loads(existing["metadata"]) if existing else {}),
             "youtube_match": {
@@ -230,6 +242,26 @@ def match_videos(
             },
         }
         values = _candidate_values(row, metadata, timestamp)
+        content_changed = existing is None or any(
+            (
+                json.loads(existing[field]) != metadata
+                if field == "metadata"
+                else existing[field] != value
+            )
+            for field, value in values.items()
+            if field not in {"timestamp", "last_verified_at"}
+        )
+        if existing and not content_changed:
+            if existing["id"] not in updated_ids | refreshed_ids:
+                counts.unchanged += 1
+            continue
+        if existing:
+            updated_ids.add(existing["id"])
+            refreshed_ids.discard(existing["id"])
+        if dry_run:
+            if not existing:
+                counts.created += 1
+            continue
         with connection:
             if existing:
                 candidate_id = existing["id"]
@@ -247,7 +279,6 @@ def match_videos(
                     """,
                     {**values, "candidate_id": candidate_id},
                 )
-                counts.updated += 1
             else:
                 cursor = connection.execute(
                     """
@@ -291,4 +322,6 @@ def match_videos(
                     timestamp,
                 ),
             )
+    counts.updated = len(updated_ids)
+    counts.verification_refreshed = len(refreshed_ids - updated_ids)
     return counts
