@@ -11,7 +11,11 @@ export async function browserRequestPage<T>(path: string, params?: ApiParams, si
   return parseApiPage<T>(await requestJson<unknown>(buildBrowserApiUrl(path, params), signal));
 }
 
-export const browserTransport: ApiTransport = { requestPage: browserRequestPage };
+export function browserRequestDetail<T>(path: string, signal?: AbortSignal) {
+  return requestJson<T>(buildBrowserApiUrl(path), signal);
+}
+
+export const browserTransport: ApiTransport = { requestPage: browserRequestPage, requestDetail: browserRequestDetail };
 
 export async function submitCorrection(report: CorrectionReport) {
   const response = await fetch(buildBrowserApiUrl("/corrections"), {

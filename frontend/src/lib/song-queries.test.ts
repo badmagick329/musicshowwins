@@ -14,7 +14,7 @@ describe("song queries", () => {
 
   it("passes the API parameters and AbortSignal to the transport", async () => {
     const signal = new AbortController().signal;
-    const transport: ApiTransport = { requestPage: vi.fn(async () => ({ count: 0, next: null, previous: null, results: [] })) };
+    const transport: ApiTransport = { requestPage: vi.fn(async () => ({ count: 0, next: null, previous: null, results: [] })), requestDetail: vi.fn() };
     const filters = { search: "ive", sort: "artist" as const, page: 2 };
     const queryFn = songsQueryOptions(filters, transport).queryFn;
     if (!queryFn) throw new Error("Expected songs query function");

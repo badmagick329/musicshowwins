@@ -78,6 +78,15 @@ describe("page metadata", () => {
     });
   });
 
+  it("preserves the homepage title for all-time alone and labels an all-time search", async () => {
+    const allTime = await homeMetadata({ searchParams: Promise.resolve({ rankings: "all-time" }) });
+    expect(allTime).toMatchObject({ alternates: { canonical: "/" }, robots: { index: false, follow: true } });
+    expect(allTime.title).toBeUndefined();
+
+    const search = await homeMetadata({ searchParams: Promise.resolve({ rankings: "all-time", search: "aespa" }) });
+    expect(search).toMatchObject({ title: "Artist search results", alternates: { canonical: "/" }, robots: { index: false, follow: true } });
+  });
+
   it("sets artist and song detail titles without duplicate branding", async () => {
     const artist = await artistMetadata({ params: Promise.resolve({ id: "3" }) });
     const song = await songMetadata({ params: Promise.resolve({ id: "7" }) });

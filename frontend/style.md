@@ -172,6 +172,7 @@ The persistent navigation should contain:
 - Home;
 - Artists;
 - Songs;
+- Rankings;
 - Wins;
 - Shows;
 - About.
@@ -182,9 +183,9 @@ tables and lists.
 The homepage should provide a balanced overview rather than one dominant hero:
 
 - a prominent global search entry;
+- a prominent link to current-year rankings in the intro;
+- shared-period previews of the artist and song rankings;
 - recent wins;
-- a preview of the artist leaderboard;
-- a preview of the song leaderboard;
 - a clear list of the music shows covered by the archive.
 
 Use cards only when they create meaningful grouping. Prefer section bands,

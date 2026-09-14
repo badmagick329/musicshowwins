@@ -13,12 +13,12 @@ const now = new Date("2026-08-30T00:00:00Z");
 
 describe("wins filters", () => {
   it("uses safe defaults", () => {
-    expect(defaultWinsFilters()).toEqual({ search: "", show: "", year: undefined, dateFrom: "", dateTo: "", ordering: "-date", page: 1 });
+    expect(defaultWinsFilters()).toEqual({ search: "", artist: "", song: "", show: "", year: undefined, dateFrom: "", dateTo: "", ordering: "-date", page: 1 });
     expect(parseWinsFilters({}, now)).toEqual(defaultWinsFilters());
   });
 
   it("parses every supported URL parameter", () => {
-    expect(parseWinsFilters({ search: "  ive ", show: "music-bank", year: "2025", date_from: "2025-01-01", date_to: "2025-02-01", ordering: "date", page: "3" }, now)).toEqual({ search: "ive", show: "music-bank", year: 2025, dateFrom: "2025-01-01", dateTo: "2025-02-01", ordering: "date", page: 3 });
+    expect(parseWinsFilters({ search: "  ive ", artist: "7", song: "9", show: "music-bank", year: "2025", date_from: "2025-01-01", date_to: "2025-02-01", ordering: "date", page: "3" }, now)).toEqual({ search: "ive", artist: "7", song: "9", show: "music-bank", year: 2025, dateFrom: "2025-01-01", dateTo: "2025-02-01", ordering: "date", page: 3 });
   });
 
   it("drops invalid year, page, dates, and ordering values", () => {
