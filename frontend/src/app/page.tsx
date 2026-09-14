@@ -1,4 +1,5 @@
 import { ArtistSearch } from "@/components/artist-search";
+import { TopWinsThisYearLink } from "@/components/top-wins-this-year-link";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { JsonLd } from "@/components/json-ld";
@@ -54,7 +55,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ s
           <div className="max-w-3xl">
             <h1 className="font-heading text-4xl font-bold leading-[1.04] tracking-tight text-surface-berry-foreground sm:text-[44px]">K-pop music show wins &amp; artist rankings</h1>
             <p className="mt-5 max-w-2xl text-base leading-relaxed text-surface-berry-foreground/80 sm:text-lg">{siteDescription}</p>
-            <Link href="/rankings" className="mt-6 inline-flex min-h-11 items-center border-2 border-surface-berry-foreground bg-highlight-yellow px-4 text-sm font-bold text-foreground shadow-[3px_3px_0_var(--section-ink)] transition-transform hover:-translate-y-0.5">Top wins this year →</Link>
+            <TopWinsThisYearLink />
             <p className="mt-3 text-sm text-surface-berry-foreground/80">See the songs and artists with the most music-show wins in {year}.</p>
           </div>
         </section>
