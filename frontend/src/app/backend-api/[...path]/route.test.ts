@@ -13,6 +13,18 @@ function context(...path: string[]) {
 }
 
 describe("backend API proxy", () => {
+  it("uses the server API default for browser requests when no URL is configured", async () => {
+    vi.stubEnv("DJANGO_API_BASE_URL", "");
+    const fetchMock = vi.fn(async (input: string | URL | Request) => {
+      void input;
+      return new Response('{"count":0,"next":null,"previous":null,"results":[]}', { headers: { "Content-Type": "application/json" } });
+    });
+    vi.stubGlobal("fetch", fetchMock);
+    const response = await GET(new NextRequest("http://localhost:3000/backend-api/leaderboards/artists?date_from=2026-01-01"), context("leaderboards", "artists"));
+    expect(response.status).toBe(200);
+    expect(String(fetchMock.mock.calls[0]?.[0])).toBe("http://127.0.0.1:8000/api/v1/leaderboards/artists?date_from=2026-01-01");
+  });
+
   it("proxies GET requests with query strings and preserves status and content type", async () => {
     vi.stubEnv("DJANGO_API_BASE_URL", "http://backend:8000/api/v1");
     vi.stubEnv("INTERNAL_API_SECRET", "internal-secret");

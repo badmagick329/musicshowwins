@@ -106,6 +106,7 @@ export async function requestJson<T>(url: string, signal?: AbortSignal, options:
 
 export type ApiTransport = {
   requestPage<T>(path: string, params?: ApiParams, signal?: AbortSignal): Promise<ApiPage<T>>;
+  requestDetail<T>(path: string, signal?: AbortSignal): Promise<T>;
 };
 
 export function parsePositivePage(value: string | string[] | undefined) {

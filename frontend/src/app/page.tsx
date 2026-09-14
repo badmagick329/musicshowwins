@@ -10,23 +10,30 @@ import {
   SectionHeading,
 } from "@/components/data-display";
 import { getHomeData } from "@/lib/api";
+import { archiveToday } from "@/lib/rankings";
 import { noIndexFollow, siteDescription, siteUrl } from "@/lib/seo";
 
-export async function generateMetadata({ searchParams }: { searchParams: Promise<{ search?: string | string[] }> }): Promise<Metadata> {
-  const search = (await searchParams).search;
-  if (typeof search !== "string" || !search.trim()) return { alternates: { canonical: "/" } };
+export async function generateMetadata({ searchParams }: { searchParams: Promise<{ search?: string | string[]; rankings?: string | string[] }> }): Promise<Metadata> {
+  const { search, rankings } = await searchParams;
+  const hasSearch = typeof search === "string" && Boolean(search.trim());
+  if (!hasSearch && rankings !== "all-time") return { alternates: { canonical: "/" } };
   return {
-    title: "Artist search results",
-    description: siteDescription,
+    ...(hasSearch ? { title: "Artist search results", description: siteDescription } : {}),
     alternates: { canonical: "/" },
     robots: noIndexFollow,
   };
 }
 
-export default async function Home({ searchParams }: { searchParams: Promise<{ search?: string }> }) {
+export default async function Home({ searchParams }: { searchParams: Promise<{ search?: string; rankings?: string }> }) {
   const params = await searchParams;
   const query = typeof params.search === "string" ? params.search : "";
-  const data = await getHomeData(query);
+  const period = params.rankings === "all-time" ? "all-time" : "year";
+  const today = archiveToday();
+  const year = today.slice(0, 4);
+  const searchParam = query.trim() ? `search=${encodeURIComponent(query.trim())}` : "";
+  const thisYearHref = searchParam ? `/?${searchParam}` : "/";
+  const allTimeHref = `/?${searchParam ? `${searchParam}&` : ""}rankings=all-time`;
+  const data = await getHomeData(query, period, today);
 
   return (
     <>
@@ -47,6 +54,8 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ s
           <div className="max-w-3xl">
             <h1 className="font-heading text-4xl font-bold leading-[1.04] tracking-tight text-surface-berry-foreground sm:text-[44px]">K-pop music show wins &amp; artist rankings</h1>
             <p className="mt-5 max-w-2xl text-base leading-relaxed text-surface-berry-foreground/80 sm:text-lg">{siteDescription}</p>
+            <Link href="/rankings" className="mt-6 inline-flex min-h-11 items-center border-2 border-surface-berry-foreground bg-highlight-yellow px-4 text-sm font-bold text-foreground shadow-[3px_3px_0_var(--section-ink)] transition-transform hover:-translate-y-0.5">Top wins this year →</Link>
+            <p className="mt-3 text-sm text-surface-berry-foreground/80">See the songs and artists with the most music-show wins in {year}.</p>
           </div>
         </section>
 
@@ -55,14 +64,14 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ s
         </div>
         <ErrorState messages={data.errors} />
 
-        <section id="wins" className="mt-14">
-          <SectionHeading title="Recent wins" action={<Link href="/wins" className="compact-link-target text-sm font-bold text-link-pink">View all wins</Link>} />
-          <RecentWins wins={data.wins} />
-        </section>
-
-        <div className="mt-14 grid gap-12 lg:grid-cols-2">
+        <section className="mt-14" aria-labelledby="home-rankings-title">
+          <div className="mb-5 flex flex-wrap items-center justify-between gap-3 border-b-2 border-foreground pb-3">
+            <h2 id="home-rankings-title" className="font-heading text-xl font-bold tracking-tight sm:text-2xl">Most wins {period === "year" ? `in ${year}` : "of all time"}</h2>
+            <div role="group" aria-label="Leaderboard period" className="flex border-2 border-foreground bg-card text-sm font-bold"><Link href={thisYearHref} aria-current={period === "year" ? "page" : undefined} className={`inline-flex min-h-11 items-center px-4 ${period === "year" ? "bg-action-pink text-white" : "hover:bg-accent"}`}>This year</Link><Link href={allTimeHref} aria-current={period === "all-time" ? "page" : undefined} className={`inline-flex min-h-11 items-center px-4 ${period === "all-time" ? "bg-action-pink text-white" : "hover:bg-accent"}`}>All time</Link></div>
+          </div>
+          <div className="grid gap-12 lg:grid-cols-2">
           <section id="artists">
-            <SectionHeading title="Artist leaderboard" action={<Link href="/artists" className="compact-link-target text-sm font-bold text-link-pink">All artists</Link>} />
+            <SectionHeading level={3} title="Artists" action={<Link href={period === "year" ? "/rankings?kind=artists" : "/rankings?kind=artists&period=all-time"} className="compact-link-target text-sm font-bold text-link-pink">Full artist rankings →</Link>} />
             <Leaderboard
               rows={data.artists}
               kind="artist"
@@ -70,14 +79,20 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ s
             />
           </section>
           <section id="songs">
-            <SectionHeading title="Song leaderboard" action={<Link href="/songs" className="compact-link-target text-sm font-bold text-link-pink">All songs</Link>} />
+            <SectionHeading level={3} title="Songs" action={<Link href={period === "year" ? "/rankings" : "/rankings?period=all-time"} className="compact-link-target text-sm font-bold text-link-pink">Full song rankings →</Link>} />
             <Leaderboard
               rows={data.songs}
               kind="song"
               empty="No song rankings are available right now."
             />
           </section>
-        </div>
+          </div>
+        </section>
+
+        <section id="wins" className="mt-14">
+          <SectionHeading title="Recent wins" action={<Link href="/wins" className="compact-link-target text-sm font-bold text-link-pink">View all wins</Link>} />
+          <RecentWins wins={data.wins} />
+        </section>
 
         <section id="shows" className="mt-14">
           <SectionHeading title="Music shows" action={<Link href="/shows" className="compact-link-target text-sm font-bold text-link-pink">All shows</Link>} />

@@ -13,10 +13,11 @@ import {
   winsUrl,
   hasActiveWinsFilters,
   winsDateRangeError,
+  winsDetailId,
   type WinsFilters,
 } from "@/lib/wins-filters";
 import { clearWinsNavigation, winsFiltersFromSearchParams, writeWinsHistory } from "@/lib/wins-navigation";
-import { showsQueryOptions, winsQueryOptions } from "@/lib/wins-queries";
+import { selectedArtistQueryOptions, selectedSongQueryOptions, showsQueryOptions, winsQueryOptions } from "@/lib/wins-queries";
 import { archivePageCount } from "@/lib/pagination";
 import { usePaginationScroll } from "@/lib/use-pagination-scroll";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -78,8 +79,12 @@ export function WinsExplorer() {
   const filtersRef = useRef(filters);
   useEffect(() => { filtersRef.current = filters; }, [filters]);
   const dateRangeError = winsDateRangeError(filters);
+  const artistId = winsDetailId(filters.artist);
+  const songId = winsDetailId(filters.song);
   const shows = useQuery(showsQueryOptions(browserTransport));
   const wins = useQuery({ ...winsQueryOptions(filters, browserTransport), enabled: !dateRangeError, placeholderData: keepPreviousData });
+  const selectedArtist = useQuery({ ...selectedArtistQueryOptions(artistId, browserTransport), enabled: Boolean(artistId) });
+  const selectedSong = useQuery({ ...selectedSongQueryOptions(songId, browserTransport), enabled: Boolean(songId) });
   const { requestPaginationScroll, cancelPaginationScroll } = usePaginationScroll(filters.page, Boolean(wins.data) && !wins.isPlaceholderData && !wins.isFetching, "wins-results-title");
   const write = useCallback((update: Partial<WinsFilters>, mode: "push" | "replace" = "push") => writeWinsHistory(filtersRef.current, update, mode), []);
   const apply = useCallback((update: Partial<WinsFilters>) => { cancelPaginationScroll(); return write(update); }, [cancelPaginationScroll, write]);
@@ -118,7 +123,7 @@ export function WinsExplorer() {
             </select>
           </label>
           <label className="text-sm font-bold">Year
-            <select value={filters.year ?? ""} onChange={(event) => apply({ year: event.target.value ? Number(event.target.value) : undefined })} className="mt-1 min-h-11 w-full border-2 border-foreground bg-card px-3 font-normal">
+            <select value={filters.year ?? ""} onChange={(event) => apply({ year: event.target.value ? Number(event.target.value) : undefined, dateFrom: "", dateTo: "" })} className="mt-1 min-h-11 w-full border-2 border-foreground bg-card px-3 font-normal">
               <option value="">All years</option>
               {archiveYears().map((year) => <option key={year} value={year}>{year}</option>)}
             </select>
@@ -129,16 +134,20 @@ export function WinsExplorer() {
             </select>
           </label>
           <label className="text-sm font-bold">Date from
-            <input type="date" value={filters.dateFrom} onChange={(event) => apply({ dateFrom: event.target.value })} className="mt-1 min-h-11 w-full border-2 border-foreground bg-card px-3 font-normal tabular-nums" />
+            <input type="date" value={filters.dateFrom} onChange={(event) => apply({ dateFrom: event.target.value, year: undefined })} className="mt-1 min-h-11 w-full border-2 border-foreground bg-card px-3 font-normal tabular-nums" />
           </label>
           <label className="text-sm font-bold">Date to
-            <input type="date" value={filters.dateTo} onChange={(event) => apply({ dateTo: event.target.value })} className="mt-1 min-h-11 w-full border-2 border-foreground bg-card px-3 font-normal tabular-nums" />
+            <input type="date" value={filters.dateTo} onChange={(event) => apply({ dateTo: event.target.value, year: undefined })} className="mt-1 min-h-11 w-full border-2 border-foreground bg-card px-3 font-normal tabular-nums" />
           </label>
           <div className="flex items-end">
             {activeFilters && <button type="button" onClick={clearFilters} className="min-h-11 border-2 border-foreground bg-card px-4 text-sm font-bold shadow-[2px_2px_0_var(--foreground)] transition-transform hover:-translate-y-0.5">Clear filters</button>}
           </div>
         </div>
         {shows.isError && <p role="status" className="mt-3 text-sm text-destructive">The music show filter couldn&apos;t load. The other filters still work.</p>}
+        {(filters.artist || filters.song) && <div aria-live="polite" className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
+          {filters.artist && <span>Artist: {artistId ? selectedArtist.data?.name ?? (selectedArtist.isError ? "Unavailable" : "Loading…") : filters.artist} <button type="button" onClick={() => apply({ artist: "" })} className="font-bold underline underline-offset-4">Clear artist filter</button></span>}
+          {filters.song && <span>Song: {songId ? selectedSong.data ? <>“{selectedSong.data.title}” by {selectedSong.data.artist.name}</> : selectedSong.isError ? "Unavailable" : "Loading…" : `“${filters.song}”`} <button type="button" onClick={() => apply({ song: "" })} className="font-bold underline underline-offset-4">Clear song filter</button></span>}
+        </div>}
         {dateRangeError && <p role="alert" className="mt-3 border-l-4 border-destructive bg-danger-surface px-3 py-2 text-sm">{dateRangeError}</p>}
       </section>
 

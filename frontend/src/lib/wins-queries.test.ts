@@ -18,7 +18,7 @@ describe("wins queries", () => {
 
   it("forwards TanStack Query abort signals to the transport", async () => {
     const signal = new AbortController().signal;
-    const transport: ApiTransport = { requestPage: vi.fn(async () => ({ count: 0, next: null, previous: null, results: [] })) };
+    const transport: ApiTransport = { requestPage: vi.fn(async () => ({ count: 0, next: null, previous: null, results: [] })), requestDetail: vi.fn() };
     const queryFn = winsQueryOptions(defaultWinsFilters(), transport).queryFn;
     if (!queryFn) throw new Error("Expected wins query function");
     await queryFn({ queryKey: queryKeys.wins.list(defaultWinsFilters()), signal, meta: undefined, client: new QueryClient() });
@@ -39,8 +39,8 @@ describe("wins queries", () => {
     const response = { count: 1, next: null, previous: null, results: [{ id: 1 }] };
     const serverRequest = vi.fn(async () => response);
     const browserRequest = vi.fn(async () => response);
-    const server: ApiTransport = { requestPage: serverRequest as ApiTransport["requestPage"] };
-    const browser: ApiTransport = { requestPage: browserRequest as ApiTransport["requestPage"] };
+    const server: ApiTransport = { requestPage: serverRequest as ApiTransport["requestPage"], requestDetail: vi.fn() };
+    const browser: ApiTransport = { requestPage: browserRequest as ApiTransport["requestPage"], requestDetail: vi.fn() };
     const serverClient = new QueryClient({ defaultOptions: { queries: { staleTime: archiveStaleTime } } });
     await serverClient.prefetchQuery(winsQueryOptions(defaultWinsFilters(), server));
     const client = new QueryClient({ defaultOptions: { queries: { staleTime: archiveStaleTime } } });
@@ -57,7 +57,7 @@ describe("wins queries", () => {
   });
 
   it("uses the show-list query key independently", () => {
-    const transport: ApiTransport = { requestPage: vi.fn() };
+    const transport: ApiTransport = { requestPage: vi.fn(), requestDetail: vi.fn() };
     expect(showsQueryOptions(transport).queryKey).toEqual(["shows"]);
   });
 });

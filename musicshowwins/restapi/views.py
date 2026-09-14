@@ -98,6 +98,8 @@ def filters(request):
     year = _year(params.get("year"))
     date_from = _date(params.get("date_from"), "date_from")
     date_to = _date(params.get("date_to"), "date_to")
+    if year is not None and (date_from or date_to):
+        raise ValidationError({"year": "Choose a year or a date range, not both."})
     if date_from and date_to and date_from > date_to:
         raise ValidationError({"date_range": "date_from cannot be after date_to."})
     return {
@@ -268,12 +270,21 @@ class LeaderboardList(generics.ListAPIView):
     def get_queryset(self):
         params = self.request.query_params
         year = _year(params.get("year"))
-        limit = _integer(params.get("limit"), "limit", minimum=1, maximum=1000) or 100
-        return leaderboard_queryset(
+        date_from = _date(params.get("date_from"), "date_from")
+        date_to = _date(params.get("date_to"), "date_to")
+        if year is not None and (date_from or date_to):
+            raise ValidationError({"year": "Choose a year or a date range, not both."})
+        if date_from and date_to and date_from > date_to:
+            raise ValidationError({"date_range": "date_from cannot be after date_to."})
+        limit = _integer(params.get("limit"), "limit", minimum=1, maximum=1000)
+        query = leaderboard_queryset(
             self.leaderboard_kind,
             year=year,
             show=params.get("show", "").strip(),
-        )[:limit]
+            date_from=date_from,
+            date_to=date_to,
+        )
+        return query[:limit] if limit is not None else query
 
 
 class ArtistLeaderboard(LeaderboardList):

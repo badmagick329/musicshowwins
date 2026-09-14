@@ -1,11 +1,10 @@
 import type { NextRequest } from "next/server";
-import { publicArchiveCacheTag, publicArchiveRevalidateSeconds } from "@/lib/api-server";
+import { getServerApiBaseUrl, publicArchiveCacheTag, publicArchiveRevalidateSeconds } from "@/lib/api-server";
 
 type RouteContext = { params: Promise<{ path: string[] }> };
 
 function upstreamUrl(request: NextRequest, path: string[]) {
-  const configured = process.env.DJANGO_API_BASE_URL;
-  if (!configured) throw new Error("Backend is unavailable");
+  const configured = getServerApiBaseUrl();
   const base = new URL(configured.endsWith("/") ? configured : `${configured}/`);
   if (base.protocol !== "http:" && base.protocol !== "https:") {
     throw new Error("Backend is unavailable");
@@ -17,8 +16,7 @@ function upstreamUrl(request: NextRequest, path: string[]) {
 }
 
 function sanitizedText(value: string) {
-  const configured = process.env.DJANGO_API_BASE_URL;
-  if (!configured) return value;
+  const configured = getServerApiBaseUrl();
   const base = new URL(configured.endsWith("/") ? configured.slice(0, -1) : configured);
   const basePath = base.pathname.replace(/\/$/, "");
   let result = value;

@@ -7,7 +7,15 @@ import requests
 from django.apps import apps
 from django.conf import settings
 from django.core.cache import cache
-from main.models import Artist, ArtistAlias, MusicShow, Song, Win, WinReference
+from main.models import (
+    Artist,
+    ArtistAlias,
+    ImportIssue,
+    MusicShow,
+    Song,
+    Win,
+    WinReference,
+)
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.test import APIClient
 
@@ -309,6 +317,87 @@ def test_leaderboards_are_dense_ranked_and_year_filtered(archive):
     assert [row["rank"] for row in artists] == [1, 1, 2]
     assert [row["wins"] for row in artists] == [2, 2, 1]
     assert [row["wins"] for row in songs] == [2, 1, 1]
+
+
+@pytest.mark.django_db
+def test_rankings_date_bounds_ties_pagination_and_exact_drill_down(
+    archive, monkeypatch
+):
+    show, alpha, beta, first, second = archive
+    other_show = MusicShow.objects.create(slug="inkigayo", name="Inkigayo")
+    Win.objects.create(show=other_show, song=first, date=date(2025, 1, 2))
+    Win.objects.create(show=other_show, song=second, date=date(2025, 1, 3))
+    third_artist = Artist.objects.create(name="Gamma")
+    third_song = Song.objects.create(artist=third_artist, title="Third")
+    Win.objects.create(show=show, song=third_song, date=date(2025, 1, 3))
+    ImportIssue.objects.create(
+        issue_type=ImportIssue.IssueType.LEGACY_UNDATED,
+        candidate={"artist": alpha.name, "song": first.title, "wins": 99},
+    )
+    client = APIClient()
+
+    params = {"date_from": "2025-01-01", "date_to": "2025-01-02"}
+    songs = client.get("/api/v1/leaderboards/songs", params).data["results"]
+    assert [(row["song"]["id"], row["wins"], row["rank"]) for row in songs] == [
+        (first.pk, 2, 1),
+        (second.pk, 1, 2),
+    ]
+    artists = client.get("/api/v1/leaderboards/artists", params).data["results"]
+    assert [(row["artist"]["id"], row["wins"]) for row in artists] == [
+        (alpha.pk, 2),
+        (beta.pk, 1),
+    ]
+    one_day = {"date_from": "2025-01-03", "date_to": "2025-01-03"}
+    previous_year = {"date_from": "2024-01-01", "date_to": "2024-12-31"}
+    assert client.get("/api/v1/leaderboards/songs", one_day).data["count"] == 2
+    assert (
+        client.get("/api/v1/leaderboards/songs", previous_year).data["results"][0][
+            "wins"
+        ]
+        == 1
+    )
+    assert client.get("/api/v1/leaderboards/songs").data["results"][0]["wins"] == 3
+
+    tie_period = {"date_from": "2025-01-01", "date_to": "2025-01-03"}
+    tied = client.get("/api/v1/leaderboards/songs", tie_period).data["results"]
+    assert [(row["wins"], row["rank"]) for row in tied] == [(2, 1), (2, 1), (1, 2)]
+    monkeypatch.setattr(PageNumberPagination, "page_size", 1)
+    second_page = client.get(
+        "/api/v1/leaderboards/songs", {**tie_period, "page": 2}
+    ).data
+    assert second_page["count"] == 3
+    assert second_page["results"][0]["rank"] == 1
+    third_page = client.get(
+        "/api/v1/leaderboards/songs", {**tie_period, "page": 3}
+    ).data
+    assert third_page["results"][0]["rank"] == 2
+
+    exact = client.get(
+        "/api/v1/wins", {"artist": alpha.pk, "song": first.pk, **params}
+    ).data
+    assert exact["count"] == 2
+    assert {row["song"]["id"] for row in exact["results"]} == {first.pk}
+    mismatch = client.get(
+        "/api/v1/wins", {"artist": beta.pk, "song": first.pk, **params}
+    ).data
+    assert mismatch["count"] == 0
+    cache.clear()
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "params,field",
+    [
+        ({"date_from": "2025-02-30"}, "date_from"),
+        ({"date_from": "2025-02-02", "date_to": "2025-02-01"}, "date_range"),
+        ({"year": "2025", "date_from": "2025-01-01"}, "year"),
+    ],
+)
+def test_rankings_reject_invalid_periods(archive, params, field):
+    response = APIClient().get("/api/v1/leaderboards/songs", params)
+    assert response.status_code == 400
+    assert field in response.data
+    cache.clear()
 
 
 @pytest.mark.django_db

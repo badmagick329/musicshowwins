@@ -5,6 +5,8 @@ export const winsOrderings = ["-date", "date"] as const;
 export type WinsOrdering = (typeof winsOrderings)[number];
 export type WinsFilters = {
   search: string;
+  artist: string;
+  song: string;
   show: string;
   year?: number;
   dateFrom: string;
@@ -19,7 +21,7 @@ export function currentArchiveYear(now = new Date()) {
 }
 
 export function defaultWinsFilters(): WinsFilters {
-  return { search: "", show: "", year: undefined, dateFrom: "", dateTo: "", ordering: "-date", page: 1 };
+  return { search: "", artist: "", song: "", show: "", year: undefined, dateFrom: "", dateTo: "", ordering: "-date", page: 1 };
 }
 
 function single(value: string | string[] | undefined) {
@@ -37,6 +39,8 @@ export function normalizeWinsFilters(filters: Partial<WinsFilters>, now = new Da
   const year = typeof filters.year === "number" && Number.isInteger(filters.year) && filters.year >= archiveStartYear && filters.year <= currentArchiveYear(now) ? filters.year : undefined;
   return {
     search: typeof filters.search === "string" ? filters.search.trim() : defaults.search,
+    artist: typeof filters.artist === "string" ? filters.artist.trim() : defaults.artist,
+    song: typeof filters.song === "string" ? filters.song.trim() : defaults.song,
     show: typeof filters.show === "string" ? filters.show.trim() : defaults.show,
     year,
     dateFrom: validDate(filters.dateFrom),
@@ -50,6 +54,8 @@ export function parseWinsFilters(params: WinsSearchParams, now = new Date()) {
   const rawYear = single(params.year);
   return normalizeWinsFilters({
     search: single(params.search),
+    artist: single(params.artist),
+    song: single(params.song),
     show: single(params.show),
     year: rawYear && /^\d{4}$/.test(rawYear) ? Number(rawYear) : undefined,
     dateFrom: single(params.date_from),
@@ -65,9 +71,16 @@ export function winsDateRangeError(filters: WinsFilters) {
     : null;
 }
 
+export function winsDetailId(value: string) {
+  if (!/^[1-9]\d*$/.test(value)) return "";
+  return Number.isSafeInteger(Number(value)) ? value : "";
+}
+
 export function winsApiParams(filters: WinsFilters) {
   return {
     search: filters.search || undefined,
+    artist: filters.artist || undefined,
+    song: filters.song || undefined,
     show: filters.show || undefined,
     year: filters.year,
     date_from: filters.dateFrom || undefined,
@@ -81,6 +94,8 @@ export function serializeWinsFilters(filters: WinsFilters) {
   const normalized = normalizeWinsFilters(filters);
   const params = new URLSearchParams();
   if (normalized.search) params.set("search", normalized.search);
+  if (normalized.artist) params.set("artist", normalized.artist);
+  if (normalized.song) params.set("song", normalized.song);
   if (normalized.show) params.set("show", normalized.show);
   if (normalized.year) params.set("year", String(normalized.year));
   if (normalized.dateFrom) params.set("date_from", normalized.dateFrom);
@@ -98,14 +113,14 @@ export function winsUrl(filters: WinsFilters) {
 export function updateWinsFilters(filters: WinsFilters, update: Partial<WinsFilters>) {
   const current = normalizeWinsFilters(filters);
   const candidate = normalizeWinsFilters({ ...current, ...update, page: update.page ?? current.page });
-  const responseChangingKeys: (keyof WinsFilters)[] = ["search", "show", "year", "dateFrom", "dateTo", "ordering"];
+  const responseChangingKeys: (keyof WinsFilters)[] = ["search", "artist", "song", "show", "year", "dateFrom", "dateTo", "ordering"];
   const resetPage = responseChangingKeys.some((key) => candidate[key] !== current[key]);
   return { ...candidate, page: resetPage ? 1 : candidate.page };
 }
 
 export function hasActiveWinsFilters(filters: WinsFilters) {
   const defaults = defaultWinsFilters();
-  return filters.search !== defaults.search || filters.show !== defaults.show || filters.year !== defaults.year || filters.dateFrom !== defaults.dateFrom || filters.dateTo !== defaults.dateTo || filters.ordering !== defaults.ordering;
+  return filters.search !== defaults.search || filters.artist !== defaults.artist || filters.song !== defaults.song || filters.show !== defaults.show || filters.year !== defaults.year || filters.dateFrom !== defaults.dateFrom || filters.dateTo !== defaults.dateTo || filters.ordering !== defaults.ordering;
 }
 
 export function archiveYears(now = new Date()) {

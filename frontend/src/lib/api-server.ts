@@ -1,5 +1,6 @@
 import "server-only";
 import { artistOrderings, type ArtistSort } from "@/lib/artist-list";
+import { archiveToday } from "@/lib/rankings";
 import {
   buildApiUrl,
   parseApiPage,
@@ -35,7 +36,7 @@ function publicArchiveRequestOptions() {
 }
 
 export function getServerApiBaseUrl() {
-  return (process.env.DJANGO_API_BASE_URL ?? defaultBaseUrl).replace(/\/$/, "");
+  return (process.env.DJANGO_API_BASE_URL || defaultBaseUrl).replace(/\/$/, "");
 }
 
 export function buildServerApiUrl(path: string, params: ApiParams = {}) {
@@ -46,7 +47,7 @@ export async function serverRequestPage<T>(path: string, params?: ApiParams, sig
   return parseApiPage<T>(await requestJson<unknown>(buildServerApiUrl(path, params), signal, publicArchiveRequestOptions()));
 }
 
-export const serverTransport: ApiTransport = { requestPage: serverRequestPage };
+export const serverTransport: ApiTransport = { requestPage: serverRequestPage, requestDetail: serverRequestJson };
 
 async function serverRequestJson<T>(path: string, signal?: AbortSignal) {
   return requestJson<T>(buildServerApiUrl(path), signal, publicArchiveRequestOptions());
@@ -90,9 +91,11 @@ export const getAllSongWins = (id: number) => collectPages<Win>("/wins", { song:
 export const getShows = () => serverRequestPage<Show>("/shows");
 
 export async function warmCanonicalArchivePages() {
+  const today = archiveToday();
+  const currentYear = today.slice(0, 4);
   await Promise.all([
-    serverRequestPage<ArtistLeaderboardRow>("/leaderboards/artists", { limit: 5 }),
-    serverRequestPage<SongLeaderboardRow>("/leaderboards/songs", { limit: 5 }),
+    serverRequestPage<ArtistLeaderboardRow>("/leaderboards/artists", { limit: 5, date_from: `${currentYear}-01-01`, date_to: today }),
+    serverRequestPage<SongLeaderboardRow>("/leaderboards/songs", { limit: 5, date_from: `${currentYear}-01-01`, date_to: today }),
     serverRequestPage<Win>("/wins", { page: 1 }),
     getShows(),
     getArtists(),
@@ -108,10 +111,11 @@ async function safePage<T>(label: string, path: string, params?: Record<string, 
   }
 }
 
-export async function getHomeData(search = ""): Promise<HomeData> {
+export async function getHomeData(search = "", rankingsPeriod: "year" | "all-time" = "year", today = archiveToday()): Promise<HomeData> {
+  const rankingDates: Record<string, string> = rankingsPeriod === "year" ? { date_from: `${today.slice(0, 4)}-01-01`, date_to: today } : {};
   const [artists, songs, wins, shows, artistResults] = await Promise.all([
-    safePage<ArtistLeaderboardRow>("Artist leaderboard", "/leaderboards/artists", { limit: 5 }),
-    safePage<SongLeaderboardRow>("Song leaderboard", "/leaderboards/songs", { limit: 5 }),
+    safePage<ArtistLeaderboardRow>("Artist leaderboard", "/leaderboards/artists", { limit: 5, ...rankingDates }),
+    safePage<SongLeaderboardRow>("Song leaderboard", "/leaderboards/songs", { limit: 5, ...rankingDates }),
     safePage<Win>("Recent wins", "/wins", { page: 1 }),
     safePage<Show>("Music shows", "/shows"),
     search.trim() ? safePage<Artist>("Artist search", "/artists", { search: search.trim(), ordering: artistOrderings.wins, page: 1 }) : Promise.resolve({ page: { count: 0, next: null, previous: null, results: [] } as ApiPage<Artist>, error: undefined }),

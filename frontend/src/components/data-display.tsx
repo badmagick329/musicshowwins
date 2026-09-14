@@ -10,10 +10,10 @@ import { formatDate } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 
-export function SectionHeading({ title, action }: { title: string; action?: React.ReactNode }) {
+export function SectionHeading({ title, action, level = 2 }: { title: string; action?: React.ReactNode; level?: 2 | 3 }) {
   return (
     <div className="mb-4 flex items-end justify-between gap-4 border-b-2 border-foreground pb-3">
-      <h2 className="font-heading text-xl font-bold tracking-tight sm:text-2xl">{title}</h2>
+      {level === 2 ? <h2 className="font-heading text-xl font-bold tracking-tight sm:text-2xl">{title}</h2> : <h3 className="font-heading text-xl font-bold tracking-tight sm:text-2xl">{title}</h3>}
       {action}
     </div>
   );

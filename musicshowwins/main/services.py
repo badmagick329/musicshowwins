@@ -155,8 +155,15 @@ def show_queryset(search: str = ""):
     return query.order_by("name")
 
 
-def leaderboard_queryset(kind: str, *, year: int | None = None, show: str = ""):
-    filters = {"year": year, "show": show}
+def leaderboard_queryset(
+    kind: str,
+    *,
+    year: int | None = None,
+    show: str = "",
+    date_from: date | None = None,
+    date_to: date | None = None,
+):
+    filters = {"year": year, "show": show, "date_from": date_from, "date_to": date_to}
     filters = {key: value for key, value in filters.items() if value not in (None, "")}
     if kind == "artists":
         query = win_filters(**filters, prefix="songs__wins__")

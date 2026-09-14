@@ -4,8 +4,8 @@ import { WinsExplorer } from "@/components/wins-explorer";
 import { QueryProvider } from "@/components/query-provider";
 import { makeQueryClient } from "@/lib/query-client";
 import { serverTransport } from "@/lib/api-server";
-import { hasActiveWinsFilters, parseWinsFilters, type WinsSearchParams } from "@/lib/wins-filters";
-import { showsQueryOptions, winsQueryOptions } from "@/lib/wins-queries";
+import { hasActiveWinsFilters, parseWinsFilters, winsDetailId, type WinsSearchParams } from "@/lib/wins-filters";
+import { selectedArtistQueryOptions, selectedSongQueryOptions, showsQueryOptions, winsQueryOptions } from "@/lib/wins-queries";
 import { noIndexFollow, pageMetadata } from "@/lib/seo";
 
 const description = "Search K-pop music show results by artist, song, show, year, or date. Coverage starts in 2014.";
@@ -22,10 +22,14 @@ export async function generateMetadata({ searchParams }: { searchParams: Promise
 
 export default async function WinsPage({ searchParams }: { searchParams: Promise<WinsSearchParams> }) {
   const filters = parseWinsFilters(await searchParams);
+  const artistId = winsDetailId(filters.artist);
+  const songId = winsDetailId(filters.song);
   const queryClient = makeQueryClient();
   await Promise.all([
     queryClient.prefetchQuery(winsQueryOptions(filters, serverTransport)),
     queryClient.prefetchQuery(showsQueryOptions(serverTransport)),
+    ...(artistId ? [queryClient.prefetchQuery(selectedArtistQueryOptions(artistId, serverTransport))] : []),
+    ...(songId ? [queryClient.prefetchQuery(selectedSongQueryOptions(songId, serverTransport))] : []),
   ]);
 
   return <QueryProvider><HydrationBoundary state={dehydrate(queryClient)}><WinsExplorer /></HydrationBoundary></QueryProvider>;

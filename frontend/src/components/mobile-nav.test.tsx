@@ -7,6 +7,7 @@ describe("mobile navigation", () => {
       "Home",
       "Artists",
       "Songs",
+      "Rankings",
       "Wins",
       "Shows",
       "About",

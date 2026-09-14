@@ -24,7 +24,16 @@ vi.mock("@tanstack/react-query", () => ({
         isFetching: false,
       };
     }
-    const filters = options.queryKey[2] as { show: string; search: string; page: number };
+    if (options.queryKey[1] === "selected-artist") {
+      return { data: { id: 3, name: "Artist" }, isError: false };
+    }
+    if (options.queryKey[1] === "selected-song") {
+      return { data: { id: 7, title: "Archive Winner", artist: { id: 3, name: "Artist" } }, isError: false };
+    }
+    const filters = options.queryKey[2] as { show: string; search: string; page: number; dateFrom: string };
+    if (filters.dateFrom === "2030-01-01") {
+      return { data: { count: 0, next: null, previous: null, results: [] }, isError: false, isFetching: false, isPlaceholderData: false, isLoading: false, refetch: vi.fn() };
+    }
     const title = filters.show === "the-show" ? "The Show Winner" : filters.show === "music-bank" ? "Music Bank Winner" : filters.search ? `${filters.search} Winner` : "Archive Winner";
     return {
       data: { count: 201, next: filters.page < 3 ? "next" : null, previous: filters.page > 1 ? "previous" : null, results: [
@@ -133,6 +142,27 @@ describe("WinsExplorer", () => {
     render(<WinsExplorer />);
     expect(screen.getAllByRole("link", { name: "Archive Winner" }).every((link) => link.getAttribute("href") === "/songs/7")).toBe(true);
     expect(screen.getAllByRole("link", { name: "Filter wins by Music Bank" }).every((link) => link.getAttribute("href") === "/wins?show=music-bank#wins-results-title")).toBe(true);
+  });
+
+  it("keeps the selected song name through zero results and a reload", () => {
+    setUrl("/wins?song=7&show=music-bank&date_from=2030-01-01&date_to=2030-12-31");
+    render(<WinsExplorer />);
+    expect(screen.getByRole("button", { name: "Clear song filter" }).parentElement?.textContent).toContain("Song: “Archive Winner” by Artist");
+    expect(screen.getByText("No wins match these filters.")).toBeTruthy();
+    cleanup();
+    render(<WinsExplorer />);
+    expect(screen.getByRole("button", { name: "Clear song filter" }).parentElement?.textContent).toContain("Song: “Archive Winner” by Artist");
+    fireEvent.click(screen.getByRole("button", { name: "Clear song filter" }));
+    expect(window.location.search).toBe("?show=music-bank&date_from=2030-01-01&date_to=2030-12-31");
+  });
+
+  it("keeps the selected artist name when no wins match", () => {
+    setUrl("/wins?artist=3&date_from=2030-01-01&date_to=2030-12-31");
+    render(<WinsExplorer />);
+    expect(screen.getByRole("button", { name: "Clear artist filter" }).parentElement?.textContent).toContain("Artist: Artist");
+    expect(screen.getByText("No wins match these filters.")).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Clear artist filter" }));
+    expect(window.location.search).toBe("?date_from=2030-01-01&date_to=2030-12-31");
   });
 
   it("clears filters from an initially filtered URL", () => {
