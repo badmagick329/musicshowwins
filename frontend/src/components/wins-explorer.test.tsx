@@ -4,7 +4,7 @@ import { act, cleanup, fireEvent, render, screen, within } from "@testing-librar
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { WinsExplorer } from "./wins-explorer";
 
-const queryState = vi.hoisted(() => ({ isFetching: false, isPlaceholderData: false, videoReferences: [] as unknown[] }));
+const queryState = vi.hoisted(() => ({ isFetching: false, isPlaceholderData: false, videoReferences: [] as unknown[], winsEnabled: true }));
 
 vi.mock("next/navigation", () => ({
   useSearchParams: () => new URLSearchParams(window.location.search),
@@ -13,7 +13,7 @@ vi.mock("next/navigation", () => ({
 vi.mock("@tanstack/react-query", () => ({
   keepPreviousData: () => undefined,
   queryOptions: <T,>(options: T) => options,
-  useQuery: (options: { queryKey: readonly unknown[] }) => {
+  useQuery: (options: { queryKey: readonly unknown[]; enabled?: boolean }) => {
     if (options.queryKey[0] === "shows") {
       return {
         data: { count: 2, next: null, previous: null, results: [
@@ -30,6 +30,7 @@ vi.mock("@tanstack/react-query", () => ({
     if (options.queryKey[1] === "selected-song") {
       return { data: { id: 7, title: "Archive Winner", artist: { id: 3, name: "Artist" } }, isError: false };
     }
+    queryState.winsEnabled = options.enabled !== false;
     const filters = options.queryKey[2] as { show: string; search: string; page: number; dateFrom: string };
     if (filters.dateFrom === "2030-01-01") {
       return { data: { count: 0, next: null, previous: null, results: [] }, isError: false, isFetching: false, isPlaceholderData: false, isLoading: false, refetch: vi.fn() };
@@ -61,6 +62,7 @@ afterEach(() => {
   queryState.isFetching = false;
   queryState.isPlaceholderData = false;
   queryState.videoReferences = [];
+  queryState.winsEnabled = true;
 });
 
 describe("WinsExplorer", () => {
@@ -163,6 +165,15 @@ describe("WinsExplorer", () => {
     expect(screen.getByText("No wins match these filters.")).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: "Clear artist filter" }));
     expect(window.location.search).toBe("?date_from=2030-01-01&date_to=2030-12-31");
+  });
+
+  it("shows malformed date errors without requesting wins", () => {
+    setUrl("/wins?date_from=abc&date_to=1");
+    render(<WinsExplorer />);
+    expect(screen.getByRole("alert").textContent).toContain("Enter dates as YYYY-MM-DD.");
+    expect(queryState.winsEnabled).toBe(false);
+    expect(screen.queryByRole("table", { name: "Filtered music show wins" })).toBeNull();
+    expect(screen.getByRole("link", { name: "Clear dates" }).getAttribute("href")).toBe("/wins");
   });
 
   it("clears filters from an initially filtered URL", () => {

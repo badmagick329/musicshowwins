@@ -68,6 +68,7 @@ describe("page metadata", () => {
     await expect(artistsMetadata({ searchParams: Promise.resolve({ search: "aespa" }) })).resolves.toMatchObject({ robots: { index: false, follow: true } });
     await expect(songsMetadata({ searchParams: Promise.resolve({ sort: "title" }) })).resolves.toMatchObject({ robots: { index: false, follow: true } });
     await expect(winsMetadata({ searchParams: Promise.resolve({ show: "inkigayo" }) })).resolves.toMatchObject({ robots: { index: false, follow: true } });
+    await expect(winsMetadata({ searchParams: Promise.resolve({ date_from: "not-a-date" }) })).resolves.toMatchObject({ robots: { index: false, follow: true } });
   });
 
   it("keeps the homepage canonical and search-result pages out of the index", async () => {

@@ -1,4 +1,4 @@
-import { defaultWinsFilters, parseWinsFilters, updateWinsFilters, winsUrl, type WinsFilters } from "@/lib/wins-filters";
+import { defaultWinsFilters, parseWinsFilters, updateWinsFilters, winsFilterError, winsUrl, type WinsFilters } from "@/lib/wins-filters";
 
 export type HistoryMode = "push" | "replace";
 
@@ -6,6 +6,12 @@ export function winsFiltersFromSearchParams(searchParams: URLSearchParams) {
   const params: Record<string, string> = {};
   searchParams.forEach((value, key) => { params[key] = value; });
   return parseWinsFilters(params);
+}
+
+export function winsFilterErrorFromSearchParams(searchParams: URLSearchParams) {
+  const params: Record<string, string> = {};
+  searchParams.forEach((value, key) => { params[key] = value; });
+  return winsFilterError(params);
 }
 
 export function nextWinsNavigation(current: WinsFilters, update: Partial<WinsFilters>, mode: HistoryMode = "push") {

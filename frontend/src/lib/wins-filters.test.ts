@@ -7,6 +7,7 @@ import {
   serializeWinsFilters,
   updateWinsFilters,
   winsDateRangeError,
+  winsFilterError,
 } from "./wins-filters";
 
 const now = new Date("2026-08-30T00:00:00Z");
@@ -38,6 +39,13 @@ describe("wins filters", () => {
 
   it("flags invalid date ranges before requests", () => {
     expect(winsDateRangeError({ ...defaultWinsFilters(), dateFrom: "2025-02-02", dateTo: "2025-02-01" })).toMatch(/Start date/);
+  });
+
+  it("reports malformed canonical date parameters before normalization", () => {
+    expect(winsFilterError({ date_from: "2025-02-30" })).toBe("Enter dates as YYYY-MM-DD.");
+    expect(winsFilterError({ date_to: "nope" })).toBe("Enter dates as YYYY-MM-DD.");
+    expect(winsFilterError({ date_from: "2025-02-02", date_to: "2025-02-01" })).toBe("Start date must be on or before end date.");
+    expect(winsFilterError({ date_to: "2025-02-01" })).toBeNull();
   });
 
   it("generates newest-first years from the archive start", () => {

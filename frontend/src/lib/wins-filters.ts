@@ -65,6 +65,15 @@ export function parseWinsFilters(params: WinsSearchParams, now = new Date()) {
   }, now);
 }
 
+export function winsFilterError(params: WinsSearchParams) {
+  const dateFrom = single(params.date_from);
+  const dateTo = single(params.date_to);
+  if ((dateFrom && !validDate(dateFrom)) || (dateTo && !validDate(dateTo))) {
+    return "Enter dates as YYYY-MM-DD.";
+  }
+  return winsDateRangeError(parseWinsFilters(params));
+}
+
 export function winsDateRangeError(filters: WinsFilters) {
   return filters.dateFrom && filters.dateTo && filters.dateFrom > filters.dateTo
     ? "Start date must be on or before end date."
