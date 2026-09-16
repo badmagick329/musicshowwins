@@ -12,11 +12,10 @@ import {
   archiveYears,
   winsUrl,
   hasActiveWinsFilters,
-  winsDateRangeError,
   winsDetailId,
   type WinsFilters,
 } from "@/lib/wins-filters";
-import { clearWinsNavigation, winsFiltersFromSearchParams, writeWinsHistory } from "@/lib/wins-navigation";
+import { clearWinsNavigation, winsFilterErrorFromSearchParams, winsFiltersFromSearchParams, writeWinsHistory } from "@/lib/wins-navigation";
 import { selectedArtistQueryOptions, selectedSongQueryOptions, showsQueryOptions, winsQueryOptions } from "@/lib/wins-queries";
 import { archivePageCount } from "@/lib/pagination";
 import { usePaginationScroll } from "@/lib/use-pagination-scroll";
@@ -76,13 +75,13 @@ function WinsRows({ wins }: { wins: Win[] }) {
 export function WinsExplorer() {
   const searchParams = useSearchParams();
   const filters = winsFiltersFromSearchParams(searchParams);
+  const filterError = winsFilterErrorFromSearchParams(searchParams);
   const filtersRef = useRef(filters);
   useEffect(() => { filtersRef.current = filters; }, [filters]);
-  const dateRangeError = winsDateRangeError(filters);
   const artistId = winsDetailId(filters.artist);
   const songId = winsDetailId(filters.song);
   const shows = useQuery(showsQueryOptions(browserTransport));
-  const wins = useQuery({ ...winsQueryOptions(filters, browserTransport), enabled: !dateRangeError, placeholderData: keepPreviousData });
+  const wins = useQuery({ ...winsQueryOptions(filters, browserTransport), enabled: !filterError, placeholderData: keepPreviousData });
   const selectedArtist = useQuery({ ...selectedArtistQueryOptions(artistId, browserTransport), enabled: Boolean(artistId) });
   const selectedSong = useQuery({ ...selectedSongQueryOptions(songId, browserTransport), enabled: Boolean(songId) });
   const { requestPaginationScroll, cancelPaginationScroll } = usePaginationScroll(filters.page, Boolean(wins.data) && !wins.isPlaceholderData && !wins.isFetching, "wins-results-title");
@@ -148,7 +147,7 @@ export function WinsExplorer() {
           {filters.artist && <span>Artist: {artistId ? selectedArtist.data?.name ?? (selectedArtist.isError ? "Unavailable" : "Loading…") : filters.artist} <button type="button" onClick={() => apply({ artist: "" })} className="font-bold underline underline-offset-4">Clear artist filter</button></span>}
           {filters.song && <span>Song: {songId ? selectedSong.data ? <>“{selectedSong.data.title}” by {selectedSong.data.artist.name}</> : selectedSong.isError ? "Unavailable" : "Loading…" : `“${filters.song}”`} <button type="button" onClick={() => apply({ song: "" })} className="font-bold underline underline-offset-4">Clear song filter</button></span>}
         </div>}
-        {dateRangeError && <p role="alert" className="mt-3 border-l-4 border-destructive bg-danger-surface px-3 py-2 text-sm">{dateRangeError}</p>}
+        {filterError && <p role="alert" className="mt-3 border-l-4 border-destructive bg-danger-surface px-3 py-2 text-sm">{filterError} <Link href={winsUrl({ ...filters, dateFrom: "", dateTo: "", page: 1 })} className="font-bold underline underline-offset-4">Clear dates</Link></p>}
       </section>
 
       <section className="mt-8" aria-labelledby="wins-results-title">
@@ -156,10 +155,10 @@ export function WinsExplorer() {
           <div><h2 id="wins-results-title" className="scroll-mt-24 font-heading text-2xl font-bold">Results</h2>{wins.isFetching && data && <p role="status" className="mt-1 text-xs text-muted-foreground">Updating results…</p>}</div>
           {data && <ArchiveResultsSummary totalCount={data.count} page={filters.page} resultCount={data.results.length} singular="win" plural="wins" />}
         </div>
-        {dateRangeError ? null : wins.isLoading && !data ? <LoadingState label="Loading wins…" /> : wins.isError ? (
+        {filterError ? null : wins.isLoading && !data ? <LoadingState label="Loading wins…" /> : wins.isError ? (
           <div role="alert" className="border border-destructive bg-danger-surface p-4"><p className="font-semibold">Wins couldn&apos;t load. Your filters are unchanged.</p><button type="button" onClick={() => wins.refetch()} className="mt-3 min-h-10 border-2 border-foreground bg-card px-3 text-sm font-bold">Try again</button></div>
         ) : data?.results.length ? <WinsRows wins={data.results} /> : <EmptyState message="No wins match these filters." />}
-        {data && !dateRangeError && (data.previous || data.next) && <nav aria-label="Wins pages" className="mt-6 flex items-center justify-between gap-4">
+        {data && !filterError && (data.previous || data.next) && <nav aria-label="Wins pages" className="mt-6 flex items-center justify-between gap-4">
           {data.previous ? <ArchivePageLink href={winsUrl({ ...filters, page: filters.page - 1 })} onNavigate={() => paginate(filters.page - 1)}>Previous</ArchivePageLink> : <span />}
           <span className="text-sm font-semibold tabular-nums">Page {filters.page} of {archivePageCount(data.count)}</span>
           {data.next ? <ArchivePageLink href={winsUrl({ ...filters, page: filters.page + 1 })} onNavigate={() => paginate(filters.page + 1)}>Next</ArchivePageLink> : <span />}
