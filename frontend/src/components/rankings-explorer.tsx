@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
+import { useSearchParams } from "next/navigation";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { ArchivePageLink } from "@/components/archive-page-link";
 import { EmptyState, LoadingState, RankMarker } from "@/components/data-display";
 import { ArchiveResultsSummary } from "@/components/pagination";
@@ -14,6 +14,7 @@ import { archivePageCount } from "@/lib/pagination";
 import { archiveStartYear } from "@/lib/wins-filters";
 import { parseRankingSelection, rankingHeading, rankingUrl, rankingWinsUrl, type RankingKind, type RankingSelection } from "@/lib/rankings";
 import { rankingsQueryOptions } from "@/lib/rankings-queries";
+import { usePaginationScroll } from "@/lib/use-pagination-scroll";
 
 function RankingRows({ rows, selection, today }: { rows: (ArtistLeaderboardRow | SongLeaderboardRow)[]; selection: RankingSelection; today: string }) {
   const details = rows.map((row) => {
@@ -39,24 +40,17 @@ export function RankingsExplorer({ today }: { today: string }) {
   const params: Record<string, string> = {};
   searchParams.forEach((value, key) => { params[key] = value; });
   const selection = parseRankingSelection(params, today);
-  return <RankingsView key={searchParams.toString()} selection={selection} today={today} />;
+  return <RankingsView selection={selection} today={today} />;
 }
 
-function RankingsView({ selection, today }: { selection: RankingSelection; today: string }) {
-  const router = useRouter();
+function RankingControls({ selection, today, navigate }: { selection: RankingSelection; today: string; navigate: (next: RankingSelection) => void }) {
   const [draftPeriod, setDraftPeriod] = useState<"custom" | null>(null);
   const [dateFrom, setDateFrom] = useState(selection.dateFrom);
   const [dateTo, setDateTo] = useState(selection.dateTo);
   const [formError, setFormError] = useState<string | null>(null);
-  const query = useQuery({ ...rankingsQueryOptions(selection, today, browserTransport), enabled: !selection.error });
-  const data = query.data;
   const currentYear = Number(today.slice(0, 4));
   const periodValue = draftPeriod ?? (selection.period === "year" ? String(selection.year) : selection.period);
   const years = Array.from({ length: currentYear - archiveStartYear + 1 }, (_, index) => currentYear - index);
-
-  function navigate(next: RankingSelection) {
-    router.push(rankingUrl({ ...next, page: 1, error: null }, today));
-  }
 
   function changePeriod(value: string) {
     setFormError(null);
@@ -73,12 +67,7 @@ function RankingsView({ selection, today }: { selection: RankingSelection; today
     navigate(candidate);
   }
 
-  return <main className="page-enter mx-auto max-w-7xl px-5 pb-8 pt-10 lg:px-8 lg:pt-14">
-    <header className="border-2 border-foreground bg-surface-berry p-6 text-surface-berry-foreground shadow-[4px_4px_0_var(--section-ink)] sm:p-8">
-      <h1 className="font-heading text-4xl font-bold tracking-tight sm:text-[44px]">Music show rankings</h1>
-      <p className="mt-2 max-w-2xl text-surface-berry-foreground/80">Rankings count music-show wins earned during the selected period.</p>
-    </header>
-    <section aria-label="Ranking controls" className="mt-7 border-2 border-foreground bg-search-surface p-4 sm:p-5">
+  return <section aria-label="Ranking controls" className="mt-7 border-2 border-foreground bg-search-surface p-4 sm:p-5">
       <div className="flex flex-wrap items-end gap-4">
         <div role="group" aria-label="Rank songs or artists" className="flex min-h-11 border-2 border-foreground bg-card">
           {(["songs", "artists"] as RankingKind[]).map((kind) => <button key={kind} type="button" aria-pressed={selection.kind === kind} onClick={() => navigate({ ...selection, kind })} className={`min-h-11 px-4 text-sm font-bold ${selection.kind === kind ? "bg-action-pink text-white" : "hover:bg-accent"}`}>{kind === "songs" ? "Songs" : "Artists"}</button>)}
@@ -97,14 +86,39 @@ function RankingsView({ selection, today }: { selection: RankingSelection; today
         <button type="submit" className="min-h-11 border-2 border-foreground bg-highlight-yellow px-4 text-sm font-bold shadow-[2px_2px_0_var(--foreground)]">Apply</button>
       </form>}
       {(formError || selection.error) && <p role="alert" className="mt-3 border-l-4 border-destructive bg-danger-surface px-3 py-2 text-sm">{formError || selection.error}</p>}
-    </section>
+    </section>;
+}
+
+function RankingsView({ selection, today }: { selection: RankingSelection; today: string }) {
+  const query = useQuery({ ...rankingsQueryOptions(selection, today, browserTransport), enabled: !selection.error, placeholderData: keepPreviousData });
+  const data = query.data;
+  const resultsSelection = data?.selection ?? selection;
+  const { requestPaginationScroll, cancelPaginationScroll } = usePaginationScroll(selection.page, Boolean(data) && !query.isPlaceholderData && !query.isFetching, "rankings-results-title");
+
+  function navigate(next: RankingSelection) {
+    cancelPaginationScroll();
+    const url = rankingUrl({ ...next, page: 1, error: null }, today);
+    if (url !== rankingUrl(selection, today)) window.history.pushState(null, "", url);
+  }
+
+  function paginate(page: number) {
+    requestPaginationScroll(page);
+    window.history.pushState(null, "", rankingUrl({ ...selection, page }, today));
+  }
+
+  return <main className="page-enter mx-auto max-w-7xl px-5 pb-8 pt-10 lg:px-8 lg:pt-14">
+    <header className="border-2 border-foreground bg-surface-berry p-6 text-surface-berry-foreground shadow-[4px_4px_0_var(--section-ink)] sm:p-8">
+      <h1 className="font-heading text-4xl font-bold tracking-tight sm:text-[44px]">Music show rankings</h1>
+      <p className="mt-2 max-w-2xl text-surface-berry-foreground/80">Rankings count music-show wins earned during the selected period.</p>
+    </header>
+    <RankingControls key={rankingUrl(selection, today)} selection={selection} today={today} navigate={navigate} />
     <section aria-labelledby="rankings-results-title" className="mt-8">
-      <div className="mb-4 flex flex-wrap items-end justify-between gap-3 border-b-2 border-foreground pb-3"><h2 id="rankings-results-title" className="scroll-mt-24 font-heading text-2xl font-bold">{selection.error ? "Rankings" : rankingHeading(selection)}</h2>{data && <ArchiveResultsSummary totalCount={data.count} page={selection.page} resultCount={data.results.length} singular={selection.kind === "songs" ? "song" : "artist"} plural={selection.kind} />}</div>
-      {selection.error ? null : query.isLoading ? <LoadingState label="Loading rankings…" /> : query.isError ? <div role="alert" className="border border-destructive bg-danger-surface p-4"><p className="font-semibold">Rankings couldn&apos;t load.</p><button type="button" onClick={() => query.refetch()} className="mt-3 min-h-10 border-2 border-foreground bg-card px-3 text-sm font-bold">Try again</button></div> : data?.results.length ? <RankingRows rows={data.results} selection={selection} today={today} /> : <EmptyState message="No wins were recorded in this period." />}
-      {data && (data.previous || data.next) && <nav aria-label="Ranking pages" className="mt-6 flex items-center justify-between gap-4">
-        {data.previous ? <ArchivePageLink href={`${rankingUrl({ ...selection, page: selection.page - 1 }, today)}#rankings-results-title`} onNavigate={() => router.push(`${rankingUrl({ ...selection, page: selection.page - 1 }, today)}#rankings-results-title`)}>Previous</ArchivePageLink> : <span />}
-        <span className="text-sm font-semibold tabular-nums">Page {selection.page} of {archivePageCount(data.count)}</span>
-        {data.next ? <ArchivePageLink href={`${rankingUrl({ ...selection, page: selection.page + 1 }, today)}#rankings-results-title`} onNavigate={() => router.push(`${rankingUrl({ ...selection, page: selection.page + 1 }, today)}#rankings-results-title`)}>Next</ArchivePageLink> : <span />}
+      <div className="mb-4 flex flex-wrap items-end justify-between gap-3 border-b-2 border-foreground pb-3"><div><h2 id="rankings-results-title" className="scroll-mt-24 font-heading text-2xl font-bold">{selection.error ? "Rankings" : rankingHeading(resultsSelection)}</h2>{query.isFetching && data && <p role="status" className="mt-1 text-xs text-muted-foreground">Updating results…</p>}</div>{data && <ArchiveResultsSummary totalCount={data.count} page={resultsSelection.page} resultCount={data.results.length} singular={resultsSelection.kind === "songs" ? "song" : "artist"} plural={resultsSelection.kind} />}</div>
+      {selection.error ? null : query.isLoading && !data ? <LoadingState label="Loading rankings…" /> : query.isError ? <div role="alert" className="border border-destructive bg-danger-surface p-4"><p className="font-semibold">Rankings couldn&apos;t load.</p><button type="button" onClick={() => query.refetch()} className="mt-3 min-h-10 border-2 border-foreground bg-card px-3 text-sm font-bold">Try again</button></div> : data?.results.length ? <RankingRows rows={data.results} selection={resultsSelection} today={today} /> : <EmptyState message="No wins were recorded in this period." />}
+      {data && !selection.error && !query.isPlaceholderData && (data.previous || data.next) && <nav aria-label="Ranking pages" className="mt-6 flex items-center justify-between gap-4">
+        {data.previous ? <ArchivePageLink href={`${rankingUrl({ ...resultsSelection, page: resultsSelection.page - 1 }, today)}#rankings-results-title`} onNavigate={() => paginate(resultsSelection.page - 1)}>Previous</ArchivePageLink> : <span />}
+        <span className="text-sm font-semibold tabular-nums">Page {resultsSelection.page} of {archivePageCount(data.count)}</span>
+        {data.next ? <ArchivePageLink href={`${rankingUrl({ ...resultsSelection, page: resultsSelection.page + 1 }, today)}#rankings-results-title`} onNavigate={() => paginate(resultsSelection.page + 1)}>Next</ArchivePageLink> : <span />}
       </nav>}
     </section>
   </main>;
