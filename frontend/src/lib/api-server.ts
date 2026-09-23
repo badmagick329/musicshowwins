@@ -96,6 +96,8 @@ export async function warmCanonicalArchivePages() {
   await Promise.all([
     serverRequestPage<ArtistLeaderboardRow>("/leaderboards/artists", { limit: 5, date_from: `${currentYear}-01-01`, date_to: today }),
     serverRequestPage<SongLeaderboardRow>("/leaderboards/songs", { limit: 5, date_from: `${currentYear}-01-01`, date_to: today }),
+    serverRequestPage<ArtistLeaderboardRow>("/leaderboards/artists", { date_from: `${currentYear}-01-01`, date_to: today, page: 1 }),
+    serverRequestPage<SongLeaderboardRow>("/leaderboards/songs", { date_from: `${currentYear}-01-01`, date_to: today, page: 1 }),
     serverRequestPage<Win>("/wins", { page: 1 }),
     getShows(),
     getArtists(),
