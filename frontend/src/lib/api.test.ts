@@ -151,10 +151,12 @@ describe("warmCanonicalArchivePages", () => {
     await warmCanonicalArchivePages();
 
     const urls = fetchMock.mock.calls.map(([input]) => String(input));
-    expect(urls).toHaveLength(7);
+    expect(urls).toHaveLength(9);
     expect(urls).toEqual(expect.arrayContaining([
       expect.stringMatching(/\/leaderboards\/artists\?limit=5&date_from=\d{4}-01-01&date_to=\d{4}-\d{2}-\d{2}$/),
       expect.stringMatching(/\/leaderboards\/songs\?limit=5&date_from=\d{4}-01-01&date_to=\d{4}-\d{2}-\d{2}$/),
+      expect.stringMatching(/\/leaderboards\/artists\?date_from=\d{4}-01-01&date_to=\d{4}-\d{2}-\d{2}&page=1$/),
+      expect.stringMatching(/\/leaderboards\/songs\?date_from=\d{4}-01-01&date_to=\d{4}-\d{2}-\d{2}&page=1$/),
       expect.stringMatching(/\/wins\?page=1$/),
       expect.stringMatching(/\/shows$/),
       expect.stringMatching(/\/artists\?ordering=-total_wins%2Cname&page=1$/),
