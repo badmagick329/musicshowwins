@@ -1,9 +1,11 @@
 import type { NextRequest } from "next/server";
 import { getServerApiBaseUrl, publicArchiveCacheTag, publicArchiveRevalidateSeconds } from "@/lib/api-server";
+import { checkProxyRateLimit } from "@/lib/proxy-rate-limit";
 
 type RouteContext = { params: Promise<{ path: string[] }> };
 
 function upstreamUrl(request: NextRequest, path: string[]) {
+  if (path.some((segment) => segment === "" || segment === "." || segment === "..")) return null;
   const configured = getServerApiBaseUrl();
   const base = new URL(configured.endsWith("/") ? configured : `${configured}/`);
   if (base.protocol !== "http:" && base.protocol !== "https:") {
@@ -11,6 +13,8 @@ function upstreamUrl(request: NextRequest, path: string[]) {
   }
   const encodedPath = path.map(encodeURIComponent).join("/");
   const upstream = new URL(encodedPath, base);
+  const basePath = base.pathname.endsWith("/") ? base.pathname : `${base.pathname}/`;
+  if (!upstream.pathname.startsWith(basePath)) return null;
   upstream.search = request.nextUrl.search;
   return upstream;
 }
@@ -30,6 +34,20 @@ function sanitizedText(value: string) {
 async function proxy(request: NextRequest, context: RouteContext) {
   try {
     const { path } = await context.params;
+    const target = upstreamUrl(request, path);
+    if (!target) return Response.json({ detail: "Not found." }, { status: 404 });
+    if (request.method === "GET") {
+      const forwardedFor = request.headers.get("x-forwarded-for");
+      const realIp = request.headers.get("x-real-ip");
+      const clientIp = forwardedFor?.split(",").at(-1)?.trim() || realIp?.trim() || "shared";
+      const limit = checkProxyRateLimit(clientIp);
+      if (!limit.allowed) {
+        return Response.json({ detail: "Too many requests." }, {
+          status: 429,
+          headers: { "Retry-After": String(limit.retryAfter) },
+        });
+      }
+    }
     const headers = new Headers({ "X-Forwarded-Proto": "https" });
     if (request.method === "GET") {
       const secret = process.env.INTERNAL_API_SECRET;
@@ -43,7 +61,7 @@ async function proxy(request: NextRequest, context: RouteContext) {
     const contentType = request.headers.get("content-type");
     if (contentType) headers.set("Content-Type", contentType);
 
-    const upstream = await fetch(upstreamUrl(request, path), {
+    const upstream = await fetch(target, {
       method: request.method,
       headers,
       body: request.method === "POST" ? await request.arrayBuffer() : undefined,

@@ -2,10 +2,13 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
 
 import { GET, POST } from "./route";
+import { resetProxyRateLimit } from "@/lib/proxy-rate-limit";
 
 afterEach(() => {
+  resetProxyRateLimit();
   vi.unstubAllEnvs();
   vi.unstubAllGlobals();
+  vi.useRealTimers();
 });
 
 function context(...path: string[]) {
@@ -108,6 +111,65 @@ describe("backend API proxy", () => {
 
     expect(response.status).toBe(202);
     expect(await response.json()).toEqual({ detail: "accepted" });
+  });
+
+  it.each([[".."], ["."], ["wins", ""]])("rejects unsafe path segments %j without fetching", async (...path) => {
+    vi.stubEnv("DJANGO_API_BASE_URL", "http://backend:8000/api/v1");
+    const fetchMock = vi.fn();
+    vi.stubGlobal("fetch", fetchMock);
+
+    const response = await GET(new NextRequest("https://kpopwins.info/backend-api/wins"), context(...path));
+
+    expect(response.status).toBe(404);
+    expect(await response.json()).toEqual({ detail: "Not found." });
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it("limits GETs by the last forwarded IP and allows another IP", async () => {
+    vi.stubEnv("DJANGO_API_BASE_URL", "http://backend:8000/api/v1");
+    const fetchMock = vi.fn(async () => new Response("{}", { headers: { "Content-Type": "application/json" } }));
+    vi.stubGlobal("fetch", fetchMock);
+
+    for (let index = 0; index < 120; index += 1) {
+      await GET(new NextRequest("https://kpopwins.info/backend-api/wins", {
+        headers: { "x-forwarded-for": `spoofed-${index}, 203.0.113.25` },
+      }), context("wins"));
+    }
+    const limited = await GET(new NextRequest("https://kpopwins.info/backend-api/wins", {
+      headers: { "x-forwarded-for": "another-spoof, 203.0.113.25" },
+    }), context("wins"));
+    const otherClient = await GET(new NextRequest("https://kpopwins.info/backend-api/wins", {
+      headers: { "x-forwarded-for": "203.0.113.26" },
+    }), context("wins"));
+
+    expect(limited.status).toBe(429);
+    expect(limited.headers.get("Retry-After")).toBeTruthy();
+    expect(await limited.json()).toEqual({ detail: "Too many requests." });
+    expect(otherClient.status).toBe(200);
+    expect(fetchMock).toHaveBeenCalledTimes(121);
+  });
+
+  it("resets the GET window after 60 seconds and does not count POSTs", async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-09-24T12:00:00Z"));
+    vi.stubEnv("DJANGO_API_BASE_URL", "http://backend:8000/api/v1");
+    const fetchMock = vi.fn(async () => new Response("{}", { headers: { "Content-Type": "application/json" } }));
+    vi.stubGlobal("fetch", fetchMock);
+    const clientHeaders = { "x-forwarded-for": "203.0.113.25" };
+
+    await POST(new NextRequest("https://kpopwins.info/backend-api/corrections", {
+      method: "POST", headers: { ...clientHeaders, "Content-Type": "application/json" }, body: "{}",
+    }), context("corrections"));
+    for (let index = 0; index < 120; index += 1) {
+      await GET(new NextRequest("https://kpopwins.info/backend-api/wins", { headers: clientHeaders }), context("wins"));
+    }
+    const limited = await GET(new NextRequest("https://kpopwins.info/backend-api/wins", { headers: clientHeaders }), context("wins"));
+    vi.advanceTimersByTime(60_000);
+    const afterReset = await GET(new NextRequest("https://kpopwins.info/backend-api/wins", { headers: clientHeaders }), context("wins"));
+
+    expect(limited.status).toBe(429);
+    expect(afterReset.status).toBe(200);
+    expect(fetchMock).toHaveBeenCalledTimes(122);
   });
 
   it("returns a generic failure without exposing the internal URL", async () => {
