@@ -15,6 +15,7 @@ export default function AboutPage() {
       <section className="max-w-3xl">
         <h1 className="font-heading text-4xl font-bold tracking-tight sm:text-[44px]">About KpopWins</h1>
         <p className="mt-5 text-base leading-relaxed text-muted-foreground sm:text-lg">KpopWins is a fan-made record of K-pop music show wins. It covers six weekly shows from 2014 onward. KpopWins uses Wikipedia as its source and reviews results before publication.</p>
+        <p className="mt-4 text-base leading-relaxed text-muted-foreground">Results are drawn from <a href="https://en.wikipedia.org/" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-foreground">Wikipedia contributors</a>&apos; work, available under <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-foreground">CC BY-SA 4.0</a>.</p>
         <p className="mt-4 text-base leading-relaxed text-muted-foreground">We maintain the archive, add new results, and expand video coverage. Your feedback helps us decide what to improve next.</p>
       </section>
       <section id="feedback" className="mt-14 scroll-mt-6" aria-labelledby="feedback-heading">

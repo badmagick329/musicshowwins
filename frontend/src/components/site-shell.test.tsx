@@ -23,15 +23,15 @@ describe("SiteHeader", () => {
 });
 
 describe("SiteFooter", () => {
-  it("includes Wikipedia attribution, licensing, and safe external links", () => {
+  it("includes Wikipedia attribution and safe external links", () => {
     vi.stubEnv("SUPPORT_URL", "");
     const html = renderToStaticMarkup(<SiteFooter />);
     expect(html).toContain("Results come from");
     expect(html).not.toContain("Wikimedia Foundation");
     expect(html).toContain('href="https://en.wikipedia.org/"');
-    expect(html).toContain('href="https://creativecommons.org/licenses/by-sa/4.0/"');
-    expect(html.match(/target="_blank"/g)).toHaveLength(2);
-    expect(html.match(/rel="noopener noreferrer"/g)).toHaveLength(2);
+    expect(html).not.toContain("creativecommons.org");
+    expect(html.match(/target="_blank"/g)).toHaveLength(1);
+    expect(html.match(/rel="noopener noreferrer"/g)).toHaveLength(1);
     expect(html).not.toContain("Not affiliated with artists, labels, or broadcasters.");
   });
 

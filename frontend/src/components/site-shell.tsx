@@ -42,7 +42,7 @@ export function SiteFooter() {
       <div className="mx-auto grid max-w-7xl gap-4 px-5 py-8 text-sm text-muted-foreground sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start lg:px-8">
         <div className="space-y-2">
           <p><span className="font-heading font-bold text-foreground">KpopWins</span> is a fan-made record of K-pop music show wins.</p>
-          <p className="max-w-3xl text-xs leading-relaxed">Results come from <a href="https://en.wikipedia.org/" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-foreground">Wikipedia contributors</a> and are reviewed by KpopWins. Wikipedia content is available under <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-foreground">CC BY-SA 4.0</a>.</p>
+          <p className="max-w-3xl text-xs leading-relaxed">Results come from <a href="https://en.wikipedia.org/" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-foreground">Wikipedia contributors</a> and are reviewed by KpopWins.</p>
         </div>
         <div className="flex flex-wrap items-center gap-4 sm:justify-end">
           <Link href="/about#feedback" className="inline-flex min-h-11 items-center font-semibold underline underline-offset-4 hover:text-foreground">Feedback</Link>
