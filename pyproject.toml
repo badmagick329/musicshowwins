@@ -11,7 +11,6 @@ dependencies = [
     "drf-spectacular>=0.28",
     "gunicorn>=23.0",
     "lxml>=5.3",
-    "pandas>=2.2",
     "psycopg[binary]>=3.2",
     "python-dotenv>=1.0",
     "requests>=2.32",

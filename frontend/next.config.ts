@@ -5,6 +5,7 @@ const plausibleOrigin = "https://analytics.mgck.ink";
 const nextConfig: NextConfig = {
   agentRules: false,
   output: "standalone",
+  images: { unoptimized: true },
   async rewrites() {
     return [
       {
