@@ -9,7 +9,7 @@ import { formatDate } from "@/lib/utils";
 import { ApiRequestError, getAllSongWins, getSong } from "@/lib/api";
 import { buildShowBreakdown, summarizeArtist } from "@/lib/artist-profile";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { noIndexFollow, pageMetadata, siteUrl } from "@/lib/seo";
+import { noIndexFollow, pageMetadata, plural, siteUrl } from "@/lib/seo";
 
 function songId(value: string) {
   return /^\d+$/.test(value) && Number(value) > 0 ? Number(value) : null;
@@ -22,16 +22,21 @@ async function loadSong(id: number) {
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const id = songId((await params).id);
-  if (!id) return { title: "Song not found", description: "The requested song could not be found in KpopWins.", robots: noIndexFollow };
+  if (!id) return { title: "Song Not Found", description: "The requested song could not be found in KpopWins.", robots: noIndexFollow };
   try {
-    const song = await getSong(id);
+    const [song, wins] = await Promise.all([getSong(id), getAllSongWins(id)]);
+    const { earliestWin, latestWin } = summarizeArtist(wins);
+    const counts = `${song.total_wins} recorded music-show ${plural(song.total_wins, "win")} across ${song.winning_shows} ${plural(song.winning_shows, "show")}`;
+    const dates = earliestWin && latestWin
+      ? ` Earliest recorded win: ${earliestWin.show.name}, ${formatDate(earliestWin.date)}.${latestWin === earliestWin.date ? "" : ` Latest: ${formatDate(latestWin)}.`}`
+      : "";
     return pageMetadata({
-      title: `${song.title} by ${song.artist.name} — Music Show Wins`,
-      description: `${song.title} by ${song.artist.name} has ${song.total_wins} recorded music-show ${song.total_wins === 1 ? "win" : "wins"}. See win dates and a breakdown by show.`,
+      title: `${song.title} by ${song.artist.name}: ${song.total_wins} Music Show ${plural(song.total_wins, "Win")}`,
+      description: `${song.title} by ${song.artist.name} has ${counts}.${dates}`,
       path: `/songs/${id}`,
     });
   } catch (error) {
-    if (error instanceof ApiRequestError && error.status === 404) return { title: "Song not found", description: "The requested song could not be found in KpopWins.", robots: noIndexFollow };
+    if (error instanceof ApiRequestError && error.status === 404) return { title: "Song Not Found", description: "The requested song could not be found in KpopWins.", robots: noIndexFollow };
     throw error;
   }
 }

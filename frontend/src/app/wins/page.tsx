@@ -8,7 +8,7 @@ import { serverTransport } from "@/lib/api-server";
 import { ApiRequestError } from "@/lib/api-shared";
 import { hasActiveWinsFilters, parseWinsFilters, winsDetailId, winsFilterError, winsUrl, type WinsSearchParams } from "@/lib/wins-filters";
 import { selectedArtistQueryOptions, selectedSongQueryOptions, showsQueryOptions, winsQueryOptions } from "@/lib/wins-queries";
-import { noIndexFollow, pageMetadata } from "@/lib/seo";
+import { noIndexFollow, pageMetadata, paginatedTitle } from "@/lib/seo";
 
 const description = "Search K-pop music show results by artist, song, show, year, or date. Coverage starts in 2014.";
 
@@ -18,7 +18,7 @@ export async function generateMetadata({ searchParams }: { searchParams: Promise
   const filtered = hasActiveWinsFilters(filters);
   const canonical = !filtered && filters.page > 1 ? `/wins?page=${filters.page}` : "/wins";
   return {
-    ...pageMetadata({ title: filters.page > 1 && !filtered ? `Music Show Wins, page ${filters.page}` : "Music Show Wins", description, path: canonical }),
+    ...pageMetadata({ title: paginatedTitle("Music Show Wins: Every K-pop Result Since 2014", filtered ? 1 : filters.page), description, path: canonical }),
     robots: filtered || winsFilterError(params) ? noIndexFollow : undefined,
   };
 }

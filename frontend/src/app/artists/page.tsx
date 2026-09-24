@@ -5,7 +5,7 @@ import { DebouncedArtistSearch } from "@/components/debounced-artist-search";
 import { ArchiveResultsSummary, Pagination } from "@/components/pagination";
 import { getArtists, parsePositivePage } from "@/lib/api";
 import { artistSortLabels, artistSorts, artistsUrl, parseArtistSort } from "@/lib/artist-list";
-import { noIndexFollow, pageMetadata } from "@/lib/seo";
+import { noIndexFollow, pageMetadata, paginatedTitle } from "@/lib/seo";
 
 const description = "Find artists by name or win total, then view their songs and full win history.";
 type ArtistsSearchParams = { search?: string | string[]; page?: string | string[]; sort?: string | string[] };
@@ -17,7 +17,7 @@ export async function generateMetadata({ searchParams }: { searchParams: Promise
   const sort = parseArtistSort(params.sort);
   const canonical = !search && page > 1 ? `/artists?page=${page}` : "/artists";
   return {
-    ...pageMetadata({ title: page > 1 && !search ? `Artists, page ${page}` : "Artists", description, path: canonical }),
+    ...pageMetadata({ title: paginatedTitle("K-pop Artists by Music Show Wins", search ? 1 : page), description, path: canonical }),
     robots: search || sort !== "wins" ? noIndexFollow : undefined,
   };
 }
