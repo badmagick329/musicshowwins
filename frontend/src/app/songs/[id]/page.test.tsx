@@ -66,8 +66,8 @@ describe("Song detail page", () => {
     expect(apiMocks.getAllSongWins).toHaveBeenCalledWith(7);
 
     await expect(generateMetadata({ params: Promise.resolve({ id: "7" }) })).resolves.toMatchObject({
-      title: "Supernova by aespa — Music Show Wins",
-      description: expect.stringContaining("aespa"),
+      title: "Supernova by aespa: 3 Music Show Wins",
+      description: "Supernova by aespa has 3 recorded music-show wins across 2 shows. Earliest recorded win: Music Bank, 24 May 2024. Latest: 02 Jun 2024.",
     });
   });
 

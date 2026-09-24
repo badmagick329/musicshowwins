@@ -6,7 +6,7 @@ import { getShows } from "@/lib/api";
 import { pageMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = pageMetadata({
-  title: "Music Shows",
+  title: "Korean Music Shows: Latest Winners",
   description: "See the latest winner and full results for each of the six weekly shows covered by KpopWins.",
   path: "/shows",
 });

@@ -7,7 +7,7 @@ import { formatDate } from "@/lib/utils";
 import { ApiRequestError, getAllArtistWins, getArtist } from "@/lib/api";
 import { summarizeArtist } from "@/lib/artist-profile";
 import { JsonLd } from "@/components/json-ld";
-import { noIndexFollow, pageMetadata, siteUrl } from "@/lib/seo";
+import { noIndexFollow, pageMetadata, plural, siteUrl } from "@/lib/seo";
 
 function artistId(value: string) {
   return /^\d+$/.test(value) && Number(value) > 0 ? Number(value) : null;
@@ -20,16 +20,21 @@ async function loadArtist(id: number) {
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const id = artistId((await params).id);
-  if (!id) return { title: "Artist not found", description: "The requested artist could not be found in KpopWins.", robots: noIndexFollow };
+  if (!id) return { title: "Artist Not Found", description: "The requested artist could not be found in KpopWins.", robots: noIndexFollow };
   try {
-    const artist = await getArtist(id);
+    const [artist, wins] = await Promise.all([getArtist(id), getAllArtistWins(id)]);
+    const { earliestWin, latestWin } = summarizeArtist(wins);
+    const counts = `${artist.total_wins} recorded music-show ${plural(artist.total_wins, "win")} across ${artist.winning_songs} ${plural(artist.winning_songs, "song")}`;
+    const dates = earliestWin && latestWin
+      ? ` Earliest recorded win: ${earliestWin.song.title} on ${earliestWin.show.name}, ${formatDate(earliestWin.date)}. Latest win: ${formatDate(latestWin)}.`
+      : "";
     return pageMetadata({
-      title: `${artist.name} Music Show Wins`,
-      description: `Explore ${artist.name}'s ${artist.total_wins} recorded music-show ${artist.total_wins === 1 ? "win" : "wins"} across ${artist.winning_songs} ${artist.winning_songs === 1 ? "song" : "songs"}, with totals by song and show and a dated win history.`,
+      title: `${artist.name} Music Show Wins: ${artist.total_wins} Total`,
+      description: `${artist.name} has ${counts}.${dates}`,
       path: `/artists/${id}`,
     });
   } catch (error) {
-    if (error instanceof ApiRequestError && error.status === 404) return { title: "Artist not found", description: "The requested artist could not be found in KpopWins.", robots: noIndexFollow };
+    if (error instanceof ApiRequestError && error.status === 404) return { title: "Artist Not Found", description: "The requested artist could not be found in KpopWins.", robots: noIndexFollow };
     throw error;
   }
 }
@@ -54,7 +59,7 @@ export default async function ArtistPage({ params, searchParams = Promise.resolv
       }} />
     <main className="page-enter mx-auto max-w-7xl px-5 pb-8 pt-10 lg:px-8 lg:pt-14">
       <header className="border-2 border-foreground bg-surface-berry p-6 text-surface-berry-foreground shadow-[4px_4px_0_var(--section-ink)] sm:p-8">
-        <h1 className="font-heading text-4xl font-bold tracking-tight sm:text-[44px]">{artist.name}</h1><p className="mt-2 text-surface-berry-foreground/75">Music show wins</p>
+        <h1 className="font-heading text-4xl font-bold tracking-tight sm:text-[44px]">{artist.name}</h1><p className="mt-2 text-surface-berry-foreground/75">{summary.totalWins} recorded music show {plural(summary.totalWins, "win")} across {summary.winningSongs} {plural(summary.winningSongs, "song")}</p>
       </header>
 
       <section className="mt-10" aria-labelledby="summary-title">

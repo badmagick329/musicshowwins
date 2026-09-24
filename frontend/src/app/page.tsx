@@ -12,14 +12,14 @@ import {
 } from "@/components/data-display";
 import { getHomeData } from "@/lib/api";
 import { archiveToday } from "@/lib/rankings";
-import { noIndexFollow, siteDescription, siteUrl } from "@/lib/seo";
+import { noIndexFollow, siteDescription, siteName, siteUrl } from "@/lib/seo";
 
 export async function generateMetadata({ searchParams }: { searchParams: Promise<{ search?: string | string[]; rankings?: string | string[] }> }): Promise<Metadata> {
   const { search, rankings } = await searchParams;
   const hasSearch = typeof search === "string" && Boolean(search.trim());
   if (!hasSearch && rankings !== "all-time") return { alternates: { canonical: "/" } };
   return {
-    ...(hasSearch ? { title: "Artist search results", description: siteDescription } : {}),
+    ...(hasSearch ? { title: "Artist Search Results", description: siteDescription } : {}),
     alternates: { canonical: "/" },
     robots: noIndexFollow,
   };
@@ -44,6 +44,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ s
         name: "KpopWins music show wins archive",
         description: siteDescription,
         url: siteUrl,
+        creator: { "@type": "Organization", name: siteName, url: siteUrl },
         license: "https://creativecommons.org/licenses/by-sa/4.0/",
         isAccessibleForFree: true,
         temporalCoverage: "2014-01-01/..",

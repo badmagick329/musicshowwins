@@ -67,6 +67,12 @@ describe("artist summary and metadata", () => {
     expect(metadata.alternates?.canonical).toBe("/artists/3");
   });
 
+  it("answers win-count and earliest-win searches in the title and description", async () => {
+    const metadata = await generateMetadata({ params });
+    expect(metadata.title).toBe("aespa Music Show Wins: 2 Total");
+    expect(metadata.description).toBe("aespa has 2 recorded music-show wins across 2 songs. Earliest recorded win: Black Mamba on Inkigayo, 17 Jan 2021. Latest win: 02 Jun 2024.");
+  });
+
   it("handles an empty catalogue without inventing an earliest win", async () => {
     apiMocks.getAllArtistWins.mockResolvedValue([]);
     const html = renderToStaticMarkup(await ArtistPage({ params }));

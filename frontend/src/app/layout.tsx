@@ -3,13 +3,13 @@ import type { ReactNode } from "react";
 import Script from "next/script";
 import { JsonLd } from "@/components/json-ld";
 import { SiteFooter, SiteHeader } from "@/components/site-shell";
-import { siteDescription, siteName, siteUrl } from "@/lib/seo";
+import { homeTitle, siteDescription, siteName, siteUrl } from "@/lib/seo";
 import "./globals.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "K-pop Music Show Wins & Artist Rankings | KpopWins",
+    default: `${homeTitle} | KpopWins`,
     template: "%s | KpopWins",
   },
   description: siteDescription,
@@ -18,12 +18,12 @@ export const metadata: Metadata = {
     type: "website",
     url: "/",
     siteName,
-    title: "K-pop Music Show Wins & Artist Rankings | KpopWins",
+    title: `${homeTitle} | KpopWins`,
     description: siteDescription,
   },
   twitter: {
     card: "summary_large_image",
-    title: "K-pop Music Show Wins & Artist Rankings | KpopWins",
+    title: `${homeTitle} | KpopWins`,
     description: siteDescription,
   },
   robots: { index: true, follow: true },

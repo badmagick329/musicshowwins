@@ -4,9 +4,9 @@ import { RankingsExplorer } from "@/components/rankings-explorer";
 import { QueryProvider } from "@/components/query-provider";
 import { makeQueryClient } from "@/lib/query-client";
 import { serverTransport } from "@/lib/api-server";
-import { archiveToday, parseRankingSelection, rankingHeading, type RankingSearchParams } from "@/lib/rankings";
+import { archiveToday, parseRankingSelection, type RankingSearchParams, type RankingSelection } from "@/lib/rankings";
 import { rankingsQueryOptions } from "@/lib/rankings-queries";
-import { noIndexFollow, pageMetadata } from "@/lib/seo";
+import { noIndexFollow, pageMetadata, paginatedTitle } from "@/lib/seo";
 
 const description = "Rank songs and artists by music-show wins earned in a year, across all time, or within custom dates.";
 
@@ -15,9 +15,16 @@ export async function generateMetadata({ searchParams }: { searchParams: Promise
   const selection = parseRankingSelection(await searchParams, today);
   const canonical = !selection.error && selection.kind === "songs" && selection.period === "year" && selection.year === Number(today.slice(0, 4)) && selection.page === 1;
   return {
-    ...pageMetadata({ title: selection.error ? "Music Show Rankings" : `${rankingHeading(selection)} — Music Show Rankings`, description, path: "/rankings" }),
+    ...pageMetadata({ title: selection.error ? "Music Show Rankings" : paginatedTitle(`Music Show Rankings: ${rankingTitle(selection)}`, selection.page), description, path: "/rankings" }),
     robots: canonical ? undefined : noIndexFollow,
   };
+}
+
+function rankingTitle(selection: RankingSelection) {
+  const subject = selection.kind === "songs" ? "Top Songs" : "Top Artists";
+  if (selection.period === "all-time") return `${subject} of All Time`;
+  if (selection.period === "custom") return `${subject}, ${selection.dateFrom} to ${selection.dateTo}`;
+  return `${subject} of ${selection.year}`;
 }
 
 export default async function RankingsPage({ searchParams }: { searchParams: Promise<RankingSearchParams> }) {
