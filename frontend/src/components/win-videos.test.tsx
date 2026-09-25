@@ -147,6 +147,21 @@ describe("win video references", () => {
     expect(within(panel).getAllByText("Official video")).toHaveLength(2);
   });
 
+  it("labels fan uploads as a single link and in the expanded list", () => {
+    const fan = reference({ id: 2, is_official: false, publisher_name: "Fan Channel", url: "https://www.youtube.com/watch?v=def456" });
+    const single = render(<ArtistWinHistory wins={[win(1, { references: [fan] })]} />);
+    for (const view of [desktop(single.container), mobile(single.container)]) {
+      const link = view.getByRole("link", { name: `Watch fan upload for ${winName}` });
+      expect(link.textContent).toBe("Fan upload");
+    }
+    single.unmount();
+
+    const { container } = render(<ArtistWinHistory wins={[win(1, { references: [reference({ id: 1 }), fan] })]} />);
+    const panel = expandDesktop(container);
+    expect(within(panel).getAllByText("Official video")).toHaveLength(1);
+    expect(within(panel).getAllByText("Fan upload")).toHaveLength(1);
+  });
+
   it("links each listed video to the API URL in a new tab with the safe rel", () => {
     const { container } = render(<ArtistWinHistory wins={[win(1, { references: [reference({ id: 1 }), reference({ id: 2, url: "https://www.youtube.com/watch?v=def456", title: "Boom Boom Bass Encore" })] })]} />);
     const panel = expandDesktop(container);

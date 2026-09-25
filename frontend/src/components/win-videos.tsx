@@ -10,8 +10,10 @@ export function winVideoReferences(win: Win) {
   return win.references.filter((reference) => reference.reference_type === "video");
 }
 
-export function winVideoActionLabel(count: number) {
-  return count === 1 ? "Watch video" : "Choose video";
+export function winVideoActionLabel(count: number, isOfficial = true) {
+  if (count > 1) return "Choose video";
+  // Fan uploads can vanish or be edited, so visitors should know before leaving the site.
+  return isOfficial ? "Watch video" : "Fan upload";
 }
 
 function winContext(win: Win) {
@@ -42,11 +44,11 @@ function WinVideoActionLink({ win, video, className }: { win: Win; video: WinRef
       href={video.url}
       target="_blank"
       rel="noopener noreferrer"
-      aria-label={`Watch video for ${winContext(win)}`}
+      aria-label={`Watch ${video.is_official ? "video" : "fan upload"} for ${winContext(win)}`}
       className={cn(winVideoActionClass, className)}
     >
       <Play className="size-3.5 shrink-0" aria-hidden="true" />
-      <span className="text-center">{winVideoActionLabel(1)}</span>
+      <span className="text-center">{winVideoActionLabel(1, video.is_official)}</span>
       <ExternalLink className="size-3.5 shrink-0" aria-hidden="true" />
     </a>
   );
@@ -86,6 +88,9 @@ function WinVideoLink({ video }: { video: WinReference }) {
             <span className="break-words font-semibold leading-snug">{title}</span>
             {video.is_official && title !== "Official video" && (
               <span className="border border-border bg-secondary px-1.5 py-0.5 text-xs font-bold uppercase tracking-wide text-secondary-foreground">Official video</span>
+            )}
+            {!video.is_official && (
+              <span className="border border-border bg-muted px-1.5 py-0.5 text-xs font-bold uppercase tracking-wide text-muted-foreground">Fan upload</span>
             )}
           </span>
           <span className="mt-0.5 block text-xs text-muted-foreground">{publisher}</span>

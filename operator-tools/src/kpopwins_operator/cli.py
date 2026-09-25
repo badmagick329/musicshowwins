@@ -32,9 +32,11 @@ from .reddit_hydration import (
     load_reddit_youtube_ids,
 )
 from .reddit_import import (
-    RedditOfficialImportError,
-    import_official_links,
-    load_official_audit_links,
+    FAN_UPLOAD,
+    OFFICIAL,
+    RedditImportError,
+    import_audit_links,
+    load_audit_links,
 )
 from .registry import SUPPORTED_SHOWS, RegistryError, load_registry
 from .review_batches import (
@@ -185,6 +187,13 @@ def build_parser() -> argparse.ArgumentParser:
     import_parser.add_argument("--input")
     import_parser.add_argument("--limit", type=_positive_integer)
     import_parser.add_argument("--dry-run", action="store_true")
+    fan_parser = reddit_commands.add_parser(
+        "import-fan",
+        help="Import fan-channel YouTube audit links for wins without a video",
+    )
+    fan_parser.add_argument("--input")
+    fan_parser.add_argument("--limit", type=_positive_integer)
+    fan_parser.add_argument("--dry-run", action="store_true")
     list_parser = candidate_commands.add_parser("list")
     list_parser.add_argument(
         "--status", choices=("pending", "approved", "rejected"), default="pending"
@@ -611,14 +620,17 @@ def main(
                         f"more-remaining={'yes' if counts.more_remaining else 'no'}",
                         file=output,
                     )
-                elif args.reddit_command == "import-official":
+                elif args.reddit_command in {"import-official", "import-fan"}:
                     input_path = (
                         Path(args.input).expanduser().resolve()
                         if args.input
                         else config.default_reddit_audit_path
                     )
-                    entries = load_official_audit_links(input_path)
-                    counts = import_official_links(
+                    entries = load_audit_links(
+                        input_path,
+                        FAN_UPLOAD if args.reddit_command == "import-fan" else OFFICIAL,
+                    )
+                    counts = import_audit_links(
                         connection,
                         entries,
                         limit=args.limit,
@@ -628,6 +640,7 @@ def main(
                     print(
                         f"eligible={counts.eligible} selected={counts.selected} "
                         f"created={counts.created} existing={counts.existing} "
+                        f"already-covered={counts.covered} "
                         f"dry-run={'yes' if args.dry_run else 'no'}",
                         file=output,
                     )
@@ -672,7 +685,7 @@ def main(
         RegistryError,
         RedditError,
         RedditHydrationError,
-        RedditOfficialImportError,
+        RedditImportError,
         YouTubeError,
         OSError,
         sqlite3.Error,

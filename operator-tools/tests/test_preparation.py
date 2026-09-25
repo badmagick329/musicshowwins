@@ -160,10 +160,10 @@ def test_reddit_resumes_and_shares_youtube_budget(
         return HydrationCounts()
 
     monkeypatch.setattr(preparation, "hydrate_youtube_ids", hydrate)
-    monkeypatch.setattr(preparation, "load_official_audit_links", lambda p: [])
+    monkeypatch.setattr(preparation, "load_audit_links", lambda p: [])
     monkeypatch.setattr(
         preparation,
-        "import_official_links",
+        "import_audit_links",
         lambda *a, **k: ImportCounts(eligible=2, created=1),
     )
     report = preparation.prepare_candidates(connection, config, **options)

@@ -45,6 +45,19 @@ reclassify links and import official links as pending candidates:
 ./operator.ps1 prepare --reddit
 ```
 
+`prepare` imports only official links. To add fan-channel links for wins that
+still have no approved or pending official video, run it deliberately after a
+completed `--reddit` preparation:
+
+```powershell
+./operator.ps1 reddit import-fan --dry-run
+./operator.ps1 reddit import-fan
+```
+
+Fan uploads are reviewed under the playbook's fan-upload rules, labelled
+"Fan upload" on the site and hidden by production's daily availability check
+if they disappear.
+
 If discovery pauses, repeat the same command. Completed pages are saved. The
 YouTube request budget is shared across ingestion and Reddit hydration. Default
 limits are 10 upload pages per channel and 100 Reddit episode pages. Override

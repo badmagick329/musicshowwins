@@ -9,9 +9,9 @@ from kpopwins_operator.cli import main
 from kpopwins_operator.database import insert_candidate
 from kpopwins_operator.reddit import REDDIT_ENTRY_POINT, canonical_watch_url
 from kpopwins_operator.reddit_import import (
-    RedditOfficialImportError,
-    import_official_links,
-    load_official_audit_links,
+    RedditImportError,
+    import_audit_links,
+    load_audit_links,
 )
 
 TIMESTAMP = "2026-09-05T12:00:00Z"
@@ -142,14 +142,14 @@ def add_current_state(
 def test_rejects_unsupported_malformed_and_incomplete_reports(tmp_path, document):
     path = write_report(tmp_path / "audit.json", document)
     with pytest.raises(ValueError):
-        load_official_audit_links(path)
+        load_audit_links(path)
 
 
 def test_rejects_invalid_json_and_excludes_invalid_official_url(tmp_path):
     invalid_json = tmp_path / "invalid.json"
     invalid_json.write_text("{", encoding="utf-8")
     with pytest.raises(ValueError, match="not valid JSON"):
-        load_official_audit_links(invalid_json)
+        load_audit_links(invalid_json)
 
     malformed = report_document(
         episodes=[
@@ -161,7 +161,7 @@ def test_rejects_invalid_json_and_excludes_invalid_official_url(tmp_path):
         ]
     )
     path = write_report(tmp_path / "malformed.json", malformed)
-    assert load_official_audit_links(path) == []
+    assert load_audit_links(path) == []
 
 
 def test_filters_and_deduplicates_deterministically_without_changing_report(tmp_path):
@@ -191,7 +191,7 @@ def test_filters_and_deduplicates_deterministically_without_changing_report(tmp_
     path = write_report(tmp_path / "audit.json", document)
     before = path.read_bytes()
 
-    entries = load_official_audit_links(path)
+    entries = load_audit_links(path)
 
     assert [(entry.show_slug, entry.win_date, entry.video_id) for entry in entries] == [
         ("music-bank", "2026-01-02", "video000001"),
@@ -212,8 +212,8 @@ def test_import_creates_pending_candidate_with_current_metadata(connection, tmp_
     connection.execute("UPDATE youtube_videos SET last_seen_at='2026-09-04T12:00:00Z'")
     connection.commit()
     before_report = path.read_bytes()
-    entries = load_official_audit_links(path)
-    counts = import_official_links(
+    entries = load_audit_links(path)
+    counts = import_audit_links(
         connection,
         entries,
         limit=None,
@@ -249,7 +249,7 @@ def test_import_creates_pending_candidate_with_current_metadata(connection, tmp_
     }
     assert path.read_bytes() == before_report
 
-    rerun = import_official_links(
+    rerun = import_audit_links(
         connection,
         entries,
         limit=None,
@@ -278,9 +278,9 @@ def test_import_falls_back_to_verified_channel_title(connection, tmp_path):
         ),
     )
 
-    import_official_links(
+    import_audit_links(
         connection,
-        load_official_audit_links(path),
+        load_audit_links(path),
         limit=None,
         dry_run=False,
         timestamp=TIMESTAMP,
@@ -311,9 +311,9 @@ def test_dry_run_and_limit_use_same_validation_and_deterministic_prefix(
         ),
     )
 
-    counts = import_official_links(
+    counts = import_audit_links(
         connection,
-        load_official_audit_links(path),
+        load_audit_links(path),
         limit=2,
         dry_run=True,
         timestamp=TIMESTAMP,
@@ -330,9 +330,9 @@ def test_dry_run_and_limit_use_same_validation_and_deterministic_prefix(
         == 0
     )
 
-    import_official_links(
+    import_audit_links(
         connection,
-        load_official_audit_links(path),
+        load_audit_links(path),
         limit=2,
         dry_run=False,
         timestamp=TIMESTAMP,
@@ -389,9 +389,9 @@ def test_reruns_preserve_existing_pending_approved_and_rejected_candidates(
     before = list(connection.execute("SELECT * FROM reference_candidates ORDER BY id"))
     path = write_report(tmp_path / "audit.json", report_document(episodes=episodes))
 
-    counts = import_official_links(
+    counts = import_audit_links(
         connection,
-        load_official_audit_links(path),
+        load_audit_links(path),
         limit=None,
         dry_run=False,
         timestamp=TIMESTAMP,
@@ -429,10 +429,10 @@ def test_stale_report_validation_fails_before_any_insert(
         ),
     )
 
-    with pytest.raises(RedditOfficialImportError, match="Stale Reddit audit"):
-        import_official_links(
+    with pytest.raises(RedditImportError, match="Stale Reddit audit"):
+        import_audit_links(
             connection,
-            load_official_audit_links(path),
+            load_audit_links(path),
             limit=None,
             dry_run=False,
             timestamp=TIMESTAMP,
@@ -465,9 +465,62 @@ def test_cli_input_override_prints_summary_without_external_calls(
 
     assert result == 0
     assert output.getvalue() == (
-        "eligible=1 selected=1 created=1 existing=0 dry-run=yes\n"
+        "eligible=1 selected=1 created=1 existing=0 already-covered=0 dry-run=yes\n"
     )
     assert (
         connection.execute("SELECT COUNT(*) FROM reference_candidates").fetchone()[0]
         == 0
+    )
+
+
+def test_fan_import_adds_unofficial_links_only_for_wins_without_a_video(
+    connection, tmp_path
+):
+    add_current_state(connection, "music-bank", "2026-01-02", "fan00000001")
+    add_current_state(connection, "music-bank", "2026-01-09", "fan00000002")
+    connection.execute(
+        "UPDATE youtube_channels SET is_active = 0 WHERE show_slug = 'music-bank'"
+    )
+    insert_candidate(
+        connection,
+        {
+            "show_slug": "music-bank",
+            "win_date": "2026-01-09",
+            "reference_type": "video",
+            "provider": "youtube",
+            "external_id": "official001",
+            "url": canonical_watch_url("official001"),
+            "is_official": True,
+            "review_status": "approved",
+        },
+        timestamp=TIMESTAMP,
+    )
+    connection.commit()
+    fan = {"classification": "new_unverified"}
+    path = write_report(
+        tmp_path / "audit.json",
+        report_document(
+            episodes=[
+                episode("music-bank", "2026-01-02", [audit_link("fan00000001", **fan)]),
+                episode("music-bank", "2026-01-09", [audit_link("fan00000002", **fan)]),
+            ]
+        ),
+    )
+
+    assert load_audit_links(path) == []
+    counts = import_audit_links(
+        connection,
+        load_audit_links(path, "new_unverified"),
+        limit=None,
+        dry_run=False,
+        timestamp=TIMESTAMP,
+    )
+
+    assert (counts.eligible, counts.covered, counts.created) == (1, 1, 1)
+    row = connection.execute(
+        "SELECT * FROM reference_candidates WHERE external_id = 'fan00000001'"
+    ).fetchone()
+    assert (row["is_official"], row["review_status"]) == (0, "pending")
+    assert json.loads(row["metadata"])["reddit_audit"]["classification"] == (
+        "new_unverified"
     )

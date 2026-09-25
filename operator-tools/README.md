@@ -178,6 +178,8 @@ The import defaults to the completed audit report; `--input` selects another
 report and `--limit` selects a deterministic prefix. It rechecks current wins,
 videos, and active official-channel mappings before writing. Reruns count
 existing candidates without changing pending, approved, or rejected decisions.
+`reddit import-fan` imports `new_unverified` (fan-channel) links the same way,
+unofficial, and only for wins without an approved or pending official video.
 
 ## Quota and recovery
 

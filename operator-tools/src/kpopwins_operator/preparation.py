@@ -15,7 +15,7 @@ from .manifest import write_atomic
 from .matching import match_videos
 from .reddit import RedditClient, run_reddit_audit
 from .reddit_hydration import hydrate_youtube_ids, load_reddit_youtube_ids
-from .reddit_import import import_official_links, load_official_audit_links
+from .reddit_import import import_audit_links, load_audit_links
 from .registry import load_registry
 from .review_batches import print_review_next_step, review_queue_counts
 from .youtube import YouTubeClient
@@ -175,9 +175,9 @@ def prepare_candidates(
                     )
                     if refreshed.collection_complete:
                         stage("reddit-import")
-                        reddit_import = import_official_links(
+                        reddit_import = import_audit_links(
                             connection,
-                            load_official_audit_links(refreshed.report_path),
+                            load_audit_links(refreshed.report_path),
                             limit=None,
                             dry_run=False,
                             timestamp=timestamp,
