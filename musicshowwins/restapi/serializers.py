@@ -142,6 +142,14 @@ class WinSerializer(serializers.ModelSerializer):
         source="active_references", many=True, read_only=True
     )
     moment = serializers.SerializerMethodField()
+    milestones = serializers.SerializerMethodField()
+
+    def get_milestones(self, instance):
+        return {
+            "song_win": instance.song_win_number,
+            "song_show_win": instance.song_show_win_number,
+            "artist_win": instance.artist_win_number,
+        }
 
     def get_moment(self, instance):
         moment = getattr(instance, "public_moment", None)
@@ -157,7 +165,7 @@ class WinSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Win
-        fields = ("id", "date", "show", "song", "references", "moment")
+        fields = ("id", "date", "show", "song", "references", "moment", "milestones")
 
 
 class ArtistLeaderboardSerializer(serializers.Serializer):

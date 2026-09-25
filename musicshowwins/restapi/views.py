@@ -13,6 +13,7 @@ from main.services import (
     leaderboard_queryset,
     show_queryset,
     wins_queryset,
+    with_milestones,
 )
 from rest_framework import generics, status
 from rest_framework.exceptions import ValidationError
@@ -257,7 +258,7 @@ class WinList(generics.ListAPIView):
 
     def get_queryset(self):
         return ordered(
-            wins_queryset(with_song_totals=True, **filters(self.request)),
+            with_milestones(wins_queryset(with_song_totals=True, **filters(self.request))),
             self.request,
             {"date", "id", "show__name", "song__title", "song__artist__name"},
             "-date",

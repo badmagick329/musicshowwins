@@ -109,6 +109,7 @@ def test_read_only_collections_and_contracts(archive):
         "song",
         "references",
         "moment",
+        "milestones",
     }
     assert wins.data["results"][0]["references"] == []
 
@@ -414,6 +415,30 @@ def test_page_number_pagination(archive):
     assert len(response.data["results"]) == settings.PAGE_SIZE
     assert response.data["next"]
     assert len(client.get("/api/v1/wins?page=2").data["results"]) == 1
+
+
+@pytest.mark.django_db
+def test_win_milestones_count_the_whole_catalogue_despite_filters(archive):
+    show, artist_a, _, song_a, _ = archive
+    other_show = MusicShow.objects.create(slug="inkigayo", name="Inkigayo")
+    other_song = Song.objects.create(artist=artist_a, title="Third")
+    # Same date as an existing Alpha win on another show: the id breaks the tie.
+    tied = Win.objects.create(show=other_show, song=song_a, date=date(2025, 1, 1))
+    Win.objects.create(show=other_show, song=other_song, date=date(2025, 3, 1))
+
+    client = APIClient()
+    filtered = client.get("/api/v1/wins", {"show": "inkigayo", "ordering": "date"})
+    assert [row["milestones"] for row in filtered.data["results"]] == [
+        {"song_win": 3, "song_show_win": 1, "artist_win": 3},
+        {"song_win": 1, "song_show_win": 1, "artist_win": 4},
+    ]
+    assert filtered.data["results"][0]["id"] == tied.pk
+
+    bank = client.get("/api/v1/wins", {"artist": artist_a.pk, "show": show.slug, "ordering": "date"})
+    assert [row["milestones"] for row in bank.data["results"]] == [
+        {"song_win": 1, "song_show_win": 1, "artist_win": 1},
+        {"song_win": 2, "song_show_win": 2, "artist_win": 2},
+    ]
 
 
 @pytest.mark.django_db

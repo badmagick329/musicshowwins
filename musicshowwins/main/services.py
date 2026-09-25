@@ -112,6 +112,30 @@ def wins_queryset(*, with_song_totals: bool = False, **filters):
     return queryset.filter(win_filters(**filters))
 
 
+def _win_ordinal(**same):
+    earlier = Q(date__lt=OuterRef("date")) | Q(date=OuterRef("date"), pk__lte=OuterRef("pk"))
+    return Subquery(
+        Win.objects.filter(earlier, **{field: OuterRef(ref) for field, ref in same.items()})
+        .order_by()
+        .values(*same)
+        .annotate(n=Count("pk"))
+        .values("n")
+    )
+
+
+def with_milestones(queryset):
+    """Number each win within its song, song/show and artist across the whole catalogue.
+
+    Correlated subqueries rather than window functions: a window would number only
+    the rows left after list filters such as ``show=`` or ``artist=``.
+    """
+    return queryset.annotate(
+        song_win_number=_win_ordinal(song_id="song_id"),
+        song_show_win_number=_win_ordinal(song_id="song_id", show_id="show_id"),
+        artist_win_number=_win_ordinal(song__artist_id="song__artist_id"),
+    )
+
+
 def all_artists_queryset(**filters):
     query = win_filters(**filters, prefix="songs__wins__")
     return Artist.objects.annotate(
