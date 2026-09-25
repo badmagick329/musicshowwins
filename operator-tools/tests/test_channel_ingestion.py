@@ -20,8 +20,8 @@ class ResolveClient:
         return ResolvedChannel(channel_id, f"Title {handle}", f"UU-{channel_id}")
 
 
-def entry(show="music-bank", handle="@KBSKpop", allow=False):
-    return ChannelEntry(show, handle, ("music bank", "뮤직뱅크"), allow)
+def entry(show="music-bank", handle="@KBSKpop", allow=False, ingest=True):
+    return ChannelEntry(show, handle, ("music bank", "뮤직뱅크"), allow, ingest)
 
 
 def test_verification_is_dry_until_applied_and_rejects_unallowed_channel_collision(
@@ -54,6 +54,45 @@ def test_verification_is_dry_until_applied_and_rejects_unallowed_channel_collisi
         ResolveClient(["UCX", "UCX"]),
     )
     assert len(allowed) == 2
+
+
+def test_reference_only_channel_is_official_but_never_ingested(connection):
+    verified = verify_channels(
+        [entry(), entry(handle="@kbsworldtv", ingest=False)],
+        ResolveClient(["UC1", "UC2"]),
+    )
+    apply_verified_channels(connection, verified, verified_at="now", full_registry=True)
+    assert [
+        tuple(row)
+        for row in connection.execute(
+            "SELECT channel_id, ingest_uploads, is_active FROM youtube_channels "
+            "ORDER BY channel_id"
+        )
+    ] == [("UC1", 1, 1), ("UC2", 0, 1)]
+    states = connection.execute("SELECT channel_id FROM youtube_ingestion_state")
+    assert [row[0] for row in states] == ["UC1"]
+
+    class PlaylistRecorder:
+        playlists = []
+
+        def playlist_page(self, playlist_id, token):
+            self.playlists.append(playlist_id)
+            return PlaylistPage((), {}, None)
+
+    client = PlaylistRecorder()
+    counts = ingest_channels(
+        connection, client, handle=None, max_pages=5, restart=False, timestamp="now"
+    )
+    assert (counts.channels, client.playlists) == (1, ["UU-UC1"])
+    with pytest.raises(ValueError, match="upload ingestion"):
+        ingest_channels(
+            connection,
+            client,
+            handle="@kbsworldtv",
+            max_pages=5,
+            restart=False,
+            timestamp="now",
+        )
 
 
 def add_channel(connection):

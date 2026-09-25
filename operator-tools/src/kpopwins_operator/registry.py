@@ -24,6 +24,9 @@ class ChannelEntry:
     handle: str
     keywords: tuple[str, ...]
     allow_duplicate_channel: bool = False
+    # General broadcaster channels hold tens of thousands of unrelated uploads, so
+    # they vouch for links found elsewhere (Reddit) without a full history crawl.
+    ingest_uploads: bool = True
 
 
 def load_registry(path: Path) -> list[ChannelEntry]:
@@ -43,7 +46,13 @@ def load_registry(path: Path) -> list[ChannelEntry]:
         show = str(row.get("show_slug", "")).strip()
         handle = str(row.get("handle", "")).strip()
         raw_keywords = row.get("keywords")
-        allowed = {"show_slug", "handle", "keywords", "allow_duplicate_channel"}
+        allowed = {
+            "show_slug",
+            "handle",
+            "keywords",
+            "allow_duplicate_channel",
+            "ingest_uploads",
+        }
         if set(row) - allowed or show not in SUPPORTED_SHOWS:
             raise RegistryError(
                 f"Invalid channel registry entry for {show or '<blank>'}."
@@ -66,6 +75,8 @@ def load_registry(path: Path) -> list[ChannelEntry]:
             row["allow_duplicate_channel"], bool
         ):
             raise RegistryError("allow_duplicate_channel must be true or false.")
+        if "ingest_uploads" in row and not isinstance(row["ingest_uploads"], bool):
+            raise RegistryError("ingest_uploads must be true or false.")
         identities.add(identity)
         handles.add(handle.casefold())
         entries.append(
@@ -75,6 +86,7 @@ def load_registry(path: Path) -> list[ChannelEntry]:
                 keywords=keywords,
                 allow_duplicate_channel=row.get("allow_duplicate_channel", False)
                 is True,
+                ingest_uploads=row.get("ingest_uploads", True) is True,
             )
         )
     if {entry.show_slug for entry in entries} != SUPPORTED_SHOWS:

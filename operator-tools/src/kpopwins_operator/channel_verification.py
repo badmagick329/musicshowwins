@@ -59,13 +59,14 @@ def apply_verified_channels(
                 """
                 INSERT INTO youtube_channels (
                     show_slug, configured_handle, channel_id, channel_title,
-                    uploads_playlist_id, verified_at, is_active
-                ) VALUES (?, ?, ?, ?, ?, ?, 1)
+                    uploads_playlist_id, verified_at, ingest_uploads, is_active
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, 1)
                 ON CONFLICT (show_slug, configured_handle) DO UPDATE SET
                     channel_id = excluded.channel_id,
                     channel_title = excluded.channel_title,
                     uploads_playlist_id = excluded.uploads_playlist_id,
                     verified_at = excluded.verified_at,
+                    ingest_uploads = excluded.ingest_uploads,
                     is_active = 1
                 """,
                 (
@@ -75,8 +76,11 @@ def apply_verified_channels(
                     result.resolved.title,
                     result.resolved.uploads_playlist_id,
                     verified_at,
+                    int(result.entry.ingest_uploads),
                 ),
             )
+            if not result.entry.ingest_uploads:
+                continue
             connection.execute(
                 """
                 INSERT INTO youtube_ingestion_state (channel_id)

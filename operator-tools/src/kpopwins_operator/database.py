@@ -11,7 +11,7 @@ from uuid import uuid4
 from .config import Config
 from .validation import normalize_candidate
 
-SCHEMA_VERSION = 5
+SCHEMA_VERSION = 6
 
 
 class DatabaseError(RuntimeError):
@@ -204,12 +204,18 @@ CREATE TABLE candidate_deferrals (
 );
 """
 
+MIGRATION_5_TO_6 = """
+ALTER TABLE youtube_channels
+ADD COLUMN ingest_uploads INTEGER NOT NULL DEFAULT 1 CHECK (ingest_uploads IN (0, 1));
+"""
+
 SCHEMA = (
     SCHEMA_V1
     + MIGRATION_1_TO_2
     + MIGRATION_2_TO_3
     + MIGRATION_3_TO_4
     + MIGRATION_4_TO_5
+    + MIGRATION_5_TO_6
 )
 
 
@@ -264,6 +270,10 @@ def initialize_database(config: Config) -> int:
         if version == 4:
             connection.executescript(MIGRATION_4_TO_5)
             connection.execute("PRAGMA user_version = 5")
+            version = 5
+        if version == 5:
+            connection.executescript(MIGRATION_5_TO_6)
+            connection.execute("PRAGMA user_version = 6")
     return SCHEMA_VERSION
 
 

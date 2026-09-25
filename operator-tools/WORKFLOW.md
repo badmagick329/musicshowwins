@@ -194,7 +194,10 @@ Exported files stay ignored and are never included in the application image.
 4. Start the local Django API. Apply Django migrations after updating backend code.
 
 `prepare` and `review` automatically initialize or migrate offline operator
-state. Channel verification remains explicit. For later runs, go straight to
+state. Channel verification remains explicit: rerun it with `--apply` after
+editing `official-youtube-channels.toml`. Entries with `ingest_uploads = false`
+are broadcaster channels whose uploads are mostly unrelated. They count as
+official for links found on Reddit but their upload history is never scanned. For later runs, go straight to
 `prepare`; initial history scanning uses the same resumable command.
 
 ## Correct a published reference

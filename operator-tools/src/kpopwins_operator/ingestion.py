@@ -75,7 +75,7 @@ def _selected_channels(
     sql = """
         SELECT channel_id, MIN(uploads_playlist_id) AS uploads_playlist_id
         FROM youtube_channels
-        WHERE is_active = 1
+        WHERE is_active = 1 AND ingest_uploads = 1
     """
     parameters: tuple[str, ...] = ()
     if handle:
@@ -84,7 +84,9 @@ def _selected_channels(
     sql += " GROUP BY channel_id ORDER BY channel_id"
     rows = list(connection.execute(sql, parameters))
     if handle and not rows:
-        raise ValueError(f"No verified active channel found for {handle}.")
+        raise ValueError(
+            f"No verified active channel with upload ingestion found for {handle}."
+        )
     if not rows:
         raise ValueError("No verified channels; run `youtube verify-channels --apply`.")
     return rows

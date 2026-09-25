@@ -10,7 +10,9 @@ from kpopwins_operator.database import (
     MIGRATION_1_TO_2,
     MIGRATION_2_TO_3,
     MIGRATION_3_TO_4,
+    MIGRATION_4_TO_5,
     SCHEMA_V1,
+    SCHEMA_VERSION,
     initialize_database,
     open_database,
 )
@@ -80,7 +82,7 @@ def test_tracked_registry_has_the_six_supported_shows():
     )
     entries = load_registry(path)
     assert {entry.show_slug for entry in entries} == SUPPORTED_SHOWS
-    assert {entry.handle for entry in entries} == {
+    assert {entry.handle for entry in entries if entry.ingest_uploads} == {
         "@KBSKpop",
         "@MBCkpop",
         "@SBSKPOP",
@@ -88,6 +90,50 @@ def test_tracked_registry_has_the_six_supported_shows():
         "@ALLTHEKPOP",
         "@THEKPOP",
     }
+
+
+def test_registry_reads_reference_only_channels(tmp_path):
+    path = tmp_path / "channels.toml"
+    rows = [
+        f'[[channels]]\nshow_slug = "{show}"\nhandle = "@{show}"\nkeywords = ["show"]\n'
+        for show in sorted(SUPPORTED_SHOWS)
+    ]
+    rows.append(
+        '[[channels]]\nshow_slug = "music-bank"\nhandle = "@broadcaster"\n'
+        'keywords = ["music bank"]\ningest_uploads = false\n'
+    )
+    path.write_text("\n".join(rows), encoding="utf-8")
+    entries = {entry.handle: entry for entry in load_registry(path)}
+    assert entries["@music-bank"].ingest_uploads is True
+    assert entries["@broadcaster"].ingest_uploads is False
+
+    path.write_text(
+        "\n".join(rows).replace("ingest_uploads = false", 'ingest_uploads = "no"'),
+        encoding="utf-8",
+    )
+    with pytest.raises(RegistryError, match="ingest_uploads"):
+        load_registry(path)
+
+
+def test_version_five_upgrade_keeps_channels_ingesting(config):
+    config.home.mkdir(parents=True)
+    with sqlite3.connect(config.database_path) as old:
+        old.executescript(
+            SCHEMA_V1
+            + MIGRATION_1_TO_2
+            + MIGRATION_2_TO_3
+            + MIGRATION_3_TO_4
+            + MIGRATION_4_TO_5
+        )
+        old.execute("PRAGMA user_version=5")
+        old.execute("""INSERT INTO youtube_channels (
+            show_slug, configured_handle, channel_id, channel_title,
+            uploads_playlist_id, verified_at
+        ) VALUES ('music-bank', '@KBSKpop', 'UC1', 'KBS Kpop', 'UU1', 'now')""")
+    initialize_database(config)
+    with open_database(config) as upgraded:
+        row = upgraded.execute("SELECT ingest_uploads FROM youtube_channels").fetchone()
+        assert row[0] == 1
 
 
 def test_registry_rejects_duplicate_handles(tmp_path):
@@ -131,7 +177,7 @@ def test_real_version_one_to_two_migration_preserves_rows(config):
     connection.commit()
     connection.close()
 
-    assert initialize_database(config) == 5
+    assert initialize_database(config) == SCHEMA_VERSION
     with open_database(config) as migrated:
         assert migrated.execute("SELECT COUNT(*) FROM wins").fetchone()[0] == 1
         assert (
@@ -161,7 +207,7 @@ def test_version_two_to_three_migration_preserves_videos_and_adds_lookup_state(c
     connection.commit()
     connection.close()
 
-    assert initialize_database(config) == 5
+    assert initialize_database(config) == SCHEMA_VERSION
     with open_database(config) as migrated:
         row = migrated.execute(
             "SELECT title, channel_title FROM youtube_videos WHERE video_id='v1'"
