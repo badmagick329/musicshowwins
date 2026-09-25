@@ -10,7 +10,7 @@ For a changing total or recent result, state the record date and cite the canoni
 
 ## Main pages
 
-- [Home](${siteUrl}/): Recent wins, top-five artist and song leaderboards, and a list of covered music shows.
+- [Home](${siteUrl}/): This week's winners for each music show, top-five artist and song leaderboards, and a list of covered music shows.
 - [Artists](${siteUrl}/artists): Search and sort artists, then open an artist's totals, wins by year and show, winning songs, notable moments, and complete win history.
 - [Songs](${siteUrl}/songs): Search and sort winning songs, then open a song's totals, wins by show, notable moments, and complete win history.
 - [Wins](${siteUrl}/wins): Search and filter dated results by artist, song, show, year, or date, with video links where available.
