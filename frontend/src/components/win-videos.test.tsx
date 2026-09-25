@@ -21,7 +21,7 @@ function reference(overrides: Partial<WinReference> = {}): WinReference {
 }
 
 function win(id: number, overrides: Partial<Win> = {}): Win {
-  return { id, date: "2024-06-27", show: { id: 2, slug: "m-countdown", name: "M Countdown", active: true }, song: { id: 7, title: "Boom Boom Bass", artist: { id: 3, name: "Riize" }, total_wins: 1, latest_win_date: "2024-06-27", winning_shows: 1 }, references: [], milestones: { song_win: 2, song_show_win: 1, artist_win: 2 }, ...overrides };
+  return { id, date: "2024-06-27", show: { id: 2, slug: "m-countdown", name: "M Countdown", active: true }, song: { id: 7, title: "Boom Boom Bass", artist: { id: 3, name: "Riize" }, total_wins: 1, latest_win_date: "2024-06-27", winning_shows: 1 }, performed: null, references: [], milestones: { song_win: 2, song_show_win: 1, artist_win: 2 }, ...overrides };
 }
 
 const winName = "Boom Boom Bass by Riize, 27 Jun 2024, M Countdown";
@@ -58,6 +58,20 @@ describe("win video references", () => {
       expect(link.className).not.toContain("bg-brand-pink");
       expect(view.queryByRole("button", { name: /video/i })).toBeNull();
     }
+  });
+
+  it("says the winner was absent instead of offering a search when no video exists", () => {
+    const { container } = render(<ArtistWinHistory wins={[win(1, { performed: false })]} />);
+    for (const view of [desktop(container), mobile(container)]) {
+      expect(view.getByText("Absent from broadcast")).toBeTruthy();
+      expect(view.queryByRole("link", { name: /Search YouTube/ })).toBeNull();
+    }
+  });
+
+  it("still links a video for an absent winner when one exists", () => {
+    const { container } = render(<ArtistWinHistory wins={[win(1, { performed: false, references: [reference()] })]} />);
+    expect(desktop(container).getByRole("link", { name: `Watch video for ${winName}` })).toBeTruthy();
+    expect(desktop(container).queryByText("Absent from broadcast")).toBeNull();
   });
 
   it("renders one video as a direct external Watch video link", () => {

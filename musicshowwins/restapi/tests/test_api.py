@@ -107,6 +107,7 @@ def test_read_only_collections_and_contracts(archive):
         "date",
         "show",
         "song",
+        "performed",
         "references",
         "moment",
         "milestones",

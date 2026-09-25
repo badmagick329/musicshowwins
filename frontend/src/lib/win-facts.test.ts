@@ -8,7 +8,7 @@ function win(date: string, milestones: Win["milestones"]): Win {
     date,
     show: { id: 1, name: "Inkigayo", slug: "inkigayo", active: true },
     song: { id: 1, title: "Bad", artist: { id: 1, name: "Ateez" }, total_wins: 7, winning_shows: 4, latest_win_date: date },
-    references: [],
+    performed: null, references: [],
     milestones,
   };
 }

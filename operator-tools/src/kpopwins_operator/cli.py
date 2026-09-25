@@ -25,6 +25,7 @@ from .ingestion import ingest_channels
 from .manifest import ManifestError, approved_document, serialize_document, write_atomic
 from .matching import match_videos
 from .preparation import prepare_candidates
+from .presence import build_presence, serialize_presence
 from .reddit import RedditError, run_reddit_audit
 from .reddit_hydration import (
     RedditHydrationError,
@@ -134,6 +135,12 @@ def build_parser() -> argparse.ArgumentParser:
         "export-approved", help="Export approved reference candidates"
     )
     export_parser.add_argument("--output")
+    presence_parser = subparsers.add_parser(
+        "export-presence",
+        help="Export whether each winner performed, from cached Reddit lineups",
+    )
+    presence_parser.add_argument("--input")
+    presence_parser.add_argument("--output")
 
     youtube_parser = subparsers.add_parser(
         "youtube", help="Use official YouTube channels"
@@ -480,6 +487,33 @@ def main(
                 _status(connection, output, now or _now())
             elif args.command == "due":
                 _due(connection, output, args.provider, args.limit, now or _now())
+            elif args.command == "export-presence":
+                artists = {
+                    (row["show_slug"], row["win_date"]): row["artist_name"]
+                    for row in connection.execute(
+                        "SELECT show_slug, win_date, artist_name FROM wins "
+                        "WHERE is_current = 1"
+                    )
+                }
+                document, counts = build_presence(
+                    config,
+                    Path(args.input).expanduser().resolve()
+                    if args.input
+                    else config.default_reddit_audit_path,
+                    artists,
+                )
+                destination = (
+                    Path(args.output).expanduser().resolve()
+                    if args.output
+                    else config.default_presence_path
+                )
+                write_atomic(destination, serialize_presence(document))
+                print(
+                    f"performed={counts.performed} absent={counts.absent} "
+                    f"unknown={counts.unknown}",
+                    file=output,
+                )
+                print(f"Wrote presence manifest: {destination}", file=output)
             elif args.command == "export-approved":
                 content = serialize_document(approved_document(connection))
                 if args.output == "-":

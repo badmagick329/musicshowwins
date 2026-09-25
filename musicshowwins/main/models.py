@@ -123,6 +123,9 @@ class Win(models.Model):
         related_name="wins",
     )
     source_revision = models.CharField(max_length=80, blank=True, null=True)
+    # Winners often win weeks after promotions end, so no stage exists to link.
+    # Null means unknown; the operator presence manifest fills it from lineups.
+    performed = models.BooleanField(null=True, blank=True)
 
     class Meta:
         ordering = ("-date", "show__name", "song__title")

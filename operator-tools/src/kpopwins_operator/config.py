@@ -44,6 +44,10 @@ class Config:
         return self.manifests_dir / "win-references-v1.json"
 
     @property
+    def default_presence_path(self) -> Path:
+        return self.manifests_dir / "win-presence-v1.json"
+
+    @property
     def channel_registry_path(self) -> Path:
         return REPOSITORY_ROOT / "operator-tools" / "official-youtube-channels.toml"
 

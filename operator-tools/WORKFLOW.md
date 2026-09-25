@@ -184,6 +184,21 @@ migrations first when required, such as support for withdrawn references.
 See [the deployment runbook](../.ignore/deployment/runbook.md) for code releases.
 Exported files stay ignored and are never included in the application image.
 
+**6. Refresh winner presence.** After a `--reddit` preparation, record whether
+each winner performed on the winning broadcast. The site shows "Absent from
+broadcast" instead of a YouTube search when a win has no video and the winner
+was absent:
+
+```powershell
+./operator.ps1 export-presence
+uv run python manage.py import_win_presence .ignore/operator-tools/manifests/win-presence-v1.json
+./.ignore/deployment/import-win-references.ps1 -Kind presence
+./.ignore/deployment/import-win-references.ps1 -Kind presence -Apply
+```
+
+Presence compares Reddit's winner line with the performer tables on the same
+cached episode page. Episodes without a usable lineup are left unknown.
+
 ## Resume or narrow review
 
 - `review batch` resumes an open batch for the same filters without replacing

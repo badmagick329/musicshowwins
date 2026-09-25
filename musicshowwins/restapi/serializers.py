@@ -165,7 +165,16 @@ class WinSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Win
-        fields = ("id", "date", "show", "song", "references", "moment", "milestones")
+        fields = (
+            "id",
+            "date",
+            "show",
+            "song",
+            "performed",
+            "references",
+            "moment",
+            "milestones",
+        )
 
 
 class ArtistLeaderboardSerializer(serializers.Serializer):

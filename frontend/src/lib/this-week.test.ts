@@ -9,7 +9,7 @@ const shows: Show[] = [
 
 function win(id: number, date: string, slug: string): Win {
   const show = shows.find((item) => item.slug === slug)!;
-  return { id, date, show: { id: show.id, slug, name: show.name, active: true }, song: { id, title: `Song ${id}`, artist: { id: 1, name: "Artist" }, total_wins: 1, winning_shows: 1, latest_win_date: date }, references: [], milestones: { song_win: 2, song_show_win: 1, artist_win: 2 } };
+  return { id, date, show: { id: show.id, slug, name: show.name, active: true }, song: { id, title: `Song ${id}`, artist: { id: 1, name: "Artist" }, total_wins: 1, winning_shows: 1, latest_win_date: date }, performed: null, references: [], milestones: { song_win: 2, song_show_win: 1, artist_win: 2 } };
 }
 
 describe("this week", () => {

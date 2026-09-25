@@ -56,6 +56,15 @@ function YouTubeSearchLink({ win, placement, className }: { win: Win; placement:
   );
 }
 
+// Searching YouTube for a stage that never happened wastes the visitor's click.
+function AbsentFromBroadcast({ className }: { className?: string }) {
+  return <span className={cn("inline-flex min-h-11 items-center text-xs text-muted-foreground", className)}>Absent from broadcast</span>;
+}
+
+function NoVideo({ win, placement, className }: { win: Win; placement: VideoPlacement; className?: string }) {
+  return win.performed === false ? <AbsentFromBroadcast className={className} /> : <YouTubeSearchLink win={win} placement={placement} className={className} />;
+}
+
 function WinVideoActionLink({ win, video, placement, className }: { win: Win; video: WinReference; placement: VideoPlacement; className: string }) {
   return (
     <a
@@ -142,7 +151,7 @@ export function DesktopWinVideoRow({ win, colSpan, videoCellClassName = "w-44 px
         {children}
         <TableCell className={videoCellClassName}>
           {videos.length === 0 ? (
-            <YouTubeSearchLink win={win} placement="desktop" />
+            <NoVideo win={win} placement="desktop" />
           ) : videos.length === 1 ? (
             <WinVideoActionLink win={win} video={videos[0]} placement="desktop" className={actionClassName} />
           ) : (
@@ -165,7 +174,7 @@ export function MobileWinVideoDisclosure({ win, className }: { win: Win; classNa
   const [open, setOpen] = useState(false);
   const videos = winVideoReferences(win);
   const panelId = `win-videos-mobile-${win.id}`;
-  if (!videos.length) return <div className={className}><YouTubeSearchLink win={win} placement="mobile" className="text-sm" /></div>;
+  if (!videos.length) return <div className={className}><NoVideo win={win} placement="mobile" className="text-sm" /></div>;
   return (
     <div className={cn("flex flex-col items-end", className)}>
       {videos.length === 1 ? (
