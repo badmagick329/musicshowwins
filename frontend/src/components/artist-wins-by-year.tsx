@@ -4,8 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import type { Artist, Win } from "@/lib/api-shared";
 import { artistYears, datedArtistWins, parseArtistYear } from "@/lib/artist-years";
 import { ArtistYearResults } from "@/components/artist-year-results";
-
-type Plausible = ((event: string, options: { props: Record<string, string> }) => void) & { q?: unknown[] };
+import { trackEvent } from "@/lib/analytics";
 const control = "min-h-11 border border-foreground bg-card px-3 py-2 text-sm font-semibold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground";
 
 export function ArtistWinsByYear({ artist, wins, initialYear }: { artist: Artist; wins: Win[]; initialYear: string | null }) {
@@ -41,14 +40,7 @@ export function ArtistWinsByYear({ artist, wins, initialYear }: { artist: Artist
   }, [year]);
 
   function track(event: string, selectedYear = year, extra: Record<string, string> = {}) {
-    const analytics = window as Window & { plausible?: Plausible };
-    // Preserve deliberate interactions while the deferred Plausible script loads.
-    analytics.plausible ??= Object.assign((...args: Parameters<Plausible>) => {
-      analytics.plausible!.q!.push(args);
-    }, { q: [] as unknown[] });
-    analytics.plausible(event, {
-      props: { artist: artist.name, artist_id: String(artist.id), year: selectedYear ?? "all", ...extra },
-    });
+    trackEvent(event, { artist: artist.name, artist_id: String(artist.id), year: selectedYear ?? "all", ...extra });
   }
 
   function selectYear(value: string | null, source: string) {

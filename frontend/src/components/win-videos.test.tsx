@@ -1,11 +1,18 @@
 // @vitest-environment jsdom
 
 import { cleanup, fireEvent, render, within } from "@testing-library/react";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { expectTypeOf } from "vitest";
 import type { Win, WinReference } from "@/lib/api-shared";
 import { ArtistWinHistory } from "./artist-win-history";
 import { winVideoActionLabel, winVideoReferences } from "./win-videos";
+
+const plausible = vi.fn();
+
+beforeEach(() => {
+  Object.assign(window, { plausible });
+  plausible.mockClear();
+});
 
 afterEach(cleanup);
 
@@ -160,6 +167,26 @@ describe("win video references", () => {
     const panel = expandDesktop(container);
     expect(within(panel).getAllByText("Official video")).toHaveLength(1);
     expect(within(panel).getAllByText("Fan upload")).toHaveLength(1);
+  });
+
+  it("tracks video opens with official or fan source and placement", () => {
+    const fan = reference({ id: 2, is_official: false, title: "Fan clip", url: "https://www.youtube.com/watch?v=def456" });
+    const single = render(<ArtistWinHistory wins={[win(1, { references: [fan] })]} />);
+    fireEvent.click(mobile(single.container).getByRole("link", { name: `Watch fan upload for ${winName}` }));
+    expect(plausible).toHaveBeenLastCalledWith("Win video opened", { props: { show: "m-countdown", year: "2024", source: "fan", placement: "mobile" } });
+    single.unmount();
+
+    const { container } = render(<ArtistWinHistory wins={[win(1, { references: [reference({ id: 1 }), fan] })]} />);
+    const panel = expandDesktop(container);
+    fireEvent.click(within(panel).getByRole("link", { name: /Boom Boom Bass MV/ }));
+    expect(plausible).toHaveBeenLastCalledWith("Win video opened", { props: { show: "m-countdown", year: "2024", source: "official", placement: "list" } });
+    expect(plausible).toHaveBeenCalledTimes(2);
+  });
+
+  it("tracks YouTube searches when no video exists", () => {
+    const { container } = render(<ArtistWinHistory wins={[win(1)]} />);
+    fireEvent.click(desktop(container).getByRole("link", { name: `Search YouTube for ${winName}` }));
+    expect(plausible).toHaveBeenCalledWith("YouTube search clicked", { props: { show: "m-countdown", year: "2024", placement: "desktop" } });
   });
 
   it("links each listed video to the API URL in a new tab with the safe rel", () => {

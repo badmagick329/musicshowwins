@@ -4,6 +4,7 @@ import { useState } from "react";
 import { ChevronDown, ExternalLink, Play, Search } from "lucide-react";
 import type { Win, WinReference } from "@/lib/api-shared";
 import { cn, formatDate } from "@/lib/utils";
+import { trackEvent } from "@/lib/analytics";
 import { TableCell, TableRow } from "@/components/ui/table";
 
 export function winVideoReferences(win: Win) {
@@ -16,6 +17,22 @@ export function winVideoActionLabel(count: number, isOfficial = true) {
   return isOfficial ? "Watch video" : "Fan upload";
 }
 
+type VideoPlacement = "desktop" | "mobile" | "list";
+
+// Measures whether visitors use video links at all, and whether fan uploads earn their removal risk.
+function trackVideoOpened(win: Win, video: WinReference, placement: VideoPlacement) {
+  trackEvent("Win video opened", {
+    show: win.show.slug,
+    year: win.date.slice(0, 4),
+    source: video.is_official ? "official" : "fan",
+    placement,
+  });
+}
+
+function trackSearch(win: Win, placement: VideoPlacement) {
+  trackEvent("YouTube search clicked", { show: win.show.slug, year: win.date.slice(0, 4), placement });
+}
+
 function winContext(win: Win) {
   return `${win.song.title} by ${win.song.artist.name}, ${formatDate(win.date)}, ${win.show.name}`;
 }
@@ -24,12 +41,13 @@ const winVideoActionClass = "grid cursor-pointer grid-cols-[0.875rem_1fr_0.875re
 const desktopActionClass = "h-8 px-2.5 text-xs shadow-[2px_2px_0_var(--foreground)]";
 const mobileActionClass = "min-h-10 w-44 max-w-full px-3 text-sm shadow-[2px_2px_0_var(--foreground)]";
 
-function YouTubeSearchLink({ win, className }: { win: Win; className?: string }) {
+function YouTubeSearchLink({ win, placement, className }: { win: Win; placement: VideoPlacement; className?: string }) {
   const date = win.date.slice(2).replaceAll("-", "");
   const query = `${win.song.artist.name} ${win.song.title} ${date}`;
   const href = `https://www.youtube.com/results?${new URLSearchParams({ search_query: query })}`;
   return (
     <a href={href} target="_blank" rel="noopener noreferrer"
+      onClick={() => trackSearch(win, placement)}
       aria-label={`Search YouTube for ${winContext(win)}`}
       className={cn("inline-flex min-h-11 items-center gap-1.5 text-xs text-muted-foreground underline underline-offset-4 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2", className)}>
       <Search className="size-3.5 shrink-0" aria-hidden="true" />
@@ -38,12 +56,13 @@ function YouTubeSearchLink({ win, className }: { win: Win; className?: string })
   );
 }
 
-function WinVideoActionLink({ win, video, className }: { win: Win; video: WinReference; className: string }) {
+function WinVideoActionLink({ win, video, placement, className }: { win: Win; video: WinReference; placement: VideoPlacement; className: string }) {
   return (
     <a
       href={video.url}
       target="_blank"
       rel="noopener noreferrer"
+      onClick={() => trackVideoOpened(win, video, placement)}
       aria-label={`Watch ${video.is_official ? "video" : "fan upload"} for ${winContext(win)}`}
       className={cn(winVideoActionClass, className)}
     >
@@ -71,7 +90,7 @@ function WinVideoToggleButton({ win, count, open, panelId, onToggle, className }
   );
 }
 
-function WinVideoLink({ video }: { video: WinReference }) {
+function WinVideoLink({ win, video }: { win: Win; video: WinReference }) {
   const title = video.title.trim() || (video.is_official ? "Official video" : "Video");
   const publisher = video.publisher_name.trim() || "YouTube";
   return (
@@ -80,6 +99,7 @@ function WinVideoLink({ video }: { video: WinReference }) {
         href={video.url}
         target="_blank"
         rel="noopener noreferrer"
+        onClick={() => trackVideoOpened(win, video, "list")}
         className="flex items-center gap-3 border border-border bg-card px-3 py-2.5 text-foreground transition-colors motion-reduce:transition-none hover:bg-accent focus-visible:bg-accent"
       >
         <Play aria-hidden="true" className="size-5 shrink-0 text-brand-pink" />
@@ -105,7 +125,7 @@ function WinVideoPanel({ win, videos, panelId }: { win: Win; videos: WinReferenc
   return (
     <div id={panelId} className="border-l-4 border-brand-pink bg-highlight-yellow p-3">
       <ul aria-label={`Videos for ${winContext(win)}`} className="flex flex-col gap-2">
-        {videos.map((video) => <WinVideoLink key={video.id} video={video} />)}
+        {videos.map((video) => <WinVideoLink key={video.id} win={win} video={video} />)}
       </ul>
     </div>
   );
@@ -122,9 +142,9 @@ export function DesktopWinVideoRow({ win, colSpan, videoCellClassName = "w-44 px
         {children}
         <TableCell className={videoCellClassName}>
           {videos.length === 0 ? (
-            <YouTubeSearchLink win={win} />
+            <YouTubeSearchLink win={win} placement="desktop" />
           ) : videos.length === 1 ? (
-            <WinVideoActionLink win={win} video={videos[0]} className={actionClassName} />
+            <WinVideoActionLink win={win} video={videos[0]} placement="desktop" className={actionClassName} />
           ) : (
             <WinVideoToggleButton win={win} count={videos.length} open={open} panelId={panelId} onToggle={() => setOpen(!open)} className={actionClassName} />
           )}
@@ -145,11 +165,11 @@ export function MobileWinVideoDisclosure({ win, className }: { win: Win; classNa
   const [open, setOpen] = useState(false);
   const videos = winVideoReferences(win);
   const panelId = `win-videos-mobile-${win.id}`;
-  if (!videos.length) return <div className={className}><YouTubeSearchLink win={win} className="text-sm" /></div>;
+  if (!videos.length) return <div className={className}><YouTubeSearchLink win={win} placement="mobile" className="text-sm" /></div>;
   return (
     <div className={cn("flex flex-col items-end", className)}>
       {videos.length === 1 ? (
-        <WinVideoActionLink win={win} video={videos[0]} className={mobileActionClass} />
+        <WinVideoActionLink win={win} video={videos[0]} placement="mobile" className={mobileActionClass} />
       ) : (
         <>
           <WinVideoToggleButton win={win} count={videos.length} open={open} panelId={panelId} onToggle={() => setOpen(!open)} className={mobileActionClass} />

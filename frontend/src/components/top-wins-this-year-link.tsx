@@ -1,17 +1,10 @@
 "use client";
 
 import Link from "next/link";
-
-type Plausible = ((event: string, options: { props: Record<string, string> }) => void) & { q?: unknown[] };
-
-const eventName = "Top wins this year clicked";
+import { trackEvent } from "@/lib/analytics";
 
 function trackClick() {
-  const analytics = window as Window & { plausible?: Plausible };
-  analytics.plausible ??= Object.assign((...args: Parameters<Plausible>) => {
-    analytics.plausible!.q!.push(args);
-  }, { q: [] as unknown[] });
-  analytics.plausible(eventName, { props: {} });
+  trackEvent("Top wins this year clicked");
 }
 
 export function TopWinsThisYearLink() {
