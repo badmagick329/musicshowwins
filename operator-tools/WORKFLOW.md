@@ -70,7 +70,7 @@ handles its file paths:
 ```text
 Review and apply the next batch of YouTube video candidates in this project.
 
-Follow .ignore/docs/operator-workflow/AGENT_REVIEW_PLAYBOOK.md. Run
+Follow .ignore/docs/operator-workflow/agent-review-playbook.md. Run
 ./operator.ps1 review batch to create or resume an assignment. Read every
 candidate in the batch.json file printed as Agent evidence, check the evidence,
 and fill decisions.json with approve, reject or defer decisions, your reviewer
@@ -84,7 +84,7 @@ Do not export references, import into Django or contact production.
 ```
 
 You can use this prompt in the current task or give it to another agent working
-in this repository. The [agent playbook](../.ignore/docs/operator-workflow/AGENT_REVIEW_PLAYBOOK.md)
+in this repository. The [agent playbook](../.ignore/docs/operator-workflow/agent-review-playbook.md)
 contains the review criteria and recovery instructions.
 
 Each batch gets a generated ID, such as `bbf708c4630446348e893f2a8e428bd9`.
