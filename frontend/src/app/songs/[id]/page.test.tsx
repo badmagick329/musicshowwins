@@ -35,7 +35,7 @@ function win(id: number, date: string, show: { id: number; slug: string; name: s
     date,
     show: { ...show, active: true },
     song,
-    references: [],
+    references: [], milestones: { song_win: 2, song_show_win: 1, artist_win: 2 },
   };
 }
 

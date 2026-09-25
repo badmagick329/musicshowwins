@@ -7,6 +7,7 @@ import type {
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { DesktopWinVideoRow, MobileWinVideoDisclosure } from "@/components/win-videos";
 import { formatDate } from "@/lib/utils";
+import { notableTag } from "@/lib/win-facts";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 
@@ -64,6 +65,13 @@ export function ShowWinsStrip({ shows, label }: { shows: { id: number; slug: str
   );
 }
 
+// Shown on only the few notable rows so long histories stay scannable.
+export function WinFactTag({ win }: { win: Win }) {
+  const tag = notableTag(win);
+  if (!tag) return null;
+  return <span className="mt-1 block"><span className="inline-block border border-highlight-yellow bg-highlight-yellow/25 px-1.5 py-0.5 text-xs font-semibold text-foreground">{tag}</span></span>;
+}
+
 export function RankMarker({ rank }: { rank: number }) {
   return <span className={cn("rank-marker", rank <= 3 && `rank-marker--${rank}`)}>{rank}</span>;
 }
@@ -112,7 +120,7 @@ export function WinRecord({ win, hideArtist = false, hideSong = false }: { win: 
     <article className="border-b border-border/70 px-3 py-3 last:border-b-0">
       <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-x-3 gap-y-2">
         <time dateTime={win.date} className="font-heading text-sm font-bold tabular-nums text-muted-foreground">{formatDate(win.date)}</time>
-        {!hideSong && <div className="col-span-2 row-start-2 min-w-0"><p className="break-words font-semibold"><Link prefetch={false} href={`/songs/${win.song.id}`} className="compact-link-target">{win.song.title}</Link></p>{!hideArtist && <p className="break-words text-xs text-muted-foreground"><Link prefetch={false} href={`/artists/${win.song.artist.id}`} className="compact-link-target">{win.song.artist.name}</Link></p>}</div>}
+        {hideSong ? <div className="col-span-2 row-start-2 empty:hidden"><WinFactTag win={win} /></div> : <div className="col-span-2 row-start-2 min-w-0"><p className="break-words font-semibold"><Link prefetch={false} href={`/songs/${win.song.id}`} className="compact-link-target">{win.song.title}</Link></p>{!hideArtist && <p className="break-words text-xs text-muted-foreground"><Link prefetch={false} href={`/artists/${win.song.artist.id}`} className="compact-link-target">{win.song.artist.name}</Link></p>}<WinFactTag win={win} /></div>}
         <ShowBadge slug={win.show.slug} name={win.show.name} />
       </div>
       <MobileWinVideoDisclosure win={win} className="mt-3" />

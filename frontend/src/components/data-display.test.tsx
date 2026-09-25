@@ -23,7 +23,7 @@ describe("MusicShowList", () => {
 describe("homepage data tables", () => {
   it("renders semantic desktop tables alongside mobile records", () => {
     const leaderboard = renderToStaticMarkup(<Leaderboard kind="artist" rows={[{ rank: 1, wins: 12, artist: { id: 3, name: "aespa" } }]} />);
-    const recent = renderToStaticMarkup(<RecentWins wins={[{ id: 1, date: "2024-06-02", show: { id: 1, slug: "music-bank", name: "Music Bank", active: true }, song: { id: 7, title: "Supernova", artist: { id: 3, name: "aespa" }, total_wins: 1, latest_win_date: "2024-06-02", winning_shows: 1 }, references: [] }]} />);
+    const recent = renderToStaticMarkup(<RecentWins wins={[{ id: 1, date: "2024-06-02", show: { id: 1, slug: "music-bank", name: "Music Bank", active: true }, song: { id: 7, title: "Supernova", artist: { id: 3, name: "aespa" }, total_wins: 1, latest_win_date: "2024-06-02", winning_shows: 1 }, references: [], milestones: { song_win: 2, song_show_win: 1, artist_win: 2 } }]} />);
 
     expect(leaderboard).toContain("Top five artists by music show wins");
     expect(leaderboard).toContain("rank-marker--1");

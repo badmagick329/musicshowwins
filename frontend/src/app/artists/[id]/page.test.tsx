@@ -13,7 +13,7 @@ import ArtistPage, { generateMetadata } from "./page";
 const artist: Artist = { id: 3, name: "aespa", total_wins: 2, winning_songs: 2, latest_win_date: "2024-06-02" };
 const earliest: Win = {
   id: 1, date: "2021-01-17", show: { id: 1, slug: "inkigayo", name: "Inkigayo", active: true },
-  song: { id: 7, title: "Black Mamba", artist, total_wins: 1, latest_win_date: "2021-01-17", winning_shows: 1 }, references: [],
+  song: { id: 7, title: "Black Mamba", artist, total_wins: 1, latest_win_date: "2021-01-17", winning_shows: 1 }, references: [], milestones: { song_win: 2, song_show_win: 1, artist_win: 2 },
 };
 const latest: Win = { ...earliest, id: 2, date: "2024-06-02", song: { ...earliest.song, id: 8, title: "Supernova" } };
 const params = Promise.resolve({ id: "3" });
