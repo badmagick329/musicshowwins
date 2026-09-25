@@ -63,6 +63,25 @@ class PlannedReference:
     record: ValidatedReference
     instance: WinReference | None
     changed_fields: tuple[str, ...]
+    values: dict[str, Any]
+
+
+def _keep_production_availability(
+    instance: WinReference, values: dict[str, Any]
+) -> dict[str, Any]:
+    """Production's availability check knows more than an offline manifest."""
+    values = dict(values)
+    if (
+        instance.status == WinReference.Status.UNAVAILABLE
+        and values["status"] == WinReference.Status.ACTIVE
+    ):
+        values["status"] = WinReference.Status.UNAVAILABLE
+    if instance.last_verified_at and (
+        values["last_verified_at"] is None
+        or instance.last_verified_at > values["last_verified_at"]
+    ):
+        values["last_verified_at"] = instance.last_verified_at
+    return values
 
 
 def _error(index: int, message: str) -> ReferenceDocumentError:
@@ -276,6 +295,7 @@ def _plan_import(records: list[ValidatedReference]) -> list[PlannedReference]:
             raise _error(record.index, "matches an earlier reference in this document.")
         if instance:
             claimed.add(instance.pk)
+            values = _keep_production_availability(instance, values)
             changed = tuple(
                 field
                 for field in MUTABLE_FIELDS
@@ -289,6 +309,7 @@ def _plan_import(records: list[ValidatedReference]) -> list[PlannedReference]:
                 record=record,
                 instance=instance,
                 changed_fields=changed,
+                values=values,
             )
         )
 
@@ -301,9 +322,7 @@ def _plan_import(records: list[ValidatedReference]) -> list[PlannedReference]:
         final_states.append((instance.win_id, values, instance.pk))
     for plan in plans:
         if plan.instance is None:
-            final_states.append(
-                (plan.record.win.pk, plan.record.values, -plan.record.index)
-            )
+            final_states.append((plan.record.win.pk, plan.values, -plan.record.index))
 
     urls: dict[tuple[int, str], int] = {}
     external_ids: dict[tuple[int, str, str], int] = {}
@@ -346,11 +365,11 @@ def import_document(
 
         for plan in plans:
             if plan.instance is None:
-                WinReference.objects.create(win=plan.record.win, **plan.record.values)
+                WinReference.objects.create(win=plan.record.win, **plan.values)
                 created += 1
             elif plan.changed_fields:
                 for field in plan.changed_fields:
-                    setattr(plan.instance, field, plan.record.values[field])
+                    setattr(plan.instance, field, plan.values[field])
                 if plan.changed_fields == ("last_verified_at",):
                     plan.instance.save(update_fields=plan.changed_fields)
                     verification_refreshed += 1

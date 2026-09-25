@@ -124,6 +124,10 @@ REST_FRAMEWORK = {
 INTERNAL_API_SECRET = os.environ.get("INTERNAL_API_SECRET", "")
 CACHE_REVALIDATION_URL = os.environ.get("CACHE_REVALIDATION_URL", "")
 CACHE_REVALIDATION_SECRET = os.environ.get("CACHE_REVALIDATION_SECRET", "")
+YOUTUBE_API_KEY = os.environ.get("YOUTUBE_API_KEY", "")
+YOUTUBE_API_BASE_URL = os.environ.get(
+    "YOUTUBE_API_BASE_URL", "https://www.googleapis.com/youtube/v3"
+)
 
 SPECTACULAR_SETTINGS = {
     "TITLE": "Music Show Wins API",
