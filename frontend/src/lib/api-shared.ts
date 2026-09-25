@@ -55,10 +55,11 @@ export type WinMilestones = { song_win: number; song_show_win: number; artist_wi
 export type Win = { id: number; date: string; show: ShowSummary; song: Song; references: WinReference[]; moment?: WinMoment | null; milestones: WinMilestones };
 export type ArtistLeaderboardRow = { rank: number; wins: number; artist: Pick<Artist, "id" | "name"> };
 export type SongLeaderboardRow = { rank: number; wins: number; song: Pick<Song, "id" | "title" | "artist"> };
+export type ArchiveWeek = { start: string; end: string; current: boolean; wins: Win[] };
 export type HomeData = {
   artists: ArtistLeaderboardRow[];
   songs: SongLeaderboardRow[];
-  wins: Win[];
+  week: ArchiveWeek;
   shows: Show[];
   artistResults: Artist[];
   artistResultCount: number;

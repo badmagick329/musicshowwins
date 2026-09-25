@@ -7,11 +7,12 @@ import {
   ErrorState,
   Leaderboard,
   MusicShowList,
-  RecentWins,
   SectionHeading,
 } from "@/components/data-display";
 import { getHomeData } from "@/lib/api";
 import { archiveToday } from "@/lib/rankings";
+import { koreaToday } from "@/lib/this-week";
+import { ThisWeek } from "@/components/this-week";
 import { noIndexFollow, siteDescription, siteName, siteUrl } from "@/lib/seo";
 
 export async function generateMetadata({ searchParams }: { searchParams: Promise<{ search?: string | string[]; rankings?: string | string[] }> }): Promise<Metadata> {
@@ -34,7 +35,8 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ s
   const searchParam = query.trim() ? `search=${encodeURIComponent(query.trim())}` : "";
   const thisYearHref = searchParam ? `/?${searchParam}` : "/";
   const allTimeHref = `/?${searchParam ? `${searchParam}&` : ""}rankings=all-time`;
-  const data = await getHomeData(query, period, today);
+  const koreaDate = koreaToday();
+  const data = await getHomeData(query, period, today, koreaDate);
 
   return (
     <>
@@ -66,6 +68,8 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ s
         </div>
         <ErrorState messages={data.errors} />
 
+        <ThisWeek week={data.week} shows={data.shows} today={koreaDate} />
+
         <section className="mt-14" aria-labelledby="home-rankings-title">
           <div className="mb-5 flex flex-wrap items-center justify-between gap-3 border-b-2 border-foreground pb-3">
             <h2 id="home-rankings-title" className="font-heading text-xl font-bold tracking-tight sm:text-2xl">Most wins {period === "year" ? `in ${year}` : "of all time"}</h2>
@@ -89,11 +93,6 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ s
             />
           </section>
           </div>
-        </section>
-
-        <section id="wins" className="mt-14">
-          <SectionHeading title="Recent wins" action={<Link href="/wins" className="compact-link-target text-sm font-bold text-link-pink">View all wins</Link>} />
-          <RecentWins wins={data.wins} />
         </section>
 
         <section id="shows" className="mt-14">

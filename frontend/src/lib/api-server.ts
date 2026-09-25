@@ -1,6 +1,7 @@
 import "server-only";
 import { artistOrderings, type ArtistSort } from "@/lib/artist-list";
 import { archiveToday } from "@/lib/rankings";
+import { addDays, chooseWeek, koreaToday, weekStart } from "@/lib/this-week";
 import {
   buildApiUrl,
   parseApiPage,
@@ -99,6 +100,7 @@ export async function warmCanonicalArchivePages() {
     serverRequestPage<ArtistLeaderboardRow>("/leaderboards/artists", { date_from: `${currentYear}-01-01`, date_to: today, page: 1 }),
     serverRequestPage<SongLeaderboardRow>("/leaderboards/songs", { date_from: `${currentYear}-01-01`, date_to: today, page: 1 }),
     serverRequestPage<Win>("/wins", { page: 1 }),
+    serverRequestPage<Win>("/wins", currentWeekParams()),
     getShows(),
     getArtists(),
     getSongs(),
@@ -113,14 +115,28 @@ async function safePage<T>(label: string, path: string, params?: Record<string, 
   }
 }
 
-export async function getHomeData(search = "", rankingsPeriod: "year" | "all-time" = "year", today = archiveToday()): Promise<HomeData> {
+function currentWeekParams(today = koreaToday()) {
+  const start = weekStart(today);
+  return { date_from: start, date_to: addDays(start, 6), ordering: "date" };
+}
+
+export async function getHomeData(search = "", rankingsPeriod: "year" | "all-time" = "year", today = archiveToday(), koreaDate = koreaToday()): Promise<HomeData> {
   const rankingDates: Record<string, string> = rankingsPeriod === "year" ? { date_from: `${today.slice(0, 4)}-01-01`, date_to: today } : {};
-  const [artists, songs, wins, shows, artistResults] = await Promise.all([
+  const [artists, songs, currentWins, latestWins, shows, artistResults] = await Promise.all([
     safePage<ArtistLeaderboardRow>("Artist leaderboard", "/leaderboards/artists", { limit: 5, ...rankingDates }),
     safePage<SongLeaderboardRow>("Song leaderboard", "/leaderboards/songs", { limit: 5, ...rankingDates }),
-    safePage<Win>("Recent wins", "/wins", { page: 1 }),
+    safePage<Win>("This week", "/wins", currentWeekParams(koreaDate)),
+    safePage<Win>("Latest results", "/wins", { page: 1 }),
     safePage<Show>("Music shows", "/shows"),
     search.trim() ? safePage<Artist>("Artist search", "/artists", { search: search.trim(), ordering: artistOrderings.wins, page: 1 }) : Promise.resolve({ page: { count: 0, next: null, previous: null, results: [] } as ApiPage<Artist>, error: undefined }),
   ]);
-  return { artists: artists.page.results, songs: songs.page.results, wins: wins.page.results.slice(0, 8), shows: shows.page.results, artistResults: artistResults.page.results.slice(0, 8), artistResultCount: artistResults.page.count, errors: [artists.error, songs.error, wins.error, shows.error, artistResults.error].filter((error): error is string => Boolean(error)) };
+  return {
+    artists: artists.page.results,
+    songs: songs.page.results,
+    week: chooseWeek(koreaDate, currentWins.page.results, latestWins.page.results),
+    shows: shows.page.results,
+    artistResults: artistResults.page.results.slice(0, 8),
+    artistResultCount: artistResults.page.count,
+    errors: [artists.error, songs.error, currentWins.error, latestWins.error, shows.error, artistResults.error].filter((error): error is string => Boolean(error)),
+  };
 }

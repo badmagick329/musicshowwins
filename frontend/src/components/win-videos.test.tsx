@@ -4,7 +4,6 @@ import { cleanup, fireEvent, render, within } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 import { expectTypeOf } from "vitest";
 import type { Win, WinReference } from "@/lib/api-shared";
-import { RecentWins } from "./data-display";
 import { ArtistWinHistory } from "./artist-win-history";
 import { winVideoActionLabel, winVideoReferences } from "./win-videos";
 
@@ -41,7 +40,7 @@ describe("win video references", () => {
   });
 
   it("offers a YouTube search on desktop and mobile only when no video exists", () => {
-    const { container } = render(<RecentWins wins={[win(1, { references: [reference({ reference_type: "article" })] })]} />);
+    const { container } = render(<ArtistWinHistory wins={[win(1, { references: [reference({ reference_type: "article" })] })]} />);
     for (const view of [desktop(container), mobile(container)]) {
       const link = view.getByRole("link", { name: `Search YouTube for ${winName}` });
       const url = new URL(link.getAttribute("href")!);
@@ -55,7 +54,7 @@ describe("win video references", () => {
   });
 
   it("renders one video as a direct external Watch video link", () => {
-    const { container } = render(<RecentWins wins={[win(1, { references: [reference()] })]} />);
+    const { container } = render(<ArtistWinHistory wins={[win(1, { references: [reference()] })]} />);
     const link = desktop(container).getByRole("link", { name: `Watch video for ${winName}` });
     expect(link.getAttribute("href")).toBe("https://www.youtube.com/watch?v=abc123");
     expect(link.getAttribute("target")).toBe("_blank");
@@ -66,7 +65,7 @@ describe("win video references", () => {
   });
 
   it("keeps the play and external-link icons and no chevron on the single-video action", () => {
-    const { container } = render(<RecentWins wins={[win(1, { references: [reference()] })]} />);
+    const { container } = render(<ArtistWinHistory wins={[win(1, { references: [reference()] })]} />);
     const link = desktop(container).getByRole("link", { name: `Watch video for ${winName}` });
     expect(link.querySelector("svg.lucide-play")).toBeTruthy();
     expect(link.querySelector("svg.lucide-external-link")).toBeTruthy();
@@ -75,7 +74,7 @@ describe("win video references", () => {
   });
 
   it("sizes both desktop actions identically with the same three-column layout", () => {
-    const { container } = render(<RecentWins wins={[win(1, { references: [reference()] }), win(2, { references: [reference({ id: 5, title: "Second MV" }), reference({ id: 6, url: "https://www.youtube.com/watch?v=ghi789" })] })]} />);
+    const { container } = render(<ArtistWinHistory wins={[win(1, { references: [reference()] }), win(2, { references: [reference({ id: 5, title: "Second MV" }), reference({ id: 6, url: "https://www.youtube.com/watch?v=ghi789" })] })]} />);
     const link = desktop(container).getByRole("link", { name: `Watch video for ${winName}` });
     const button = desktop(container).getByRole("button", { name: `Choose from 2 videos for ${winName}` });
     expect(link.className).toBe(button.className);
@@ -99,7 +98,7 @@ describe("win video references", () => {
   });
 
   it("gives the single-video action no disclosure attributes and no panel", () => {
-    const { container } = render(<RecentWins wins={[win(1, { references: [reference()] })]} />);
+    const { container } = render(<ArtistWinHistory wins={[win(1, { references: [reference()] })]} />);
     const link = desktop(container).getByRole("link", { name: `Watch video for ${winName}` });
     expect(link.getAttribute("aria-expanded")).toBeNull();
     expect(link.getAttribute("aria-controls")).toBeNull();
@@ -110,7 +109,7 @@ describe("win video references", () => {
   });
 
   it("labels several videos with a Choose video button whose name carries the count", () => {
-    const { container } = render(<RecentWins wins={[win(1, { references: [reference({ id: 1 }), reference({ id: 2, url: "https://www.youtube.com/watch?v=def456" })] })]} />);
+    const { container } = render(<ArtistWinHistory wins={[win(1, { references: [reference({ id: 1 }), reference({ id: 2, url: "https://www.youtube.com/watch?v=def456" })] })]} />);
     const button = desktop(container).getByRole("button", { name: `Choose from 2 videos for ${winName}` });
     expect(button.textContent).toContain("Choose video");
     expect(button.className).toContain("whitespace-nowrap");
@@ -120,7 +119,7 @@ describe("win video references", () => {
   });
 
   it("starts collapsed and expands and collapses on click, independent per win", () => {
-    const { container } = render(<RecentWins wins={[win(1, { references: [reference({ id: 1 }), reference({ id: 2, url: "https://www.youtube.com/watch?v=def456" })] }), win(2, { references: [reference({ id: 5, title: "Second MV" }), reference({ id: 6, url: "https://www.youtube.com/watch?v=ghi789" })] })]} />);
+    const { container } = render(<ArtistWinHistory wins={[win(1, { references: [reference({ id: 1 }), reference({ id: 2, url: "https://www.youtube.com/watch?v=def456" })] }), win(2, { references: [reference({ id: 5, title: "Second MV" }), reference({ id: 6, url: "https://www.youtube.com/watch?v=ghi789" })] })]} />);
     const buttons = desktop(container).getAllByRole("button", { name: /for Boom Boom Bass by Riize/ });
     expect(container.querySelector("td[colspan]")).toBeNull();
 
@@ -141,7 +140,7 @@ describe("win video references", () => {
   });
 
   it("renders titles, publisher names, and official status in the expanded list", () => {
-    const { container } = render(<RecentWins wins={[win(1, { references: [reference({ id: 1 }), reference({ id: 2, url: "https://www.youtube.com/watch?v=def456", title: "Boom Boom Bass Encore" })] })]} />);
+    const { container } = render(<ArtistWinHistory wins={[win(1, { references: [reference({ id: 1 }), reference({ id: 2, url: "https://www.youtube.com/watch?v=def456", title: "Boom Boom Bass Encore" })] })]} />);
     const panel = expandDesktop(container);
     expect(within(panel).getByText("Boom Boom Bass MV")).toBeTruthy();
     expect(within(panel).getAllByText("Mnet K-POP")).toHaveLength(2);
@@ -149,7 +148,7 @@ describe("win video references", () => {
   });
 
   it("links each listed video to the API URL in a new tab with the safe rel", () => {
-    const { container } = render(<RecentWins wins={[win(1, { references: [reference({ id: 1 }), reference({ id: 2, url: "https://www.youtube.com/watch?v=def456", title: "Boom Boom Bass Encore" })] })]} />);
+    const { container } = render(<ArtistWinHistory wins={[win(1, { references: [reference({ id: 1 }), reference({ id: 2, url: "https://www.youtube.com/watch?v=def456", title: "Boom Boom Bass Encore" })] })]} />);
     const panel = expandDesktop(container);
     const link = within(panel).getByRole("link", { name: /Boom Boom Bass MV/ });
     expect(link.getAttribute("href")).toBe("https://www.youtube.com/watch?v=abc123");
@@ -158,18 +157,11 @@ describe("win video references", () => {
   });
 
   it("falls back to sensible labels for missing metadata", () => {
-    const { container } = render(<RecentWins wins={[win(1, { references: [reference({ id: 1, title: "", publisher_name: "" }), reference({ id: 2, title: "", publisher_name: "", is_official: false, url: "https://www.youtube.com/watch?v=def456" })] })]} />);
+    const { container } = render(<ArtistWinHistory wins={[win(1, { references: [reference({ id: 1, title: "", publisher_name: "" }), reference({ id: 2, title: "", publisher_name: "", is_official: false, url: "https://www.youtube.com/watch?v=def456" })] })]} />);
     const panel = expandDesktop(container);
     expect(panel.textContent).toContain("Official video");
     expect(panel.textContent).toContain("Video");
     expect(panel.textContent).toContain("YouTube");
-  });
-
-  it("expands RecentWins desktop rows with colSpan 5 inside the table body", () => {
-    const { container } = render(<RecentWins wins={[win(1, { references: [reference({ id: 1 }), reference({ id: 2, url: "https://www.youtube.com/watch?v=def456" })] })]} />);
-    const panel = expandDesktop(container);
-    expect(container.querySelector('td[colspan="5"]')).toBeTruthy();
-    expect(container.querySelector(".desktop-table tbody")?.contains(panel)).toBe(true);
   });
 
   it("expands ArtistWinHistory rows with colSpan 4, or 3 when the song column is hidden", () => {
@@ -188,7 +180,6 @@ describe("win video references", () => {
   it("keeps video actions on one line with a matching Video column width in every win table", () => {
     const references = [reference({ id: 1 }), reference({ id: 2, url: "https://www.youtube.com/watch?v=def456" })];
     const views = [
-      render(<RecentWins wins={[win(1, { references })]} />),
       render(<ArtistWinHistory wins={[win(1, { references })]} />),
       render(<ArtistWinHistory wins={[win(1, { references })]} hideSong />),
     ];
@@ -205,7 +196,7 @@ describe("win video references", () => {
 
   it("keeps song-history video actions compact while other desktop tables fill their fixed video column", () => {
     const references = [reference()];
-    const recent = render(<RecentWins wins={[win(1, { references })]} />);
+    const recent = render(<ArtistWinHistory wins={[win(1, { references })]} />);
     const songHistory = render(<ArtistWinHistory wins={[win(1, { references })]} hideSong />);
     const recentAction = desktop(recent.container).getByRole("link", { name: `Watch video for ${winName}` });
     const songAction = desktop(songHistory.container).getByRole("link", { name: `Watch video for ${winName}` });

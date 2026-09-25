@@ -2,7 +2,15 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 
 vi.mock("@/lib/api", () => ({
-  getHomeData: vi.fn(async () => ({ artists: [], songs: [], wins: [], shows: [], artistResults: [], artistResultCount: 0, errors: [] })),
+  getHomeData: vi.fn(async () => ({
+    artists: [],
+    songs: [],
+    week: { start: "2026-09-14", end: "2026-09-20", current: false, wins: [{ id: 9, date: "2026-09-20", show: { id: 6, slug: "inkigayo", name: "Inkigayo", active: true }, song: { id: 4, title: "Bad", artist: { id: 2, name: "Ateez" }, total_wins: 7, winning_shows: 4, latest_win_date: "2026-09-20" }, references: [], milestones: { song_win: 7, song_show_win: 3, artist_win: 40 } }] },
+    shows: [{ id: 5, slug: "music-core", name: "Show! Music Core", active: true }, { id: 6, slug: "inkigayo", name: "Inkigayo", active: true }],
+    artistResults: [],
+    artistResultCount: 0,
+    errors: [],
+  })),
 }));
 vi.mock("@/components/artist-search", () => ({ ArtistSearch: () => null }));
 
@@ -20,7 +28,12 @@ describe("homepage banner", () => {
     expect(html).toContain("Top wins this year");
     expect(html).toContain('bg-action-pink text-white');
     expect(html).toContain('href="/rankings?kind=artists"');
-    expect(html.indexOf("Most wins in")).toBeLessThan(html.indexOf("Recent wins"));
+    expect(html).not.toContain("Recent wins");
+    expect(html.indexOf("Latest results · 14–20 Sept")).toBeLessThan(html.indexOf("Most wins in"));
+    expect(html).toContain("No results yet this week.");
+    expect(html).toContain("7th recorded win for Bad");
+    expect(html).toContain("Triple crown · Inkigayo");
+    expect(html).toContain("No result recorded");
   });
 
   it("keeps full-ranking links aligned with the shared all-time preview", async () => {
@@ -29,7 +42,7 @@ describe("homepage banner", () => {
     expect(html).toContain('bg-action-pink text-white');
     expect(html).toContain('href="/rankings?kind=artists&amp;period=all-time"');
     expect(html).toContain('href="/rankings?period=all-time"');
-    expect(html.indexOf("Most wins of all time")).toBeLessThan(html.indexOf("Recent wins"));
+    expect(html.indexOf("Latest results")).toBeLessThan(html.indexOf("Most wins of all time"));
   });
 
   it("keeps an artist search when changing preview period", async () => {

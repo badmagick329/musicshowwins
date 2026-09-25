@@ -18,17 +18,20 @@ export function ordinal(value: number) {
 export function notableTag(win: Win): string | null {
   const { artist_win, song_show_win, song_win } = win.milestones;
   if (win.date.startsWith(COVERAGE_START_YEAR)) return null;
-  if (artist_win === 1) return "1st recorded win";
+  if (artist_win === 1 || ARTIST_MILESTONES.has(artist_win)) return `${ordinal(artist_win)} recorded win for ${win.song.artist.name}`;
   if (song_show_win === 3) return `Triple crown · ${win.show.name}`;
-  if (ARTIST_MILESTONES.has(artist_win)) return `${ordinal(artist_win)} recorded win`;
-  if (SONG_MILESTONES.has(song_win)) return `${ordinal(song_win)} win for ${win.song.title}`;
+  if (SONG_MILESTONES.has(song_win)) return `${ordinal(song_win)} recorded win for ${win.song.title}`;
   return null;
 }
 
-/** The always-present context line on a This week card. */
-export function cardFacts(win: Win): string[] {
-  const facts = win.date.startsWith(COVERAGE_START_YEAR) ? [] : [`${ordinal(win.milestones.song_win)} recorded win for ${win.song.title}`];
+/**
+ * A This week card shows the song's running count plus any other notable tag.
+ * An artist's first recorded win implies the song's, so only the tag remains.
+ */
+export function cardFacts(win: Win): { count: string | null; tag: string | null } {
+  if (win.date.startsWith(COVERAGE_START_YEAR)) return { count: null, tag: null };
   const tag = notableTag(win);
-  if (tag && !tag.endsWith(`win for ${win.song.title}`)) facts.push(tag);
-  return facts;
+  const count = `${ordinal(win.milestones.song_win)} recorded win for ${win.song.title}`;
+  if (win.milestones.artist_win === 1) return { count: null, tag };
+  return { count, tag: tag === count ? null : tag };
 }

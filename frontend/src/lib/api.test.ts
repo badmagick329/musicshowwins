@@ -123,11 +123,14 @@ describe("getHomeData", () => {
       return new Response(JSON.stringify({ count: results.length, next: null, previous: null, results }), { status: 200 });
     });
     vi.stubGlobal("fetch", fetchMock);
-    const data = await getHomeData();
+    const data = await getHomeData("", "year", "2026-09-25", "2026-09-25");
     expect(data.shows).toEqual([{ id: 1, slug: "music-bank", name: "Music Bank", active: true }]);
     expect(data.errors).toEqual([]);
     expect(data.artistResultCount).toBe(0);
-    expect(fetchMock).toHaveBeenCalledTimes(4);
+    expect(fetchMock).toHaveBeenCalledTimes(5);
+    expect(fetchMock.mock.calls.map(([input]) => String(input))).toEqual(expect.arrayContaining([
+      expect.stringMatching(/\/wins\?date_from=2026-09-21&date_to=2026-09-27&ordering=date$/),
+    ]));
   });
 
   it("preserves the full artist result count while limiting the homepage rows", async () => {
@@ -151,7 +154,7 @@ describe("warmCanonicalArchivePages", () => {
     await warmCanonicalArchivePages();
 
     const urls = fetchMock.mock.calls.map(([input]) => String(input));
-    expect(urls).toHaveLength(9);
+    expect(urls).toHaveLength(10);
     expect(urls).toEqual(expect.arrayContaining([
       expect.stringMatching(/\/leaderboards\/artists\?limit=5&date_from=\d{4}-01-01&date_to=\d{4}-\d{2}-\d{2}$/),
       expect.stringMatching(/\/leaderboards\/songs\?limit=5&date_from=\d{4}-01-01&date_to=\d{4}-\d{2}-\d{2}$/),
@@ -162,6 +165,7 @@ describe("warmCanonicalArchivePages", () => {
       expect.stringMatching(/\/artists\?ordering=-total_wins%2Cname&page=1$/),
       expect.stringMatching(/\/songs\?ordering=-total_wins%2Ctitle%2Cartist__name&page=1$/),
       expect.stringMatching(/\/wins\?ordering=-date&page=1$/),
+      expect.stringMatching(/\/wins\?date_from=\d{4}-\d{2}-\d{2}&date_to=\d{4}-\d{2}-\d{2}&ordering=date$/),
     ]));
   });
 });

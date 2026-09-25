@@ -5,7 +5,7 @@ import type {
   Win,
 } from "@/lib/api-shared";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { DesktopWinVideoRow, MobileWinVideoDisclosure } from "@/components/win-videos";
+import { MobileWinVideoDisclosure } from "@/components/win-videos";
 import { formatDate } from "@/lib/utils";
 import { notableTag } from "@/lib/win-facts";
 import { cn } from "@/lib/utils";
@@ -68,8 +68,11 @@ export function ShowWinsStrip({ shows, label }: { shows: { id: number; slug: str
 // Shown on only the few notable rows so long histories stay scannable.
 export function WinFactTag({ win }: { win: Win }) {
   const tag = notableTag(win);
-  if (!tag) return null;
-  return <span className="mt-1 block"><span className="inline-block border border-highlight-yellow bg-highlight-yellow/25 px-1.5 py-0.5 text-xs font-semibold text-foreground">{tag}</span></span>;
+  return tag ? <span className="mt-1 block"><FactLabel>{tag}</FactLabel></span> : null;
+}
+
+export function FactLabel({ children }: { children: React.ReactNode }) {
+  return <span className="inline-block border border-highlight-yellow bg-highlight-yellow/25 px-1.5 py-0.5 text-xs font-semibold text-foreground">{children}</span>;
 }
 
 export function RankMarker({ rank }: { rank: number }) {
@@ -126,20 +129,6 @@ export function WinRecord({ win, hideArtist = false, hideSong = false }: { win: 
       <MobileWinVideoDisclosure win={win} className="mt-3" />
     </article>
   );
-}
-
-export function RecentWins({ wins }: { wins: Win[] }) {
-  if (!wins.length) {
-    return <EmptyState message="No recent wins are available right now." />;
-  }
-  return <div className="border border-border bg-card">
-    <Table className="desktop-table border-collapse">
-      <TableCaption className="sr-only">Most recent music show wins</TableCaption>
-      <TableHeader><TableRow className="border-b-2 border-foreground bg-muted/50 text-xs uppercase tracking-[0.12em] text-muted-foreground"><TableHead className="w-32 px-4 py-3">Date</TableHead><TableHead className="px-4 py-3">Song</TableHead><TableHead className="px-4 py-3">Artist</TableHead><TableHead className="w-44 px-4 py-3 text-right">Music show</TableHead><TableHead className="w-44 px-4 py-3 text-right">Video</TableHead></TableRow></TableHeader>
-      <TableBody>{wins.map((win) => <DesktopWinVideoRow key={win.id} win={win} colSpan={5}><TableCell className="px-4 py-3"><time dateTime={win.date} className="font-heading text-sm font-bold tabular-nums text-muted-foreground">{formatDate(win.date)}</time></TableCell><TableCell className="px-4 py-3"><Link prefetch={false} href={`/songs/${win.song.id}`} className="compact-link-target font-semibold">{win.song.title}</Link></TableCell><TableCell className="px-4 py-3"><Link prefetch={false} href={`/artists/${win.song.artist.id}`} className="compact-link-target">{win.song.artist.name}</Link></TableCell><TableCell className="w-44 px-4 py-3 text-right"><ShowBadge slug={win.show.slug} name={win.show.name} /></TableCell></DesktopWinVideoRow>)}</TableBody>
-    </Table>
-    <div className="mobile-record flex-col">{wins.map((win) => <WinRecord key={win.id} win={win} />)}</div>
-  </div>;
 }
 
 export function MusicShowList({ shows }: { shows: Show[] }) {
