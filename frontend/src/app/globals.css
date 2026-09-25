@@ -127,6 +127,7 @@ input:disabled {
 
 .show-badge { border-color: color-mix(in srgb, var(--show-color) 50%, transparent); background: color-mix(in srgb, var(--show-color) 12%, white); color: var(--foreground); }
 .compact-link-target { @apply inline-flex min-h-6 min-w-6 max-w-full items-center underline-offset-4 hover:underline focus-visible:outline-offset-[-2px]; }
+.show-strip-cell { box-shadow: inset 0 4px 0 var(--show-color); padding-top: calc(0.75rem + 4px); }
 .show-inkigayo { --show-color: var(--show-inkigayo); }
 .show-m-countdown { --show-color: var(--show-m-countdown); }
 .show-music-bank { --show-color: var(--show-music-bank); }

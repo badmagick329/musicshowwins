@@ -3,12 +3,11 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArtistWinHistory } from "@/components/artist-win-history";
 import { WinMoments } from "@/components/win-moments";
-import { EmptyState, ShowBadge } from "@/components/data-display";
+import { EmptyState, Metric, MetricGrid, ShowWinsStrip } from "@/components/data-display";
 import { JsonLd } from "@/components/json-ld";
 import { formatDate } from "@/lib/utils";
 import { ApiRequestError, getAllSongWins, getSong } from "@/lib/api";
 import { buildShowBreakdown, summarizeArtist } from "@/lib/artist-profile";
-import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { noIndexFollow, pageMetadata, plural, siteUrl } from "@/lib/seo";
 
 function songId(value: string) {
@@ -28,7 +27,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
     const { earliestWin, latestWin } = summarizeArtist(wins);
     const counts = `${song.total_wins} recorded music-show ${plural(song.total_wins, "win")} across ${song.winning_shows} ${plural(song.winning_shows, "show")}`;
     const dates = earliestWin && latestWin
-      ? ` Earliest recorded win: ${earliestWin.show.name}, ${formatDate(earliestWin.date)}.${latestWin === earliestWin.date ? "" : ` Latest: ${formatDate(latestWin)}.`}`
+      ? ` Earliest recorded win: ${earliestWin.show.name}, ${formatDate(earliestWin.date)}.${latestWin.date === earliestWin.date ? "" : ` Latest: ${formatDate(latestWin.date)}.`}`
       : "";
     return pageMetadata({
       title: `${song.title} by ${song.artist.name}: ${song.total_wins} Music Show ${plural(song.total_wins, "Win")}`,
@@ -61,13 +60,9 @@ export default async function SongPage({ params }: { params: Promise<{ id: strin
     }} />
   <main className="page-enter mx-auto max-w-7xl px-5 pb-8 pt-10 lg:px-8 lg:pt-14">
     <header className="border-2 border-foreground bg-surface-berry p-6 text-surface-berry-foreground shadow-[4px_4px_0_var(--section-ink)] sm:p-8"><h1 className="font-heading text-4xl font-bold tracking-tight sm:text-[44px]">{song.title}</h1><p className="mt-2 text-surface-berry-foreground/75">by <Link href={`/artists/${song.artist.id}`} className="font-semibold underline-offset-4 hover:underline">{song.artist.name}</Link></p></header>
-    <section className="mt-10" aria-labelledby="summary-title"><h2 id="summary-title" className="mb-4 border-b-2 border-foreground pb-3 font-heading text-2xl font-bold">Summary</h2><dl className="grid border border-border bg-card sm:grid-cols-2 lg:grid-cols-4"><Metric label="Total wins" value={String(song.total_wins)} /><Metric label="Shows with wins" value={String(song.winning_shows)} /><Metric label="First win" value={summary.firstWin ? formatDate(summary.firstWin) : "Not recorded"} /><Metric label="Latest win" value={song.latest_win_date ? formatDate(song.latest_win_date) : "Not recorded"} /></dl></section>
-    <section className="mt-12" aria-labelledby="shows-title"><h2 id="shows-title" className="mb-4 border-b-2 border-foreground pb-3 font-heading text-2xl font-bold">Wins by show</h2>{shows.length ? <div className="border border-border bg-card"><Table className="desktop-table border-collapse"><TableCaption className="sr-only">Song wins by music show</TableCaption><TableHeader><TableRow className="border-b-2 border-foreground bg-muted/50 text-xs uppercase tracking-[0.12em] text-muted-foreground"><TableHead className="px-4 py-3">Show</TableHead><TableHead className="w-24 px-4 py-3 text-right">Wins</TableHead></TableRow></TableHeader><TableBody>{shows.map((show) => <TableRow key={show.id} className="border-border/70 hover:bg-accent/60"><TableCell className="px-4 py-3"><ShowBadge slug={show.slug} name={show.name} /></TableCell><TableCell className="px-4 py-3 text-right font-heading text-lg font-bold tabular-nums">{show.wins}</TableCell></TableRow>)}</TableBody></Table><ul className="mobile-record flex-col">{shows.map((show) => <li key={show.id} className="flex items-center justify-between gap-3 border-b border-border px-4 py-3 last:border-b-0"><ShowBadge slug={show.slug} name={show.name} /><strong className="font-heading text-lg tabular-nums">{show.wins}</strong></li>)}</ul></div> : <EmptyState message="No music show wins are recorded for this song." />}</section>
+    <section className="mt-10" aria-labelledby="summary-title"><h2 id="summary-title" className="mb-4 border-b-2 border-foreground pb-3 font-heading text-2xl font-bold">Summary</h2><MetricGrid><Metric label="Total wins" value={String(song.total_wins)} /><Metric label="Shows with wins" value={String(song.winning_shows)} /><Metric label="First win" value={summary.earliestWin ? formatDate(summary.earliestWin.date) : "Not recorded"} /><Metric label="Latest win" value={song.latest_win_date ? formatDate(song.latest_win_date) : "Not recorded"} /></MetricGrid></section>
+    <section className="mt-12" aria-labelledby="shows-title"><h2 id="shows-title" className="mb-4 border-b-2 border-foreground pb-3 font-heading text-2xl font-bold">Wins by show</h2>{shows.length ? <ShowWinsStrip shows={shows} label="Song wins by music show" />: <EmptyState message="No music show wins are recorded for this song." />}</section>
     <WinMoments wins={wins} />
     <section className="mt-12" aria-labelledby="history-title"><div className="mb-4 flex items-end justify-between gap-4 border-b-2 border-foreground pb-3"><h2 id="history-title" className="font-heading text-2xl font-bold">Win history</h2><span className="text-sm text-muted-foreground">Newest first</span></div><ArtistWinHistory wins={wins} emptyMessage="No wins with dates are recorded for this song." hideSong /></section>
   </main></>;
-}
-
-function Metric({ label, value }: { label: string; value: string }) {
-  return <div className="border-b border-border p-4 last:border-b-0 sm:border-r sm:[&:nth-child(2)]:border-r-0 lg:border-b-0 lg:[&:nth-child(2)]:border-r"><dt className="text-sm text-muted-foreground">{label}</dt><dd className="mt-1 font-heading text-2xl font-bold tabular-nums">{value}</dd></div>;
 }

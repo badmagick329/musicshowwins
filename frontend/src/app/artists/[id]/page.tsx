@@ -7,6 +7,8 @@ import { formatDate } from "@/lib/utils";
 import { ApiRequestError, getAllArtistWins, getArtist } from "@/lib/api";
 import { summarizeArtist } from "@/lib/artist-profile";
 import { JsonLd } from "@/components/json-ld";
+import { Metric, MetricGrid } from "@/components/data-display";
+import type { Win } from "@/lib/api-shared";
 import { noIndexFollow, pageMetadata, plural, siteUrl } from "@/lib/seo";
 
 function artistId(value: string) {
@@ -26,7 +28,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
     const { earliestWin, latestWin } = summarizeArtist(wins);
     const counts = `${artist.total_wins} recorded music-show ${plural(artist.total_wins, "win")} across ${artist.winning_songs} ${plural(artist.winning_songs, "song")}`;
     const dates = earliestWin && latestWin
-      ? ` Earliest recorded win: ${earliestWin.song.title} on ${earliestWin.show.name}, ${formatDate(earliestWin.date)}. Latest win: ${formatDate(latestWin)}.`
+      ? ` Earliest recorded win: ${earliestWin.song.title} on ${earliestWin.show.name}, ${formatDate(earliestWin.date)}. Latest win: ${formatDate(latestWin.date)}.`
       : "";
     return pageMetadata({
       title: `${artist.name} Music Show Wins: ${artist.total_wins} Total`,
@@ -64,18 +66,12 @@ export default async function ArtistPage({ params, searchParams = Promise.resolv
 
       <section className="mt-10" aria-labelledby="summary-title">
         <h2 id="summary-title" className="mb-4 border-b-2 border-foreground pb-3 font-heading text-2xl font-bold">Win summary</h2>
-        <dl className="grid border border-border bg-card sm:grid-cols-2 lg:grid-cols-4">
+        <MetricGrid>
           <Metric label="Recorded wins" value={String(summary.totalWins)} />
           <Metric label="Winning songs" value={String(summary.winningSongs)} />
-          <Metric label="Earliest recorded win" value={summary.earliestWin ? <>
-            <Link prefetch={false} href={`/songs/${summary.earliestWin.song.id}`} className="compact-link-target text-lg leading-snug underline underline-offset-4">{summary.earliestWin.song.title}</Link>
-            <span className="mt-1 block font-sans text-sm font-normal leading-relaxed">
-              {summary.earliestWin.show.name}<br />
-              <time dateTime={summary.earliestWin.date}>{formatDate(summary.earliestWin.date)}</time>
-            </span>
-          </> : "Not recorded"} />
-          <Metric label="Latest win" value={summary.latestWin ? formatDate(summary.latestWin) : "Not recorded"} />
-        </dl>
+          <Metric label="Earliest recorded win" value={summary.earliestWin ? <WinDetail win={summary.earliestWin} /> : "Not recorded"} />
+          <Metric label="Latest win" value={summary.latestWin ? <WinDetail win={summary.latestWin} /> : "Not recorded"} />
+        </MetricGrid>
       </section>
 
       <ArtistWinsByYear artist={artist} wins={wins} initialYear={parseArtistYear((await searchParams).year)} />
@@ -84,6 +80,12 @@ export default async function ArtistPage({ params, searchParams = Promise.resolv
   );
 }
 
-function Metric({ label, value }: { label: string; value: React.ReactNode }) {
-  return <div className="min-w-0 border-b border-border p-4 last:border-b-0 sm:border-r sm:[&:nth-child(2)]:border-r-0 lg:border-b-0 lg:[&:nth-child(2)]:border-r"><dt className="text-sm text-muted-foreground">{label}</dt><dd className="mt-1 break-words font-heading text-2xl font-bold tabular-nums">{value}</dd></div>;
+function WinDetail({ win }: { win: Win }) {
+  return <>
+    <Link prefetch={false} href={`/songs/${win.song.id}`} className="compact-link-target text-lg leading-snug underline underline-offset-4">{win.song.title}</Link>
+    <span className="mt-1 block font-sans text-sm font-normal leading-relaxed">
+      {win.show.name}<br />
+      <time dateTime={win.date}>{formatDate(win.date)}</time>
+    </span>
+  </>;
 }

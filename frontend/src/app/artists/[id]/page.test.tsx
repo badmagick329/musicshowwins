@@ -40,7 +40,7 @@ describe("artist summary and metadata", () => {
     expect(html).toContain("Wins in 2024");
     const allHtml = renderToStaticMarkup(await ArtistPage({ params }));
     expect(allHtml.slice(allHtml.indexOf("<dl"), allHtml.indexOf("</dl>"))).toBe(summary);
-    expect(allHtml).toContain("Wins across all years");
+    expect(allHtml).not.toContain("Wins in ");
   });
 
   it.each([null, "2026-09-06T00:00:00Z"])("does not treat a published moment or reference verification (%s) as career-first verification", async (lastVerified) => {

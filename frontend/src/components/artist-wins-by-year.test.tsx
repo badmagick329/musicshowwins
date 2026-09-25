@@ -35,7 +35,7 @@ describe("artist year exploration", () => {
     const songs = screen.getByRole("region", { name: "Songs" });
     expect(within(songs).getAllByRole("row").map((row) => row.textContent)).toEqual(["RankSongWins", "1Song 12", "2Song 21"]);
     const shows = screen.getByRole("region", { name: "Wins by show" });
-    expect(within(shows).getAllByRole("row").map((row) => row.textContent)).toEqual(["ShowWins", "Show 12", "Show 21"]);
+    expect(within(shows).getAllByRole("listitem").map((item) => item.textContent)).toEqual(["Show 12 wins", "Show 21 win"]);
     expect(within(screen.getByRole("region", { name: "Win history" })).getAllByRole("row")).toHaveLength(4);
     expect(screen.queryByText("Moment 1")).toBeNull();
     expect(screen.getByRole("button", { name: "2024: 3 recorded wins" }).getAttribute("aria-pressed")).toBe("true");
@@ -52,7 +52,7 @@ describe("artist year exploration", () => {
     expect(screen.getByRole("list", { name: "Recorded wins per year" }).children).toHaveLength(3);
     fireEvent.click(screen.getByRole("button", { name: "Reset to all years" }));
     expect(window.location.search).toBe("");
-    expect(screen.getByRole("heading", { name: "Wins across all years" }).parentElement!.textContent).toContain("4 recorded wins · 2 winning songs");
+    expect(screen.getByRole("status").textContent).toBe("");
     expect(plausible).toHaveBeenLastCalledWith("Artist year selected", { props: { artist: artist.name, artist_id: "3", year: "all", source: "all-years" } });
   });
 
@@ -69,8 +69,13 @@ describe("artist year exploration", () => {
   });
 
   it("uses singular wording and shows only relevant controls and scope notes", () => {
+    window.history.replaceState(null, "", "/artists/3?year=2024");
+    const single = render(<ArtistWinsByYear artist={artist} wins={[wins[0]]} initialYear="2024" />);
+    expect(screen.getByRole("heading", { name: "Wins in 2024" }).parentElement!.textContent).toContain("1 recorded win · 1 winning song");
+    single.unmount();
+    window.history.replaceState(null, "", "/artists/3");
     const view = render(<ArtistWinsByYear artist={artist} wins={[wins[0]]} initialYear={null} />);
-    expect(screen.getByRole("heading", { name: "Wins across all years" }).parentElement!.textContent).toContain("1 recorded win · 1 winning song");
+    expect(screen.getByRole("status").textContent).toBe("");
     expect(screen.queryByRole("button", { name: "Copy link" })).toBeNull();
     expect(screen.queryByRole("button", { name: "Reset to all years" })).toBeNull();
     expect(screen.queryByText("Undated history is excluded.")).toBeNull();

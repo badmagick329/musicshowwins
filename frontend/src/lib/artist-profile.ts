@@ -3,9 +3,8 @@ import type { Win } from "@/lib/api-shared";
 export type ArtistSummary = {
   totalWins: number;
   winningSongs: number;
-  firstWin: string | null;
   earliestWin: Win | null;
-  latestWin: string | null;
+  latestWin: Win | null;
 };
 
 export type ShowBreakdown = {
@@ -20,10 +19,9 @@ export function summarizeArtist(wins: Win[]): ArtistSummary {
   return {
     totalWins: wins.length,
     winningSongs: new Set(wins.map((win) => win.song.id)).size,
-    firstWin: chronological[0]?.date ?? null,
     // Catalogue order, moments, and reference checks do not verify a career first.
     earliestWin: chronological[0] ?? null,
-    latestWin: chronological.at(-1)?.date ?? null,
+    latestWin: chronological.at(-1) ?? null,
   };
 }
 

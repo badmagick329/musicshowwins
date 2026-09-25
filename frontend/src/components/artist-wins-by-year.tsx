@@ -99,9 +99,12 @@ export function ArtistWinsByYear({ artist, wins, initialYear }: { artist: Artist
       const link = (event.target as HTMLElement).closest<HTMLAnchorElement>('a[href^="/songs/"]');
       if (link) track("Artist year song opened", year, { song_id: link.getAttribute("href")!.split("/")[2] });
     }}>
+      {/* The all-years totals already sit in the summary above; only a selected year needs its own line. */}
       <div className="mt-3" role="status" aria-live="polite" aria-atomic="true">
-        <h2 className="font-heading text-xl font-semibold">{year ? `Wins in ${year}` : "Wins across all years"}</h2>
-        {year && !selected.length ? <p className="mt-1">No wins are recorded for {year}.</p> : <p className="mt-1"><strong>{selected.length}</strong> recorded {selected.length === 1 ? "win" : "wins"} · <strong>{winningSongs}</strong> winning {winningSongs === 1 ? "song" : "songs"}</p>}
+        {year && <>
+          <h2 className="font-heading text-xl font-semibold">Wins in {year}</h2>
+          {selected.length ? <p className="mt-1"><strong>{selected.length}</strong> recorded {selected.length === 1 ? "win" : "wins"} · <strong>{winningSongs}</strong> winning {winningSongs === 1 ? "song" : "songs"}</p> : <p className="mt-1">No wins are recorded for {year}.</p>}
+        </>}
       </div>
       {selected.length > 0 && <ArtistYearResults key={year ?? "all"} wins={selected} />}
     </div>

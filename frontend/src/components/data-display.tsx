@@ -37,6 +37,33 @@ export function ShowBadge({ slug, name, className }: { slug: string; name?: stri
   );
 }
 
+// A gap-px grid draws single dividers at every column count, so tiles can reflow
+// from two columns on phones to four on desktop without per-breakpoint borders.
+export function MetricGrid({ children }: { children: React.ReactNode }) {
+  return <dl className="grid grid-cols-2 gap-px border border-border bg-border lg:grid-cols-4">{children}</dl>;
+}
+
+export function Metric({ label, value }: { label: string; value: React.ReactNode }) {
+  return <div className="min-w-0 bg-card p-4"><dt className="text-sm text-muted-foreground">{label}</dt><dd className="mt-1 break-words font-heading text-xl font-bold tabular-nums sm:text-2xl">{value}</dd></div>;
+}
+
+// At most six shows exist, so one compact row replaces a tall two-column table.
+// Cells draw their own outlines (overlapping across the 1px gap) so unused tracks
+// stay page-coloured when an artist has won on fewer shows.
+export function ShowWinsStrip({ shows, label }: { shows: { id: number; slug: string; name: string; wins: number }[]; label: string }) {
+  return (
+    <ul aria-label={label} className="grid grid-cols-2 gap-px p-px sm:grid-cols-3 lg:grid-cols-6">
+      {shows.map((show) => (
+        <li key={show.id} className={cn("show-strip-cell bg-card px-4 py-3 outline outline-1 outline-border", `show-${show.slug}`)}>
+          <span className="block text-sm font-semibold">{show.name}</span>
+          <span className="font-heading text-2xl font-bold tabular-nums">{show.wins}</span>
+          <span className="sr-only"> {show.wins === 1 ? "win" : "wins"}</span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 export function RankMarker({ rank }: { rank: number }) {
   return <span className={cn("rank-marker", rank <= 3 && `rank-marker--${rank}`)}>{rank}</span>;
 }

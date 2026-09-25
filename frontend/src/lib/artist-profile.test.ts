@@ -14,8 +14,8 @@ describe("artist profile calculations", () => {
   const wins = [win(1, "2025-01-02", bank, 10), win(2, "2023-06-01", core, 11), win(3, "2024-04-03", bank, 10), win(4, "2025-02-01", countdown, 12)];
 
   it("calculates totals, unique winning songs, and date range", () => {
-    expect(summarizeArtist(wins)).toEqual({ totalWins: 4, winningSongs: 3, firstWin: "2023-06-01", earliestWin: wins[1], latestWin: "2025-02-01" });
-    expect(summarizeArtist([])).toEqual({ totalWins: 0, winningSongs: 0, firstWin: null, earliestWin: null, latestWin: null });
+    expect(summarizeArtist(wins)).toEqual({ totalWins: 4, winningSongs: 3, earliestWin: wins[1], latestWin: wins[3] });
+    expect(summarizeArtist([])).toEqual({ totalWins: 0, winningSongs: 0, earliestWin: null, latestWin: null });
   });
 
   it("retains song and show details without changing history order, with stable same-day ties", () => {
