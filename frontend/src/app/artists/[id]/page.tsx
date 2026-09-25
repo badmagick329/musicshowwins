@@ -5,7 +5,7 @@ import { ArtistWinsByYear } from "@/components/artist-wins-by-year";
 import { parseArtistYear } from "@/lib/artist-years";
 import { formatDate } from "@/lib/utils";
 import { ApiRequestError, getAllArtistWins, getArtist } from "@/lib/api";
-import { summarizeArtist } from "@/lib/artist-profile";
+import { artistHighlights, summarizeArtist } from "@/lib/artist-profile";
 import { JsonLd } from "@/components/json-ld";
 import { Metric, MetricGrid } from "@/components/data-display";
 import type { Win } from "@/lib/api-shared";
@@ -47,6 +47,7 @@ export default async function ArtistPage({ params, searchParams = Promise.resolv
   const artist = await loadArtist(id);
   const wins = await getAllArtistWins(id);
   const summary = summarizeArtist(wins);
+  const highlights = artistHighlights(wins);
 
   return (
     <>
@@ -72,6 +73,7 @@ export default async function ArtistPage({ params, searchParams = Promise.resolv
           <Metric label="Earliest recorded win" value={summary.earliestWin ? <WinDetail win={summary.earliestWin} /> : "Not recorded"} />
           <Metric label="Latest win" value={summary.latestWin ? <WinDetail win={summary.latestWin} /> : "Not recorded"} />
         </MetricGrid>
+        {highlights.length > 0 && <p className="mt-3 text-sm text-muted-foreground"><strong className="font-semibold text-foreground">Highlights:</strong> {highlights.join(" · ")}</p>}
       </section>
 
       <ArtistWinsByYear artist={artist} wins={wins} initialYear={parseArtistYear((await searchParams).year)} />

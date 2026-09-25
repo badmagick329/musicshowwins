@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { Win } from "./api-shared";
-import { buildShowBreakdown, summarizeArtist } from "./artist-profile";
+import { artistHighlights, buildShowBreakdown, summarizeArtist } from "./artist-profile";
 
 function win(id: number, date: string, show: { id: number; slug: string; name: string }, songId: number): Win {
   return { id, date, show: { ...show, active: true }, song: { id: songId, title: `Song ${songId}`, artist: { id: 1, name: "Artist" }, total_wins: 1, latest_win_date: date, winning_shows: 1 }, references: [], milestones: { song_win: 2, song_show_win: 1, artist_win: 2 } };
@@ -27,5 +27,15 @@ describe("artist profile calculations", () => {
 
   it("sorts show totals by count then show name", () => {
     expect(buildShowBreakdown(wins).map(({ name, wins: count }) => [name, count])).toEqual([["Music Bank", 2], ["M Countdown", 1], ["Music Core", 1]]);
+  });
+
+  it("derives highlights and skips ones that only restate the summary", () => {
+    expect(artistHighlights(wins)).toEqual(["Most wins: Song 10 (2)", "Best year: 2025 (2 wins)"]);
+    const crown = [win(5, "2024-01-01", bank, 10), win(6, "2024-02-01", bank, 10), win(7, "2024-03-01", bank, 10)];
+    expect(artistHighlights(crown)).toEqual(["1 triple crown"]);
+    const tie = [...crown, win(8, "2025-01-01", core, 11), win(9, "2025-02-01", core, 11), win(10, "2025-03-01", core, 11)];
+    expect(artistHighlights(tie)).toEqual(["Most wins: Song 10 and Song 11 (3)", "Best year: 2025 (3 wins)", "2 triple crowns"]);
+    const threeWay = [win(11, "2024-01-01", bank, 1), win(12, "2024-01-02", bank, 2), win(13, "2024-01-03", bank, 3)];
+    expect(artistHighlights(threeWay)).toEqual([]);
   });
 });
