@@ -99,7 +99,9 @@
   --show-the-show: #d6a715;
 }
 
-* { @apply border-border; }
+@layer base {
+  * { @apply border-border; }
+}
 html { @apply scroll-smooth font-sans; background: var(--background); }
 body {
   @apply text-foreground antialiased;

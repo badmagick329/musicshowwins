@@ -48,7 +48,7 @@ export function SiteFooter() {
           <Link href="/about#feedback" className="inline-flex min-h-11 items-center font-semibold underline underline-offset-4 hover:text-foreground">Feedback</Link>
         {supportUrl && (
           <div className="flex flex-col items-start gap-4 sm:items-end">
-            <a href={supportUrl} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-10 items-center gap-2 border border-foreground bg-highlight-yellow px-3 text-sm font-bold text-foreground shadow-[2px_2px_0_var(--foreground)] transition-transform hover:-translate-y-0.5">
+            <a href={supportUrl} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-10 items-center gap-2 border bg-highlight-yellow px-3 text-sm font-bold text-foreground shadow-[2px_2px_0_var(--foreground)] transition-transform hover:-translate-y-0.5">
               <Coffee className="size-4" aria-hidden="true" />
               Buy me a coffee
             </a>

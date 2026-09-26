@@ -31,23 +31,23 @@ export default async function ArtistsPage({ searchParams }: { searchParams: Prom
 
   return (
     <main className="page-enter mx-auto max-w-7xl px-5 pb-8 pt-10 lg:px-8 lg:pt-14">
-      <header className="border-2 border-foreground bg-surface-berry p-6 text-surface-berry-foreground shadow-[4px_4px_0_var(--section-ink)] sm:p-8">
+      <header className="border-2 bg-surface-berry p-6 text-surface-berry-foreground shadow-[4px_4px_0_var(--section-ink)] sm:p-8">
         <h1 className="font-heading text-4xl font-bold tracking-tight">Artists</h1>
         <p className="mt-2 max-w-2xl text-surface-berry-foreground/80">Find an artist and view their winning songs and full win history.</p>
       </header>
-      <div className="mt-8 border-2 border-foreground bg-search-surface p-5">
+      <div className="mt-8 border-2 bg-search-surface p-5">
         <DebouncedArtistSearch id="artist-list-search" query={search} />
       </div>
       <section className="mt-7" aria-labelledby="artist-sort-title">
-        <div className="flex flex-col gap-3 border-b-2 border-foreground pb-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-3 border-b-2 pb-4 sm:flex-row sm:items-center sm:justify-between">
           <h2 id="artist-sort-title" className="font-heading text-lg font-bold">Sort artists</h2>
-          <nav aria-label="Artist sorting" className="grid grid-cols-3 border-2 border-foreground bg-card">
+          <nav aria-label="Artist sorting" className="grid grid-cols-3 border-2 bg-card">
             {artistSorts.map((option) => (
               <Link
                 key={option}
                 href={artistsUrl({ search, sort: option })}
                 aria-current={sort === option ? "page" : undefined}
-                className={`border-r-2 border-foreground px-3 py-2 text-center text-sm font-bold last:border-r-0 ${sort === option ? "bg-action-pink text-white" : "hover:bg-accent"}`}
+                className={`border-r-2 px-3 py-2 text-center text-sm font-bold last:border-r-0 ${sort === option ? "bg-action-pink text-white" : "hover:bg-accent"}`}
               >
                 {artistSortLabels[option]}
               </Link>
@@ -56,7 +56,7 @@ export default async function ArtistsPage({ searchParams }: { searchParams: Prom
         </div>
       </section>
       <section className="mt-8" aria-labelledby="artist-results-title">
-        <div className="mb-4 flex items-end justify-between gap-4 border-b-2 border-foreground pb-3">
+        <div className="mb-4 flex items-end justify-between gap-4 border-b-2 pb-3">
           <h2 id="artist-results-title" className="scroll-mt-24 font-heading text-2xl font-bold">{search ? `Results for "${search}"` : "All artists"}</h2>
           <ArchiveResultsSummary totalCount={artists.count} page={page} resultCount={artists.results.length} singular="artist" plural="artists" />
         </div>

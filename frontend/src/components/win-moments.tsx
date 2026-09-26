@@ -20,7 +20,7 @@ export function WinMoments({ wins }: { wins: Win[] }) {
 
   return (
     <section className="mt-12" aria-labelledby="moments-title">
-      <h2 id="moments-title" className="mb-4 border-b-2 border-foreground pb-3 font-heading text-2xl font-bold">
+      <h2 id="moments-title" className="mb-4 border-b-2 pb-3 font-heading text-2xl font-bold">
         Notable moments
       </h2>
       <div id="additional-moments" className="grid gap-5">
@@ -61,7 +61,7 @@ export function WinMoments({ wins }: { wins: Win[] }) {
           aria-controls="additional-moments"
           aria-label={expanded ? "Show fewer notable moments" : `Show ${remaining} more notable ${remaining === 1 ? "moment" : "moments"}`}
           onClick={() => setExpanded((value) => !value)}
-          className="mt-4 inline-flex min-h-11 items-center gap-2 border border-foreground bg-card px-4 py-2 font-semibold transition-colors hover:bg-accent focus-visible:bg-accent"
+          className="mt-4 inline-flex min-h-11 items-center gap-2 border bg-card px-4 py-2 font-semibold transition-colors hover:bg-accent focus-visible:bg-accent"
         >
           {expanded ? "Show fewer" : `${remaining} more`}
           {expanded ? <ChevronUp aria-hidden="true" className="size-4" /> : <ChevronDown aria-hidden="true" className="size-4" />}

@@ -11,7 +11,7 @@ export function ShowCards({ shows }: { shows: Show[] }) {
   return (
     <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
       {shows.map((show) => (
-        <article key={show.id} className={`show-${show.slug} relative flex min-w-0 cursor-pointer flex-col border-2 border-foreground bg-card p-5 shadow-[4px_4px_0_var(--show-color)] transition-colors hover:bg-accent`}>
+        <article key={show.id} className={`show-${show.slug} relative flex min-w-0 cursor-pointer flex-col border-2 bg-card p-5 shadow-[4px_4px_0_var(--show-color)] transition-colors hover:bg-accent`}>
           <div className="flex items-start justify-between gap-4">
             <h2 className="font-heading text-xl font-bold">{show.name}</h2>
             <ShowBadge slug={show.slug} name={show.name} className="shrink-0" />
@@ -39,7 +39,7 @@ export function ShowCards({ shows }: { shows: Show[] }) {
               </div>
             ) : <p className="mt-2 text-sm text-muted-foreground">No wins recorded yet.</p>}
           </div>
-          <Link prefetch={false} href={`/wins?show=${encodeURIComponent(show.slug)}#wins-results-title`} className="mt-5 inline-flex min-h-10 items-center justify-center border border-foreground bg-highlight-yellow px-4 text-sm font-bold shadow-[2px_2px_0_var(--foreground)] after:absolute after:inset-0 focus-visible:after:outline-2 focus-visible:after:outline-offset-[-2px] focus-visible:after:outline-brand-pink">View wins</Link>
+          <Link prefetch={false} href={`/wins?show=${encodeURIComponent(show.slug)}#wins-results-title`} className="mt-5 inline-flex min-h-10 items-center justify-center border bg-highlight-yellow px-4 text-sm font-bold shadow-[2px_2px_0_var(--foreground)] after:absolute after:inset-0 focus-visible:after:outline-2 focus-visible:after:outline-offset-[-2px] focus-visible:after:outline-brand-pink">View wins</Link>
         </article>
       ))}
     </div>

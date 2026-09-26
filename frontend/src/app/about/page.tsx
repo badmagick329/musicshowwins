@@ -19,7 +19,7 @@ export default function AboutPage() {
         <p className="mt-4 text-base leading-relaxed text-muted-foreground">We maintain the archive, add new results, and expand video coverage. Your feedback helps us decide what to improve next.</p>
       </section>
       <section id="feedback" className="mt-14 scroll-mt-6" aria-labelledby="feedback-heading">
-        <h2 id="feedback-heading" className="border-b-2 border-foreground pb-3 font-heading text-2xl font-bold">Share feedback</h2>
+        <h2 id="feedback-heading" className="border-b-2 pb-3 font-heading text-2xl font-bold">Share feedback</h2>
         <p className="mt-4 max-w-2xl leading-relaxed text-muted-foreground">Have an idea, found something confusing, or wish the site did something differently? Tell us below. Corrections and missing video links are welcome too.</p>
         <QueryProvider><CorrectionForm /></QueryProvider>
       </section>

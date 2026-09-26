@@ -39,10 +39,10 @@ function winContext(win: Win) {
   return `${win.song.title} by ${win.song.artist.name}, ${formatDate(win.date)}, ${win.show.name}`;
 }
 
-const winVideoActionClass = "grid cursor-pointer grid-cols-[0.875rem_1fr_0.875rem] items-center gap-1.5 whitespace-nowrap border-2 border-foreground font-bold transition-colors motion-reduce:transition-none";
+const winVideoActionClass = "grid cursor-pointer grid-cols-[0.875rem_1fr_0.875rem] items-center gap-1.5 whitespace-nowrap border-2 font-bold transition-colors motion-reduce:transition-none";
 // Filled leaves the site; outlined opens the list in place.
 const externalActionClass = "bg-action-pink text-primary-foreground hover:bg-accent-foreground";
-const toggleActionClass = "border-action-pink! bg-card text-action-pink hover:bg-accent";
+const toggleActionClass = "border-action-pink bg-card text-action-pink hover:bg-accent";
 const desktopActionClass = "h-8 px-2.5 text-xs shadow-[2px_2px_0_var(--foreground)]";
 const mobileActionClass = "min-h-10 w-44 max-w-full px-3 text-sm shadow-[2px_2px_0_var(--foreground)]";
 

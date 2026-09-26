@@ -14,7 +14,7 @@ import { artistPath } from "@/lib/paths";
 
 export function SectionHeading({ title, action, level = 2 }: { title: string; action?: React.ReactNode; level?: 2 | 3 }) {
   return (
-    <div className="mb-4 flex items-end justify-between gap-4 border-b-2 border-foreground pb-3">
+    <div className="mb-4 flex items-end justify-between gap-4 border-b-2 pb-3">
       {level === 2 ? <h2 className="font-heading text-xl font-bold tracking-tight sm:text-2xl">{title}</h2> : <h3 className="font-heading text-xl font-bold tracking-tight sm:text-2xl">{title}</h3>}
       {action}
     </div>
@@ -111,10 +111,10 @@ export function Leaderboard({ rows, kind, empty = "No wins to show yet." }: { ro
     <div className="overflow-hidden border border-border bg-card">
       <Table className="desktop-table w-full border-collapse text-sm">
         <TableCaption className="sr-only">Top five {kind === "artist" ? "artists" : "songs"} by music show wins</TableCaption>
-        <TableHeader><TableRow className="border-foreground border-b-2 bg-muted/50 text-left text-xs uppercase tracking-[0.12em] text-muted-foreground"><TableHead className="w-16 px-4 py-3">Rank</TableHead><TableHead className="px-4 py-3">{kind === "artist" ? "Artist" : "Song"}</TableHead><TableHead className="w-24 px-4 py-3 text-right">Wins</TableHead></TableRow></TableHeader>
+        <TableHeader><TableRow className="border-b-2 bg-muted/50 text-left text-xs uppercase tracking-[0.12em] text-muted-foreground"><TableHead className="w-16 px-4 py-3">Rank</TableHead><TableHead className="px-4 py-3">{kind === "artist" ? "Artist" : "Song"}</TableHead><TableHead className="w-24 px-4 py-3 text-right">Wins</TableHead></TableRow></TableHeader>
         <TableBody>{rows.map((row, index) => <DesktopLeaderboardRow key={`${kind}-${index}-${row.rank}`} row={row} kind={kind} />)}</TableBody>
       </Table>
-      <div className="mobile-record flex-col"><div className="flex items-center justify-between border-b-2 border-foreground bg-muted/50 px-3 py-3 text-xs font-bold uppercase tracking-[0.12em] text-muted-foreground"><span>Rank · {kind}</span><span>Wins</span></div>{rows.map((row, index) => <MobileLeaderboardRow key={`${kind}-mobile-${index}-${row.rank}`} row={row} kind={kind} />)}</div>
+      <div className="mobile-record flex-col"><div className="flex items-center justify-between border-b-2 bg-muted/50 px-3 py-3 text-xs font-bold uppercase tracking-[0.12em] text-muted-foreground"><span>Rank · {kind}</span><span>Wins</span></div>{rows.map((row, index) => <MobileLeaderboardRow key={`${kind}-mobile-${index}-${row.rank}`} row={row} kind={kind} />)}</div>
     </div>
   );
 }
@@ -144,7 +144,7 @@ export function MusicShowList({ shows }: { shows: Show[] }) {
           <Link prefetch={false}
             href={`/wins?show=${encodeURIComponent(show.slug)}#wins-results-title`}
             aria-label={`View ${show.name} wins`}
-            className="flex items-center justify-between gap-4 border-2 border-foreground bg-card p-4 transition-colors hover:bg-accent focus-visible:bg-accent"
+            className="flex items-center justify-between gap-4 border-2 bg-card p-4 transition-colors hover:bg-accent focus-visible:bg-accent"
           >
             <ShowBadge slug={show.slug} name={show.name} />
             <span className="text-xs tabular-nums text-muted-foreground">{show.total_wins} wins</span>

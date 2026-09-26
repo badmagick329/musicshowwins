@@ -54,7 +54,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ s
       }} />
     <main className="page-enter">
       <div className="mx-auto max-w-7xl px-5 pb-8 pt-10 lg:px-8 lg:pt-14">
-        <section className="border-2 border-foreground bg-surface-berry p-6 shadow-[4px_4px_0_var(--section-ink)] sm:p-8 lg:p-10">
+        <section className="border-2 bg-surface-berry p-6 shadow-[4px_4px_0_var(--section-ink)] sm:p-8 lg:p-10">
           <div className="max-w-3xl">
             <h1 className="font-heading text-4xl font-bold leading-[1.04] tracking-tight text-surface-berry-foreground sm:text-[44px]">K-pop music show wins &amp; artist rankings</h1>
             <p className="mt-5 max-w-2xl text-base leading-relaxed text-surface-berry-foreground/80 sm:text-lg">{siteDescription}</p>
@@ -71,9 +71,9 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ s
         <ThisWeek week={data.week} shows={data.shows} today={koreaDate} />
 
         <section className="mt-14" aria-labelledby="home-rankings-title">
-          <div className="mb-5 flex flex-wrap items-center justify-between gap-3 border-b-2 border-foreground pb-3">
+          <div className="mb-5 flex flex-wrap items-center justify-between gap-3 border-b-2 pb-3">
             <h2 id="home-rankings-title" className="font-heading text-xl font-bold tracking-tight sm:text-2xl">Most wins {period === "year" ? `in ${year}` : "of all time"}</h2>
-            <div role="group" aria-label="Leaderboard period" className="flex border-2 border-foreground bg-card text-sm font-bold"><Link href={thisYearHref} aria-current={period === "year" ? "page" : undefined} className={`inline-flex min-h-11 items-center px-4 ${period === "year" ? "bg-action-pink text-white" : "hover:bg-accent"}`}>This year</Link><Link href={allTimeHref} aria-current={period === "all-time" ? "page" : undefined} className={`inline-flex min-h-11 items-center px-4 ${period === "all-time" ? "bg-action-pink text-white" : "hover:bg-accent"}`}>All time</Link></div>
+            <div role="group" aria-label="Leaderboard period" className="flex border-2 bg-card text-sm font-bold"><Link href={thisYearHref} aria-current={period === "year" ? "page" : undefined} className={`inline-flex min-h-11 items-center px-4 ${period === "year" ? "bg-action-pink text-white" : "hover:bg-accent"}`}>This year</Link><Link href={allTimeHref} aria-current={period === "all-time" ? "page" : undefined} className={`inline-flex min-h-11 items-center px-4 ${period === "all-time" ? "bg-action-pink text-white" : "hover:bg-accent"}`}>All time</Link></div>
           </div>
           <div className="grid gap-12 lg:grid-cols-2">
           <section id="artists">

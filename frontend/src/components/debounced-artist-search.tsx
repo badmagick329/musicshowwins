@@ -49,7 +49,7 @@ export function DebouncedArtistSearch({ id, query, className = "" }: { id: strin
         }}
         placeholder="Artist name or alias"
         autoComplete="off"
-        className={`min-h-12 w-full min-w-0 border-2 border-foreground bg-card px-4 text-base placeholder:text-muted-foreground ${className}`}
+        className={`min-h-12 w-full min-w-0 border-2 bg-card px-4 text-base placeholder:text-muted-foreground ${className}`}
       />
     </form>
   );

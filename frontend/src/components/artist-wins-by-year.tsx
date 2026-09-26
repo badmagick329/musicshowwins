@@ -5,7 +5,7 @@ import type { Artist, Win } from "@/lib/api-shared";
 import { artistYears, datedArtistWins, parseArtistYear } from "@/lib/artist-years";
 import { ArtistYearResults } from "@/components/artist-year-results";
 import { trackEvent } from "@/lib/analytics";
-const control = "min-h-11 border border-foreground bg-card px-3 py-2 text-sm font-semibold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground";
+const control = "min-h-11 border bg-card px-3 py-2 text-sm font-semibold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground";
 
 export function ArtistWinsByYear({ artist, wins, initialYear }: { artist: Artist; wins: Win[]; initialYear: string | null }) {
   const [year, setYear] = useState(initialYear);
@@ -57,7 +57,7 @@ export function ArtistWinsByYear({ artist, wins, initialYear }: { artist: Artist
 
   return <>
     <section className="mt-10" aria-labelledby="years-title">
-      <div className="flex flex-col gap-3 border-b-2 border-foreground pb-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-6">
+      <div className="flex flex-col gap-3 border-b-2 pb-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-6">
         <h2 id="years-title" className="font-heading text-2xl font-bold">Wins by year</h2>
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
           <label htmlFor="artist-year" className="font-semibold">Year</label>
@@ -76,7 +76,7 @@ export function ArtistWinsByYear({ artist, wins, initialYear }: { artist: Artist
           <ul aria-label="Recorded wins per year" className="flex w-full" style={{ minWidth: `${years.length * 3.5}rem` }}>
             {years.map((item) => <li key={item.year} className="min-w-14 flex-1">
               <button ref={year === item.year ? selectedBarRef : undefined} type="button" aria-label={`${item.year}: ${item.count} recorded ${item.count === 1 ? "win" : "wins"}`} aria-pressed={year === item.year} onClick={() => selectYear(item.year, "chart")} className="group flex w-full cursor-pointer flex-col items-center focus-visible:outline-offset-[-2px]">
-                <span className="flex h-48 w-full flex-col items-center justify-end border-b border-foreground">
+                <span className="flex h-48 w-full flex-col items-center justify-end border-b">
                   <span className="mb-1 text-sm font-bold tabular-nums">{item.count}</span>
                   <span aria-hidden="true" className={`w-2/3 max-w-16 ${year === item.year ? "bg-primary group-hover:opacity-90" : "bg-surface-berry group-hover:bg-section-ink"}`} style={{ height: `${item.count / max * 160}px` }} />
                 </span>

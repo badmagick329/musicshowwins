@@ -67,12 +67,12 @@ export default async function ArtistPage({ params, searchParams = Promise.resolv
         ],
       }} />
     <main className="page-enter mx-auto max-w-7xl px-5 pb-8 pt-10 lg:px-8 lg:pt-14">
-      <header className="border-2 border-foreground bg-surface-berry p-6 text-surface-berry-foreground shadow-[4px_4px_0_var(--section-ink)] sm:p-8">
+      <header className="border-2 bg-surface-berry p-6 text-surface-berry-foreground shadow-[4px_4px_0_var(--section-ink)] sm:p-8">
         <h1 className="font-heading text-4xl font-bold tracking-tight sm:text-[44px]">{artist.name}</h1><p className="mt-2 text-surface-berry-foreground/75">{summary.totalWins} recorded music show {plural(summary.totalWins, "win")} across {summary.winningSongs} {plural(summary.winningSongs, "song")}</p>
       </header>
 
       <section className="mt-10" aria-labelledby="summary-title">
-        <h2 id="summary-title" className="mb-4 border-b-2 border-foreground pb-3 font-heading text-2xl font-bold">Win summary</h2>
+        <h2 id="summary-title" className="mb-4 border-b-2 pb-3 font-heading text-2xl font-bold">Win summary</h2>
         <MetricGrid>
           <Metric label="Recorded wins" value={String(summary.totalWins)} />
           <Metric label="Winning songs" value={String(summary.winningSongs)} />
