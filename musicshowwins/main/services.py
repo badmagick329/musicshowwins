@@ -113,9 +113,13 @@ def wins_queryset(*, with_song_totals: bool = False, **filters):
 
 
 def _win_ordinal(**same):
-    earlier = Q(date__lt=OuterRef("date")) | Q(date=OuterRef("date"), pk__lte=OuterRef("pk"))
+    earlier = Q(date__lt=OuterRef("date")) | Q(
+        date=OuterRef("date"), pk__lte=OuterRef("pk")
+    )
     return Subquery(
-        Win.objects.filter(earlier, **{field: OuterRef(ref) for field, ref in same.items()})
+        Win.objects.filter(
+            earlier, **{field: OuterRef(ref) for field, ref in same.items()}
+        )
         .order_by()
         .values(*same)
         .annotate(n=Count("pk"))
@@ -173,6 +177,7 @@ def show_queryset(search: str = ""):
         latest_win_song_title=Subquery(latest_win.values("song__title")[:1]),
         latest_win_artist_id=Subquery(latest_win.values("song__artist_id")[:1]),
         latest_win_artist_name=Subquery(latest_win.values("song__artist__name")[:1]),
+        latest_win_artist_slug=Subquery(latest_win.values("song__artist__slug")[:1]),
     )
     if search:
         query = query.filter(Q(name__icontains=search) | Q(slug__icontains=search))

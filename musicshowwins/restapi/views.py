@@ -5,6 +5,7 @@ from datetime import date
 import requests
 from django.conf import settings
 from django.db.models import Q
+from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import extend_schema
 from main.services import (
     all_artists_queryset,
@@ -52,7 +53,7 @@ class Sitemap(APIView):
         fields = ("id", "latest_win_date")
         return Response(
             {
-                "artists": list(all_artists_queryset().values(*fields)),
+                "artists": list(all_artists_queryset().values(*fields, "slug")),
                 "songs": list(all_songs_queryset().values(*fields)),
             }
         )
@@ -216,10 +217,17 @@ class ArtistList(generics.ListAPIView):
 
 
 class ArtistDetail(generics.RetrieveAPIView):
+    """Look artists up by slug, or by the numeric ID older URLs carried."""
+
     serializer_class = ArtistSerializer
 
     def get_queryset(self):
         return all_artists_queryset()
+
+    def get_object(self):
+        key = self.kwargs["key"]
+        lookup = {"pk": int(key)} if key.isdigit() else {"slug": key}
+        return get_object_or_404(self.get_queryset(), **lookup)
 
 
 class SongList(generics.ListAPIView):
@@ -258,7 +266,9 @@ class WinList(generics.ListAPIView):
 
     def get_queryset(self):
         return ordered(
-            with_milestones(wins_queryset(with_song_totals=True, **filters(self.request))),
+            with_milestones(
+                wins_queryset(with_song_totals=True, **filters(self.request))
+            ),
             self.request,
             {"date", "id", "show__name", "song__title", "song__artist__name"},
             "-date",

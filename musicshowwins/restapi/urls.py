@@ -20,7 +20,7 @@ urlpatterns = [
         name="corrections",
     ),
     re_path(r"^v1/artists/?$", views.ArtistList.as_view(), name="artists"),
-    path("v1/artists/<int:pk>", views.ArtistDetail.as_view(), name="artist-detail"),
+    path("v1/artists/<slug:key>", views.ArtistDetail.as_view(), name="artist-detail"),
     re_path(r"^v1/songs/?$", views.SongList.as_view(), name="songs"),
     path("v1/songs/<int:pk>", views.SongDetail.as_view(), name="song-detail"),
     re_path(r"^v1/wins/?$", views.WinList.as_view(), name="wins"),

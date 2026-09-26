@@ -2,9 +2,10 @@ import type { MetadataRoute } from "next";
 import { connection } from "next/server";
 import { buildServerApiUrl, publicArchiveCacheTag, publicArchiveRevalidateSeconds } from "@/lib/api-server";
 import { siteUrl } from "@/lib/seo";
+import { artistPath } from "@/lib/paths";
 
 type SitemapEntry = { id: number; latest_win_date: string | null };
-type SitemapSource = { artists: SitemapEntry[]; songs: SitemapEntry[] };
+type SitemapSource = { artists: (SitemapEntry & { slug: string })[]; songs: SitemapEntry[] };
 
 function isSitemapSource(value: unknown): value is SitemapSource {
   if (!value || typeof value !== "object") return false;
@@ -15,7 +16,8 @@ function isSitemapSource(value: unknown): value is SitemapSource {
     return Number.isInteger(item.id) &&
       (item.latest_win_date === null || typeof item.latest_win_date === "string");
   };
-  return Array.isArray(source.artists) && source.artists.every(validEntry) &&
+  const validArtist = (entry: unknown) => validEntry(entry) && typeof (entry as Record<string, unknown>).slug === "string";
+  return Array.isArray(source.artists) && source.artists.every(validArtist) &&
     Array.isArray(source.songs) && source.songs.every(validEntry);
 }
 
@@ -52,7 +54,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   return [
     ...staticPages,
     ...source.artists.map((artist) => ({
-      url: `${siteUrl}/artists/${artist.id}`,
+      url: `${siteUrl}${artistPath(artist)}`,
       lastModified: modified(artist.latest_win_date),
       changeFrequency: "weekly" as const,
       priority: 0.8,

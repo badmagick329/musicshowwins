@@ -40,8 +40,8 @@ def test_sitemap_source_returns_every_entity_without_pagination(archive):
     assert response.status_code == 200
     assert response.data == {
         "artists": [
-            {"id": archive[1].pk, "latest_win_date": date(2025, 1, 1)},
-            {"id": archive[2].pk, "latest_win_date": date(2025, 1, 2)},
+            {"id": archive[1].pk, "latest_win_date": date(2025, 1, 1), "slug": "alpha"},
+            {"id": archive[2].pk, "latest_win_date": date(2025, 1, 2), "slug": "beta"},
         ],
         "songs": [
             {"id": archive[3].pk, "latest_win_date": date(2025, 1, 1)},
@@ -84,11 +84,12 @@ def test_read_only_collections_and_contracts(archive):
         "song": {
             "id": archive[4].pk,
             "title": "Second",
-            "artist": {"id": archive[2].pk, "name": "Beta"},
+            "artist": {"id": archive[2].pk, "slug": "beta", "name": "Beta"},
         },
     }
     assert set(artists.data["results"][0]) == {
         "id",
+        "slug",
         "name",
         "total_wins",
         "winning_songs",
@@ -221,6 +222,7 @@ def test_artist_ordering_and_win_annotations(archive, django_assert_num_queries)
     assert [artist["name"] for artist in default[:3]] == ["Alpha", "Beta", "Aardvark"]
     assert default[0] == {
         "id": archive[1].pk,
+        "slug": "alpha",
         "name": "Alpha",
         "total_wins": 3,
         "winning_songs": 2,
@@ -228,6 +230,7 @@ def test_artist_ordering_and_win_annotations(archive, django_assert_num_queries)
     }
     assert default[2] == {
         "id": no_wins.pk,
+        "slug": "aardvark",
         "name": "Aardvark",
         "total_wins": 0,
         "winning_songs": 0,
@@ -262,7 +265,7 @@ def test_song_annotations_ordering_and_query_count(archive, django_assert_num_qu
     assert default[0] == {
         "id": archive[3].pk,
         "title": "First",
-        "artist": {"id": archive[1].pk, "name": "Alpha"},
+        "artist": {"id": archive[1].pk, "slug": "alpha", "name": "Alpha"},
         "total_wins": 3,
         "latest_win_date": "2025-02-01",
         "winning_shows": 2,
@@ -792,3 +795,14 @@ def test_general_feedback_needs_only_a_message(settings):
     assert post.call_args.kwargs["json"]["embeds"][0]["fields"] == [
         {"name": "Feedback", "value": "Please improve song search."}
     ]
+
+
+@pytest.mark.django_db
+def test_artist_detail_resolves_slug_and_legacy_id(archive):
+    client = APIClient()
+    by_slug = client.get("/api/v1/artists/alpha")
+    by_id = client.get(f"/api/v1/artists/{archive[1].pk}")
+    assert by_slug.status_code == by_id.status_code == 200
+    assert by_slug.data == by_id.data
+    assert by_slug.data["slug"] == "alpha"
+    assert client.get("/api/v1/artists/missing-artist").status_code == 404

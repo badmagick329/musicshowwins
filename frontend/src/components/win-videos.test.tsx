@@ -21,7 +21,7 @@ function reference(overrides: Partial<WinReference> = {}): WinReference {
 }
 
 function win(id: number, overrides: Partial<Win> = {}): Win {
-  return { id, date: "2024-06-27", show: { id: 2, slug: "m-countdown", name: "M Countdown", active: true }, song: { id: 7, title: "Boom Boom Bass", artist: { id: 3, name: "Riize" }, total_wins: 1, latest_win_date: "2024-06-27", winning_shows: 1 }, performed: null, references: [], milestones: { song_win: 2, song_show_win: 1, artist_win: 2 }, ...overrides };
+  return { id, date: "2024-06-27", show: { id: 2, slug: "m-countdown", name: "M Countdown", active: true }, song: { id: 7, title: "Boom Boom Bass", artist: { id: 3, slug: "riize", name: "Riize" }, total_wins: 1, latest_win_date: "2024-06-27", winning_shows: 1 }, performed: null, references: [], milestones: { song_win: 2, song_show_win: 1, artist_win: 2 }, ...overrides };
 }
 
 const winName = "Boom Boom Bass by Riize, 27 Jun 2024, M Countdown";

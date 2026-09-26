@@ -20,7 +20,7 @@ import { generateMetadata as winsMetadata } from "./wins/page";
 import { metadata as showsMetadata } from "./shows/page";
 import { metadata as aboutMetadata } from "./about/page";
 import { generateMetadata as homeMetadata } from "./page";
-import { generateMetadata as artistMetadata } from "./artists/[id]/page";
+import { generateMetadata as artistMetadata } from "./artists/[slug]/page";
 import { generateMetadata as songMetadata } from "./songs/[id]/page";
 
 const staticRoutes = [
@@ -30,8 +30,8 @@ const staticRoutes = [
 
 beforeEach(() => {
   vi.clearAllMocks();
-  apiMocks.getArtist.mockResolvedValue({ id: 3, name: "aespa", total_wins: 12, winning_songs: 3 });
-  apiMocks.getSong.mockResolvedValue({ id: 7, title: "Supernova", artist: { id: 3, name: "aespa" }, total_wins: 3, winning_shows: 2 });
+  apiMocks.getArtist.mockResolvedValue({ id: 3, slug: "aespa", name: "aespa", total_wins: 12, winning_songs: 3 });
+  apiMocks.getSong.mockResolvedValue({ id: 7, title: "Supernova", artist: { id: 3, slug: "aespa", name: "aespa" }, total_wins: 3, winning_shows: 2 });
   apiMocks.getAllArtistWins.mockResolvedValue([]);
   apiMocks.getAllSongWins.mockResolvedValue([]);
 });
@@ -99,12 +99,12 @@ describe("page metadata", () => {
   });
 
   it("sets artist and song detail titles without duplicate branding", async () => {
-    const artist = await artistMetadata({ params: Promise.resolve({ id: "3" }) });
+    const artist = await artistMetadata({ params: Promise.resolve({ slug: "aespa" }) });
     const song = await songMetadata({ params: Promise.resolve({ id: "7" }) });
     expect(artist).toMatchObject({
       title: "aespa Music Show Wins: 12 Total",
       description: "aespa has 12 recorded music-show wins across 3 songs.",
-      alternates: { canonical: "/artists/3" },
+      alternates: { canonical: "/artists/aespa" },
     });
     expect(song).toMatchObject({
       title: "Supernova by aespa: 3 Music Show Wins",
@@ -120,19 +120,19 @@ describe("page metadata", () => {
   });
 
   it("uses clear not-found title fallbacks", async () => {
-    await expect(artistMetadata({ params: Promise.resolve({ id: "invalid" }) })).resolves.toMatchObject({ title: "Artist Not Found" });
+    await expect(artistMetadata({ params: Promise.resolve({ slug: "Not A Slug" }) })).resolves.toMatchObject({ title: "Artist Not Found" });
     await expect(songMetadata({ params: Promise.resolve({ id: "invalid" }) })).resolves.toMatchObject({ title: "Song Not Found" });
 
     apiMocks.getArtist.mockRejectedValueOnce(new ApiRequestError(404));
     apiMocks.getSong.mockRejectedValueOnce(new ApiRequestError(404));
-    await expect(artistMetadata({ params: Promise.resolve({ id: "999" }) })).resolves.toMatchObject({ title: "Artist Not Found" });
+    await expect(artistMetadata({ params: Promise.resolve({ slug: "missing-artist" }) })).resolves.toMatchObject({ title: "Artist Not Found" });
     await expect(songMetadata({ params: Promise.resolve({ id: "999" }) })).resolves.toMatchObject({ title: "Song Not Found" });
   });
 
   it("does not turn temporary API failures into noindex metadata", async () => {
     apiMocks.getArtist.mockRejectedValueOnce(new ApiRequestError(503));
     apiMocks.getSong.mockRejectedValueOnce(new ApiRequestError(503));
-    await expect(artistMetadata({ params: Promise.resolve({ id: "3" }) })).rejects.toThrow();
+    await expect(artistMetadata({ params: Promise.resolve({ slug: "aespa" }) })).rejects.toThrow();
     await expect(songMetadata({ params: Promise.resolve({ id: "7" }) })).rejects.toThrow();
   });
 });

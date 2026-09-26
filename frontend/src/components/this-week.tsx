@@ -5,6 +5,7 @@ import { MobileWinVideoDisclosure } from "@/components/win-videos";
 import { buildWeek, formatSlotDay, formatWeekRange } from "@/lib/this-week";
 import { cardFacts } from "@/lib/win-facts";
 import { cn } from "@/lib/utils";
+import { artistPath } from "@/lib/paths";
 
 export function ThisWeek({ week, shows, today }: { week: ArchiveWeek; shows: Show[]; today: string }) {
   const slots = buildWeek(week, shows, today);
@@ -24,7 +25,7 @@ export function ThisWeek({ week, shows, today }: { week: ArchiveWeek; shows: Sho
               const facts = cardFacts(win);
               return (
                 <div key={win.id} className="mt-1.5">
-                  <p className="leading-snug"><Link prefetch={false} href={`/songs/${win.song.id}`} className="compact-link-target font-heading text-lg font-bold">{win.song.title}</Link><span aria-hidden="true" className="text-muted-foreground"> · </span><Link prefetch={false} href={`/artists/${win.song.artist.id}`} className="compact-link-target text-sm">{win.song.artist.name}</Link></p>
+                  <p className="leading-snug"><Link prefetch={false} href={`/songs/${win.song.id}`} className="compact-link-target font-heading text-lg font-bold">{win.song.title}</Link><span aria-hidden="true" className="text-muted-foreground"> · </span><Link prefetch={false} href={artistPath(win.song.artist)} className="compact-link-target text-sm">{win.song.artist.name}</Link></p>
                   {(facts.count || facts.tag) && <p className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground">{facts.count && <span>{facts.count}</span>}{facts.tag && <FactLabel>{facts.tag}</FactLabel>}</p>}
                   <MobileWinVideoDisclosure win={win} className="mt-2.5 items-start" />
                 </div>

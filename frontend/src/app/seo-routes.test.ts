@@ -26,7 +26,7 @@ describe("SEO and agent discovery routes", () => {
       void input;
       void init;
       return Response.json({
-        artists: [{ id: 3, latest_win_date: "2026-08-31" }],
+        artists: [{ id: 3, slug: "aespa", latest_win_date: "2026-08-31" }],
         songs: [{ id: 7, latest_win_date: "2026-08-30" }],
       });
     });
@@ -36,7 +36,7 @@ describe("SEO and agent discovery routes", () => {
     expect(urls).toEqual(expect.arrayContaining([
       "https://kpopwins.info/",
       "https://kpopwins.info/artists",
-      "https://kpopwins.info/artists/3",
+      "https://kpopwins.info/artists/aespa",
       "https://kpopwins.info/songs/7",
     ]));
     expect(fetchMock).toHaveBeenCalledOnce();

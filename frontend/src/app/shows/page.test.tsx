@@ -15,7 +15,7 @@ const show = {
   total_wins: 42,
   first_win_date: "2014-01-03",
   latest_win_date: "2025-08-01",
-  latest_win: { id: 9, date: "2025-08-01", song: { id: 4, title: "Winner", artist: { id: 3, name: "Example Artist" } } },
+  latest_win: { id: 9, date: "2025-08-01", song: { id: 4, title: "Winner", artist: { id: 3, slug: "example-artist", name: "Example Artist" } } },
 };
 
 describe("ShowsPage", () => {

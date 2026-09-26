@@ -1,7 +1,7 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import ArtistsLoading from "./artists/loading";
-import ArtistLoading from "./artists/[id]/loading";
+import ArtistLoading from "./artists/[slug]/loading";
 import SongsLoading from "./songs/loading";
 import SongLoading from "./songs/[id]/loading";
 import WinsLoading from "./wins/loading";

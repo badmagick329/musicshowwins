@@ -38,6 +38,7 @@ class ShowSerializer(ShowSummarySerializer):
                 "title": instance.latest_win_song_title,
                 "artist": {
                     "id": instance.latest_win_artist_id,
+                    "slug": instance.latest_win_artist_slug,
                     "name": instance.latest_win_artist_name,
                 },
             },
@@ -66,15 +67,19 @@ class SitemapEntrySerializer(serializers.Serializer):
     latest_win_date = serializers.DateField(allow_null=True)
 
 
+class ArtistSitemapEntrySerializer(SitemapEntrySerializer):
+    slug = serializers.SlugField()
+
+
 class SitemapSerializer(serializers.Serializer):
-    artists = SitemapEntrySerializer(many=True)
+    artists = ArtistSitemapEntrySerializer(many=True)
     songs = SitemapEntrySerializer(many=True)
 
 
 class ArtistSummarySerializer(serializers.ModelSerializer):
     class Meta:
         model = Artist
-        fields = ("id", "name")
+        fields = ("id", "slug", "name")
 
 
 class ArtistSerializer(serializers.ModelSerializer):
@@ -86,6 +91,7 @@ class ArtistSerializer(serializers.ModelSerializer):
         model = Artist
         fields = (
             "id",
+            "slug",
             "name",
             "total_wins",
             "winning_songs",

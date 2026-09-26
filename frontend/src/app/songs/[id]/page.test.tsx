@@ -23,7 +23,7 @@ import { ApiRequestError } from "@/lib/api";
 const song: Song = {
   id: 7,
   title: "Supernova",
-  artist: { id: 3, name: "aespa" },
+  artist: { id: 3, slug: "aespa", name: "aespa" },
   total_wins: 3,
   latest_win_date: "2024-06-02",
   winning_shows: 2,
@@ -55,7 +55,7 @@ describe("Song detail page", () => {
   it("renders the summary, show breakdown, metadata, and complete newest-first history", async () => {
     const html = renderToStaticMarkup(await SongPage({ params: Promise.resolve({ id: "7" }) }));
     expect(html).toContain("Supernova");
-    expect(html).toContain('href="/artists/3"');
+    expect(html).toContain('href="/artists/aespa"');
     expect(html).toContain("Shows with wins");
     expect(html).toContain("24 May 2024");
     expect(html).toContain("02 Jun 2024");

@@ -25,10 +25,10 @@ vi.mock("@tanstack/react-query", () => ({
       };
     }
     if (options.queryKey[1] === "selected-artist") {
-      return { data: { id: 3, name: "Artist" }, isError: false };
+      return { data: { id: 3, slug: "artist", name: "Artist" }, isError: false };
     }
     if (options.queryKey[1] === "selected-song") {
-      return { data: { id: 7, title: "Archive Winner", artist: { id: 3, name: "Artist" } }, isError: false };
+      return { data: { id: 7, title: "Archive Winner", artist: { id: 3, slug: "artist", name: "Artist" } }, isError: false };
     }
     queryState.winsEnabled = options.enabled !== false;
     const filters = options.queryKey[2] as { show: string; search: string; page: number; dateFrom: string };
@@ -38,8 +38,8 @@ vi.mock("@tanstack/react-query", () => ({
     const title = filters.show === "the-show" ? "The Show Winner" : filters.show === "music-bank" ? "Music Bank Winner" : filters.search ? `${filters.search} Winner` : "Archive Winner";
     return {
       data: { count: 201, next: filters.page < 3 ? "next" : null, previous: filters.page > 1 ? "previous" : null, results: [
-        { id: 1, date: "2025-01-01", show: { id: 1, slug: filters.show || "music-bank", name: filters.show === "the-show" ? "The Show" : "Music Bank", active: true }, song: { id: 7, title, artist: { id: 3, name: "Artist" }, total_wins: 1 }, references: queryState.videoReferences, milestones: { song_win: 2, song_show_win: 1, artist_win: 2 } },
-        { id: 2, date: "2025-01-02", show: { id: 3, slug: "show-champion", name: "Show Champion", active: true }, song: { id: 8, title: "Second Winner", artist: { id: 4, name: "Another Artist" }, total_wins: 1 }, references: [], milestones: { song_win: 2, song_show_win: 1, artist_win: 2 } },
+        { id: 1, date: "2025-01-01", show: { id: 1, slug: filters.show || "music-bank", name: filters.show === "the-show" ? "The Show" : "Music Bank", active: true }, song: { id: 7, title, artist: { id: 3, slug: "artist", name: "Artist" }, total_wins: 1 }, references: queryState.videoReferences, milestones: { song_win: 2, song_show_win: 1, artist_win: 2 } },
+        { id: 2, date: "2025-01-02", show: { id: 3, slug: "show-champion", name: "Show Champion", active: true }, song: { id: 8, title: "Second Winner", artist: { id: 4, slug: "another-artist", name: "Another Artist" }, total_wins: 1 }, references: [], milestones: { song_win: 2, song_show_win: 1, artist_win: 2 } },
       ] },
       isError: false,
       isFetching: queryState.isFetching,

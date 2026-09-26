@@ -147,3 +147,17 @@ def test_blank_external_ids_do_not_conflict(db):
         )
 
     assert win.references.count() == 2
+
+
+@pytest.mark.django_db
+def test_artist_slugs_are_unique_ascii_and_stable():
+    from main.models import Artist
+
+    first = Artist.objects.create(name="Rosé")
+    clash = Artist.objects.create(name="Rose")
+    numeric = Artist.objects.create(name="015")
+    assert (first.slug, clash.slug, numeric.slug) == ("rose", "rose-2", "015-artist")
+    first.name = "ROSÉ"
+    first.save()
+    first.refresh_from_db()
+    assert first.slug == "rose"

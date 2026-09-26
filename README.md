@@ -109,7 +109,7 @@ The read-only API is available at:
 ```text
 /api/v1/shows
 /api/v1/artists
-/api/v1/artists/{id}
+/api/v1/artists/{slug-or-id}
 /api/v1/songs
 /api/v1/songs/{id}
 /api/v1/wins

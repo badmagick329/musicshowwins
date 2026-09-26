@@ -7,6 +7,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models.signals import m2m_changed
 from django.dispatch import receiver
+from django.utils.text import slugify
 
 
 def normalize_text(value: str) -> str:
@@ -35,9 +36,23 @@ class MusicShow(models.Model):
         return self.name
 
 
+def unique_artist_slug(name: str, exclude_pk: int | None = None) -> str:
+    base = slugify(name) or "artist"
+    # A purely numeric slug would be read as a legacy artist ID.
+    if base.isdigit():
+        base = f"{base}-artist"
+    slug, suffix = base, 2
+    while Artist.objects.filter(slug=slug).exclude(pk=exclude_pk).exists():
+        slug, suffix = f"{base}-{suffix}", suffix + 1
+    return slug
+
+
 class Artist(models.Model):
     name = models.CharField(max_length=200)
     identity_key = models.CharField(max_length=200, unique=True, editable=False)
+    # Public URLs use the slug; it is assigned once and kept when the name is
+    # corrected so shared links keep working.
+    slug = models.SlugField(max_length=220, unique=True)
 
     class Meta:
         ordering = ("name",)
@@ -45,6 +60,8 @@ class Artist(models.Model):
     def save(self, *args, **kwargs):
         self.name = normalize_text(self.name)
         self.identity_key = normalize_key(self.name)
+        if not self.slug:
+            self.slug = unique_artist_slug(self.name, exclude_pk=self.pk)
         super().save(*args, **kwargs)
 
     def __str__(self):

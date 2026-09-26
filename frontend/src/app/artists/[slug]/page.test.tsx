@@ -6,17 +6,20 @@ const apiMocks = vi.hoisted(() => ({ getArtist: vi.fn(), getAllArtistSongs: vi.f
 vi.mock("@/lib/api", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@/lib/api")>()), ...apiMocks,
 }));
-vi.mock("next/navigation", () => ({ notFound: () => { throw new Error("NEXT_NOT_FOUND"); } }));
+vi.mock("next/navigation", () => ({
+  notFound: () => { throw new Error("NEXT_NOT_FOUND"); },
+  permanentRedirect: (url: string) => { throw new Error(`NEXT_REDIRECT ${url}`); },
+}));
 
 import ArtistPage, { generateMetadata } from "./page";
 
-const artist: Artist = { id: 3, name: "aespa", total_wins: 2, winning_songs: 2, latest_win_date: "2024-06-02" };
+const artist: Artist = { id: 3, slug: "aespa", name: "aespa", total_wins: 2, winning_songs: 2, latest_win_date: "2024-06-02" };
 const earliest: Win = {
   id: 1, date: "2021-01-17", show: { id: 1, slug: "inkigayo", name: "Inkigayo", active: true },
   song: { id: 7, title: "Black Mamba", artist, total_wins: 1, latest_win_date: "2021-01-17", winning_shows: 1 }, performed: null, references: [], milestones: { song_win: 2, song_show_win: 1, artist_win: 2 },
 };
 const latest: Win = { ...earliest, id: 2, date: "2024-06-02", song: { ...earliest.song, id: 8, title: "Supernova" } };
-const params = Promise.resolve({ id: "3" });
+const params = Promise.resolve({ slug: "aespa" });
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -64,7 +67,7 @@ describe("artist summary and metadata", () => {
     expect(metadata.description).not.toContain("complete");
     expect(metadata.openGraph?.description).toBe(metadata.description);
     expect(metadata.twitter?.description).toBe(metadata.description);
-    expect(metadata.alternates?.canonical).toBe("/artists/3");
+    expect(metadata.alternates?.canonical).toBe("/artists/aespa");
   });
 
   it("answers win-count and earliest-win searches in the title and description", async () => {
@@ -78,5 +81,16 @@ describe("artist summary and metadata", () => {
     const html = renderToStaticMarkup(await ArtistPage({ params }));
     expect(html).toContain("Earliest recorded win");
     expect(html).toContain("Not recorded");
+  });
+
+  it("permanently redirects legacy numeric URLs to the slug, keeping the year", async () => {
+    await expect(ArtistPage({ params: Promise.resolve({ slug: "3" }), searchParams: Promise.resolve({ year: "2024" }) })).rejects.toThrow("NEXT_REDIRECT /artists/aespa?year=2024");
+    expect(apiMocks.getArtist).toHaveBeenCalledWith("3");
+    expect(apiMocks.getAllArtistWins).not.toHaveBeenCalled();
+  });
+
+  it("rejects malformed artist keys without calling the API", async () => {
+    await expect(ArtistPage({ params: Promise.resolve({ slug: "Not A Slug" }) })).rejects.toThrow("NEXT_NOT_FOUND");
+    expect(apiMocks.getArtist).not.toHaveBeenCalled();
   });
 });

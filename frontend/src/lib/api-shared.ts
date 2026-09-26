@@ -9,12 +9,13 @@ export type ApiParams = Record<string, string | number | undefined>;
 
 export type Artist = {
   id: number;
+  slug: string;
   name: string;
   total_wins: number;
   winning_songs: number;
   latest_win_date: string | null;
 };
-export type Song = { id: number; title: string; artist: Pick<Artist, "id" | "name">; total_wins: number; latest_win_date: string | null; winning_shows: number };
+export type Song = { id: number; title: string; artist: Pick<Artist, "id" | "slug" | "name">; total_wins: number; latest_win_date: string | null; winning_shows: number };
 export type ShowSummary = { id: number; slug: string; name: string; active: boolean };
 export type Show = ShowSummary & {
   id: number;
@@ -27,7 +28,7 @@ export type Show = ShowSummary & {
   latest_win: {
     id: number;
     date: string;
-    song: Pick<Song, "id" | "title"> & { artist: Pick<Artist, "id" | "name"> };
+    song: Pick<Song, "id" | "title"> & { artist: Pick<Artist, "id" | "slug" | "name"> };
   } | null;
 };
 export type CorrectionReport = {
@@ -53,7 +54,7 @@ export type WinMoment = { heading: string; body: string; citations: WinReference
 // Catalogue-wide ordinals (coverage starts in 2014), independent of list filters.
 export type WinMilestones = { song_win: number; song_show_win: number; artist_win: number };
 export type Win = { id: number; date: string; show: ShowSummary; song: Song; performed: boolean | null; references: WinReference[]; moment?: WinMoment | null; milestones: WinMilestones };
-export type ArtistLeaderboardRow = { rank: number; wins: number; artist: Pick<Artist, "id" | "name"> };
+export type ArtistLeaderboardRow = { rank: number; wins: number; artist: Pick<Artist, "id" | "slug" | "name"> };
 export type SongLeaderboardRow = { rank: number; wins: number; song: Pick<Song, "id" | "title" | "artist"> };
 export type ArchiveWeek = { start: string; end: string; current: boolean; wins: Win[] };
 export type HomeData = {

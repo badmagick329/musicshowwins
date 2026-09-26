@@ -10,6 +10,7 @@ import { formatDate } from "@/lib/utils";
 import { notableTag } from "@/lib/win-facts";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import { artistPath } from "@/lib/paths";
 
 export function SectionHeading({ title, action, level = 2 }: { title: string; action?: React.ReactNode; level?: 2 | 3 }) {
   return (
@@ -93,7 +94,7 @@ function DesktopLeaderboardRow({ row, kind }: { row: ArtistLeaderboardRow | Song
   return (
     <TableRow className="border-border/70 transition-colors hover:bg-accent/60">
       <TableCell className="w-16 px-4 py-3"><RankMarker rank={row.rank} /></TableCell>
-      <TableCell className="px-4 py-3"><p className="font-semibold">{kind === "artist" ? <Link prefetch={false} href={`/artists/${artist.id}`} className="compact-link-target">{title}</Link> : <Link prefetch={false} href={`/songs/${songId}`} className="compact-link-target">{title}</Link>}</p>{subtitle && <p className="text-xs text-muted-foreground"><Link prefetch={false} href={`/artists/${artist.id}`} className="compact-link-target">{subtitle}</Link></p>}</TableCell>
+      <TableCell className="px-4 py-3"><p className="font-semibold">{kind === "artist" ? <Link prefetch={false} href={artistPath(artist)} className="compact-link-target">{title}</Link> : <Link prefetch={false} href={`/songs/${songId}`} className="compact-link-target">{title}</Link>}</p>{subtitle && <p className="text-xs text-muted-foreground"><Link prefetch={false} href={artistPath(artist)} className="compact-link-target">{subtitle}</Link></p>}</TableCell>
       <TableCell className="w-24 px-4 py-3 text-right font-heading text-lg font-bold tabular-nums">{row.wins}</TableCell>
     </TableRow>
   );
@@ -101,7 +102,7 @@ function DesktopLeaderboardRow({ row, kind }: { row: ArtistLeaderboardRow | Song
 
 function MobileLeaderboardRow({ row, kind }: { row: ArtistLeaderboardRow | SongLeaderboardRow; kind: "artist" | "song" }) {
   const { title, subtitle, artist, songId } = leaderboardCopy(row, kind);
-  return <div className="mobile-record items-center gap-3 border-b border-border/70 px-3 py-3"><RankMarker rank={row.rank} /><div className="min-w-0 flex-1"><p className="font-semibold">{kind === "artist" ? <Link prefetch={false} href={`/artists/${artist.id}`} className="compact-link-target w-full truncate">{title}</Link> : <Link prefetch={false} href={`/songs/${songId}`} className="compact-link-target w-full truncate">{title}</Link>}</p>{subtitle && <p className="text-xs text-muted-foreground"><Link prefetch={false} href={`/artists/${artist.id}`} className="compact-link-target w-full truncate">{subtitle}</Link></p>}</div><p className="font-heading text-lg font-bold tabular-nums"><span className="sr-only">{row.wins} wins</span>{row.wins}</p></div>;
+  return <div className="mobile-record items-center gap-3 border-b border-border/70 px-3 py-3"><RankMarker rank={row.rank} /><div className="min-w-0 flex-1"><p className="font-semibold">{kind === "artist" ? <Link prefetch={false} href={artistPath(artist)} className="compact-link-target w-full truncate">{title}</Link> : <Link prefetch={false} href={`/songs/${songId}`} className="compact-link-target w-full truncate">{title}</Link>}</p>{subtitle && <p className="text-xs text-muted-foreground"><Link prefetch={false} href={artistPath(artist)} className="compact-link-target w-full truncate">{subtitle}</Link></p>}</div><p className="font-heading text-lg font-bold tabular-nums"><span className="sr-only">{row.wins} wins</span>{row.wins}</p></div>;
 }
 
 export function Leaderboard({ rows, kind, empty = "No wins to show yet." }: { rows: (ArtistLeaderboardRow | SongLeaderboardRow)[]; kind: "artist" | "song"; empty?: string }) {
@@ -123,7 +124,7 @@ export function WinRecord({ win, hideArtist = false, hideSong = false }: { win: 
     <article className="border-b border-border/70 px-3 py-3 last:border-b-0">
       <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-x-3 gap-y-2">
         <time dateTime={win.date} className="font-heading text-sm font-bold tabular-nums text-muted-foreground">{formatDate(win.date)}</time>
-        {hideSong ? <div className="col-span-2 row-start-2 empty:hidden"><WinFactTag win={win} /></div> : <div className="col-span-2 row-start-2 min-w-0"><p className="break-words font-semibold"><Link prefetch={false} href={`/songs/${win.song.id}`} className="compact-link-target">{win.song.title}</Link></p>{!hideArtist && <p className="break-words text-xs text-muted-foreground"><Link prefetch={false} href={`/artists/${win.song.artist.id}`} className="compact-link-target">{win.song.artist.name}</Link></p>}<WinFactTag win={win} /></div>}
+        {hideSong ? <div className="col-span-2 row-start-2 empty:hidden"><WinFactTag win={win} /></div> : <div className="col-span-2 row-start-2 min-w-0"><p className="break-words font-semibold"><Link prefetch={false} href={`/songs/${win.song.id}`} className="compact-link-target">{win.song.title}</Link></p>{!hideArtist && <p className="break-words text-xs text-muted-foreground"><Link prefetch={false} href={artistPath(win.song.artist)} className="compact-link-target">{win.song.artist.name}</Link></p>}<WinFactTag win={win} /></div>}
         <ShowBadge slug={win.show.slug} name={win.show.name} />
       </div>
       <MobileWinVideoDisclosure win={win} className="mt-3" />

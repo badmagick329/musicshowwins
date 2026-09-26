@@ -5,7 +5,7 @@ import type { Artist, Win } from "@/lib/api-shared";
 import { artistYears, datedArtistWins, parseArtistYear } from "@/lib/artist-years";
 import { ArtistWinsByYear } from "./artist-wins-by-year";
 
-const artist: Artist = { id: 3, name: "Artist & Collaborator", total_wins: 4, winning_songs: 2, latest_win_date: "2024-01-01" };
+const artist: Artist = { id: 3, slug: "artist-collaborator", name: "Artist & Collaborator", total_wins: 4, winning_songs: 2, latest_win_date: "2024-01-01" };
 function win(id: number, year: number, song = 1, show = 1): Win {
   return { id, date: `${year}-01-01`, song: { id: song, title: `Song ${song}`, artist, total_wins: 99, winning_shows: 9, latest_win_date: null }, show: { id: show, name: `Show ${show}`, slug: "music-bank", active: true }, performed: null, references: [], milestones: { song_win: 2, song_show_win: 1, artist_win: 2 }, moment: { heading: `Moment ${id}`, body: `Story ${id}`, citations: [] } };
 }

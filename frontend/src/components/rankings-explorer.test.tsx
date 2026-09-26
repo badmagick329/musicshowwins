@@ -19,8 +19,8 @@ vi.mock("@tanstack/react-query", () => ({
     const kind = selection.kind;
     const page = selection.page;
     const row = kind === "artists"
-      ? { rank: page === 2 ? 2 : 1, wins: 3, artist: { id: 7, name: "Alpha" } }
-      : { rank: page === 2 ? 2 : 1, wins: 3, song: { id: 9, title: "First", artist: { id: 7, name: "Alpha" } } };
+      ? { rank: page === 2 ? 2 : 1, wins: 3, artist: { id: 7, slug: "alpha", name: "Alpha" } }
+      : { rank: page === 2 ? 2 : 1, wins: 3, song: { id: 9, title: "First", artist: { id: 7, slug: "alpha", name: "Alpha" } } };
     return { data: { count: 101, previous: page > 1 ? "previous" : null, next: page === 1 ? "next" : null, results: [row], selection }, isLoading: false, isError: false, isFetching: queryState.pending, isPlaceholderData: queryState.pending, refetch: vi.fn() };
   },
 }));

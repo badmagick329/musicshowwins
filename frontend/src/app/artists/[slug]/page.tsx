@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import { ArtistWinsByYear } from "@/components/artist-wins-by-year";
 import { parseArtistYear } from "@/lib/artist-years";
 import { formatDate } from "@/lib/utils";
@@ -10,21 +10,24 @@ import { JsonLd } from "@/components/json-ld";
 import { Metric, MetricGrid } from "@/components/data-display";
 import type { Win } from "@/lib/api-shared";
 import { noIndexFollow, pageMetadata, plural, siteUrl } from "@/lib/seo";
+import { artistPath } from "@/lib/paths";
 
-function artistId(value: string) {
-  return /^\d+$/.test(value) && Number(value) > 0 ? Number(value) : null;
+// Slugs are lowercase words; digits alone are the IDs older URLs used.
+function artistKey(value: string) {
+  return /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(value) && value !== "0" ? value : null;
 }
 
-async function loadArtist(id: number) {
-  try { return await getArtist(id); }
+async function loadArtist(key: string) {
+  try { return await getArtist(key); }
   catch (error) { if (error instanceof ApiRequestError && error.status === 404) notFound(); throw error; }
 }
 
-export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
-  const id = artistId((await params).id);
-  if (!id) return { title: "Artist Not Found", description: "The requested artist could not be found in KpopWins.", robots: noIndexFollow };
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const key = artistKey((await params).slug);
+  if (!key) return { title: "Artist Not Found", description: "The requested artist could not be found in KpopWins.", robots: noIndexFollow };
   try {
-    const [artist, wins] = await Promise.all([getArtist(id), getAllArtistWins(id)]);
+    const artist = await getArtist(key);
+    const wins = await getAllArtistWins(artist.id);
     const { earliestWin, latestWin } = summarizeArtist(wins);
     const counts = `${artist.total_wins} recorded music-show ${plural(artist.total_wins, "win")} across ${artist.winning_songs} ${plural(artist.winning_songs, "song")}`;
     const dates = earliestWin && latestWin
@@ -33,7 +36,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
     return pageMetadata({
       title: `${artist.name} Music Show Wins: ${artist.total_wins} Total`,
       description: `${artist.name} has ${counts}.${dates}`,
-      path: `/artists/${id}`,
+      path: artistPath(artist),
     });
   } catch (error) {
     if (error instanceof ApiRequestError && error.status === 404) return { title: "Artist Not Found", description: "The requested artist could not be found in KpopWins.", robots: noIndexFollow };
@@ -41,11 +44,14 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   }
 }
 
-export default async function ArtistPage({ params, searchParams = Promise.resolve({}) }: { params: Promise<{ id: string }>; searchParams?: Promise<{ year?: string | string[] }> }) {
-  const id = artistId((await params).id);
-  if (!id) notFound();
-  const artist = await loadArtist(id);
-  const wins = await getAllArtistWins(id);
+export default async function ArtistPage({ params, searchParams = Promise.resolve({}) }: { params: Promise<{ slug: string }>; searchParams?: Promise<{ year?: string | string[] }> }) {
+  const key = artistKey((await params).slug);
+  if (!key) notFound();
+  const artist = await loadArtist(key);
+  const year = (await searchParams).year;
+  // Old numeric links and search results move to the name-based URL for good.
+  if (key !== artist.slug) permanentRedirect(`${artistPath(artist)}${typeof year === "string" ? `?year=${encodeURIComponent(year)}` : ""}`);
+  const wins = await getAllArtistWins(artist.id);
   const summary = summarizeArtist(wins);
   const highlights = artistHighlights(wins);
 
@@ -57,7 +63,7 @@ export default async function ArtistPage({ params, searchParams = Promise.resolv
         itemListElement: [
           { "@type": "ListItem", position: 1, name: "Home", item: siteUrl },
           { "@type": "ListItem", position: 2, name: "Artists", item: `${siteUrl}/artists` },
-          { "@type": "ListItem", position: 3, name: artist.name, item: `${siteUrl}/artists/${id}` },
+          { "@type": "ListItem", position: 3, name: artist.name, item: `${siteUrl}${artistPath(artist)}` },
         ],
       }} />
     <main className="page-enter mx-auto max-w-7xl px-5 pb-8 pt-10 lg:px-8 lg:pt-14">
@@ -76,7 +82,7 @@ export default async function ArtistPage({ params, searchParams = Promise.resolv
         {highlights.length > 0 && <p className="mt-3 text-sm text-muted-foreground"><strong className="font-semibold text-foreground">Highlights:</strong> {highlights.join(" · ")}</p>}
       </section>
 
-      <ArtistWinsByYear artist={artist} wins={wins} initialYear={parseArtistYear((await searchParams).year)} />
+      <ArtistWinsByYear artist={artist} wins={wins} initialYear={parseArtistYear(year)} />
     </main>
     </>
   );

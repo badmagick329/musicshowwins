@@ -16,7 +16,7 @@ vi.mock("@tanstack/react-query", () => ({
   useQuery: (options: { queryKey: readonly unknown[] }) => {
     const filters = options.queryKey[2] as { search: string; sort: string; page: number };
     return {
-      data: { count: 101, next: filters.page === 1 ? "page-2" : null, previous: filters.page > 1 ? "page-1" : null, results: [{ id: 7, title: filters.search ? `${filters.search} Song` : "Archive Song", artist: { id: 3, name: "Artist" }, total_wins: 1, latest_win_date: "2025-01-01", winning_shows: 1 }] },
+      data: { count: 101, next: filters.page === 1 ? "page-2" : null, previous: filters.page > 1 ? "page-1" : null, results: [{ id: 7, title: filters.search ? `${filters.search} Song` : "Archive Song", artist: { id: 3, slug: "artist", name: "Artist" }, total_wins: 1, latest_win_date: "2025-01-01", winning_shows: 1 }] },
       isError: false,
       isFetching: queryState.isFetching,
       isPlaceholderData: queryState.isPlaceholderData,

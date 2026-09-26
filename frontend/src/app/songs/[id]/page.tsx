@@ -9,6 +9,7 @@ import { formatDate } from "@/lib/utils";
 import { ApiRequestError, getAllSongWins, getSong } from "@/lib/api";
 import { buildShowBreakdown, summarizeArtist } from "@/lib/artist-profile";
 import { noIndexFollow, pageMetadata, plural, siteUrl } from "@/lib/seo";
+import { artistPath } from "@/lib/paths";
 
 function songId(value: string) {
   return /^\d+$/.test(value) && Number(value) > 0 ? Number(value) : null;
@@ -59,7 +60,7 @@ export default async function SongPage({ params }: { params: Promise<{ id: strin
       ],
     }} />
   <main className="page-enter mx-auto max-w-7xl px-5 pb-8 pt-10 lg:px-8 lg:pt-14">
-    <header className="border-2 border-foreground bg-surface-berry p-6 text-surface-berry-foreground shadow-[4px_4px_0_var(--section-ink)] sm:p-8"><h1 className="font-heading text-4xl font-bold tracking-tight sm:text-[44px]">{song.title}</h1><p className="mt-2 text-surface-berry-foreground/75">by <Link href={`/artists/${song.artist.id}`} className="font-semibold underline-offset-4 hover:underline">{song.artist.name}</Link></p></header>
+    <header className="border-2 border-foreground bg-surface-berry p-6 text-surface-berry-foreground shadow-[4px_4px_0_var(--section-ink)] sm:p-8"><h1 className="font-heading text-4xl font-bold tracking-tight sm:text-[44px]">{song.title}</h1><p className="mt-2 text-surface-berry-foreground/75">by <Link href={artistPath(song.artist)} className="font-semibold underline-offset-4 hover:underline">{song.artist.name}</Link></p></header>
     <section className="mt-10" aria-labelledby="summary-title"><h2 id="summary-title" className="mb-4 border-b-2 border-foreground pb-3 font-heading text-2xl font-bold">Summary</h2><MetricGrid><Metric label="Total wins" value={String(song.total_wins)} /><Metric label="Shows with wins" value={String(song.winning_shows)} /><Metric label="First win" value={summary.earliestWin ? formatDate(summary.earliestWin.date) : "Not recorded"} /><Metric label="Latest win" value={song.latest_win_date ? formatDate(song.latest_win_date) : "Not recorded"} /></MetricGrid></section>
     <section className="mt-12" aria-labelledby="shows-title"><h2 id="shows-title" className="mb-4 border-b-2 border-foreground pb-3 font-heading text-2xl font-bold">Wins by show</h2>{shows.length ? <ShowWinsStrip shows={shows} label="Song wins by music show" />: <EmptyState message="No music show wins are recorded for this song." />}</section>
     <WinMoments wins={wins} />

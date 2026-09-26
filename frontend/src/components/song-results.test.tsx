@@ -9,7 +9,7 @@ vi.mock("next/link", () => ({
 
 describe("SongResults", () => {
   it("renders a semantic desktop table and linked stacked mobile record", () => {
-    const html = renderToStaticMarkup(<SongResults songs={[{ id: 7, title: "Supernova", artist: { id: 3, name: "aespa" }, total_wins: 5, latest_win_date: "2024-06-02", winning_shows: 3 }]} empty="None" />);
+    const html = renderToStaticMarkup(<SongResults songs={[{ id: 7, title: "Supernova", artist: { id: 3, slug: "aespa", name: "aespa" }, total_wins: 5, latest_win_date: "2024-06-02", winning_shows: 3 }]} empty="None" />);
     expect(html).toContain('href="/songs/7"');
     expect(html.match(/data-prefetch="false"/g)).toHaveLength(3);
     expect(html).toContain("<table");

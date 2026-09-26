@@ -22,7 +22,7 @@ describe("MusicShowList", () => {
 
 describe("homepage data tables", () => {
   it("renders semantic desktop tables alongside mobile records", () => {
-    const leaderboard = renderToStaticMarkup(<Leaderboard kind="artist" rows={[{ rank: 1, wins: 12, artist: { id: 3, name: "aespa" } }]} />);
+    const leaderboard = renderToStaticMarkup(<Leaderboard kind="artist" rows={[{ rank: 1, wins: 12, artist: { id: 3, slug: "aespa", name: "aespa" } }]} />);
 
     expect(leaderboard).toContain("Top five artists by music show wins");
     expect(leaderboard).toContain("rank-marker--1");

@@ -9,7 +9,7 @@ const win: Win = {
   id: 42,
   date: "2017-06-20",
   show: { id: 1, slug: "the-show", name: "The Show", active: true },
-  song: { id: 2, title: "What's My Name?", artist: { id: 3, name: "T-ara" }, total_wins: 1, latest_win_date: "2017-06-20", winning_shows: 1 },
+  song: { id: 2, title: "What's My Name?", artist: { id: 3, slug: "t-ara", name: "T-ara" }, total_wins: 1, latest_win_date: "2017-06-20", winning_shows: 1 },
   performed: null, references: [], milestones: { song_win: 2, song_show_win: 1, artist_win: 2 },
   moment: {
     heading: "T-ara's first win in over five years",

@@ -58,7 +58,7 @@ describe("request failures and input", () => {
 
   it("caches server detail requests without forwarding visitor identity", async () => {
     const fetchMock = vi.fn<(input: string | URL | Request, init?: RequestInit) => Promise<Response>>(async () =>
-      new Response(JSON.stringify({ id: 8, name: "Artist" })));
+      new Response(JSON.stringify({ id: 8, slug: "artist", name: "Artist" })));
     vi.stubGlobal("fetch", fetchMock);
 
     await getArtist(8);
@@ -134,7 +134,7 @@ describe("getHomeData", () => {
   });
 
   it("preserves the full artist result count while limiting the homepage rows", async () => {
-    const artists = Array.from({ length: 10 }, (_, index) => ({ id: index, name: `Artist ${index}`, total_wins: 10 - index, winning_songs: 1, latest_win_date: "2025-01-01" }));
+    const artists = Array.from({ length: 10 }, (_, index) => ({ id: index, slug: "artist", name: `Artist ${index}`, total_wins: 10 - index, winning_songs: 1, latest_win_date: "2025-01-01" }));
     vi.stubGlobal("fetch", vi.fn(async (input: string | URL | Request) => {
       const isArtists = String(input).includes("/artists?");
       return new Response(JSON.stringify({ count: isArtists ? 12 : 0, next: isArtists ? "?page=2" : null, previous: null, results: isArtists ? artists : [] }), { status: 200 });
