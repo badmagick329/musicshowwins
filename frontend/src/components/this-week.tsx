@@ -13,7 +13,7 @@ export function ThisWeek({ week, shows, today }: { week: ArchiveWeek; shows: Sho
   return (
     <section id="this-week" className="mt-14">
       <SectionHeading title={week.current ? `This week · ${range}` : `Latest results · ${range}`} action={<Link href="/wins" className="compact-link-target text-sm font-bold text-link-pink">View all wins</Link>} />
-      {!week.current && <p className="-mt-1 mb-4 text-sm text-muted-foreground">No results yet this week.</p>}
+      {!week.current && <p className="-mt-1 mb-4 text-sm text-muted-foreground">No results yet this week, so these are last week&apos;s.</p>}
       <ol aria-label="Music show results by broadcast day" className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {slots.map((slot) => (
           <li key={slot.slug} className={cn("show-strip-cell border border-border bg-card px-4 pb-3", `show-${slot.slug}`)}>
@@ -27,7 +27,7 @@ export function ThisWeek({ week, shows, today }: { week: ArchiveWeek; shows: Sho
                 <div key={win.id} className="mt-1.5">
                   <p className="leading-snug"><Link prefetch={false} href={`/songs/${win.song.id}`} className="compact-link-target font-heading text-lg font-bold">{win.song.title}</Link><span aria-hidden="true" className="text-muted-foreground"> · </span><Link prefetch={false} href={artistPath(win.song.artist)} className="compact-link-target text-sm">{win.song.artist.name}</Link></p>
                   {(facts.count || facts.tag) && <p className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground">{facts.count && <span>{facts.count}</span>}{facts.tag && <FactLabel>{facts.tag}</FactLabel>}</p>}
-                  <MobileWinVideoDisclosure win={win} className="mt-2.5 items-start" />
+                  <MobileWinVideoDisclosure win={win} overlay className="mt-2.5 items-start" />
                 </div>
               );
             }) : (

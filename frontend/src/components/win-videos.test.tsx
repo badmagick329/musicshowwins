@@ -5,7 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { expectTypeOf } from "vitest";
 import type { Win, WinReference } from "@/lib/api-shared";
 import { ArtistWinHistory } from "./artist-win-history";
-import { winVideoActionLabel, winVideoReferences } from "./win-videos";
+import { MobileWinVideoDisclosure, winVideoActionLabel, winVideoReferences } from "./win-videos";
 
 const plausible = vi.fn();
 
@@ -261,5 +261,19 @@ describe("win video references", () => {
     expect(songAction.className.split(" ")).not.toContain("w-full");
     expect(songAction.className).toContain("w-44");
     expect(songAction.className).toContain("ml-auto");
+  });
+
+  it("closes an overlay list on an outside click or Escape, returning focus on Escape", () => {
+    const twoVideos = win(1, { references: [reference({ id: 1 }), reference({ id: 2, url: "https://www.youtube.com/watch?v=def456" })] });
+    const { container, getByRole, queryByRole } = render(<><MobileWinVideoDisclosure win={twoVideos} overlay /><p>outside</p></>);
+    const button = getByRole("button", { name: `Choose from 2 videos for ${winName}` });
+    fireEvent.click(button);
+    expect(getByRole("list", { name: `Videos for ${winName}` }).closest(".absolute")).toBeTruthy();
+    fireEvent.pointerDown(container.querySelector("p")!);
+    expect(queryByRole("list")).toBeNull();
+    fireEvent.click(button);
+    fireEvent.keyDown(document, { key: "Escape" });
+    expect(queryByRole("list")).toBeNull();
+    expect(document.activeElement).toBe(button);
   });
 });

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ChevronDown, ExternalLink, Play, Search } from "lucide-react";
 import type { Win, WinReference } from "@/lib/api-shared";
 import { cn, formatDate } from "@/lib/utils";
@@ -175,19 +175,46 @@ export function DesktopWinVideoRow({ win, colSpan, videoCellClassName = "w-44 px
   );
 }
 
-export function MobileWinVideoDisclosure({ win, className }: { win: Win; className?: string }) {
+// `overlay` floats the list over the page instead of pushing content down: in a grid of cards,
+// an inline list stretches every card in the row to the open card's height.
+export function MobileWinVideoDisclosure({ win, overlay = false, className }: { win: Win; overlay?: boolean; className?: string }) {
   const [open, setOpen] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
   const videos = winVideoReferences(win);
   const panelId = `win-videos-mobile-${win.id}`;
+
+  useEffect(() => {
+    if (!overlay || !open) return;
+    const root = rootRef.current!;
+    function onPointerDown(event: PointerEvent) {
+      if (!root.contains(event.target as Node)) setOpen(false);
+    }
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key !== "Escape") return;
+      setOpen(false);
+      root.querySelector<HTMLButtonElement>("button[aria-controls]")?.focus();
+    }
+    document.addEventListener("pointerdown", onPointerDown);
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.removeEventListener("pointerdown", onPointerDown);
+      document.removeEventListener("keydown", onKeyDown);
+    };
+  }, [overlay, open]);
+
   if (!videos.length) return <div className={className}><NoVideo win={win} placement="mobile" className="text-sm" /></div>;
   return (
-    <div className={cn("flex flex-col items-end", className)}>
+    <div ref={rootRef} className={cn("flex flex-col items-end", overlay && "relative", className)}>
       {videos.length === 1 ? (
         <WinVideoActionLink win={win} video={videos[0]} placement="mobile" className={mobileActionClass} />
       ) : (
         <>
           <WinVideoToggleButton win={win} count={videos.length} open={open} panelId={panelId} onToggle={() => setOpen(!open)} className={mobileActionClass} />
-          {open && <div className="w-full pt-2"><WinVideoPanel win={win} videos={videos} panelId={panelId} /></div>}
+          {open && (
+            <div className={overlay ? "absolute inset-x-0 top-full z-20 pt-2" : "w-full pt-2"}>
+              <div className={cn(overlay && "shadow-[4px_4px_0_var(--foreground)]")}><WinVideoPanel win={win} videos={videos} panelId={panelId} /></div>
+            </div>
+          )}
         </>
       )}
     </div>

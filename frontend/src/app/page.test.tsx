@@ -30,7 +30,7 @@ describe("homepage banner", () => {
     expect(html).toContain('href="/rankings?kind=artists"');
     expect(html).not.toContain("Recent wins");
     expect(html.indexOf("Latest results · 14–20 Sept")).toBeLessThan(html.indexOf("Most wins in"));
-    expect(html).toContain("No results yet this week.");
+    expect(html).toContain("No results yet this week, so these are last week");
     expect(html).toContain("7th recorded win for Bad");
     expect(html).toContain("Triple crown · Inkigayo");
     expect(html).toContain("No result recorded");
