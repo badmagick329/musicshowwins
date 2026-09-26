@@ -186,8 +186,18 @@ export function MobileWinVideoDisclosure({ win, overlay = false, className }: { 
   useEffect(() => {
     if (!overlay || !open) return;
     const root = rootRef.current!;
+    // Close on a completed outside tap only. A touch that turns into a scroll ends in
+    // pointercancel, so scrolling leaves the list open. (Document click listeners miss
+    // taps on plain content in iOS Safari.)
+    let outsideTap = false;
     function onPointerDown(event: PointerEvent) {
-      if (!root.contains(event.target as Node)) setOpen(false);
+      outsideTap = !root.contains(event.target as Node);
+    }
+    function onPointerCancel() {
+      outsideTap = false;
+    }
+    function onPointerUp() {
+      if (outsideTap) setOpen(false);
     }
     function onKeyDown(event: KeyboardEvent) {
       if (event.key !== "Escape") return;
@@ -195,9 +205,13 @@ export function MobileWinVideoDisclosure({ win, overlay = false, className }: { 
       root.querySelector<HTMLButtonElement>("button[aria-controls]")?.focus();
     }
     document.addEventListener("pointerdown", onPointerDown);
+    document.addEventListener("pointercancel", onPointerCancel);
+    document.addEventListener("pointerup", onPointerUp);
     document.addEventListener("keydown", onKeyDown);
     return () => {
       document.removeEventListener("pointerdown", onPointerDown);
+      document.removeEventListener("pointercancel", onPointerCancel);
+      document.removeEventListener("pointerup", onPointerUp);
       document.removeEventListener("keydown", onKeyDown);
     };
   }, [overlay, open]);

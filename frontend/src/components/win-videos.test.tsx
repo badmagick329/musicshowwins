@@ -263,13 +263,19 @@ describe("win video references", () => {
     expect(songAction.className).toContain("ml-auto");
   });
 
-  it("closes an overlay list on an outside click or Escape, returning focus on Escape", () => {
+  it("keeps an overlay list open while scrolling and closes it on an outside tap or Escape, returning focus on Escape", () => {
     const twoVideos = win(1, { references: [reference({ id: 1 }), reference({ id: 2, url: "https://www.youtube.com/watch?v=def456" })] });
     const { container, getByRole, queryByRole } = render(<><MobileWinVideoDisclosure win={twoVideos} overlay /><p>outside</p></>);
     const button = getByRole("button", { name: `Choose from 2 videos for ${winName}` });
     fireEvent.click(button);
     expect(getByRole("list", { name: `Videos for ${winName}` }).closest(".absolute")).toBeTruthy();
-    fireEvent.pointerDown(container.querySelector("p")!);
+    const outside = container.querySelector("p")!;
+    fireEvent.pointerDown(outside);
+    fireEvent.pointerCancel(outside);
+    fireEvent.pointerUp(outside);
+    expect(queryByRole("list")).toBeTruthy();
+    fireEvent.pointerDown(outside);
+    fireEvent.pointerUp(outside);
     expect(queryByRole("list")).toBeNull();
     fireEvent.click(button);
     fireEvent.keyDown(document, { key: "Escape" });
