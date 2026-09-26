@@ -11,10 +11,12 @@ export function winVideoReferences(win: Win) {
   return win.references.filter((reference) => reference.reference_type === "video");
 }
 
+// External links all start with "Watch" and the list toggle with its count, so a scanned column
+// separates "leaves the site" from "opens a list here". Fan uploads can vanish or be edited, so
+// visitors should know before leaving.
 export function winVideoActionLabel(count: number, isOfficial = true) {
-  if (count > 1) return "Choose video";
-  // Fan uploads can vanish or be edited, so visitors should know before leaving the site.
-  return isOfficial ? "Watch video" : "Fan upload";
+  if (count > 1) return `${count} videos`;
+  return isOfficial ? "Watch on YouTube" : "Watch fan upload";
 }
 
 type VideoPlacement = "desktop" | "mobile" | "list";
@@ -37,7 +39,10 @@ function winContext(win: Win) {
   return `${win.song.title} by ${win.song.artist.name}, ${formatDate(win.date)}, ${win.show.name}`;
 }
 
-const winVideoActionClass = "grid cursor-pointer grid-cols-[0.875rem_1fr_0.875rem] items-center gap-1.5 whitespace-nowrap border-2 border-foreground bg-action-pink font-bold text-primary-foreground transition-colors motion-reduce:transition-none hover:bg-accent-foreground";
+const winVideoActionClass = "grid cursor-pointer grid-cols-[0.875rem_1fr_0.875rem] items-center gap-1.5 whitespace-nowrap border-2 border-foreground font-bold transition-colors motion-reduce:transition-none";
+// Filled leaves the site; outlined opens the list in place.
+const externalActionClass = "bg-action-pink text-primary-foreground hover:bg-accent-foreground";
+const toggleActionClass = "border-action-pink! bg-card text-action-pink hover:bg-accent";
 const desktopActionClass = "h-8 px-2.5 text-xs shadow-[2px_2px_0_var(--foreground)]";
 const mobileActionClass = "min-h-10 w-44 max-w-full px-3 text-sm shadow-[2px_2px_0_var(--foreground)]";
 
@@ -72,8 +77,8 @@ function WinVideoActionLink({ win, video, placement, className }: { win: Win; vi
       target="_blank"
       rel="noopener noreferrer"
       onClick={() => trackVideoOpened(win, video, placement)}
-      aria-label={`Watch ${video.is_official ? "video" : "fan upload"} for ${winContext(win)}`}
-      className={cn(winVideoActionClass, className)}
+      aria-label={`${winVideoActionLabel(1, video.is_official)} for ${winContext(win)}`}
+      className={cn(winVideoActionClass, externalActionClass, className)}
     >
       <Play className="size-3.5 shrink-0" aria-hidden="true" />
       <span className="text-center">{winVideoActionLabel(1, video.is_official)}</span>
@@ -90,7 +95,7 @@ function WinVideoToggleButton({ win, count, open, panelId, onToggle, className }
       aria-controls={panelId}
       aria-label={`Choose from ${count} videos for ${winContext(win)}`}
       onClick={onToggle}
-      className={cn(winVideoActionClass, className)}
+      className={cn(winVideoActionClass, toggleActionClass, className)}
     >
       <Play className="size-3.5 shrink-0" aria-hidden="true" />
       <span className="text-center">{winVideoActionLabel(count)}</span>

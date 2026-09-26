@@ -42,8 +42,8 @@ describe("win video references", () => {
     expectTypeOf<Win["references"]>().toEqualTypeOf<WinReference[]>();
     expect(winVideoReferences(win(1, { references: [reference()] }))).toHaveLength(1);
     expect(winVideoReferences(win(1, { references: [reference({ reference_type: "article" })] }))).toHaveLength(0);
-    expect(winVideoActionLabel(1)).toBe("Watch video");
-    expect(winVideoActionLabel(3)).toBe("Choose video");
+    expect(winVideoActionLabel(1)).toBe("Watch on YouTube");
+    expect(winVideoActionLabel(3)).toBe("3 videos");
   });
 
   it("offers a YouTube search on desktop and mobile only when no video exists", () => {
@@ -70,35 +70,34 @@ describe("win video references", () => {
 
   it("still links a video for an absent winner when one exists", () => {
     const { container } = render(<ArtistWinHistory wins={[win(1, { performed: false, references: [reference()] })]} />);
-    expect(desktop(container).getByRole("link", { name: `Watch video for ${winName}` })).toBeTruthy();
+    expect(desktop(container).getByRole("link", { name: `Watch on YouTube for ${winName}` })).toBeTruthy();
     expect(desktop(container).queryByText("Absent from broadcast")).toBeNull();
   });
 
-  it("renders one video as a direct external Watch video link", () => {
+  it("renders one video as a direct external Watch on YouTube link", () => {
     const { container } = render(<ArtistWinHistory wins={[win(1, { references: [reference()] })]} />);
-    const link = desktop(container).getByRole("link", { name: `Watch video for ${winName}` });
+    const link = desktop(container).getByRole("link", { name: `Watch on YouTube for ${winName}` });
     expect(link.getAttribute("href")).toBe("https://www.youtube.com/watch?v=abc123");
     expect(link.getAttribute("target")).toBe("_blank");
     expect(link.getAttribute("rel")).toBe("noopener noreferrer");
-    expect(link.textContent).toContain("Watch video");
+    expect(link.textContent).toContain("Watch on YouTube");
     expect(within(container).queryByRole("link", { name: /Search YouTube/ })).toBeNull();
-    expect(mobile(container).getByRole("link", { name: `Watch video for ${winName}` })).toBeTruthy();
+    expect(mobile(container).getByRole("link", { name: `Watch on YouTube for ${winName}` })).toBeTruthy();
   });
 
   it("keeps the play and external-link icons and no chevron on the single-video action", () => {
     const { container } = render(<ArtistWinHistory wins={[win(1, { references: [reference()] })]} />);
-    const link = desktop(container).getByRole("link", { name: `Watch video for ${winName}` });
+    const link = desktop(container).getByRole("link", { name: `Watch on YouTube for ${winName}` });
     expect(link.querySelector("svg.lucide-play")).toBeTruthy();
     expect(link.querySelector("svg.lucide-external-link")).toBeTruthy();
     expect(link.querySelector("svg[class*='chevron']")).toBeNull();
     expect(link.className).toContain("whitespace-nowrap");
   });
 
-  it("sizes both desktop actions identically with the same three-column layout", () => {
+  it("sizes both desktop actions with the same three-column layout", () => {
     const { container } = render(<ArtistWinHistory wins={[win(1, { references: [reference()] }), win(2, { references: [reference({ id: 5, title: "Second MV" }), reference({ id: 6, url: "https://www.youtube.com/watch?v=ghi789" })] })]} />);
-    const link = desktop(container).getByRole("link", { name: `Watch video for ${winName}` });
+    const link = desktop(container).getByRole("link", { name: `Watch on YouTube for ${winName}` });
     const button = desktop(container).getByRole("button", { name: `Choose from 2 videos for ${winName}` });
-    expect(link.className).toBe(button.className);
     for (const className of [link.className, button.className]) {
       expect(className).toContain("h-8");
       expect(className).toContain("w-full");
@@ -110,9 +109,9 @@ describe("win video references", () => {
       expect(action.children[1].className).toContain("text-center");
       expect(action.children[2].getAttribute("class")).toContain("size-3.5");
     }
-    const mobileLink = mobile(container).getByRole("link", { name: `Watch video for ${winName}` });
+    const mobileLink = mobile(container).getByRole("link", { name: `Watch on YouTube for ${winName}` });
     const mobileButton = mobile(container).getByRole("button", { name: `Choose from 2 videos for ${winName}` });
-    expect(mobileLink.className).toBe(mobileButton.className);
+    expect(mobileButton.className).toContain("w-44");
     expect(mobileLink.className.split(" ")).not.toContain("w-full");
     expect(mobileLink.className).toContain("w-44");
     expect(mobileLink.className).toContain("min-h-10");
@@ -120,7 +119,7 @@ describe("win video references", () => {
 
   it("gives the single-video action no disclosure attributes and no panel", () => {
     const { container } = render(<ArtistWinHistory wins={[win(1, { references: [reference()] })]} />);
-    const link = desktop(container).getByRole("link", { name: `Watch video for ${winName}` });
+    const link = desktop(container).getByRole("link", { name: `Watch on YouTube for ${winName}` });
     expect(link.getAttribute("aria-expanded")).toBeNull();
     expect(link.getAttribute("aria-controls")).toBeNull();
     expect(document.getElementById("win-videos-desktop-1")).toBeNull();
@@ -129,11 +128,12 @@ describe("win video references", () => {
     expect(container.querySelector("td[colspan]")).toBeNull();
   });
 
-  it("labels several videos with a Choose video button whose name carries the count", () => {
+  it("labels several videos with an outlined count button", () => {
     const { container } = render(<ArtistWinHistory wins={[win(1, { references: [reference({ id: 1 }), reference({ id: 2, url: "https://www.youtube.com/watch?v=def456" })] })]} />);
     const button = desktop(container).getByRole("button", { name: `Choose from 2 videos for ${winName}` });
-    expect(button.textContent).toContain("Choose video");
+    expect(button.textContent).toContain("2 videos");
     expect(button.className).toContain("whitespace-nowrap");
+    expect(button.className).toContain("bg-card");
     expect(button.getAttribute("aria-expanded")).toBe("false");
     expect(button.getAttribute("aria-controls")).toBe("win-videos-desktop-1");
     expect(mobile(container).getByRole("button", { name: `Choose from 2 videos for ${winName}` }).getAttribute("aria-controls")).toBe("win-videos-mobile-1");
@@ -173,7 +173,8 @@ describe("win video references", () => {
     const single = render(<ArtistWinHistory wins={[win(1, { references: [fan] })]} />);
     for (const view of [desktop(single.container), mobile(single.container)]) {
       const link = view.getByRole("link", { name: `Watch fan upload for ${winName}` });
-      expect(link.textContent).toBe("Fan upload");
+      expect(link.textContent).toBe("Watch fan upload");
+      expect(link.className).toContain("bg-action-pink");
     }
     single.unmount();
 
@@ -254,8 +255,8 @@ describe("win video references", () => {
     const references = [reference()];
     const recent = render(<ArtistWinHistory wins={[win(1, { references })]} />);
     const songHistory = render(<ArtistWinHistory wins={[win(1, { references })]} hideSong />);
-    const recentAction = desktop(recent.container).getByRole("link", { name: `Watch video for ${winName}` });
-    const songAction = desktop(songHistory.container).getByRole("link", { name: `Watch video for ${winName}` });
+    const recentAction = desktop(recent.container).getByRole("link", { name: `Watch on YouTube for ${winName}` });
+    const songAction = desktop(songHistory.container).getByRole("link", { name: `Watch on YouTube for ${winName}` });
     expect(recentAction.className.split(" ")).toContain("w-full");
     expect(songAction.className.split(" ")).not.toContain("w-full");
     expect(songAction.className).toContain("w-44");

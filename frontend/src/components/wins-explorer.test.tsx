@@ -82,7 +82,7 @@ describe("WinsExplorer", () => {
     const { container } = render(<WinsExplorer />);
     const desktopScope = within(container.querySelector(".desktop-table") as HTMLElement);
     const button = desktopScope.getByRole("button", { name: "Choose from 2 videos for Archive Winner by Artist, 01 Jan 2025, Music Bank" });
-    expect(button.textContent).toContain("Choose video");
+    expect(button.textContent).toContain("2 videos");
     expect(button.getAttribute("aria-expanded")).toBe("false");
     fireEvent.click(button);
     expect(button.getAttribute("aria-expanded")).toBe("true");
@@ -104,11 +104,11 @@ describe("WinsExplorer", () => {
   it("links a single video win directly from the results table and mobile record", () => {
     queryState.videoReferences = [{ id: 5, reference_type: "video", provider: "youtube", external_id: "x1", url: "https://www.youtube.com/watch?v=x1", title: "Archive Winner MV", publisher_name: "KBS World", is_official: true, published_at: null, last_verified_at: null }];
     const { container } = render(<WinsExplorer />);
-    const link = within(container.querySelector(".desktop-table") as HTMLElement).getByRole("link", { name: "Watch video for Archive Winner by Artist, 01 Jan 2025, Music Bank" });
+    const link = within(container.querySelector(".desktop-table") as HTMLElement).getByRole("link", { name: "Watch on YouTube for Archive Winner by Artist, 01 Jan 2025, Music Bank" });
     expect(link.getAttribute("href")).toBe("https://www.youtube.com/watch?v=x1");
     expect(link.getAttribute("target")).toBe("_blank");
     expect(link.getAttribute("rel")).toBe("noopener noreferrer");
-    expect(within(container.querySelector(".mobile-record") as HTMLElement).getByRole("link", { name: "Watch video for Archive Winner by Artist, 01 Jan 2025, Music Bank" })).toBeTruthy();
+    expect(within(container.querySelector(".mobile-record") as HTMLElement).getByRole("link", { name: "Watch on YouTube for Archive Winner by Artist, 01 Jan 2025, Music Bank" })).toBeTruthy();
     expect(container.querySelector("td[colspan]")).toBeNull();
   });
 
