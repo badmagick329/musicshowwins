@@ -22,7 +22,7 @@ const defaultBaseUrl = "http://127.0.0.1:8000/api/v1";
 export const publicArchiveCacheTag = "public-archive";
 export const publicArchiveRevalidateSeconds = 86_400;
 
-function internalRequestHeaders() {
+export function internalRequestHeaders() {
   const headers: Record<string, string> = { "X-Forwarded-Proto": "https" };
   const secret = process.env.INTERNAL_API_SECRET;
   if (secret) headers["X-KpopWins-Internal-Key"] = secret;
