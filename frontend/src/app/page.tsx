@@ -54,13 +54,11 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ s
       }} />
     <main className="page-enter">
       <div className="mx-auto max-w-7xl px-5 pb-8 pt-10 lg:px-8 lg:pt-14">
-        <section className="border-2 bg-surface-berry p-6 shadow-[4px_4px_0_var(--section-ink)] sm:p-8 lg:p-10">
-          <div className="max-w-3xl">
-            <h1 className="font-heading text-4xl font-bold leading-[1.04] tracking-tight text-surface-berry-foreground sm:text-[44px]">K-pop music show wins &amp; artist rankings</h1>
-            <p className="mt-5 max-w-2xl text-base leading-relaxed text-surface-berry-foreground/80 sm:text-lg">{siteDescription}</p>
-            <TopWinsThisYearLink />
-            <p className="mt-3 text-sm text-surface-berry-foreground/80">See the songs and artists with the most music-show wins in {year}.</p>
-          </div>
+        {/* Kept short: the meta description carries the search copy, and on phones this block used to fill half the first screen. */}
+        <section className="border-2 bg-surface-berry p-5 shadow-[4px_4px_0_var(--section-ink)] sm:p-6 lg:px-8">
+          <h1 className="font-heading text-[28px] font-bold leading-tight tracking-tight text-surface-berry-foreground sm:text-[32px]">K-pop music show wins &amp; artist rankings</h1>
+          <p className="mt-2 text-base text-surface-berry-foreground/80">Every music show win since 2014, by artist, song and show.</p>
+          <TopWinsThisYearLink />
         </section>
 
         <div className="mt-8">
