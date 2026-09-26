@@ -23,6 +23,6 @@ describe("legacy artist URL proxy", () => {
   });
 
   it("only matches numeric artist paths", () => {
-    expect(config.matcher).toBe("/artists/:id(\d+)");
+    expect(config.matcher).toBe("/artists/:id([0-9]+)");
   });
 });

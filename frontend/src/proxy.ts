@@ -13,4 +13,4 @@ export async function proxy(request: NextRequest) {
   return NextResponse.redirect(target, 308);
 }
 
-export const config = { matcher: "/artists/:id(\d+)" };
+export const config = { matcher: "/artists/:id([0-9]+)" };
