@@ -20,7 +20,7 @@ describe("homepage banner", () => {
   it("uses the simplified copy without the redundant archive panel", async () => {
     const html = renderToStaticMarkup(await Home({ searchParams: Promise.resolve({}) }));
     expect(html).toContain("K-pop music show wins &amp; artist rankings");
-    expect(html).toContain("Explore K-pop music show win counts for BTS, TWICE, EXO and more, with artist rankings and results from Inkigayo, Music Bank and other shows.");
+    expect(html).toContain("Every K-pop music show win since 2014 from Inkigayo, Music Bank, M Countdown and more, with artist and song rankings.");
     expect(html).not.toContain("clearly kept");
     expect(html).toContain('href="/shows"');
     expect(html).toContain("All shows");

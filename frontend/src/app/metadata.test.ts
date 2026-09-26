@@ -42,7 +42,7 @@ describe("page metadata", () => {
       default: "K-pop Music Show Wins This Week & Artist Rankings | KpopWins",
       template: "%s | KpopWins",
     });
-    expect(rootMetadata.description).toBe("Explore K-pop music show win counts for BTS, TWICE, EXO and more, with artist rankings and results from Inkigayo, Music Bank and other shows.");
+    expect(rootMetadata.description).toBe("Every K-pop music show win since 2014 from Inkigayo, Music Bank, M Countdown and more, with artist and song rankings.");
     expect(rootMetadata.openGraph).toMatchObject({
       title: "K-pop Music Show Wins This Week & Artist Rankings | KpopWins",
       description: rootMetadata.description,
