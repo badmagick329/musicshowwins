@@ -19,3 +19,4 @@ Makefile
 crontab
 deploy.sh
 db-pg15-backup
+.claude/
