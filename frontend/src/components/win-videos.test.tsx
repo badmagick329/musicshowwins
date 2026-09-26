@@ -111,9 +111,9 @@ describe("win video references", () => {
     }
     const mobileLink = mobile(container).getByRole("link", { name: `Watch on YouTube for ${winName}` });
     const mobileButton = mobile(container).getByRole("button", { name: `Choose from 2 videos for ${winName}` });
-    expect(mobileButton.className).toContain("w-44");
+    expect(mobileButton.className).toContain("w-52");
     expect(mobileLink.className.split(" ")).not.toContain("w-full");
-    expect(mobileLink.className).toContain("w-44");
+    expect(mobileLink.className).toContain("w-52");
     expect(mobileLink.className).toContain("min-h-10");
   });
 

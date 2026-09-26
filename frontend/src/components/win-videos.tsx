@@ -44,7 +44,7 @@ const winVideoActionClass = "grid cursor-pointer grid-cols-[0.875rem_1fr_0.875re
 const externalActionClass = "bg-action-pink text-primary-foreground hover:bg-accent-foreground";
 const toggleActionClass = "border-action-pink bg-card text-action-pink hover:bg-accent";
 const desktopActionClass = "h-8 px-2.5 text-xs shadow-[2px_2px_0_var(--foreground)]";
-const mobileActionClass = "min-h-10 w-44 max-w-full px-3 text-sm shadow-[2px_2px_0_var(--foreground)]";
+const mobileActionClass = "min-h-10 w-52 max-w-full px-3 text-sm shadow-[2px_2px_0_var(--foreground)]";
 
 function YouTubeSearchLink({ win, placement, className }: { win: Win; placement: VideoPlacement; className?: string }) {
   const date = win.date.slice(2).replaceAll("-", "");
