@@ -118,9 +118,6 @@ The batch includes up to 25 candidates, latest wins first, with video metadata,
 official-channel mappings, matching evidence, cached Reddit winner text and
 other candidates for the same win.
 
-The agent fills `decisions.json` with approve, reject or defer, plus its identity,
-reason and specific evidence for each candidate. Blank templates cannot be applied.
-
 **3. Check the agent's result.** The prompt above includes applying the decisions;
 you do not need to run a separate command. The agent uses:
 
@@ -132,13 +129,10 @@ The whole batch is validated and saved atomically. Add `--dry-run` for validatio
 only. `applied.json` records the result; the database retains the decision history.
 Rerunning the same applied file is harmless.
 
-Reuse the same prompt for the next batch. Deferred candidates remain pending but are skipped until
-their evidence changes. Use `review batch --include-deferred` to reconsider them.
-
 **4. Finish ready reviews, then export, verify and import locally.** Follow the
 queue printed after `review apply`. If ready candidates remain, give another
 batch to the agent. Deferred candidates are skipped until evidence changes or
-you explicitly include them. When no ready candidates remain, run these commands
+you include them with `review batch --include-deferred`. When no ready candidates remain, run these commands
 in order:
 
 ```powershell

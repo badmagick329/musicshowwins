@@ -1,12 +1,12 @@
 # Frontend
 
-Next.js frontend for the Music Show Wins archive. The homepage is a first live
-vertical slice backed by the read-only Django API; see [`style.md`](style.md)
-for the product direction.
+Public Next.js frontend for the KpopWins archive (home, artists, songs, wins,
+shows, rankings and about pages), backed by the read-only Django API. See
+[`style.md`](style.md) for the product direction.
 
 ## Stack
 
-- Next.js 16.3.1 with the App Router and TypeScript
+- Next.js 16.3 with the App Router and TypeScript
 - Tailwind CSS 4
 - shadcn/ui (Base UI, neutral CSS-variable theme)
 - TanStack Query for interactive browser-side archive data

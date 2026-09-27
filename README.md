@@ -48,16 +48,8 @@ The public Next.js frontend lives in [`frontend/`](frontend/README.md).
 
 ## YouTube reference workflow
 
-From the repository root, `./operator.ps1 prepare` synchronizes local Django
-wins from Wikipedia, then discovers and matches videos using the local API.
-Run `./operator.ps1 review batch` and give its printed evidence and decision
-template paths to a review agent. The agent fills and applies the decisions;
-do not apply the blank template. Finish all ready batches, then run
-`./operator.ps1 export-approved`, `./operator.ps1 verify` and
-`./operator.ps1 import` in that order. Verification is a local dry run; import
-writes to local Django. Production import is a separate step.
-Follow the [short video workflow](operator-tools/WORKFLOW.md) for applying agent
-decisions, exporting references and verifying the import locally.
+Win videos come from the offline operator tools and reach Django only through
+reviewed, exported manifests. Follow the [video workflow](operator-tools/WORKFLOW.md).
 
 ## Wikipedia synchronization
 
@@ -104,7 +96,7 @@ as rejected audit issues and are not restored as dated wins.
 
 ## API
 
-The read-only API is available at:
+The API is read-only apart from public correction submissions:
 
 ```text
 /api/v1/shows
@@ -115,6 +107,8 @@ The read-only API is available at:
 /api/v1/wins
 /api/v1/leaderboards/artists
 /api/v1/leaderboards/songs
+/api/v1/sitemap
+/api/v1/corrections   (POST)
 /api/schema/
 /api/docs/
 ```
