@@ -34,6 +34,8 @@ describe("artist year exploration", () => {
     expect(screen.getByRole("heading", { name: "Wins in 2024" }).parentElement!.textContent).toContain("3 recorded wins · 2 winning songs");
     const songs = screen.getByRole("region", { name: "Songs" });
     expect(within(songs).getAllByRole("row").map((row) => row.textContent)).toEqual(["RankSongWins", "1Song 12", "2Song 21"]);
+    // One table for every width: each song is listed once, not again in a hidden mobile copy.
+    expect(within(songs).getAllByRole("link", { name: "Song 1" })).toHaveLength(1);
     const shows = screen.getByRole("region", { name: "Wins by show" });
     expect(within(shows).getAllByRole("listitem").map((item) => item.textContent)).toEqual(["Show 12 wins", "Show 21 win"]);
     expect(within(screen.getByRole("region", { name: "Win history" })).getAllByRole("article")).toHaveLength(3);
