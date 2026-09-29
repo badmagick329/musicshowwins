@@ -21,11 +21,12 @@ describe("MusicShowList", () => {
 });
 
 describe("homepage data tables", () => {
-  it("renders semantic desktop tables alongside mobile records", () => {
+  it("renders each leaderboard row once in one table for every width", () => {
     const leaderboard = renderToStaticMarkup(<Leaderboard kind="artist" rows={[{ rank: 1, wins: 12, artist: { id: 3, slug: "aespa", name: "aespa" } }]} />);
 
     expect(leaderboard).toContain("Top five artists by music show wins");
-    expect(leaderboard).toContain("rank-marker--1");
-    expect(leaderboard).toContain("mobile-record");
+    expect(leaderboard.match(/<table/g)).toHaveLength(1);
+    expect(leaderboard.match(/rank-marker--1/g)).toHaveLength(1);
+    expect(leaderboard.match(/href="\/artists\/aespa"/g)).toHaveLength(1);
   });
 });

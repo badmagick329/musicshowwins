@@ -2,31 +2,28 @@ import Link from "next/link";
 import type { Song } from "@/lib/api-shared";
 import { EmptyState } from "@/components/data-display";
 import { formatDate } from "@/lib/utils";
-import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { artistPath } from "@/lib/paths";
 
-function SongFacts({ song }: { song: Song }) {
-  return <>
-    <span className="whitespace-nowrap text-sm tabular-nums"><strong>{song.total_wins}</strong> {song.total_wins === 1 ? "win" : "wins"}</span>
-    <span className="min-w-0 text-center text-sm tabular-nums text-muted-foreground">{song.latest_win_date ? `Latest win ${formatDate(song.latest_win_date)}` : "No win date recorded"}</span>
-    <span className="whitespace-nowrap text-right text-sm tabular-nums text-muted-foreground"><strong className="text-foreground">{song.winning_shows}</strong> {song.winning_shows === 1 ? "show" : "shows"}</span>
-  </>;
-}
+// Each song is rendered once: a card on phones, a table-like row from `md` up. Unit words
+// are visible on cards and screen-reader-only in rows, where the column header names them.
+const columns = "grid grid-cols-[auto_minmax(0,1fr)_auto] items-baseline gap-x-3 gap-y-2 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_5rem_9rem_5rem] md:gap-x-6";
 
 export function SongResults({ songs, empty }: { songs: Song[]; empty: string }) {
   if (!songs.length) return <EmptyState message={empty} />;
   return (
     <div className="border-2 bg-card">
-      <Table className="desktop-table border-collapse">
-        <TableCaption className="sr-only">Song search results</TableCaption>
-        <TableHeader><TableRow className="border-b-2 bg-muted/50 text-xs uppercase tracking-[0.12em] text-muted-foreground"><TableHead className="px-4 py-3">Song</TableHead><TableHead className="px-4 py-3">Artist</TableHead><TableHead className="w-20 px-4 py-3 text-right">Wins</TableHead><TableHead className="w-36 px-4 py-3">Latest win</TableHead><TableHead className="w-20 px-4 py-3 text-right">Shows</TableHead></TableRow></TableHeader>
-        <TableBody>{songs.map((song) => <TableRow key={song.id} className="border-border/70 hover:bg-accent/60"><TableCell className="px-4 py-4"><Link prefetch={false} href={`/songs/${song.id}`} className="compact-link-target font-heading text-lg font-bold">{song.title}</Link></TableCell><TableCell className="px-4 py-4"><Link prefetch={false} href={`/artists/${song.artist.id}`} className="compact-link-target">{song.artist.name}</Link></TableCell><TableCell className="px-4 py-4 text-right font-bold tabular-nums">{song.total_wins}</TableCell><TableCell className="px-4 py-4 tabular-nums text-muted-foreground">{song.latest_win_date ? formatDate(song.latest_win_date) : "No win date recorded"}</TableCell><TableCell className="px-4 py-4 text-right tabular-nums">{song.winning_shows}</TableCell></TableRow>)}</TableBody>
-      </Table>
-      <div className="mobile-record flex-col">
-      {songs.map((song) => <Link prefetch={false} key={song.id} href={`/songs/${song.id}`} className="group grid gap-2 border-b border-border px-4 py-4 transition-colors last:border-b-0 hover:bg-accent focus-visible:bg-accent">
-        <div><p className="font-heading text-lg font-bold">{song.title}</p><p className="text-sm text-muted-foreground lg:hidden">{song.artist.name}</p></div>
-        <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-baseline gap-x-3"><SongFacts song={song} /></div>
-      </Link>)}
+      <div aria-hidden="true" className={`${columns} hidden border-b-2 bg-muted/50 px-4 py-3 text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground md:grid`}>
+        <span>Song</span><span>Artist</span><span className="text-right">Wins</span><span>Latest win</span><span className="text-right">Shows</span>
       </div>
+      <ul aria-label="Song search results">
+        {songs.map((song) => <li key={song.id} className={`${columns} border-b border-border/70 px-4 py-4 last:border-b-0 md:hover:bg-accent/60`}>
+          <Link prefetch={false} href={`/songs/${song.id}`} className="compact-link-target col-span-3 min-w-0 break-words font-heading text-lg font-bold md:col-span-1">{song.title}</Link>
+          <Link prefetch={false} href={artistPath(song.artist)} className="compact-link-target col-span-3 -mt-2 min-w-0 break-words text-sm text-muted-foreground md:col-span-1 md:mt-0 md:text-base md:text-foreground">{song.artist.name}</Link>
+          <span className="whitespace-nowrap text-sm tabular-nums md:text-right md:text-base"><strong>{song.total_wins}</strong><span className="md:sr-only"> {song.total_wins === 1 ? "win" : "wins"}</span></span>
+          <span className="min-w-0 text-center text-sm tabular-nums text-muted-foreground md:text-left md:text-base">{song.latest_win_date ? <><span className="md:sr-only">Latest win </span>{formatDate(song.latest_win_date)}</> : "No win date recorded"}</span>
+          <span className="whitespace-nowrap text-right text-sm tabular-nums text-muted-foreground md:text-base md:text-foreground"><strong className="text-foreground md:font-normal">{song.winning_shows}</strong><span className="md:sr-only"> {song.winning_shows === 1 ? "show" : "shows"}</span></span>
+        </li>)}
+      </ul>
     </div>
   );
 }

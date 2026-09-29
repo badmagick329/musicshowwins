@@ -5,8 +5,6 @@ import type {
   Win,
 } from "@/lib/api-shared";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { MobileWinVideoDisclosure } from "@/components/win-videos";
-import { formatDate } from "@/lib/utils";
 import { notableTag } from "@/lib/win-facts";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
@@ -89,46 +87,25 @@ function leaderboardCopy(row: ArtistLeaderboardRow | SongLeaderboardRow, kind: "
   return { title, subtitle, artist, songId: kind === "song" ? songRow.song.id : undefined };
 }
 
-function DesktopLeaderboardRow({ row, kind }: { row: ArtistLeaderboardRow | SongLeaderboardRow; kind: "artist" | "song" }) {
-  const { title, subtitle, artist, songId } = leaderboardCopy(row, kind);
-  return (
-    <TableRow className="border-border/70 transition-colors hover:bg-accent/60">
-      <TableCell className="w-16 px-4 py-3"><RankMarker rank={row.rank} /></TableCell>
-      <TableCell className="px-4 py-3"><p className="font-semibold">{kind === "artist" ? <Link prefetch={false} href={artistPath(artist)} className="compact-link-target">{title}</Link> : <Link prefetch={false} href={`/songs/${songId}`} className="compact-link-target">{title}</Link>}</p>{subtitle && <p className="text-xs text-muted-foreground"><Link prefetch={false} href={artistPath(artist)} className="compact-link-target">{subtitle}</Link></p>}</TableCell>
-      <TableCell className="w-24 px-4 py-3 text-right font-heading text-lg font-bold tabular-nums">{row.wins}</TableCell>
-    </TableRow>
-  );
-}
-
-function MobileLeaderboardRow({ row, kind }: { row: ArtistLeaderboardRow | SongLeaderboardRow; kind: "artist" | "song" }) {
-  const { title, subtitle, artist, songId } = leaderboardCopy(row, kind);
-  return <div className="mobile-record items-center gap-3 border-b border-border/70 px-3 py-3"><RankMarker rank={row.rank} /><div className="min-w-0 flex-1"><p className="font-semibold">{kind === "artist" ? <Link prefetch={false} href={artistPath(artist)} className="compact-link-target w-full truncate">{title}</Link> : <Link prefetch={false} href={`/songs/${songId}`} className="compact-link-target w-full truncate">{title}</Link>}</p>{subtitle && <p className="text-xs text-muted-foreground"><Link prefetch={false} href={artistPath(artist)} className="compact-link-target w-full truncate">{subtitle}</Link></p>}</div><p className="font-heading text-lg font-bold tabular-nums"><span className="sr-only">{row.wins} wins</span>{row.wins}</p></div>;
-}
-
+// Three narrow columns fit a phone, so one table serves every width; duplicated
+// desktop and mobile markup doubled the text search engines read.
 export function Leaderboard({ rows, kind, empty = "No wins to show yet." }: { rows: (ArtistLeaderboardRow | SongLeaderboardRow)[]; kind: "artist" | "song"; empty?: string }) {
   if (!rows.length) return <EmptyState message={empty} />;
   return (
     <div className="overflow-hidden border border-border bg-card">
-      <Table className="desktop-table w-full border-collapse text-sm">
+      <Table className="w-full border-collapse text-sm">
         <TableCaption className="sr-only">Top five {kind === "artist" ? "artists" : "songs"} by music show wins</TableCaption>
-        <TableHeader><TableRow className="border-b-2 bg-muted/50 text-left text-xs uppercase tracking-[0.12em] text-muted-foreground"><TableHead className="w-16 px-4 py-3">Rank</TableHead><TableHead className="px-4 py-3">{kind === "artist" ? "Artist" : "Song"}</TableHead><TableHead className="w-24 px-4 py-3 text-right">Wins</TableHead></TableRow></TableHeader>
-        <TableBody>{rows.map((row, index) => <DesktopLeaderboardRow key={`${kind}-${index}-${row.rank}`} row={row} kind={kind} />)}</TableBody>
+        <TableHeader><TableRow className="border-b-2 bg-muted/50 text-left text-xs uppercase tracking-[0.12em] text-muted-foreground"><TableHead className="w-14 px-3 py-3 sm:w-16 sm:px-4">Rank</TableHead><TableHead className="px-3 py-3 sm:px-4">{kind === "artist" ? "Artist" : "Song"}</TableHead><TableHead className="w-20 px-3 py-3 text-right sm:w-24 sm:px-4">Wins</TableHead></TableRow></TableHeader>
+        <TableBody>{rows.map((row, index) => {
+          const { title, subtitle, artist, songId } = leaderboardCopy(row, kind);
+          return <TableRow key={`${kind}-${index}-${row.rank}`} className="border-border/70 transition-colors hover:bg-accent/60">
+            <TableCell className="px-3 py-3 sm:px-4"><RankMarker rank={row.rank} /></TableCell>
+            <TableCell className="whitespace-normal break-words px-3 py-3 sm:px-4"><p className="font-semibold">{kind === "artist" ? <Link prefetch={false} href={artistPath(artist)} className="compact-link-target">{title}</Link> : <Link prefetch={false} href={`/songs/${songId}`} className="compact-link-target">{title}</Link>}</p>{subtitle && <p className="text-xs text-muted-foreground"><Link prefetch={false} href={artistPath(artist)} className="compact-link-target">{subtitle}</Link></p>}</TableCell>
+            <TableCell className="px-3 py-3 text-right font-heading text-lg font-bold tabular-nums sm:px-4">{row.wins}</TableCell>
+          </TableRow>;
+        })}</TableBody>
       </Table>
-      <div className="mobile-record flex-col"><div className="flex items-center justify-between border-b-2 bg-muted/50 px-3 py-3 text-xs font-bold uppercase tracking-[0.12em] text-muted-foreground"><span>Rank · {kind}</span><span>Wins</span></div>{rows.map((row, index) => <MobileLeaderboardRow key={`${kind}-mobile-${index}-${row.rank}`} row={row} kind={kind} />)}</div>
     </div>
-  );
-}
-
-export function WinRecord({ win, hideArtist = false, hideSong = false }: { win: Win; hideArtist?: boolean; hideSong?: boolean }) {
-  return (
-    <article className="border-b border-border/70 px-3 py-3 last:border-b-0">
-      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-x-3 gap-y-2">
-        <time dateTime={win.date} className="font-heading text-sm font-bold tabular-nums text-muted-foreground">{formatDate(win.date)}</time>
-        {hideSong ? <div className="col-span-2 row-start-2 empty:hidden"><WinFactTag win={win} /></div> : <div className="col-span-2 row-start-2 min-w-0"><p className="break-words font-semibold"><Link prefetch={false} href={`/songs/${win.song.id}`} className="compact-link-target">{win.song.title}</Link></p>{!hideArtist && <p className="break-words text-xs text-muted-foreground"><Link prefetch={false} href={artistPath(win.song.artist)} className="compact-link-target">{win.song.artist.name}</Link></p>}<WinFactTag win={win} /></div>}
-        <ShowBadge slug={win.show.slug} name={win.show.name} />
-      </div>
-      <MobileWinVideoDisclosure win={win} className="mt-3" />
-    </article>
   );
 }
 

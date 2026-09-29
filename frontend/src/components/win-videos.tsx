@@ -5,7 +5,6 @@ import { ChevronDown, ExternalLink, Play, Search } from "lucide-react";
 import type { Win, WinReference } from "@/lib/api-shared";
 import { cn, formatDate } from "@/lib/utils";
 import { trackEvent } from "@/lib/analytics";
-import { TableCell, TableRow } from "@/components/ui/table";
 
 export function winVideoReferences(win: Win) {
   return win.references.filter((reference) => reference.reference_type === "video");
@@ -49,7 +48,6 @@ const winVideoActionClass = "grid cursor-pointer grid-cols-[0.875rem_1fr_0.875re
 // Filled leaves the site; outlined opens the list in place.
 const externalActionClass = "bg-action-pink text-primary-foreground hover:bg-accent-foreground";
 const toggleActionClass = "border-action-pink bg-card text-action-pink hover:bg-accent";
-const desktopActionClass = "h-8 px-2.5 text-xs shadow-[2px_2px_0_var(--foreground)]";
 const mobileActionClass = "min-h-10 w-52 max-w-full px-3 text-sm shadow-[2px_2px_0_var(--foreground)]";
 
 function YouTubeSearchLink({ win, placement, className }: { win: Win; placement: VideoPlacement; className?: string }) {
@@ -148,36 +146,6 @@ function WinVideoPanel({ win, videos, panelId }: { win: Win; videos: WinReferenc
         {videos.map((video) => <WinVideoLink key={video.id} win={win} video={video} />)}
       </ul>
     </div>
-  );
-}
-
-export function DesktopWinVideoRow({ win, colSpan, videoCellClassName = "w-44 px-4 py-3 text-right", compactAction = false, children }: { win: Win; colSpan: number; videoCellClassName?: string; compactAction?: boolean; children: React.ReactNode }) {
-  const [open, setOpen] = useState(false);
-  const videos = winVideoReferences(win);
-  const panelId = `win-videos-desktop-${win.id}`;
-  const actionClassName = cn(desktopActionClass, compactAction ? "ml-auto w-44 max-w-full" : "w-full");
-  return (
-    <>
-      <TableRow className="border-border/70 hover:bg-accent/60">
-        {children}
-        <TableCell className={videoCellClassName}>
-          {videos.length === 0 ? (
-            <NoVideo win={win} placement="desktop" />
-          ) : videos.length === 1 ? (
-            <WinVideoActionLink win={win} video={videos[0]} placement="desktop" className={actionClassName} />
-          ) : (
-            <WinVideoToggleButton win={win} count={videos.length} open={open} panelId={panelId} onToggle={() => setOpen(!open)} className={actionClassName} />
-          )}
-        </TableCell>
-      </TableRow>
-      {open && videos.length > 1 && (
-        <TableRow className="border-border/70 hover:bg-inherit">
-          <TableCell colSpan={colSpan} className="p-0">
-            <WinVideoPanel win={win} videos={videos} panelId={panelId} />
-          </TableCell>
-        </TableRow>
-      )}
-    </>
   );
 }
 

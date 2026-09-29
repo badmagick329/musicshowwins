@@ -66,50 +66,43 @@ afterEach(() => {
 });
 
 describe("WinsExplorer", () => {
-  it("uses a semantic desktop table and retains stacked mobile records", () => {
+  it("renders each win once for every screen size", () => {
     const { container } = render(<WinsExplorer />);
-    expect(screen.getByRole("table", { name: "Filtered music show wins" })).toBeTruthy();
-    for (const heading of ["Date", "Artist", "Song", "Music show", "Video"]) expect(screen.getByRole("columnheader", { name: heading })).toBeTruthy();
-    expect(container.querySelectorAll("article")).toHaveLength(2);
-    expect(container.innerHTML).not.toContain("winsGridColumns");
+    const results = screen.getByRole("list", { name: "Filtered music show wins" });
+    expect(within(results).getAllByRole("article")).toHaveLength(2);
+    expect(within(results).getAllByRole("link", { name: "Archive Winner" })).toHaveLength(1);
+    expect(container.querySelector("table")).toBeNull();
   });
 
-  it("expands video references beneath the same win in the desktop table and mobile records", () => {
+  it("expands video references beneath the same win", () => {
     queryState.videoReferences = [
       { id: 5, reference_type: "video", provider: "youtube", external_id: "x1", url: "https://www.youtube.com/watch?v=x1", title: "Archive Winner MV", publisher_name: "KBS World", is_official: true, published_at: null, last_verified_at: null },
       { id: 6, reference_type: "video", provider: "youtube", external_id: "x2", url: "https://www.youtube.com/watch?v=x2", title: "Archive Winner Encore", publisher_name: "KBS World", is_official: true, published_at: null, last_verified_at: null },
     ];
-    const { container } = render(<WinsExplorer />);
-    const desktopScope = within(container.querySelector(".desktop-table") as HTMLElement);
-    const button = desktopScope.getByRole("button", { name: "Choose from 2 videos for Archive Winner by Artist, 01 Jan 2025, Music Bank" });
+    render(<WinsExplorer />);
+    const buttons = screen.getAllByRole("button", { name: "Choose from 2 videos for Archive Winner by Artist, 01 Jan 2025, Music Bank" });
+    expect(buttons).toHaveLength(1);
+    const [button] = buttons;
     expect(button.textContent).toContain("2 videos");
     expect(button.getAttribute("aria-expanded")).toBe("false");
     fireEvent.click(button);
     expect(button.getAttribute("aria-expanded")).toBe("true");
     const panel = document.getElementById(button.getAttribute("aria-controls") ?? "");
-    expect(panel).toBeTruthy();
-    expect(container.querySelector('td[colspan="5"]')).toBeTruthy();
-    expect(container.querySelector(".desktop-table tbody")?.contains(panel)).toBe(true);
-    expect(desktopScope.getByRole("columnheader", { name: "Video" }).className).toContain("w-44");
+    expect(button.closest("article")?.contains(panel)).toBe(true);
     const link = within(panel as HTMLElement).getByRole("link", { name: /Archive Winner MV/ });
     expect(link.getAttribute("href")).toBe("https://www.youtube.com/watch?v=x1");
     expect(link.getAttribute("target")).toBe("_blank");
     expect(link.getAttribute("rel")).toBe("noopener noreferrer");
-
-    const mobileButton = within(container.querySelector(".mobile-record") as HTMLElement).getByRole("button", { name: "Choose from 2 videos for Archive Winner by Artist, 01 Jan 2025, Music Bank" });
-    fireEvent.click(mobileButton);
-    expect(document.getElementById(mobileButton.getAttribute("aria-controls") ?? "")?.textContent).toContain("KBS World");
   });
 
-  it("links a single video win directly from the results table and mobile record", () => {
+  it("links a single video win directly", () => {
     queryState.videoReferences = [{ id: 5, reference_type: "video", provider: "youtube", external_id: "x1", url: "https://www.youtube.com/watch?v=x1", title: "Archive Winner MV", publisher_name: "KBS World", is_official: true, published_at: null, last_verified_at: null }];
-    const { container } = render(<WinsExplorer />);
-    const link = within(container.querySelector(".desktop-table") as HTMLElement).getByRole("link", { name: "Watch on YouTube for Archive Winner by Artist, 01 Jan 2025, Music Bank" });
-    expect(link.getAttribute("href")).toBe("https://www.youtube.com/watch?v=x1");
-    expect(link.getAttribute("target")).toBe("_blank");
-    expect(link.getAttribute("rel")).toBe("noopener noreferrer");
-    expect(within(container.querySelector(".mobile-record") as HTMLElement).getByRole("link", { name: "Watch on YouTube for Archive Winner by Artist, 01 Jan 2025, Music Bank" })).toBeTruthy();
-    expect(container.querySelector("td[colspan]")).toBeNull();
+    render(<WinsExplorer />);
+    const links = screen.getAllByRole("link", { name: "Watch on YouTube for Archive Winner by Artist, 01 Jan 2025, Music Bank" });
+    expect(links).toHaveLength(1);
+    expect(links[0].getAttribute("href")).toBe("https://www.youtube.com/watch?v=x1");
+    expect(links[0].getAttribute("target")).toBe("_blank");
+    expect(links[0].getAttribute("rel")).toBe("noopener noreferrer");
   });
 
   it("shows total pages and waits for real requested-page data before scrolling", () => {
@@ -172,7 +165,7 @@ describe("WinsExplorer", () => {
     render(<WinsExplorer />);
     expect(screen.getByRole("alert").textContent).toContain("Enter dates as YYYY-MM-DD.");
     expect(queryState.winsEnabled).toBe(false);
-    expect(screen.queryByRole("table", { name: "Filtered music show wins" })).toBeNull();
+    expect(screen.queryByRole("list", { name: "Filtered music show wins" })).toBeNull();
     expect(screen.getByRole("link", { name: "Clear dates" }).getAttribute("href")).toBe("/wins");
   });
 
@@ -189,7 +182,7 @@ describe("WinsExplorer", () => {
     view.rerender(<WinsExplorer />);
     expect((screen.getByLabelText("Music show") as HTMLSelectElement).value).toBe("");
     expect((screen.getByLabelText("Year") as HTMLSelectElement).value).toBe("");
-    expect(screen.getAllByText("Archive Winner")).toHaveLength(2);
+    expect(screen.getAllByText("Archive Winner")).toHaveLength(1);
   });
 
   it("debounces typing into one replacement history update", () => {
@@ -225,12 +218,12 @@ describe("WinsExplorer", () => {
     setUrl("/wins?show=music-bank");
     const view = render(<WinsExplorer />);
     expect((screen.getByLabelText("Music show") as HTMLSelectElement).value).toBe("music-bank");
-    expect(screen.getAllByText("Music Bank Winner")).toHaveLength(2);
+    expect(screen.getAllByText("Music Bank Winner")).toHaveLength(1);
 
     setUrl("/wins?show=the-show");
     window.dispatchEvent(new PopStateEvent("popstate"));
     view.rerender(<WinsExplorer />);
     expect((screen.getByLabelText("Music show") as HTMLSelectElement).value).toBe("the-show");
-    expect(screen.getAllByText("The Show Winner")).toHaveLength(2);
+    expect(screen.getAllByText("The Show Winner")).toHaveLength(1);
   });
 });

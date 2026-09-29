@@ -8,20 +8,15 @@ vi.mock("next/link", () => ({
 }));
 
 describe("SongResults", () => {
-  it("renders a semantic desktop table and linked stacked mobile record", () => {
+  it("renders each song once with its facts and canonical links", () => {
     const html = renderToStaticMarkup(<SongResults songs={[{ id: 7, title: "Supernova", artist: { id: 3, slug: "aespa", name: "aespa" }, total_wins: 5, latest_win_date: "2024-06-02", winning_shows: 3 }]} empty="None" />);
-    expect(html).toContain('href="/songs/7"');
-    expect(html.match(/data-prefetch="false"/g)).toHaveLength(3);
-    expect(html).toContain("<table");
+    expect(html.match(/href="\/songs\/7"/g)).toHaveLength(1);
+    expect(html.match(/href="\/artists\/aespa"/g)).toHaveLength(1);
+    expect(html.match(/data-prefetch="false"/g)).toHaveLength(2);
+    expect(html.match(/Supernova/g)).toHaveLength(1);
     for (const heading of ["Song", "Artist", "Wins", "Latest win", "Shows"]) expect(html).toContain(heading);
-    expect(html).not.toContain("View details");
-    expect(html).not.toContain("lucide-arrow-right");
-    expect(html).toContain("mobile-record");
-    expect(html).toContain("Supernova");
-    expect(html).toContain("aespa");
-    expect(html).toContain("5");
-    expect(html).toContain("Latest");
-    expect(html).toContain("3");
-    expect(html).toContain("grid-cols-[auto_minmax(0,1fr)_auto]");
+    expect(html).toMatch(/<strong>5<\/strong><span class="md:sr-only"> wins<\/span>/);
+    expect(html).toContain("02 Jun 2024");
+    expect(html).not.toContain("mobile-record");
   });
 });

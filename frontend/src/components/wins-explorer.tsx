@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { useCallback, useEffect, useRef } from "react";
 import { EmptyState, LoadingState, ShowBadge, WinFactTag } from "@/components/data-display";
-import { formatDate } from "@/lib/utils";
+import { cn, formatDate } from "@/lib/utils";
 import { browserTransport } from "@/lib/api-browser";
 import type { Show, Win } from "@/lib/api-shared";
 import {
@@ -19,8 +19,7 @@ import { clearWinsNavigation, winsFilterErrorFromSearchParams, winsFiltersFromSe
 import { selectedArtistQueryOptions, selectedSongQueryOptions, showsQueryOptions, winsQueryOptions } from "@/lib/wins-queries";
 import { archivePageCount } from "@/lib/pagination";
 import { usePaginationScroll } from "@/lib/use-pagination-scroll";
-import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { DesktopWinVideoRow, MobileWinVideoDisclosure } from "@/components/win-videos";
+import { WinVideoControl } from "@/components/win-videos";
 import { ArchivePageLink } from "@/components/archive-page-link";
 import { ArchiveResultsSummary } from "@/components/pagination";
 import { artistPath } from "@/lib/paths";
@@ -58,17 +57,27 @@ function WinsSearchInput({ query, onApply }: { query: string; onApply: (value: s
   );
 }
 
+const winsColumns = "md:grid-cols-[8rem_minmax(0,1fr)_minmax(0,1fr)_11rem_13rem]";
+
+// Each win is rendered once: a card on phones, a table-like row from `md` up (same pattern as
+// `ArtistWinHistory`), so the results are not duplicated in a hidden desktop or mobile copy.
 function WinsRows({ wins }: { wins: Win[] }) {
   return (
     <div className="border border-border bg-card">
-      <Table className="desktop-table border-collapse">
-        <TableCaption className="sr-only">Filtered music show wins</TableCaption>
-        <TableHeader><TableRow className="border-b-2 bg-muted/50 text-xs uppercase tracking-[0.12em] text-muted-foreground"><TableHead className="w-32 px-4 py-3">Date</TableHead><TableHead className="px-4 py-3">Artist</TableHead><TableHead className="px-4 py-3">Song</TableHead><TableHead className="w-44 px-4 py-3 text-right">Music show</TableHead><TableHead className="w-44 px-4 py-3 text-right">Video</TableHead></TableRow></TableHeader>
-        <TableBody>{wins.map((win) => <DesktopWinVideoRow key={win.id} win={win} colSpan={5} videoCellClassName="w-44 px-4 py-4 text-right"><TableCell className="px-4 py-4"><time dateTime={win.date} className="font-heading text-sm font-bold tabular-nums text-muted-foreground">{formatDate(win.date)}</time></TableCell><TableCell className="px-4 py-4"><Link prefetch={false} href={artistPath(win.song.artist)} className="compact-link-target font-semibold">{win.song.artist.name}</Link></TableCell><TableCell className="px-4 py-4"><Link prefetch={false} href={`/songs/${win.song.id}`} className="compact-link-target font-medium">{win.song.title}</Link><WinFactTag win={win} /></TableCell><TableCell className="w-44 px-4 py-4 text-right"><Link prefetch={false} href={`/wins?show=${encodeURIComponent(win.show.slug)}#wins-results-title`} aria-label={`Filter wins by ${win.show.name}`} className="compact-link-target"><ShowBadge slug={win.show.slug} name={win.show.name} /></Link></TableCell></DesktopWinVideoRow>)}</TableBody>
-      </Table>
-      <div className="mobile-record flex-col">
-        {wins.map((win) => <article key={win.id} className="grid gap-2 border-b border-border/70 px-4 py-4 last:border-b-0"><time dateTime={win.date} className="font-heading text-sm font-bold tabular-nums text-muted-foreground">{formatDate(win.date)}</time><Link prefetch={false} href={artistPath(win.song.artist)} className="compact-link-target min-w-0 font-semibold">{win.song.artist.name}</Link><div className="min-w-0"><Link prefetch={false} href={`/songs/${win.song.id}`} className="compact-link-target font-medium">{win.song.title}</Link><WinFactTag win={win} /></div><Link prefetch={false} href={`/wins?show=${encodeURIComponent(win.show.slug)}#wins-results-title`} aria-label={`Filter wins by ${win.show.name}`} className="compact-link-target"><ShowBadge slug={win.show.slug} name={win.show.name} /></Link><MobileWinVideoDisclosure win={win} /></article>)}
+      <div aria-hidden="true" className={cn("hidden border-b-2 bg-muted/50 text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground md:grid", winsColumns)}>
+        <span className="px-4 py-3">Date</span><span className="px-4 py-3">Artist</span><span className="px-4 py-3">Song</span><span className="px-4 py-3 text-right">Music show</span><span className="px-4 py-3 text-right">Video</span>
       </div>
+      <ul aria-label="Filtered music show wins">
+        {wins.map((win) => <li key={win.id} className="border-b border-border/70 last:border-b-0 md:hover:bg-accent/60">
+          <article className={cn("grid grid-cols-[minmax(0,1fr)_auto] items-start gap-x-3 gap-y-2 px-4 py-4 md:items-center md:gap-0 md:p-0", winsColumns)}>
+            <div className="md:px-4 md:py-4"><time dateTime={win.date} className="font-heading text-sm font-bold tabular-nums text-muted-foreground">{formatDate(win.date)}</time></div>
+            <div className="col-span-2 row-start-2 min-w-0 md:col-span-1 md:row-start-auto md:px-4 md:py-4"><Link prefetch={false} href={artistPath(win.song.artist)} className="compact-link-target break-words font-semibold">{win.song.artist.name}</Link></div>
+            <div className="col-span-2 row-start-3 min-w-0 md:col-span-1 md:row-start-auto md:px-4 md:py-4"><Link prefetch={false} href={`/songs/${win.song.id}`} className="compact-link-target break-words font-medium">{win.song.title}</Link><WinFactTag win={win} /></div>
+            <div className="md:px-4 md:py-4 md:text-right"><Link prefetch={false} href={`/wins?show=${encodeURIComponent(win.show.slug)}#wins-results-title`} aria-label={`Filter wins by ${win.show.name}`} className="compact-link-target"><ShowBadge slug={win.show.slug} name={win.show.name} /></Link></div>
+            <WinVideoControl win={win} className="col-span-2 mt-1" />
+          </article>
+        </li>)}
+      </ul>
     </div>
   );
 }

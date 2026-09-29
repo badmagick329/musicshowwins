@@ -140,12 +140,3 @@ input:disabled {
 .rank-marker--1 { @apply border-rank-gold-border bg-rank-gold-surface; }
 .rank-marker--2 { @apply border-rank-silver-border bg-rank-silver-surface; }
 .rank-marker--3 { @apply border-rank-bronze-border bg-rank-bronze-surface; }
-
-@media (min-width: 768px) {
-  .desktop-table { display: table; }
-  .mobile-record { display: none; }
-}
-@media (max-width: 767px) {
-  .desktop-table { display: none; }
-  .mobile-record { display: flex; }
-}
