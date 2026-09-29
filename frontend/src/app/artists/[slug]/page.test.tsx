@@ -76,6 +76,19 @@ describe("artist summary and metadata", () => {
     expect(metadata.description).toBe("aespa has 2 recorded music-show wins across 2 songs. Earliest recorded win: Black Mamba on Inkigayo, 17 Jan 2021. Latest win: 02 Jun 2024.");
   });
 
+  it("describes the artist and its winning songs as linked structured data", async () => {
+    const html = renderToStaticMarkup(await ArtistPage({ params }));
+    const graphs = [...html.matchAll(/<script type="application\/ld\+json">(.*?)<\/script>/g)].map((match) => JSON.parse(match[1]));
+    const group = graphs.find((graph) => graph["@type"] === "MusicGroup");
+    expect(group).toMatchObject({
+      "@id": "https://kpopwins.info/artists/aespa#artist",
+      name: "aespa",
+      mainEntityOfPage: "https://kpopwins.info/artists/aespa",
+      description: (await generateMetadata({ params })).description,
+    });
+    expect(group.track.map((track: { "@id": string }) => track["@id"])).toEqual(["https://kpopwins.info/songs/7#song", "https://kpopwins.info/songs/8#song"]);
+  });
+
   it("handles an empty catalogue without inventing an earliest win", async () => {
     apiMocks.getAllArtistWins.mockResolvedValue([]);
     const html = renderToStaticMarkup(await ArtistPage({ params }));

@@ -8,9 +8,10 @@ import { ApiRequestError, getAllArtistWins, getArtist } from "@/lib/api";
 import { artistHighlights, summarizeArtist } from "@/lib/artist-profile";
 import { JsonLd } from "@/components/json-ld";
 import { Metric, MetricGrid } from "@/components/data-display";
-import type { Win } from "@/lib/api-shared";
+import type { Artist, Win } from "@/lib/api-shared";
 import { noIndexFollow, pageMetadata, plural, siteUrl } from "@/lib/seo";
 import { artistPath } from "@/lib/paths";
+import { artistJsonLd } from "@/lib/structured-data";
 
 // Slugs are lowercase words; digits alone are the IDs older URLs used.
 function artistKey(value: string) {
@@ -22,20 +23,25 @@ async function loadArtist(key: string) {
   catch (error) { if (error instanceof ApiRequestError && error.status === 404) notFound(); throw error; }
 }
 
+// Shared by the meta description and the structured data so both state the same facts.
+function artistDescription(artist: Artist, wins: Win[]) {
+  const { earliestWin, latestWin } = summarizeArtist(wins);
+  const counts = `${artist.total_wins} recorded music-show ${plural(artist.total_wins, "win")} across ${artist.winning_songs} ${plural(artist.winning_songs, "song")}`;
+  const dates = earliestWin && latestWin
+    ? ` Earliest recorded win: ${earliestWin.song.title} on ${earliestWin.show.name}, ${formatDate(earliestWin.date)}. Latest win: ${formatDate(latestWin.date)}.`
+    : "";
+  return `${artist.name} has ${counts}.${dates}`;
+}
+
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const key = artistKey((await params).slug);
   if (!key) return { title: "Artist Not Found", description: "The requested artist could not be found in KpopWins.", robots: noIndexFollow };
   try {
     const artist = await getArtist(key);
     const wins = await getAllArtistWins(artist.id);
-    const { earliestWin, latestWin } = summarizeArtist(wins);
-    const counts = `${artist.total_wins} recorded music-show ${plural(artist.total_wins, "win")} across ${artist.winning_songs} ${plural(artist.winning_songs, "song")}`;
-    const dates = earliestWin && latestWin
-      ? ` Earliest recorded win: ${earliestWin.song.title} on ${earliestWin.show.name}, ${formatDate(earliestWin.date)}. Latest win: ${formatDate(latestWin.date)}.`
-      : "";
     return pageMetadata({
       title: `${artist.name} Music Show Wins: ${artist.total_wins} Total`,
-      description: `${artist.name} has ${counts}.${dates}`,
+      description: artistDescription(artist, wins),
       path: artistPath(artist),
       indexable: artist.indexable,
     });
@@ -67,6 +73,7 @@ export default async function ArtistPage({ params, searchParams = Promise.resolv
           { "@type": "ListItem", position: 3, name: artist.name, item: `${siteUrl}${artistPath(artist)}` },
         ],
       }} />
+      <JsonLd data={artistJsonLd(artist, wins, artistDescription(artist, wins))} />
     <main className="page-enter mx-auto max-w-7xl px-5 pb-8 pt-10 lg:px-8 lg:pt-14">
       <header className="border-2 bg-surface-berry p-6 text-surface-berry-foreground shadow-[4px_4px_0_var(--section-ink)] sm:p-8">
         <h1 className="font-heading text-4xl font-bold tracking-tight sm:text-[44px]">{artist.name}</h1><p className="mt-2 text-surface-berry-foreground/75">{summary.totalWins} recorded music show {plural(summary.totalWins, "win")} across {summary.winningSongs} {plural(summary.winningSongs, "song")}</p>

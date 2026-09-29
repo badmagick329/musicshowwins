@@ -71,6 +71,17 @@ describe("Song detail page", () => {
     });
   });
 
+  it("links the recording to its artist entity in structured data", async () => {
+    const html = renderToStaticMarkup(await SongPage({ params: Promise.resolve({ id: "7" }) }));
+    const graphs = [...html.matchAll(/<script type="application\/ld\+json">(.*?)<\/script>/g)].map((match) => JSON.parse(match[1]));
+    expect(graphs.find((graph) => graph["@type"] === "MusicRecording")).toMatchObject({
+      "@id": "https://kpopwins.info/songs/7#song",
+      name: "Supernova",
+      description: (await generateMetadata({ params: Promise.resolve({ id: "7" }) })).description,
+      byArtist: { "@id": "https://kpopwins.info/artists/aespa#artist", name: "aespa", url: "https://kpopwins.info/artists/aespa" },
+    });
+  });
+
   it("uses the not-found page for invalid and missing song IDs", async () => {
     await expect(SongPage({ params: Promise.resolve({ id: "nope" }) })).rejects.toThrow("NEXT_NOT_FOUND");
     expect(apiMocks.getSong).not.toHaveBeenCalled();
