@@ -34,6 +34,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
       title: `${song.title} by ${song.artist.name}: ${song.total_wins} Music Show ${plural(song.total_wins, "Win")}`,
       description: `${song.title} by ${song.artist.name} has ${counts}.${dates}`,
       path: `/songs/${id}`,
+      indexable: song.indexable,
     });
   } catch (error) {
     if (error instanceof ApiRequestError && error.status === 404) return { title: "Song Not Found", description: "The requested song could not be found in KpopWins.", robots: noIndexFollow };

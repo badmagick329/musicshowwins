@@ -37,6 +37,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       title: `${artist.name} Music Show Wins: ${artist.total_wins} Total`,
       description: `${artist.name} has ${counts}.${dates}`,
       path: artistPath(artist),
+      indexable: artist.indexable,
     });
   } catch (error) {
     if (error instanceof ApiRequestError && error.status === 404) return { title: "Artist Not Found", description: "The requested artist could not be found in KpopWins.", robots: noIndexFollow };

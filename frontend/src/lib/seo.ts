@@ -8,11 +8,12 @@ export const siteName = "KpopWins";
 export const homeTitle = "K-pop Music Show Wins This Week & Artist Rankings";
 export const siteDescription = "Every K-pop music show win since 2014 from Inkigayo, Music Bank, M Countdown and more, with artist and song rankings.";
 
-export function pageMetadata({ title, description, path }: { title: string; description: string; path: string }): Metadata {
+export function pageMetadata({ title, description, path, indexable = true }: { title: string; description: string; path: string; indexable?: boolean }): Metadata {
   return {
     title,
     description,
     alternates: { canonical: path },
+    ...(indexable ? {} : { robots: noIndexFollow }),
     openGraph: { type: "website", url: path, siteName, title, description },
     twitter: { card: "summary_large_image", title, description },
   };

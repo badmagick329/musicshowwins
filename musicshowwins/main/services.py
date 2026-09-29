@@ -4,7 +4,22 @@ from __future__ import annotations
 
 from datetime import date
 
-from django.db.models import Count, F, Max, Min, OuterRef, Prefetch, Q, Subquery, Window
+from django.db.models import (
+    BooleanField,
+    Case,
+    Count,
+    Exists,
+    F,
+    Max,
+    Min,
+    OuterRef,
+    Prefetch,
+    Q,
+    Subquery,
+    Value,
+    When,
+    Window,
+)
 from django.db.models.functions import DenseRank
 
 from .models import Artist, ArtistAlias, MusicShow, Song, Win, WinMoment, WinReference
@@ -75,13 +90,17 @@ def win_filters(
     return query
 
 
+def _public_moments():
+    return WinMoment.objects.filter(
+        status=WinMoment.Status.PUBLISHED,
+        citations__reference_type=WinReference.ReferenceType.ARTICLE,
+        citations__status=WinReference.Status.ACTIVE,
+    )
+
+
 def wins_queryset(*, with_song_totals: bool = False, **filters):
     public_moments = (
-        WinMoment.objects.filter(
-            status=WinMoment.Status.PUBLISHED,
-            citations__reference_type=WinReference.ReferenceType.ARTICLE,
-            citations__status=WinReference.Status.ACTIVE,
-        )
+        _public_moments()
         .distinct()
         .prefetch_related(
             Prefetch(
@@ -163,6 +182,35 @@ def all_songs_queryset(**filters):
             winning_shows=Count("wins__show", filter=query, distinct=True),
         )
         .order_by("title", "artist__name")
+    )
+
+
+# Google demoted the whole site in September 2026 when most indexed pages were one
+# or two Wikipedia table rows in a template. Only pages with more than that are
+# offered to search engines; the rest stay browsable but noindex. Thresholds and
+# evidence: .ignore/docs/design-docs/2026-09-29-search-index-quality.md.
+SONG_INDEX_MIN_WINS = 3
+ARTIST_INDEX_MIN_WINS = 2
+
+
+def _indexable(min_wins: int, moment_owner: str) -> Case:
+    has_moment = Exists(_public_moments().filter(**{moment_owner: OuterRef("pk")}))
+    return Case(
+        When(Q(total_wins__gte=min_wins) | has_moment, then=Value(True)),
+        default=Value(False),
+        output_field=BooleanField(),
+    )
+
+
+def indexable_artists_queryset():
+    return all_artists_queryset().annotate(
+        indexable=_indexable(ARTIST_INDEX_MIN_WINS, "win__song__artist")
+    )
+
+
+def indexable_songs_queryset():
+    return all_songs_queryset().annotate(
+        indexable=_indexable(SONG_INDEX_MIN_WINS, "win__song")
     )
 
 

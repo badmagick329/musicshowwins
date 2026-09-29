@@ -10,10 +10,12 @@ import {
   type ApiParams,
   type ApiTransport,
   type Artist,
+  type ArtistDetail,
   type ArtistLeaderboardRow,
   type HomeData,
   type Show,
   type Song,
+  type SongDetail,
   type SongLeaderboardRow,
   type Win,
 } from "@/lib/api-shared";
@@ -82,8 +84,8 @@ export async function collectPages<T>(path: string, params: Record<string, strin
 
 export const getArtists = (search = "", page = 1, sort: ArtistSort = "wins") => serverRequestPage<Artist>("/artists", { search: search.trim() || undefined, ordering: artistOrderings[sort], page });
 // Accepts a slug or the numeric ID that older artist URLs carried.
-export const getArtist = (key: string | number) => serverRequestJson<Artist>(`/artists/${encodeURIComponent(key)}`);
-export const getSong = (id: number) => serverRequestJson<Song>(`/songs/${id}`);
+export const getArtist = (key: string | number) => serverRequestJson<ArtistDetail>(`/artists/${encodeURIComponent(key)}`);
+export const getSong = (id: number) => serverRequestJson<SongDetail>(`/songs/${id}`);
 export const getSongs = (search = "", page = 1, ordering = "-total_wins,title,artist__name") => serverRequestPage<Song>("/songs", { search: search.trim() || undefined, ordering, page });
 export const getArtistSongs = (id: number, page = 1) => serverRequestPage<Song>("/songs", { artist: id, ordering: "-total_wins,title", page });
 export const getArtistWins = (id: number, page = 1) => serverRequestPage<Win>("/wins", { artist: id, ordering: "-date", page });

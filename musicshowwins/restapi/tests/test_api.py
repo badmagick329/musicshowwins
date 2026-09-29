@@ -14,6 +14,7 @@ from main.models import (
     MusicShow,
     Song,
     Win,
+    WinMoment,
     WinReference,
 )
 from rest_framework.pagination import PageNumberPagination
@@ -34,20 +35,44 @@ def archive(db):
 
 
 @pytest.mark.django_db
-def test_sitemap_source_returns_every_entity_without_pagination(archive):
-    response = APIClient().get("/api/v1/sitemap")
+def test_sitemap_and_detail_offer_only_substantial_pages_for_indexing(archive):
+    show, artist_a, artist_b, song_a, song_b = archive
+    client = APIClient()
 
-    assert response.status_code == 200
-    assert response.data == {
+    # Alpha's two wins make its page indexable; one win each leaves Beta and both
+    # songs out of search.
+    assert client.get("/api/v1/sitemap").data == {
         "artists": [
-            {"id": archive[1].pk, "latest_win_date": date(2025, 1, 1), "slug": "alpha"},
-            {"id": archive[2].pk, "latest_win_date": date(2025, 1, 2), "slug": "beta"},
+            {"id": artist_a.pk, "latest_win_date": date(2025, 1, 1), "slug": "alpha"},
         ],
-        "songs": [
-            {"id": archive[3].pk, "latest_win_date": date(2025, 1, 1)},
-            {"id": archive[4].pk, "latest_win_date": date(2025, 1, 2)},
-        ],
+        "songs": [],
     }
+    assert client.get(f"/api/v1/artists/{artist_b.slug}").data["indexable"] is False
+    assert client.get(f"/api/v1/songs/{song_a.pk}").data["indexable"] is False
+
+    Win.objects.create(show=show, song=song_a, date=date(2023, 1, 1))
+    win_b = Win.objects.get(song=song_b)
+    moment = WinMoment.objects.create(
+        win=win_b, heading="A first", body="Context.", status=WinMoment.Status.DRAFT
+    )
+    article = WinReference.objects.create(
+        win=win_b,
+        reference_type=WinReference.ReferenceType.ARTICLE,
+        provider="soompi",
+        url="https://www.soompi.com/article/1",
+    )
+    moment.citations.add(article)
+
+    # A draft moment adds nothing; a published, cited one lifts the page.
+    assert client.get(f"/api/v1/songs/{song_b.pk}").data["indexable"] is False
+    moment.status = WinMoment.Status.PUBLISHED
+    moment.save()
+
+    sitemap = client.get("/api/v1/sitemap").data
+    assert [a["slug"] for a in sitemap["artists"]] == ["alpha", "beta"]
+    assert [s["id"] for s in sitemap["songs"]] == [song_a.pk, song_b.pk]
+    assert client.get(f"/api/v1/songs/{song_a.pk}").data["indexable"] is True
+    assert client.get(f"/api/v1/artists/{artist_b.slug}").data["indexable"] is True
 
 
 @pytest.mark.django_db

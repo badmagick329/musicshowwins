@@ -99,6 +99,13 @@ class ArtistSerializer(serializers.ModelSerializer):
         )
 
 
+class ArtistDetailSerializer(ArtistSerializer):
+    indexable = serializers.BooleanField(read_only=True)
+
+    class Meta(ArtistSerializer.Meta):
+        fields = (*ArtistSerializer.Meta.fields, "indexable")
+
+
 class SongSummarySerializer(serializers.ModelSerializer):
     artist = ArtistSummarySerializer(read_only=True)
 
@@ -122,6 +129,13 @@ class SongSerializer(SongSummarySerializer):
             "latest_win_date",
             "winning_shows",
         )
+
+
+class SongDetailSerializer(SongSerializer):
+    indexable = serializers.BooleanField(read_only=True)
+
+    class Meta(SongSerializer.Meta):
+        fields = (*SongSerializer.Meta.fields, "indexable")
 
 
 class WinReferenceSerializer(serializers.ModelSerializer):

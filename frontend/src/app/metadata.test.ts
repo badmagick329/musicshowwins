@@ -30,8 +30,8 @@ const staticRoutes = [
 
 beforeEach(() => {
   vi.clearAllMocks();
-  apiMocks.getArtist.mockResolvedValue({ id: 3, slug: "aespa", name: "aespa", total_wins: 12, winning_songs: 3 });
-  apiMocks.getSong.mockResolvedValue({ id: 7, title: "Supernova", artist: { id: 3, slug: "aespa", name: "aespa" }, total_wins: 3, winning_shows: 2 });
+  apiMocks.getArtist.mockResolvedValue({ id: 3, slug: "aespa", name: "aespa", total_wins: 12, winning_songs: 3, indexable: true });
+  apiMocks.getSong.mockResolvedValue({ id: 7, title: "Supernova", artist: { id: 3, slug: "aespa", name: "aespa" }, total_wins: 3, winning_shows: 2, indexable: true });
   apiMocks.getAllArtistWins.mockResolvedValue([]);
   apiMocks.getAllSongWins.mockResolvedValue([]);
 });
@@ -117,6 +117,22 @@ describe("page metadata", () => {
       const rendered = template.replace("%s", String(title));
       expect(rendered.match(/KpopWins/g)).toHaveLength(1);
     }
+  });
+
+  it("keeps detail pages the API marks as thin out of the index but crawlable", async () => {
+    expect(await artistMetadata({ params: Promise.resolve({ slug: "aespa" }) })).not.toHaveProperty("robots");
+    expect(await songMetadata({ params: Promise.resolve({ id: "7" }) })).not.toHaveProperty("robots");
+
+    apiMocks.getArtist.mockResolvedValueOnce({ id: 4, slug: "solo", name: "Solo", total_wins: 1, winning_songs: 1, indexable: false });
+    apiMocks.getSong.mockResolvedValueOnce({ id: 8, title: "Once", artist: { id: 4, slug: "solo", name: "Solo" }, total_wins: 1, winning_shows: 1, indexable: false });
+    await expect(artistMetadata({ params: Promise.resolve({ slug: "solo" }) })).resolves.toMatchObject({
+      alternates: { canonical: "/artists/solo" },
+      robots: { index: false, follow: true },
+    });
+    await expect(songMetadata({ params: Promise.resolve({ id: "8" }) })).resolves.toMatchObject({
+      alternates: { canonical: "/songs/8" },
+      robots: { index: false, follow: true },
+    });
   });
 
   it("uses clear not-found title fallbacks", async () => {

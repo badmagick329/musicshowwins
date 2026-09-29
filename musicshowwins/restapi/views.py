@@ -11,6 +11,8 @@ from main.services import (
     all_artists_queryset,
     all_songs_queryset,
     artist_name_query,
+    indexable_artists_queryset,
+    indexable_songs_queryset,
     leaderboard_queryset,
     show_queryset,
     wins_queryset,
@@ -25,11 +27,13 @@ from rest_framework.throttling import AnonRateThrottle
 from rest_framework.views import APIView
 
 from .serializers import (
+    ArtistDetailSerializer,
     ArtistLeaderboardSerializer,
     ArtistSerializer,
     CorrectionSerializer,
     ShowSerializer,
     SitemapSerializer,
+    SongDetailSerializer,
     SongLeaderboardSerializer,
     SongSerializer,
     WinSerializer,
@@ -46,15 +50,17 @@ class Sitemap(APIView):
     @extend_schema(
         responses=SitemapSerializer,
         description=(
-            "Return every canonical artist and song URL source in one response."
+            "Return every indexable artist and song URL source in one response."
         ),
     )
     def get(self, request):
         fields = ("id", "latest_win_date")
+        artists = indexable_artists_queryset().filter(indexable=True)
+        songs = indexable_songs_queryset().filter(indexable=True)
         return Response(
             {
-                "artists": list(all_artists_queryset().values(*fields, "slug")),
-                "songs": list(all_songs_queryset().values(*fields)),
+                "artists": list(artists.values(*fields, "slug")),
+                "songs": list(songs.values(*fields)),
             }
         )
 
@@ -219,10 +225,10 @@ class ArtistList(generics.ListAPIView):
 class ArtistDetail(generics.RetrieveAPIView):
     """Look artists up by slug, or by the numeric ID older URLs carried."""
 
-    serializer_class = ArtistSerializer
+    serializer_class = ArtistDetailSerializer
 
     def get_queryset(self):
-        return all_artists_queryset()
+        return indexable_artists_queryset()
 
     def get_object(self):
         key = self.kwargs["key"]
@@ -255,10 +261,10 @@ class SongList(generics.ListAPIView):
 
 
 class SongDetail(generics.RetrieveAPIView):
-    serializer_class = SongSerializer
+    serializer_class = SongDetailSerializer
 
     def get_queryset(self):
-        return all_songs_queryset()
+        return indexable_songs_queryset()
 
 
 class WinList(generics.ListAPIView):
