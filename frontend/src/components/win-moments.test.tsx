@@ -22,12 +22,12 @@ const win: Win = {
 };
 
 describe("WinMoments", () => {
-  it("renders distinct citation labels and breakpoint-specific visible anchors", () => {
+  it("renders distinct citation labels and one anchor to the win", () => {
     render(<WinMoments wins={[win]} />);
     expect(screen.getByRole("link", { name: "Soompi — Win report" })).toBeTruthy();
     expect(screen.getByRole("link", { name: "Soompi — Later interview" })).toBeTruthy();
     const anchors = screen.getAllByRole("link", { name: "View this win" });
-    expect(anchors.map((link) => link.getAttribute("href"))).toEqual(["#win-42", "#win-mobile-42"]);
+    expect(anchors.map((link) => link.getAttribute("href"))).toEqual(["#win-42"]);
   });
 
   it("shows two moments initially and toggles the remainder", () => {

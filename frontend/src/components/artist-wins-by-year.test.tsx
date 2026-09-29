@@ -36,7 +36,7 @@ describe("artist year exploration", () => {
     expect(within(songs).getAllByRole("row").map((row) => row.textContent)).toEqual(["RankSongWins", "1Song 12", "2Song 21"]);
     const shows = screen.getByRole("region", { name: "Wins by show" });
     expect(within(shows).getAllByRole("listitem").map((item) => item.textContent)).toEqual(["Show 12 wins", "Show 21 win"]);
-    expect(within(screen.getByRole("region", { name: "Win history" })).getAllByRole("row")).toHaveLength(4);
+    expect(within(screen.getByRole("region", { name: "Win history" })).getAllByRole("article")).toHaveLength(3);
     expect(screen.queryByText("Moment 1")).toBeNull();
     expect(screen.getByRole("button", { name: "2024: 3 recorded wins" }).getAttribute("aria-pressed")).toBe("true");
     expect(plausible).toHaveBeenCalledWith("Artist year selected", { props: { artist: artist.name, artist_id: "3", year: "2024", source: "chart" } });

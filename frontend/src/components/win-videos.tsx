@@ -19,7 +19,13 @@ export function winVideoActionLabel(count: number, isOfficial = true) {
   return isOfficial ? "Watch on YouTube" : "Watch fan upload";
 }
 
-type VideoPlacement = "desktop" | "mobile" | "list";
+// "responsive" controls serve both layouts, so their placement is read from the viewport at click time.
+type VideoPlacement = "desktop" | "mobile" | "list" | "responsive";
+
+function placementAtClick(placement: VideoPlacement) {
+  if (placement !== "responsive") return placement;
+  return window.matchMedia("(min-width: 768px)").matches ? "desktop" : "mobile";
+}
 
 // Measures whether visitors use video links at all, and whether fan uploads earn their removal risk.
 function trackVideoOpened(win: Win, video: WinReference, placement: VideoPlacement) {
@@ -27,12 +33,12 @@ function trackVideoOpened(win: Win, video: WinReference, placement: VideoPlaceme
     show: win.show.slug,
     year: win.date.slice(0, 4),
     source: video.is_official ? "official" : "fan",
-    placement,
+    placement: placementAtClick(placement),
   });
 }
 
 function trackSearch(win: Win, placement: VideoPlacement) {
-  trackEvent("YouTube search clicked", { show: win.show.slug, year: win.date.slice(0, 4), placement });
+  trackEvent("YouTube search clicked", { show: win.show.slug, year: win.date.slice(0, 4), placement: placementAtClick(placement) });
 }
 
 function winContext(win: Win) {
@@ -172,6 +178,34 @@ export function DesktopWinVideoRow({ win, colSpan, videoCellClassName = "w-44 px
         </TableRow>
       )}
     </>
+  );
+}
+
+// One control for both layouts, so a win's markup is rendered once rather than as a hidden
+// desktop copy plus a mobile copy. Inside a grid row the wrapper dissolves on wide screens
+// (`md:contents`): the action sits in its column and the video list spans the whole row.
+export function WinVideoControl({ win, className }: { win: Win; className?: string }) {
+  const [open, setOpen] = useState(false);
+  const videos = winVideoReferences(win);
+  const panelId = `win-videos-${win.id}`;
+  const actionClassName = cn(mobileActionClass, "md:h-8 md:min-h-0 md:w-44 md:px-2.5 md:text-xs");
+  return (
+    <div className={cn("flex flex-col items-end md:contents", className)}>
+      <div className="md:px-4 md:py-3 md:text-right">
+        {videos.length === 0 ? (
+          <NoVideo win={win} placement="responsive" className="text-sm md:text-xs" />
+        ) : videos.length === 1 ? (
+          <WinVideoActionLink win={win} video={videos[0]} placement="responsive" className={cn(actionClassName, "md:ml-auto")} />
+        ) : (
+          <WinVideoToggleButton win={win} count={videos.length} open={open} panelId={panelId} onToggle={() => setOpen(!open)} className={cn(actionClassName, "md:ml-auto")} />
+        )}
+      </div>
+      {open && videos.length > 1 && (
+        <div className="w-full pt-2 md:col-span-full md:pt-0">
+          <WinVideoPanel win={win} videos={videos} panelId={panelId} />
+        </div>
+      )}
+    </div>
   );
 }
 

@@ -42,8 +42,7 @@ export function WinMoments({ wins }: { wins: Win[] }) {
             </div>
             <p className="mt-4 max-w-3xl leading-7">{win.moment!.body}</p>
             <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
-              <Link href={`#win-${win.id}`} className="hidden font-semibold underline-offset-4 hover:underline sm:inline">View this win</Link>
-              <Link href={`#win-mobile-${win.id}`} className="font-semibold underline-offset-4 hover:underline sm:hidden">View this win</Link>
+              <Link href={`#win-${win.id}`} className="font-semibold underline-offset-4 hover:underline">View this win</Link>
               {win.moment!.citations.map((citation) => (
                 <a key={citation.id} href={citation.url} target="_blank" rel="noreferrer" className="inline-flex min-w-0 items-center gap-1 font-semibold underline-offset-4 hover:underline">
                   <span className="break-words">{citation.publisher_name || citation.provider} — {citation.title}</span>
