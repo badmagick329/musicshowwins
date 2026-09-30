@@ -47,7 +47,7 @@ describe("artist summary and metadata", () => {
   });
 
   it.each([null, "2026-09-06T00:00:00Z"])("does not treat a published moment or reference verification (%s) as career-first verification", async (lastVerified) => {
-    const reference: WinReference = { id: 1, reference_type: "article", provider: "example", external_id: "", url: "https://example.com/story", title: "First-ever trophy", publisher_name: "Example", is_official: true, published_at: null, last_verified_at: lastVerified };
+    const reference: WinReference = { id: 1, reference_type: "article", provider: "example", external_id: "", url: "https://example.com/story", title: "First-ever trophy", publisher_name: "Example", is_official: true, artist_channel: false, published_at: null, last_verified_at: lastVerified };
     apiMocks.getAllArtistWins.mockResolvedValue([
       { ...latest, moment: { heading: "A later story", body: "Supporting story", citations: [reference] } },
       { ...earliest, references: [reference], moment: { heading: "First-ever trophy", body: "A career-first story", citations: [reference] } },

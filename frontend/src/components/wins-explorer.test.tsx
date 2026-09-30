@@ -76,8 +76,8 @@ describe("WinsExplorer", () => {
 
   it("expands video references beneath the same win", () => {
     queryState.videoReferences = [
-      { id: 5, reference_type: "video", provider: "youtube", external_id: "x1", url: "https://www.youtube.com/watch?v=x1", title: "Archive Winner MV", publisher_name: "KBS World", is_official: true, published_at: null, last_verified_at: null },
-      { id: 6, reference_type: "video", provider: "youtube", external_id: "x2", url: "https://www.youtube.com/watch?v=x2", title: "Archive Winner Encore", publisher_name: "KBS World", is_official: true, published_at: null, last_verified_at: null },
+      { id: 5, reference_type: "video", provider: "youtube", external_id: "x1", url: "https://www.youtube.com/watch?v=x1", title: "Archive Winner MV", publisher_name: "KBS World", is_official: true, artist_channel: false, published_at: null, last_verified_at: null },
+      { id: 6, reference_type: "video", provider: "youtube", external_id: "x2", url: "https://www.youtube.com/watch?v=x2", title: "Archive Winner Encore", publisher_name: "KBS World", is_official: true, artist_channel: false, published_at: null, last_verified_at: null },
     ];
     render(<WinsExplorer />);
     const buttons = screen.getAllByRole("button", { name: "Choose from 2 videos for Archive Winner by Artist, 01 Jan 2025, Music Bank" });
@@ -96,7 +96,7 @@ describe("WinsExplorer", () => {
   });
 
   it("links a single video win directly", () => {
-    queryState.videoReferences = [{ id: 5, reference_type: "video", provider: "youtube", external_id: "x1", url: "https://www.youtube.com/watch?v=x1", title: "Archive Winner MV", publisher_name: "KBS World", is_official: true, published_at: null, last_verified_at: null }];
+    queryState.videoReferences = [{ id: 5, reference_type: "video", provider: "youtube", external_id: "x1", url: "https://www.youtube.com/watch?v=x1", title: "Archive Winner MV", publisher_name: "KBS World", is_official: true, artist_channel: false, published_at: null, last_verified_at: null }];
     render(<WinsExplorer />);
     const links = screen.getAllByRole("link", { name: "Watch on YouTube for Archive Winner by Artist, 01 Jan 2025, Music Bank" });
     expect(links).toHaveLength(1);

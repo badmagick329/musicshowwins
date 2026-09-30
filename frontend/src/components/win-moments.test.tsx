@@ -15,8 +15,8 @@ const win: Win = {
     heading: "T-ara's first win in over five years",
     body: "A sourced story.",
     citations: [
-      { id: 4, reference_type: "article", provider: "soompi", external_id: "", url: "https://example.com/one", title: "Win report", publisher_name: "Soompi", is_official: false, published_at: null, last_verified_at: null },
-      { id: 5, reference_type: "article", provider: "soompi", external_id: "", url: "https://example.com/two", title: "Later interview", publisher_name: "Soompi", is_official: false, published_at: null, last_verified_at: null },
+      { id: 4, reference_type: "article", provider: "soompi", external_id: "", url: "https://example.com/one", title: "Win report", publisher_name: "Soompi", is_official: false, artist_channel: false, published_at: null, last_verified_at: null },
+      { id: 5, reference_type: "article", provider: "soompi", external_id: "", url: "https://example.com/two", title: "Later interview", publisher_name: "Soompi", is_official: false, artist_channel: false, published_at: null, last_verified_at: null },
     ],
   },
 };

@@ -223,6 +223,19 @@ class EpisodeStatus(models.Model):
         return f"{self.show.name} {self.date}: {self.get_status_display()}"
 
 
+# YouTube channels run by the artists themselves, checked 2026-09-30. Their win clips
+# are imported as unofficial (not a show's channel), but they are not fan-made and
+# rarely vanish, so visitors see them labelled as the artist's own upload.
+ARTIST_CHANNEL_IDS = frozenset(
+    {
+        "UCOmHUn--16B90oW2L6FRR3A",  # @BLACKPINK
+        "UCzw-C7fNfs018R1FzIKnlaA",  # @BIGBANG
+        "UCayQxFAoFCvGariuQCtHRGQ",  # @WINNER
+        "UCWxCyZibDIWIrGIgP25mbfw",  # @iKON
+    }
+)
+
+
 class WinReference(models.Model):
     class ReferenceType(models.TextChoices):
         VIDEO = "video", "Video"
@@ -279,6 +292,10 @@ class WinReference(models.Model):
 
     def __str__(self):
         return self.title or self.url
+
+    @property
+    def artist_channel(self):
+        return self.publisher_external_id in ARTIST_CHANNEL_IDS
 
 
 class WinMoment(models.Model):

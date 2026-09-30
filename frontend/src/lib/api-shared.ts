@@ -51,6 +51,7 @@ export type WinReference = {
   title: string;
   publisher_name: string;
   is_official: boolean;
+  artist_channel: boolean;
   published_at: string | null;
   last_verified_at: string | null;
 };

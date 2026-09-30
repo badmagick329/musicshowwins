@@ -17,7 +17,7 @@ beforeEach(() => {
 afterEach(cleanup);
 
 function reference(overrides: Partial<WinReference> = {}): WinReference {
-  return { id: 1, reference_type: "video", provider: "youtube", external_id: "abc123", url: "https://www.youtube.com/watch?v=abc123", title: "Boom Boom Bass MV", publisher_name: "Mnet K-POP", is_official: true, published_at: null, last_verified_at: null, ...overrides };
+  return { id: 1, reference_type: "video", provider: "youtube", external_id: "abc123", url: "https://www.youtube.com/watch?v=abc123", title: "Boom Boom Bass MV", publisher_name: "Mnet K-POP", is_official: true, artist_channel: false, published_at: null, last_verified_at: null, ...overrides };
 }
 
 function win(id: number, overrides: Partial<Win> = {}): Win {
@@ -180,6 +180,20 @@ describe("win video references", () => {
     const panel = expand(container);
     expect(within(panel).getAllByText("Official video")).toHaveLength(1);
     expect(within(panel).getAllByText("Fan upload")).toHaveLength(1);
+  });
+
+  it("labels uploads from the artist's own channel without calling them fan uploads", () => {
+    const own = reference({ id: 2, is_official: false, artist_channel: true, publisher_name: "BLACKPINK", url: "https://www.youtube.com/watch?v=own" });
+    const single = render(<ArtistWinHistory wins={[win(1, { references: [own] })]} />);
+    const link = within(single.container).getByRole("link", { name: `Watch on YouTube for ${winName}` });
+    fireEvent.click(link);
+    expect(plausible).toHaveBeenLastCalledWith("Win video opened", expect.objectContaining({ props: expect.objectContaining({ source: "artist" }) }));
+    single.unmount();
+
+    const { container } = render(<ArtistWinHistory wins={[win(1, { references: [reference({ id: 1 }), own] })]} />);
+    const panel = expand(container);
+    expect(within(panel).getAllByText("Artist channel")).toHaveLength(1);
+    expect(within(panel).queryByText("Fan upload")).toBeNull();
   });
 
   it("tracks video opens with source and the placement the viewport had at click time", () => {

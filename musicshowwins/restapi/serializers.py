@@ -139,6 +139,8 @@ class SongDetailSerializer(SongSerializer):
 
 
 class WinReferenceSerializer(serializers.ModelSerializer):
+    artist_channel = serializers.BooleanField(read_only=True)
+
     class Meta:
         model = WinReference
         fields = (
@@ -150,6 +152,7 @@ class WinReferenceSerializer(serializers.ModelSerializer):
             "title",
             "publisher_name",
             "is_official",
+            "artist_channel",
             "published_at",
             "last_verified_at",
         )

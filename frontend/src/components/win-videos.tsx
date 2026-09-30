@@ -10,12 +10,18 @@ export function winVideoReferences(win: Win) {
   return win.references.filter((reference) => reference.reference_type === "video");
 }
 
+type VideoSource = "official" | "artist" | "fan";
+
+function videoSource(video: WinReference): VideoSource {
+  return video.is_official ? "official" : video.artist_channel ? "artist" : "fan";
+}
+
 // External links all start with "Watch" and the list toggle with its count, so a scanned column
 // separates "leaves the site" from "opens a list here". Fan uploads can vanish or be edited, so
-// visitors should know before leaving.
-export function winVideoActionLabel(count: number, isOfficial = true) {
+// visitors should know before leaving; an artist's own channel carries neither risk.
+export function winVideoActionLabel(count: number, source: VideoSource = "official") {
   if (count > 1) return `${count} videos`;
-  return isOfficial ? "Watch on YouTube" : "Watch fan upload";
+  return source === "fan" ? "Watch fan upload" : "Watch on YouTube";
 }
 
 // "responsive" controls serve both layouts, so their placement is read from the viewport at click time.
@@ -31,7 +37,7 @@ function trackVideoOpened(win: Win, video: WinReference, placement: VideoPlaceme
   trackEvent("Win video opened", {
     show: win.show.slug,
     year: win.date.slice(0, 4),
-    source: video.is_official ? "official" : "fan",
+    source: videoSource(video),
     placement: placementAtClick(placement),
   });
 }
@@ -81,11 +87,11 @@ function WinVideoActionLink({ win, video, placement, className }: { win: Win; vi
       target="_blank"
       rel="noopener noreferrer"
       onClick={() => trackVideoOpened(win, video, placement)}
-      aria-label={`${winVideoActionLabel(1, video.is_official)} for ${winContext(win)}`}
+      aria-label={`${winVideoActionLabel(1, videoSource(video))} for ${winContext(win)}`}
       className={cn(winVideoActionClass, externalActionClass, className)}
     >
       <Play className="size-3.5 shrink-0" aria-hidden="true" />
-      <span className="text-center">{winVideoActionLabel(1, video.is_official)}</span>
+      <span className="text-center">{winVideoActionLabel(1, videoSource(video))}</span>
       <ExternalLink className="size-3.5 shrink-0" aria-hidden="true" />
     </a>
   );
@@ -128,7 +134,7 @@ function WinVideoLink({ win, video }: { win: Win; video: WinReference }) {
               <span className="border border-border bg-secondary px-1.5 py-0.5 text-xs font-bold uppercase tracking-wide text-secondary-foreground">Official video</span>
             )}
             {!video.is_official && (
-              <span className="border border-border bg-muted px-1.5 py-0.5 text-xs font-bold uppercase tracking-wide text-muted-foreground">Fan upload</span>
+              <span className="border border-border bg-muted px-1.5 py-0.5 text-xs font-bold uppercase tracking-wide text-muted-foreground">{video.artist_channel ? "Artist channel" : "Fan upload"}</span>
             )}
           </span>
           <span className="mt-0.5 block text-xs text-muted-foreground">{publisher}</span>

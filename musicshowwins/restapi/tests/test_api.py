@@ -551,10 +551,29 @@ def test_win_api_exposes_only_prefetched_active_references(archive):
         "title",
         "publisher_name",
         "is_official",
+        "artist_channel",
         "published_at",
         "last_verified_at",
     }
     assert "metadata" not in results[1]["references"][0]
+    assert results[1]["references"][0]["artist_channel"] is False
+
+
+@pytest.mark.django_db
+def test_win_api_marks_uploads_from_artist_channels(archive):
+    WinReference.objects.create(
+        win=Win.objects.order_by("date").first(),
+        reference_type="video",
+        provider="youtube",
+        external_id="own",
+        url="https://www.youtube.com/watch?v=own",
+        publisher_name="BLACKPINK",
+        publisher_external_id="UCOmHUn--16B90oW2L6FRR3A",
+    )
+
+    results = APIClient().get("/api/v1/wins?ordering=date").data["results"]
+
+    assert results[0]["references"][0]["artist_channel"] is True
 
 
 @pytest.mark.django_db
