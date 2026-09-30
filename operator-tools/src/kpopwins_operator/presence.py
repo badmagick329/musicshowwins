@@ -28,6 +28,18 @@ _WINNER_ARTIST_RE = re.compile(r"^#+\s*\[?(.+?)\s+-\s+", re.M)
 _WINNER_HEADING_RE = re.compile(r"(?im)^#+\s*winner\s*$")
 
 
+# Broadcasts that aired a different week's episode. Music Bank's 2025-03-28
+# episode was postponed to 2025-04-04, so that date's Reddit page documents the
+# 03-28 win, while the 04-04 winner was only announced online (Soompi,
+# 2025-04-04) and has no broadcast to have performed on.
+EPISODE_WIN_OVERRIDES = {("music-bank", "2025-04-04"): ("music-bank", "2025-03-28")}
+
+
+def _win_key(show: str | None, episode_date: str | None) -> tuple:
+    key = (show, episode_date)
+    return EPISODE_WIN_OVERRIDES.get(key, key)
+
+
 @dataclass
 class PresenceCounts:
     performed: int = 0
@@ -93,7 +105,7 @@ def build_presence(
     counts = PresenceCounts()
     entries = {}
     for episode in report["episodes"]:
-        key = (episode.get("show_slug"), episode.get("win_date"))
+        key = _win_key(episode.get("show_slug"), episode.get("win_date"))
         if episode.get("has_local_win") is not True or key not in artists:
             continue
         markdown = _read_cached_page(config, _page_path(episode["episode_url"]))

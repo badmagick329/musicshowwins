@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pytest
 
-from kpopwins_operator.presence import winner_performed
+from kpopwins_operator.presence import _win_key, winner_performed
 
 LINEUP = """## LINEUP
 
@@ -54,3 +54,8 @@ def test_winner_named_only_in_winner_section_is_absent():
 def test_missing_winner_section_is_unknown():
     markdown = page([*OTHERS, "KARD (카드)"], "X").split("## WINNER")[0]
     assert winner_performed(markdown, "Suho") is None
+
+
+def test_postponed_episode_documents_the_win_it_aired():
+    assert _win_key("music-bank", "2025-04-04") == ("music-bank", "2025-03-28")
+    assert _win_key("music-bank", "2025-04-11") == ("music-bank", "2025-04-11")
