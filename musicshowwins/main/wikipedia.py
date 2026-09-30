@@ -58,6 +58,7 @@ NO_BROADCAST_MARKERS = (
     "special broadcast",
     "special edition",
     "episode special",
+    "no.1 special",
     "episode did not air",
     "episode did not occur",
     "not held",

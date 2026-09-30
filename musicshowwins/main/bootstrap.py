@@ -11,7 +11,7 @@ from main.models import normalize_key
 
 MANIFEST_PATH = Path(__file__).resolve().parent / "data" / "bootstrap_cleanup.json"
 RAW_COUNTS = {"shows": 6, "artists": 296, "songs": 901, "wins": 2965}
-CLEAN_COUNTS = {"shows": 6, "artists": 292, "songs": 882, "wins": 2905}
+CLEAN_COUNTS = {"shows": 6, "artists": 291, "songs": 881, "wins": 2905}
 
 MUSIC_CORE_2016_EVIDENCE = (
     "Music Core rankings were abolished in November 2015 and did not return "

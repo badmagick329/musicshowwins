@@ -84,6 +84,22 @@ def test_parser_skips_episode_special_placeholder_before_rowspan_winner():
     ]
 
 
+def test_parser_skips_no1_special_episode_listed_as_a_winner():
+    html = """
+    <table><tr><th>Date</th><th>Artist</th><th>Song</th></tr>
+      <tr><td>August 9</td><td>Twice</td><td>Dance the Night Away</td></tr>
+      <tr><td>August 16</td><td>M Countdown No.1 Special</td>
+          <td>M Countdown No.1 Special</td></tr>
+    </table>
+    """
+
+    rows = parse_wikipedia_html(html, 2018)
+
+    assert [(row.date.isoformat(), row.artist) for row in rows] == [
+        ("2018-08-09", "Twice")
+    ]
+
+
 def test_parser_rejects_different_winners_on_the_same_date_as_one_page_failure():
     html = """
     <table><tr><th>Date</th><th>Artist</th><th>Song</th></tr>

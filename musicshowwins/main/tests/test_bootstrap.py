@@ -23,8 +23,8 @@ def test_bootstrap_restores_exact_domain_dataset(capsys):
     call_command("restore_bootstrap")
 
     assert MusicShow.objects.count() == 6
-    assert Artist.objects.count() == 292
-    assert Song.objects.count() == 882
+    assert Artist.objects.count() == 291
+    assert Song.objects.count() == 881
     assert Win.objects.count() == 2905
     assert ArtistAlias.objects.count() == 4
     assert not SourcePage.objects.exists()
