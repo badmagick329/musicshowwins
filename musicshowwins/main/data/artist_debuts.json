@@ -125,8 +125,8 @@
     },
     {
       "artist": "bibi",
-      "debut": "2019",
-      "source": "Wikipedia: Bibi (singer) / Wikidata: Q65060693"
+      "debut": "2019-05-15",
+      "source": "Wikipedia: Bibi (singer) / Wikidata: Q65060693; manual review 2026-09-30"
     },
     {
       "artist": "big-bang",
@@ -310,14 +310,15 @@
     },
     {
       "artist": "eunhyuk",
-      "debut": "2025",
+      "debut": "2025-01-27",
       "source": "Wikipedia: Eunhyuk / Wikidata: Q483161; manual review 2026-09-30",
       "solo": true
     },
     {
       "artist": "evan",
-      "debut": "2020",
-      "source": "Wikipedia: Evan (singer) / Wikidata: Q105717901"
+      "debut": "2026-06-22",
+      "source": "Wikipedia: Evan (singer) / Wikidata: Q105717901; manual review 2026-09-30",
+      "solo": true
     },
     {
       "artist": "everglow",
@@ -455,8 +456,8 @@
     },
     {
       "artist": "han-dong-geun",
-      "debut": "2014",
-      "source": "Wikipedia: Han Dong-geun / Wikidata: Q12623951"
+      "debut": "2014-09-30",
+      "source": "Wikipedia: Han Dong-geun / Wikidata: Q12623951; manual review 2026-09-30"
     },
     {
       "artist": "han-seung-woo",
@@ -497,8 +498,8 @@
     },
     {
       "artist": "hyukoh",
-      "debut": "2014",
-      "source": "Wikipedia: Hyukoh / Wikidata: Q20668424"
+      "debut": "2014-09-18",
+      "source": "Wikipedia: Hyukoh / Wikidata: Q20668424; manual review 2026-09-30"
     },
     {
       "artist": "hyuna",
@@ -781,11 +782,6 @@
       "source": "Wikipedia: Le Sserafim / Wikidata: Q111381707"
     },
     {
-      "artist": "lee-chan-won",
-      "debut": "2020",
-      "source": "Wikipedia: Lee Chan-won / Wikidata: Q92756882"
-    },
-    {
       "artist": "lee-gi-kwang",
       "debut": "2009-04-04",
       "source": "Wikipedia: Lee Gi-kwang / Wikidata: Q10919869"
@@ -800,16 +796,6 @@
       "debut": "2015",
       "source": "Wikipedia: Lee Hong-gi / Wikidata: Q484834; manual review 2026-09-30",
       "solo": true
-    },
-    {
-      "artist": "lee-mu-jin",
-      "debut": "2018",
-      "source": "Wikipedia: Lee Mu-jin / Wikidata: Q107109529"
-    },
-    {
-      "artist": "lee-young-ji",
-      "debut": "2019",
-      "source": "Wikipedia: Lee Young-ji / Wikidata: Q96873744"
     },
     {
       "artist": "leo",
@@ -1000,7 +986,7 @@
     },
     {
       "artist": "nuest-w",
-      "debut": "2017",
+      "debut": "2017-10-10",
       "source": "Wikipedia: NU'EST W / Wikidata: Q55736833; manual review 2026-09-30"
     },
     {
@@ -1173,7 +1159,7 @@
     },
     {
       "artist": "ss301",
-      "debut": "2016",
+      "debut": "2008",
       "source": "Wikipedia: Double S 301 / Wikidata: Q22971816; manual review 2026-09-30"
     },
     {
