@@ -2683,6 +2683,98 @@
           "url": "https://www.soompi.com/article/1447944wpp/kyoungseo-takes-1st-win-for-shiny-star-on-inkigayo"
         }
       ]
+    },
+    {
+      "matching_state": "matched",
+      "status": "published",
+      "event": {
+        "show": "the-show",
+        "date": "2018-08-14",
+        "artist": "DIA",
+        "song": "Woo Woo"
+      },
+      "heading": "DIA’s first trophy came three years after debut",
+      "body": "DIA debuted in September 2015 and went through lineup changes, a long hiatus and modest chart results before “Woo Woo” won The Show on August 14, 2018, narrowly ahead of VIXX’s Leo. The members burst into tears as the result was announced live, and later spoke of the anxiety of still waiting for success three years in.",
+      "citations": [
+        {
+          "provider": "joongang",
+          "publisher_name": "Korea JoongAng Daily",
+          "title": "After first music show win, DIA is ready for more",
+          "url": "https://www.koreajoongangdaily.com/korea/after-first-music-show-win-dia-is-ready-for-more/11001394"
+        },
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "DIA Opens Up About 1st Music Show Win",
+          "url": "https://www.soompi.com/article/1218941wpp/dia-opens-1st-music-show-win"
+        }
+      ]
+    },
+    {
+      "matching_state": "matched",
+      "status": "published",
+      "event": {
+        "show": "inkigayo",
+        "date": "2016-01-03",
+        "artist": "Turbo",
+        "song": "Again"
+      },
+      "heading": "Turbo’s reunion won Inkigayo without promotions",
+      "body": "Turbo disbanded after its fifth album in 2000. Its reunion album Again, the group’s first in nearly 16 years, produced a title track that won Inkigayo on January 3, 2016 without music-show promotions.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "Weekly K-Pop Music Chart 2016 – January Week 2",
+          "url": "https://www.soompi.com/article/808657wpp/weekly-k-pop-music-chart-2016-january-week-2"
+        }
+      ]
+    },
+    {
+      "matching_state": "matched",
+      "status": "published",
+      "event": {
+        "show": "inkigayo",
+        "date": "2026-09-06",
+        "artist": "Big Bang",
+        "song": "Biiig"
+      },
+      "heading": "BIGBANG won in its 20th-anniversary year without performing",
+      "body": "During its 20th-anniversary XX: Cosmos world tour, BIGBANG won Inkigayo on September 6, 2026 with “BiiiG,” a hip-hop track co-written by G-Dragon, without appearing on the broadcast. It scored 5,351 points against ATEEZ’s “BAD” and ALPHA DRIVE ONE’s “BORN DIRE.”",
+      "citations": [
+        {
+          "provider": "specialtimes",
+          "publisher_name": "Special Times",
+          "title": "BigBang reaches No. 1 on 'Inkigayo' without broadcast",
+          "url": "https://global.specialtimes.co.kr/news/bigbang-inkigayo-number-one-big"
+        },
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "Watch: BIGBANG Takes 1st Win For “BiiiG” On “Inkigayo”",
+          "url": "https://www.soompi.com/article/1868400wpp/watch-bigbang-takes-1st-win-for-biiig-on-inkigayo-performances-by-monsta-x-chungha-and-more"
+        }
+      ]
+    },
+    {
+      "matching_state": "matched",
+      "status": "published",
+      "event": {
+        "show": "music-core",
+        "date": "2014-04-05",
+        "artist": "Park Hyo-shin",
+        "song": "Wild Flower"
+      },
+      "heading": "Park Hyo-shin’s return topped a top three with no idols",
+      "body": "“Wild Flower,” Park Hyo-shin’s first release in four years, won Music Core on April 5, 2014 ahead of Lee Sun-hee’s “Meet Him Among Them” and Lim Chang-jung’s “Ordinary Song,” a top three with no idol acts.",
+      "citations": [
+        {
+          "provider": "soompi",
+          "publisher_name": "Soompi",
+          "title": "Music Core 04.05.14: Park Hyo Shin’s “Wild Flower” Wins",
+          "url": "https://www.soompi.com/article/595883wpp/music-core-04-05-14-park-hyo-shins-wild-flower-wins"
+        }
+      ]
     }
   ]
 }
