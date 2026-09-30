@@ -1,4 +1,4 @@
-from main.models import Artist, MusicShow, Song, Win, WinReference
+from main.models import Artist, EpisodeStatus, MusicShow, Song, Win, WinReference
 from rest_framework import serializers
 
 
@@ -207,3 +207,11 @@ class SongLeaderboardSerializer(serializers.Serializer):
     rank = serializers.IntegerField()
     wins = serializers.IntegerField(source="win_count")
     song = SongSummarySerializer(source="*")
+
+
+class EpisodeStatusSerializer(serializers.ModelSerializer):
+    show = serializers.SlugRelatedField(slug_field="slug", read_only=True)
+
+    class Meta:
+        model = EpisodeStatus
+        fields = ("show", "date", "status")

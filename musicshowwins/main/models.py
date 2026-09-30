@@ -181,6 +181,48 @@ class Win(models.Model):
         return f"{self.show.name} - {self.song} - {self.date}"
 
 
+class EpisodeStatus(models.Model):
+    """A scheduled episode the source lists without a winner.
+
+    Lets This week say why a day has no result instead of implying one is
+    missing. A win on the same show and date always supersedes it.
+    """
+
+    LABEL_MAX_LENGTH = 200
+
+    class Status(models.TextChoices):
+        NOT_AIRED = "not_aired", "Not aired"
+        SPECIAL = "special", "Special episode, no chart"
+        NO_WINNER = "no_winner", "No winner announced"
+
+    show = models.ForeignKey(
+        MusicShow, on_delete=models.CASCADE, related_name="episode_statuses"
+    )
+    date = models.DateField()
+    status = models.CharField(max_length=20, choices=Status.choices)
+    # The source's own wording, kept for review; pages show only the status.
+    label = models.CharField(max_length=LABEL_MAX_LENGTH, blank=True)
+    source_page = models.ForeignKey(
+        "SourcePage",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="episode_statuses",
+    )
+    source_revision = models.CharField(max_length=80, blank=True)
+
+    class Meta:
+        ordering = ("-date", "show__name")
+        constraints = [
+            models.UniqueConstraint(
+                fields=("show", "date"), name="unique_episode_status_show_date"
+            )
+        ]
+
+    def __str__(self):
+        return f"{self.show.name} {self.date}: {self.get_status_display()}"
+
+
 class WinReference(models.Model):
     class ReferenceType(models.TextChoices):
         VIDEO = "video", "Video"

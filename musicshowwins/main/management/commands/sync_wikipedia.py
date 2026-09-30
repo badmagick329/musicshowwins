@@ -133,7 +133,9 @@ class Command(BaseCommand):
                     f"exact_matches={report.exact_matches}; "
                     f"additions={report.additions}; "
                     f"conflicts={report.conflicts}; "
-                    f"missing_legacy={report.missing_legacy}"
+                    f"missing_legacy={report.missing_legacy}; "
+                    f"episodes={report.episodes}; "
+                    f"episodes_changed={report.episodes_changed}"
                 )
                 if report.failure:
                     details += f"; failure={report.failure}"

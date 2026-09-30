@@ -10,6 +10,7 @@ from django.core.cache import cache
 from main.models import (
     Artist,
     ArtistAlias,
+    EpisodeStatus,
     ImportIssue,
     MusicShow,
     RetiredArtistSlug,
@@ -464,7 +465,9 @@ def test_win_milestones_count_the_whole_catalogue_despite_filters(archive):
     ]
     assert filtered.data["results"][0]["id"] == tied.pk
 
-    bank = client.get("/api/v1/wins", {"artist": artist_a.pk, "show": show.slug, "ordering": "date"})
+    bank = client.get(
+        "/api/v1/wins", {"artist": artist_a.pk, "show": show.slug, "ordering": "date"}
+    )
     assert [row["milestones"] for row in bank.data["results"]] == [
         {"song_win": 1, "song_show_win": 1, "artist_win": 1},
         {"song_win": 2, "song_show_win": 2, "artist_win": 2},
@@ -841,3 +844,23 @@ def test_artist_detail_resolves_retired_slug_to_merged_artist(archive):
     assert response.status_code == 200
     assert response.data["slug"] == "alpha"
     assert response.data == APIClient().get("/api/v1/artists/alpha").data
+
+
+@pytest.mark.django_db
+def test_episode_statuses_are_listed_for_a_bounded_date_range():
+    cache.clear()
+    show = MusicShow.objects.create(slug="music-core", name="Show! Music Core")
+    EpisodeStatus.objects.create(show=show, date=date(2026, 9, 26), status="not_aired")
+    EpisodeStatus.objects.create(show=show, date=date(2026, 8, 1), status="special")
+    client = APIClient()
+
+    response = client.get(
+        "/api/v1/episodes", {"date_from": "2026-09-21", "date_to": "2026-09-27"}
+    )
+    assert response.data["results"] == [
+        {"show": "music-core", "date": "2026-09-26", "status": "not_aired"}
+    ]
+    assert client.get("/api/v1/episodes").status_code == 400
+    too_long = {"date_from": "2026-01-01", "date_to": "2026-03-01"}
+    assert client.get("/api/v1/episodes", too_long).status_code == 400
+    cache.clear()

@@ -7,7 +7,7 @@ from django.conf import settings
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import extend_schema
-from main.models import RetiredArtistSlug
+from main.models import EpisodeStatus, RetiredArtistSlug
 from main.services import (
     all_artists_queryset,
     all_songs_queryset,
@@ -32,6 +32,7 @@ from .serializers import (
     ArtistLeaderboardSerializer,
     ArtistSerializer,
     CorrectionSerializer,
+    EpisodeStatusSerializer,
     ShowSerializer,
     SitemapSerializer,
     SongDetailSerializer,
@@ -286,6 +287,29 @@ class WinList(generics.ListAPIView):
             self.request,
             {"date", "id", "show__name", "song__title", "song__artist__name"},
             "-date",
+        )
+
+
+class EpisodeStatusList(generics.ListAPIView):
+    """Episodes without a winner in a short date range, for the This week view."""
+
+    serializer_class = EpisodeStatusSerializer
+    MAX_RANGE_DAYS = 31
+
+    def get_queryset(self):
+        params = self.request.query_params
+        date_from = _date(params.get("date_from"), "date_from")
+        date_to = _date(params.get("date_to"), "date_to")
+        if date_from is None or date_to is None:
+            raise ValidationError({"date_range": "date_from and date_to are required."})
+        if date_from > date_to or (date_to - date_from).days > self.MAX_RANGE_DAYS:
+            raise ValidationError(
+                {"date_range": f"Use a range of at most {self.MAX_RANGE_DAYS} days."}
+            )
+        return (
+            EpisodeStatus.objects.select_related("show")
+            .filter(date__range=(date_from, date_to))
+            .order_by("date", "show__slug")
         )
 
 

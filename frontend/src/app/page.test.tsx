@@ -5,7 +5,7 @@ vi.mock("@/lib/api", () => ({
   getHomeData: vi.fn(async () => ({
     artists: [],
     songs: [],
-    week: { start: "2026-09-14", end: "2026-09-20", current: false, wins: [{ id: 9, date: "2026-09-20", show: { id: 6, slug: "inkigayo", name: "Inkigayo", active: true }, song: { id: 4, title: "Bad", artist: { id: 2, slug: "ateez", name: "Ateez" }, total_wins: 7, winning_shows: 4, latest_win_date: "2026-09-20" }, references: [], milestones: { song_win: 7, song_show_win: 3, artist_win: 40 } }] },
+    week: { start: "2026-09-14", end: "2026-09-20", current: false, wins: [{ id: 9, date: "2026-09-20", show: { id: 6, slug: "inkigayo", name: "Inkigayo", active: true }, song: { id: 4, title: "Bad", artist: { id: 2, slug: "ateez", name: "Ateez" }, total_wins: 7, winning_shows: 4, latest_win_date: "2026-09-20" }, references: [], milestones: { song_win: 7, song_show_win: 3, artist_win: 40 } }], episodes: [] },
     shows: [{ id: 5, slug: "music-core", name: "Show! Music Core", active: true }, { id: 6, slug: "inkigayo", name: "Inkigayo", active: true }],
     artistResults: [],
     artistResultCount: 0,

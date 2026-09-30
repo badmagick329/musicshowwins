@@ -24,6 +24,7 @@ from django.utils import timezone
 from main.models import (
     Artist,
     ArtistAlias,
+    EpisodeStatus,
     ImportIssue,
     ImportRun,
     MusicShow,
@@ -68,6 +69,34 @@ NO_BROADCAST_MARKERS = (
     "dream concert",
     "gayo daejun",
     "summer k-pop festival",
+)
+
+# Classify a no-winner row by its label.  Specials aired without a chart;
+# "not aired" labels say no episode went out; anything else (e.g. "No Chart",
+# "No Winner") only says no winner was named.  Special is checked first because
+# labels like "Show Special, No Chart and Winner" name both.
+SPECIAL_EPISODE_MARKERS = (
+    "special",
+    "festival",
+    "concert",
+    "kcon",
+    "mama",
+    "gayo daejun",
+    "highlight episode",
+    "rebroadcast",
+    "pre-record",
+    "no.1",
+    "no. 1",
+)
+NOT_AIRED_MARKERS = (
+    "no broadcast",
+    "no show",
+    "no episode",
+    "did not air",
+    "did not occur",
+    "not held",
+    "cancelled",
+    "canceled",
 )
 
 # Exact title corrections for source presentation shortcuts.  These are kept
@@ -142,6 +171,21 @@ class WinCandidate:
         }
 
 
+@dataclass(frozen=True)
+class EpisodeCandidate:
+    """A dated episode the source lists without a winner."""
+
+    date: date
+    status: str
+    label: str
+
+
+@dataclass(frozen=True)
+class ParsedPage:
+    wins: list[WinCandidate]
+    episodes: list[EpisodeCandidate]
+
+
 @dataclass
 class PageReconciliation:
     """Counts and source records reconciled for a single page."""
@@ -150,6 +194,7 @@ class PageReconciliation:
     exact_matches: int = 0
     conflicts: int = 0
     missing_legacy: int = 0
+    episodes_changed: int = 0
     addition_candidates: list[dict[str, str]] | None = None
     conflict_candidates: list[dict[str, Any]] | None = None
     missing_legacy_candidates: list[dict[str, str]] | None = None
@@ -191,6 +236,8 @@ class PageReport:
     additions: int = 0
     conflicts: int = 0
     missing_legacy: int = 0
+    episodes: int = 0
+    episodes_changed: int = 0
     failure: str | None = None
     addition_candidates: list[dict[str, str]] | None = None
     conflict_candidates: list[dict[str, Any]] | None = None
@@ -216,6 +263,8 @@ class PageReport:
             "additions": self.additions,
             "conflicts": self.conflicts,
             "missing_legacy": self.missing_legacy,
+            "episodes": self.episodes,
+            "episodes_changed": self.episodes_changed,
             "failure": self.failure,
             "addition_candidates": list(self.addition_candidates),
             "conflict_candidates": list(self.conflict_candidates),
@@ -502,6 +551,15 @@ def _is_no_broadcast(values: Iterable[str]) -> bool:
     return any(marker in text for marker in NO_BROADCAST_MARKERS)
 
 
+def _episode_status(label: str) -> str:
+    text = label.casefold()
+    if any(marker in text for marker in SPECIAL_EPISODE_MARKERS):
+        return EpisodeStatus.Status.SPECIAL
+    if any(marker in text for marker in NOT_AIRED_MARKERS):
+        return EpisodeStatus.Status.NOT_AIRED
+    return EpisodeStatus.Status.NO_WINNER
+
+
 def _header_positions(rows: list[list[str]]) -> tuple[int, dict[str, int]] | None:
     for header_index, row in enumerate(rows):
         positions: dict[str, int] = {}
@@ -609,7 +667,29 @@ def _normalize_known_source_credit(artist: str, song: str) -> tuple[str, str]:
     return artist, song
 
 
-def _candidate_rows(table: Any, year: int) -> list[WinCandidate]:
+def _episode_candidate(
+    values: list[str], positions: dict[str, int], year: int
+) -> EpisodeCandidate | None:
+    """Keep a no-winner row only when it names one date inside the page's year."""
+
+    if len(values) <= positions["date"]:
+        return None
+    parsed_date = _parse_date(values[positions["date"]], year)
+    if parsed_date is None or parsed_date.year != year:
+        return None
+    label = " ".join(
+        dict.fromkeys(
+            cleaned
+            for index, value in enumerate(values)
+            if index != positions["date"] and (cleaned := _clean_cell(value))
+        )
+    )[: EpisodeStatus.LABEL_MAX_LENGTH]
+    return EpisodeCandidate(parsed_date, _episode_status(label), label)
+
+
+def _candidate_rows(
+    table: Any, year: int
+) -> tuple[list[WinCandidate], list[EpisodeCandidate]]:
     rows = _expanded_rows(table)
     header = _header_positions(rows)
     if header is None:
@@ -617,12 +697,16 @@ def _candidate_rows(table: Any, year: int) -> list[WinCandidate]:
     header_index, positions = header
 
     candidates: list[WinCandidate] = []
+    episodes: list[EpisodeCandidate] = []
     for values in rows[header_index + 1 :]:
         if sum(bool(_clean_cell(value)) for value in values) == 0:
             continue
         if sum(_label(value) in {"date", "artist", "song"} for value in values) >= 2:
             continue
         if _is_no_broadcast(values):
+            episode = _episode_candidate(values, positions, year)
+            if episode is not None:
+                episodes.append(episode)
             continue
         largest = max(positions.values())
         if len(values) <= largest:
@@ -650,10 +734,10 @@ def _candidate_rows(table: Any, year: int) -> list[WinCandidate]:
 
     if not candidates:
         raise WikipediaParseError("Wins table contains no valid wins")
-    return candidates
+    return candidates, episodes
 
 
-def parse_wikipedia_html(html: str, year: int) -> list[WinCandidate]:
+def parse_wikipedia_html(html: str, year: int) -> ParsedPage:
     """Parse and validate the complete Date/Artist/Song source page."""
 
     if year < MIN_YEAR:
@@ -679,8 +763,11 @@ def parse_wikipedia_html(html: str, year: int) -> list[WinCandidate]:
         selected = identified
 
     candidates: list[WinCandidate] = []
+    episode_rows: list[EpisodeCandidate] = []
     for table, _ in selected:
-        candidates.extend(_candidate_rows(table, year))
+        table_wins, table_episodes = _candidate_rows(table, year)
+        candidates.extend(table_wins)
+        episode_rows.extend(table_episodes)
     keys = [candidate.key for candidate in candidates]
     if len(keys) != len(set(keys)):
         raise WikipediaParseError("Source page contains duplicate wins")
@@ -697,7 +784,13 @@ def parse_wikipedia_html(html: str, year: int) -> list[WinCandidate]:
         raise WikipediaParseError(
             f"Source page contains multiple wins for date(s): {dates}"
         )
-    return candidates
+    # A winner on the same date wins (e.g. a special placeholder above the
+    # rowspan winner); repeated rows for one date keep the first label.
+    episodes: dict[date, EpisodeCandidate] = {}
+    for episode in episode_rows:
+        if episode.date not in date_counts:
+            episodes.setdefault(episode.date, episode)
+    return ParsedPage(candidates, sorted(episodes.values(), key=lambda e: e.date))
 
 
 def _year_bounds(year: int) -> tuple[date, date]:
@@ -798,6 +891,7 @@ class WikipediaImporter:
         spec: SourceSpec,
         page: RevisionPage,
         candidates: list[WinCandidate],
+        episodes: list[EpisodeCandidate],
         run: ImportRun,
     ) -> PageReconciliation:
         result = PageReconciliation()
@@ -886,6 +980,7 @@ class WikipediaImporter:
                     source_page=source,
                     source_revision=page.revision,
                 )
+                EpisodeStatus.objects.filter(show=show, date=candidate.date).delete()
                 result.additions += 1
                 result.addition_candidates.append(candidate.as_dict())
 
@@ -919,8 +1014,52 @@ class WikipediaImporter:
                             "page; it was retained."
                         ),
                     )
+            result.episodes_changed = self._apply_episodes(show, source, page, episodes)
         result.sort_candidates()
         return result
+
+    @staticmethod
+    def _apply_episodes(
+        show: MusicShow,
+        source: SourcePage,
+        page: RevisionPage,
+        episodes: list[EpisodeCandidate],
+    ) -> int:
+        """Record no-winner episodes; statuses missing from the source are kept."""
+
+        won = set(
+            Win.objects.filter(
+                show=show, date__in=[episode.date for episode in episodes]
+            ).values_list("date", flat=True)
+        )
+        existing = {
+            status.date: status
+            for status in EpisodeStatus.objects.filter(
+                show=show, date__in=[episode.date for episode in episodes]
+            )
+        }
+        changed = 0
+        for episode in episodes:
+            if episode.date in won:
+                continue
+            current = existing.get(episode.date)
+            if current and (current.status, current.label) == (
+                episode.status,
+                episode.label,
+            ):
+                continue
+            EpisodeStatus.objects.update_or_create(
+                show=show,
+                date=episode.date,
+                defaults={
+                    "status": episode.status,
+                    "label": episode.label,
+                    "source_page": source,
+                    "source_revision": page.revision,
+                },
+            )
+            changed += 1
+        return changed
 
     def _dry_run_page(
         self,
@@ -1034,7 +1173,8 @@ class WikipediaImporter:
                         )
                         continue
                     html = self.client.html_for_revision(revision_page)
-                    candidates = parse_wikipedia_html(html, spec.year)
+                    parsed = parse_wikipedia_html(html, spec.year)
+                    candidates = parsed.wins
                     if dry_run or not approved:
                         reconciliation = self._dry_run_page(show, spec, candidates)
                         unapproved = not approved
@@ -1052,6 +1192,7 @@ class WikipediaImporter:
                                 revision=revision_page.revision,
                                 status="unapproved" if unapproved else "processed",
                                 source_rows=len(candidates),
+                                episodes=len(parsed.episodes),
                                 exact_matches=reconciliation.exact_matches,
                                 additions=reconciliation.additions,
                                 conflicts=reconciliation.conflicts,
@@ -1067,7 +1208,7 @@ class WikipediaImporter:
                         continue
                     assert run is not None
                     reconciliation = self._apply_page(
-                        show, spec, revision_page, candidates, run
+                        show, spec, revision_page, candidates, parsed.episodes, run
                     )
                     summary.wins_added += reconciliation.additions
                     summary.conflicts_found += reconciliation.conflicts
@@ -1080,6 +1221,8 @@ class WikipediaImporter:
                             revision=revision_page.revision,
                             status="processed",
                             source_rows=len(candidates),
+                            episodes=len(parsed.episodes),
+                            episodes_changed=reconciliation.episodes_changed,
                             exact_matches=reconciliation.exact_matches,
                             additions=reconciliation.additions,
                             conflicts=reconciliation.conflicts,

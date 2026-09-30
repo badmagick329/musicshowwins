@@ -60,7 +60,9 @@ export type WinMilestones = { song_win: number; song_show_win: number; artist_wi
 export type Win = { id: number; date: string; show: ShowSummary; song: Song; performed: boolean | null; references: WinReference[]; moment?: WinMoment | null; milestones: WinMilestones };
 export type ArtistLeaderboardRow = { rank: number; wins: number; artist: Pick<Artist, "id" | "slug" | "name"> };
 export type SongLeaderboardRow = { rank: number; wins: number; song: Pick<Song, "id" | "title" | "artist"> };
-export type ArchiveWeek = { start: string; end: string; current: boolean; wins: Win[] };
+// An episode the source lists without a winner; a win on the same day always takes precedence.
+export type EpisodeStatus = { show: string; date: string; status: "not_aired" | "special" | "no_winner" };
+export type ArchiveWeek = { start: string; end: string; current: boolean; wins: Win[]; episodes: EpisodeStatus[] };
 export type HomeData = {
   artists: ArtistLeaderboardRow[];
   songs: SongLeaderboardRow[];

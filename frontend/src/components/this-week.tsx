@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { ArchiveWeek, Show } from "@/lib/api-shared";
 import { FactLabel, SectionHeading } from "@/components/data-display";
 import { MobileWinVideoDisclosure } from "@/components/win-videos";
-import { buildWeek, formatSlotDay, formatWeekRange } from "@/lib/this-week";
+import { buildWeek, EPISODE_STATUS_TEXT, formatSlotDay, formatWeekRange } from "@/lib/this-week";
 import { cardFacts } from "@/lib/win-facts";
 import { cn } from "@/lib/utils";
 import { artistPath } from "@/lib/paths";
@@ -32,7 +32,7 @@ export function ThisWeek({ week, shows, today }: { week: ArchiveWeek; shows: Sho
               );
             }) : (
               <p className="mt-1 text-sm text-muted-foreground">
-                {slot.status === "upcoming" ? (slot.date === today ? "Airs today" : "Upcoming") : week.current ? "No result yet" : "No result recorded"}
+                {slot.status === "upcoming" ? (slot.date === today ? "Airs today" : "Upcoming") : slot.status === "no-result" ? (week.current ? "No result yet" : "No result recorded") : EPISODE_STATUS_TEXT[slot.status]}
               </p>
             )}
           </li>

@@ -11,6 +11,7 @@ from django.core.management.base import CommandError
 from main.models import (
     Artist,
     ArtistAlias,
+    EpisodeStatus,
     ImportIssue,
     ImportRun,
     MusicShow,
@@ -448,6 +449,8 @@ def test_dry_run_page_report_has_reconciliation_counts(show):
             "additions": 0,
             "conflicts": 0,
             "missing_legacy": 0,
+            "episodes": 0,
+            "episodes_changed": 0,
             "failure": None,
             "addition_candidates": [],
             "conflict_candidates": [],
@@ -689,3 +692,41 @@ def test_local_sync_skips_frontend_but_still_reports_source_failure(monkeypatch)
     monkeypatch.setattr(command_module, "WikipediaImporter", FailedImporter)
     with pytest.raises(CommandError, match="source unavailable"):
         call_command("sync_wikipedia", skip_cache_refresh=True)
+
+
+@pytest.mark.django_db
+def test_sync_records_no_winner_episodes_and_a_later_win_supersedes_them(show):
+    html = wins_html(
+        ("January 2", "Winner", "Song"),
+        ("January 9", "No Broadcast or Winner", "No Broadcast or Winner"),
+        ("January 16", "KCON Special Episode, winners were not announced", ""),
+    )
+    summary = sync(show, FakeClient(html=html))
+
+    assert summary.page_reports[0].episodes_changed == 2
+    assert list(
+        EpisodeStatus.objects.order_by("date").values_list("date", "status")
+    ) == [(date(2026, 1, 9), "not_aired"), (date(2026, 1, 16), "special")]
+
+    # Unchanged statuses are not rewritten; a winner added later replaces one,
+    # and a status the source dropped is kept like any historical row.
+    corrected = wins_html(
+        ("January 2", "Winner", "Song"),
+        ("January 9", "Late Winner", "Late Song"),
+    )
+    summary = sync(show, FakeClient(revision="102", html=corrected))
+    assert summary.page_reports[0].episodes_changed == 0
+    assert list(EpisodeStatus.objects.values_list("date", "status")) == [
+        (date(2026, 1, 16), "special")
+    ]
+    assert Win.objects.filter(date=date(2026, 1, 9)).exists()
+
+
+@pytest.mark.django_db
+def test_dry_run_counts_episodes_without_writing(show):
+    html = wins_html(
+        ("January 2", "Winner", "Song"), ("January 9", "No Winner", "No Winner")
+    )
+    summary = sync(show, FakeClient(html=html), dry_run=True)
+    assert summary.page_reports[0].episodes == 1
+    assert not EpisodeStatus.objects.exists()

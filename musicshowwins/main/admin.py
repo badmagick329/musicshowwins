@@ -13,6 +13,7 @@ from main.cache_invalidation import invalidate_public_archive_cache
 from main.models import (
     Artist,
     ArtistAlias,
+    EpisodeStatus,
     ImportIssue,
     ImportRun,
     MusicShow,
@@ -95,6 +96,14 @@ class ArtistAdmin(admin.ModelAdmin):
 class ArtistAliasAdmin(admin.ModelAdmin):
     list_display = ("alias", "artist", "normalized_name")
     search_fields = ("alias", "normalized_name", "artist__name")
+
+
+@admin.register(EpisodeStatus)
+class EpisodeStatusAdmin(admin.ModelAdmin):
+    list_display = ("date", "show", "status", "label")
+    list_filter = ("show", "status")
+    date_hierarchy = "date"
+    readonly_fields = ("source_page", "source_revision")
 
 
 @admin.register(RetiredArtistSlug)

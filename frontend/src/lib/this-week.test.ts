@@ -42,6 +42,25 @@ describe("this week", () => {
     expect(buildWeek(week, shows, "2026-09-25").filter((slot) => slot.status === "won").map((slot) => slot.slug)).toEqual(["music-core", "inkigayo"]);
   });
 
+  it("explains days without a winner and lets a win override a status", () => {
+    const week = {
+      ...chooseWeek("2026-09-24", [win(1, "2026-09-22", "the-show")], []),
+      episodes: [
+        { show: "the-show", date: "2026-09-22", status: "no_winner" as const },
+        { show: "show-champion", date: "2026-09-23", status: "special" as const },
+        { show: "music-core", date: "2026-09-26", status: "not_aired" as const },
+      ],
+    };
+    expect(buildWeek(week, shows, "2026-09-24").map((slot) => [slot.slug, slot.status])).toEqual([
+      ["the-show", "won"],
+      ["show-champion", "special"],
+      ["m-countdown", "upcoming"],
+      ["music-bank", "upcoming"],
+      ["music-core", "not_aired"],
+      ["inkigayo", "upcoming"],
+    ]);
+  });
+
   it("formats compact ranges and slot days", () => {
     expect(formatWeekRange("2026-09-21", "2026-09-27")).toBe("21–27 Sept");
     expect(formatWeekRange("2026-09-28", "2026-10-04")).toBe("28 Sept – 4 Oct");

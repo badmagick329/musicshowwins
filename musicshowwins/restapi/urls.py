@@ -24,6 +24,7 @@ urlpatterns = [
     re_path(r"^v1/songs/?$", views.SongList.as_view(), name="songs"),
     path("v1/songs/<int:pk>", views.SongDetail.as_view(), name="song-detail"),
     re_path(r"^v1/wins/?$", views.WinList.as_view(), name="wins"),
+    re_path(r"^v1/episodes/?$", views.EpisodeStatusList.as_view(), name="episodes"),
     re_path(
         r"^v1/leaderboards/artists/?$",
         views.ArtistLeaderboard.as_view(),

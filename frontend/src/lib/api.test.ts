@@ -127,9 +127,11 @@ describe("getHomeData", () => {
     expect(data.shows).toEqual([{ id: 1, slug: "music-bank", name: "Music Bank", active: true }]);
     expect(data.errors).toEqual([]);
     expect(data.artistResultCount).toBe(0);
-    expect(fetchMock).toHaveBeenCalledTimes(5);
+    // Five parallel requests, then the chosen week's episode statuses.
+    expect(fetchMock).toHaveBeenCalledTimes(6);
     expect(fetchMock.mock.calls.map(([input]) => String(input))).toEqual(expect.arrayContaining([
       expect.stringMatching(/\/wins\?date_from=2026-09-21&date_to=2026-09-27&ordering=date$/),
+      expect.stringMatching(/\/episodes\?date_from=2026-09-21&date_to=2026-09-27$/),
     ]));
   });
 

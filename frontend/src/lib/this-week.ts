@@ -1,4 +1,4 @@
-import type { ArchiveWeek, Show, Win } from "@/lib/api-shared";
+import type { ArchiveWeek, EpisodeStatus, Show, Win } from "@/lib/api-shared";
 
 // Regular broadcast days (ISO weekday, Monday = 1). Specials on other days still
 // appear under their show because slots match by show, not by date.
@@ -11,7 +11,7 @@ export const BROADCAST_SCHEDULE = [
   { slug: "inkigayo", weekday: 7 },
 ] as const;
 
-export type WeekSlot = { slug: string; name: string; date: string; status: "won" | "upcoming" | "no-result"; wins: Win[] };
+export type WeekSlot = { slug: string; name: string; date: string; status: "won" | "upcoming" | "no-result" | EpisodeStatus["status"]; wins: Win[] };
 
 /** Broadcast weeks follow Korean dates, not the server's timezone. */
 export function koreaToday(now = new Date()) {
@@ -32,21 +32,29 @@ export function weekStart(date: string) {
 /** The current week once it has a result; otherwise the latest week that does, so the section is never empty. */
 export function chooseWeek(today: string, currentWins: Win[], latestWins: Win[]): ArchiveWeek {
   const start = weekStart(today);
-  if (currentWins.length || !latestWins.length) return { start, end: addDays(start, 6), current: true, wins: currentWins };
+  if (currentWins.length || !latestWins.length) return { start, end: addDays(start, 6), current: true, wins: currentWins, episodes: [] };
   const latestStart = weekStart(latestWins.reduce((latest, win) => (win.date > latest ? win.date : latest), latestWins[0].date));
   const end = addDays(latestStart, 6);
-  return { start: latestStart, end, current: false, wins: latestWins.filter((win) => win.date >= latestStart && win.date <= end) };
+  return { start: latestStart, end, current: false, wins: latestWins.filter((win) => win.date >= latestStart && win.date <= end), episodes: [] };
 }
 
 export function buildWeek(week: ArchiveWeek, shows: Show[], today: string): WeekSlot[] {
   const names = new Map(shows.map((show) => [show.slug, show.name]));
   return BROADCAST_SCHEDULE.filter((entry) => names.has(entry.slug)).map(({ slug, weekday }) => {
     const wins = week.wins.filter((win) => win.show.slug === slug).toSorted((a, b) => a.date.localeCompare(b.date));
-    const date = wins[0]?.date ?? addDays(week.start, weekday - 1);
-    const status = wins.length ? "won" : date >= today ? "upcoming" : "no-result";
+    const episode = week.episodes.find((item) => item.show === slug);
+    const date = wins[0]?.date ?? episode?.date ?? addDays(week.start, weekday - 1);
+    const status = wins.length ? "won" : episode ? episode.status : date >= today ? "upcoming" : "no-result";
     return { slug, name: names.get(slug)!, date, status, wins };
   });
 }
+
+// Worded to stay true for every source label the status was classified from.
+export const EPISODE_STATUS_TEXT: Record<EpisodeStatus["status"], string> = {
+  not_aired: "No broadcast",
+  special: "Special episode, no winner",
+  no_winner: "No winner announced",
+};
 
 export function formatWeekRange(start: string, end: string) {
   const day = (value: string) => new Intl.DateTimeFormat("en-GB", { day: "numeric", timeZone: "UTC" }).format(new Date(`${value}T00:00:00Z`));

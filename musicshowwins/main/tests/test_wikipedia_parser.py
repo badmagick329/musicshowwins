@@ -77,7 +77,7 @@ def test_parser_skips_episode_special_placeholder_before_rowspan_winner():
     </table>
     """
 
-    rows = parse_wikipedia_html(html, 2014)
+    rows = parse_wikipedia_html(html, 2014).wins
 
     assert [(row.date.isoformat(), row.artist, row.song) for row in rows] == [
         ("2014-03-08", "TVXQ", "Spellbound")
@@ -93,7 +93,7 @@ def test_parser_skips_no1_special_episode_listed_as_a_winner():
     </table>
     """
 
-    rows = parse_wikipedia_html(html, 2018)
+    rows = parse_wikipedia_html(html, 2018).wins
 
     assert [(row.date.isoformat(), row.artist) for row in rows] == [
         ("2018-08-09", "Twice")
@@ -123,7 +123,7 @@ def test_parser_removes_surrounding_song_quotes_only():
     </table>
     """
 
-    rows = parse_wikipedia_html(html, 2025)
+    rows = parse_wikipedia_html(html, 2025).wins
 
     assert [(row.artist, row.song) for row in rows] == [
         ("Alpha & Beta feat. Gamma", "Friday"),
@@ -145,7 +145,7 @@ def test_parser_removes_only_the_known_korean_version_presentation_suffix():
     </table>
     """
 
-    rows = parse_wikipedia_html(html, 2024)
+    rows = parse_wikipedia_html(html, 2024).wins
 
     assert [(row.artist, row.song) for row in rows] == [
         ("NCT WISH", "Wish"),
@@ -167,7 +167,7 @@ def test_parser_removes_named_presentation_artifacts_without_global_title_rules(
     </table>
     """
 
-    rows = parse_wikipedia_html(html, 2025)
+    rows = parse_wikipedia_html(html, 2025).wins
 
     assert [(row.artist, row.song) for row in rows] == [
         ("WayV", "Frequency (Korean Ver.)"),
@@ -185,7 +185,7 @@ def test_parser_applies_the_explicit_that_that_credit_move_only():
     </table>
     """
 
-    rows = parse_wikipedia_html(html, 2025)
+    rows = parse_wikipedia_html(html, 2025).wins
 
     assert [(row.artist, row.song) for row in rows] == [
         ("Psy feat. Suga", "That That"),
@@ -251,7 +251,7 @@ def test_parser_applies_the_explicit_that_that_credit_move_only():
 )
 def test_parser_accepts_representative_layout_for_each_show(show_slug, html, expected):
     assert show_slug
-    rows = parse_wikipedia_html(html, 2025)
+    rows = parse_wikipedia_html(html, 2025).wins
     assert [(row.date.isoformat(), row.artist, row.song) for row in rows] == expected
 
 
@@ -281,7 +281,7 @@ def test_shared_page_selects_requested_year_section():
       <tr><td>February 6</td><td>Right Artist</td><td>Right Song</td></tr></table>
     """
 
-    rows = parse_wikipedia_html(html, 2014)
+    rows = parse_wikipedia_html(html, 2014).wins
 
     assert [(row.artist, row.song) for row in rows] == [("Right Artist", "Right Song")]
 
@@ -306,7 +306,7 @@ def test_multiple_requested_year_tables_are_merged_and_validated_together():
       <tr><td>February 6</td><td>Second Artist</td><td>Second Song</td></tr></table>
     """
 
-    rows = parse_wikipedia_html(html, 2014)
+    rows = parse_wikipedia_html(html, 2014).wins
 
     assert len(rows) == 2
     assert {row.artist for row in rows} == {"First Artist", "Second Artist"}
@@ -366,3 +366,45 @@ def test_source_title_handles_dedicated_and_shared_pages(slug, year, expected):
 )
 def test_source_title_routes_supported_year_boundaries(slug, year, expected):
     assert source_title(slug, year) == expected
+
+
+def test_parser_classifies_no_winner_rows_as_episode_statuses():
+    html = """
+    <table><tr><th>Date</th><th>Artist</th><th>Song</th></tr>
+      <tr><td>January 5</td><td>Alpha</td><td>Song</td></tr>
+      <tr><td>January 12</td><td colspan="2">No Broadcast or Winner</td></tr>
+      <tr><td>January 19</td><td colspan="2">No show, winner not announced</td></tr>
+      <tr><td>January 26</td>
+          <td colspan="2">MAMA Special Broadcast, winners were not announced</td></tr>
+      <tr><td>February 2</td><td colspan="2">Show Special, No Chart and Winner</td></tr>
+      <tr><td>February 9</td><td colspan="2">No Chart</td></tr>
+      <tr><td>February 9</td><td colspan="2">No Winner</td></tr>
+      <tr><td colspan="3">
+          No show, winners were not announced (September 9 – November 18)</td></tr>
+      <tr><td>December 30, 2024</td><td colspan="2">No show</td></tr>
+    </table>
+    """
+
+    page = parse_wikipedia_html(html, 2025)
+
+    assert [(row.date.isoformat(), row.status) for row in page.episodes] == [
+        ("2025-01-12", "not_aired"),
+        ("2025-01-19", "not_aired"),
+        ("2025-01-26", "special"),
+        ("2025-02-02", "special"),
+        ("2025-02-09", "no_winner"),
+    ]
+    assert page.episodes[0].label == "No Broadcast or Winner"
+
+
+def test_parser_drops_an_episode_status_on_a_date_with_a_winner():
+    html = """
+    <table class="wikitable">
+      <tr><th>Date</th><th>Artist</th><th>Song</th><th>Score</th></tr>
+      <tr><td rowspan="2">March 8</td>
+          <td class="table-na" colspan="3">Music Core 400th Episode Special</td></tr>
+      <tr><td>TVXQ</td><td>Spellbound</td><td>9,050</td></tr>
+    </table>
+    """
+
+    assert parse_wikipedia_html(html, 2014).episodes == []

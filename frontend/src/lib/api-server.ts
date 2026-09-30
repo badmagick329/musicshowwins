@@ -12,6 +12,7 @@ import {
   type Artist,
   type ArtistDetail,
   type ArtistLeaderboardRow,
+  type EpisodeStatus,
   type HomeData,
   type Show,
   type Song,
@@ -133,13 +134,15 @@ export async function getHomeData(search = "", rankingsPeriod: "year" | "all-tim
     safePage<Show>("Music shows", "/shows"),
     search.trim() ? safePage<Artist>("Artist search", "/artists", { search: search.trim(), ordering: artistOrderings.wins, page: 1 }) : Promise.resolve({ page: { count: 0, next: null, previous: null, results: [] } as ApiPage<Artist>, error: undefined }),
   ]);
+  const chosen = chooseWeek(koreaDate, currentWins.page.results, latestWins.page.results);
+  const episodes = await safePage<EpisodeStatus>("Episode status", "/episodes", { date_from: chosen.start, date_to: chosen.end });
   return {
     artists: artists.page.results,
     songs: songs.page.results,
-    week: chooseWeek(koreaDate, currentWins.page.results, latestWins.page.results),
+    week: { ...chosen, episodes: episodes.page.results },
     shows: shows.page.results,
     artistResults: artistResults.page.results.slice(0, 8),
     artistResultCount: artistResults.page.count,
-    errors: [artists.error, songs.error, currentWins.error, latestWins.error, shows.error, artistResults.error].filter((error): error is string => Boolean(error)),
+    errors: [artists.error, songs.error, currentWins.error, latestWins.error, shows.error, artistResults.error, episodes.error].filter((error): error is string => Boolean(error)),
   };
 }
