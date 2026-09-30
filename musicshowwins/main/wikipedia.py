@@ -79,6 +79,8 @@ CANONICAL_SONG_TITLES = {
         "jimin",
         "smeraldo garden marching band",
     ): "Smeraldo Garden Marching Band (feat. Loco)",
+    # Wikipedia lists the album; the title track is 꺾어.
+    ("young tak", "gogo"): "Kkeokgeo",
 }
 
 

@@ -255,6 +255,7 @@ def test_exact_historical_title_shortcuts_match_canonical_songs(show):
         ("January 3", "Zico", "Spot!"),
         ("January 10", "Lee Young-ji", "Small Girl"),
         ("January 17", "Jimin", "Smeraldo Garden Marching Band"),
+        ("January 24", "Young Tak", "Gogo"),
     )
     canonical = (
         ("Zico", "SPOT! (feat. JENNIE)", date(2026, 1, 3)),
@@ -264,6 +265,7 @@ def test_exact_historical_title_shortcuts_match_canonical_songs(show):
             "Smeraldo Garden Marching Band (feat. Loco)",
             date(2026, 1, 17),
         ),
+        ("Young Tak", "Kkeokgeo", date(2026, 1, 24)),
     )
     for artist_name, title, win_date in canonical:
         artist = Artist.objects.create(name=artist_name)
@@ -274,7 +276,7 @@ def test_exact_historical_title_shortcuts_match_canonical_songs(show):
 
     assert summary.wins_added == 0
     assert summary.conflicts_found == 0
-    assert Song.objects.filter(title__in=[row[1] for row in canonical]).count() == 3
+    assert Song.objects.filter(title__in=[row[1] for row in canonical]).count() == 4
     assert ImportIssue.objects.count() == 0
 
 
