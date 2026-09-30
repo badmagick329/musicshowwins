@@ -81,6 +81,21 @@ CANONICAL_SONG_TITLES = {
     ): "Smeraldo Garden Marching Band (feat. Loco)",
     # Wikipedia lists the album; the title track is 꺾어.
     ("young tak", "gogo"): "Kkeokgeo",
+    # Show pages spell one song differently; each maps to the merged title.
+    ("girls' generation", "mr. mr."): "Mr.Mr.",
+    ("exid", "l.i.e"): "L.I.E.",
+    ("nu'est", "i’m in trouble"): "I'm in Trouble",
+    ("hyuna", "how's this"): "How's This?",
+    ("epik high", "love drunk"): "Lovedrunk",
+    ("niel", "love killer"): "Lovekiller",
+    ("niel", "lovekiller (bad girl)"): "Lovekiller",
+    ("(g)i-dle", "hann"): "Hann (Alone)",
+    ("oh my girl", "bungee"): "Bungee (Fall in Love)",
+    ("i.o.i", "whatta man (good man)"): "Whatta Man",
+    ("shinhwa", "sniper (target)"): "Sniper",
+    ("nct u", "universe"): "Universe (Let's Play Ball)",
+    ("enhypen", "future perfect (pass the mic)"): "Future Perfect",
+    ("wayv", "frequency (korean ver.)"): "Frequency",
 }
 
 

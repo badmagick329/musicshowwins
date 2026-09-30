@@ -17,10 +17,10 @@ def test_completely_empty_archive_is_detected():
 def test_first_run_restores_the_tracked_bootstrap():
     call_command("ensure_bootstrap")
     assert MusicShow.objects.count() == 6
-    assert Artist.objects.count() == 291
-    assert Song.objects.count() == 881
+    assert Artist.objects.count() == 283
+    assert Song.objects.count() == 858
     assert Win.objects.count() == 2905
-    assert ArtistAlias.objects.count() == 4
+    assert ArtistAlias.objects.count() == 10
 
 
 @pytest.mark.django_db

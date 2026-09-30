@@ -11,7 +11,7 @@ from main.models import normalize_key
 
 MANIFEST_PATH = Path(__file__).resolve().parent / "data" / "bootstrap_cleanup.json"
 RAW_COUNTS = {"shows": 6, "artists": 296, "songs": 901, "wins": 2965}
-CLEAN_COUNTS = {"shows": 6, "artists": 291, "songs": 881, "wins": 2905}
+CLEAN_COUNTS = {"shows": 6, "artists": 283, "songs": 858, "wins": 2905}
 
 MUSIC_CORE_2016_EVIDENCE = (
     "Music Core rankings were abolished in November 2015 and did not return "
@@ -76,6 +76,20 @@ def _song_renames(manifest: dict[str, Any]) -> dict[tuple[str, str], str]:
             raise CleanupError(f"Duplicate song rename rule: {rule!r}")
         result[key] = target
     return result
+
+
+def _manifest_aliases(manifest: dict[str, Any]) -> list[dict[str, str]]:
+    """Same-act spellings merged by renames, so syncs keep resolving them."""
+
+    rules = manifest.get("aliases", [])
+    if not isinstance(rules, list) or not all(
+        isinstance(rule, dict)
+        and isinstance(rule.get("alias"), str)
+        and isinstance(rule.get("artist"), str)
+        for rule in rules
+    ):
+        raise CleanupError("Cleanup manifest aliases must be alias/artist rows")
+    return [{"alias": rule["alias"], "artist": rule["artist"]} for rule in rules]
 
 
 def _credit_moves(manifest: dict[str, Any]) -> dict[tuple[str, str], str]:
@@ -453,12 +467,26 @@ def apply_cleanup(
         seen_songs.add(key)
         cleaned_songs.append(cleaned)
 
+    # Discarded and moved wins leave songs and artists with nothing to show.
+    won = {(row["artist"], normalize_key(row["title"])) for row in cleaned_wins}
+    cleaned_songs = [
+        row
+        for row in cleaned_songs
+        if (row["artist"], normalize_key(row["title"])) in won
+    ]
+    credited = {row["artist"] for row in cleaned_songs}
+    cleaned_artists = [row for row in cleaned_artists if row["name"] in credited]
+
+    aliases = [*payload["aliases"], *_manifest_aliases(manifest)]
+    if any(row["artist"] not in credited for row in aliases):
+        raise CleanupError("Cleanup manifest alias targets a missing artist")
+
     cleaned_payload = {
         "version": payload["version"],
         "shows": payload["shows"],
         "artists": cleaned_artists,
         "songs": cleaned_songs,
-        "aliases": payload["aliases"],
+        "aliases": aliases,
         "wins": cleaned_wins,
     }
     for key, expected in CLEAN_COUNTS.items():

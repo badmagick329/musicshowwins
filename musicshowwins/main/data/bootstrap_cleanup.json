@@ -12,7 +12,20 @@
     {"from": "Kim Sung Kyu", "to": "Kim Sung-kyu"},
     {"from": "TripleS[c]", "to": "TripleS"},
     {"from": "Rosé & Bruno Mars", "to": "Rosé and Bruno Mars"},
-    {"from": "Blackpink and Selena Gomez", "to": "BLACKPINK and Selena Gomez"}
+    {"from": "Blackpink and Selena Gomez", "to": "BLACKPINK and Selena Gomez"},
+    {"from": "Cosmic Girls", "to": "WJSN"},
+    {"from": "(G)I-dle", "to": "I-dle"},
+    {"from": "B.A.P.", "to": "B.A.P"},
+    {"from": "Im Chang Jung", "to": "Im Chang-jung"},
+    {"from": "Jung Yonghwa", "to": "Jung Yong-hwa"}
+  ],
+  "aliases": [
+    {"alias": "Kim Sung Kyu", "artist": "Kim Sung-kyu"},
+    {"alias": "Cosmic Girls", "artist": "WJSN"},
+    {"alias": "(G)I-dle", "artist": "I-dle"},
+    {"alias": "B.A.P.", "artist": "B.A.P"},
+    {"alias": "Im Chang Jung", "artist": "Im Chang-jung"},
+    {"alias": "Jung Yonghwa", "artist": "Jung Yong-hwa"}
   ],
   "song_renames": [
     {"artist": "Aespa", "from": "Up (Karina solo) [a]", "to": "Up (Karina solo)"},
@@ -35,7 +48,22 @@
     {"artist": "Zico", "from": "Spot! (feat. Jennie)", "to": "SPOT! (feat. JENNIE)"},
     {"artist": "Lee Young-ji", "from": "Small Girl", "to": "Small girl (feat. D.O.)"},
     {"artist": "Lee Young-ji", "from": "Small Girl (feat. Doh Kyung-soo)", "to": "Small girl (feat. D.O.)"},
-    {"artist": "Jimin", "from": "Smeraldo Garden Marching Band", "to": "Smeraldo Garden Marching Band (feat. Loco)"}
+    {"artist": "Jimin", "from": "Smeraldo Garden Marching Band", "to": "Smeraldo Garden Marching Band (feat. Loco)"},
+    {"artist": "Girls' Generation", "from": "Mr. Mr.", "to": "Mr.Mr."},
+    {"artist": "EXID", "from": "L.I.E", "to": "L.I.E."},
+    {"artist": "NU'EST", "from": "I’m in Trouble", "to": "I'm in Trouble"},
+    {"artist": "Hyuna", "from": "How's This", "to": "How's This?"},
+    {"artist": "Epik High", "from": "Love Drunk", "to": "Lovedrunk"},
+    {"artist": "Niel", "from": "Love Killer", "to": "Lovekiller"},
+    {"artist": "Niel", "from": "Lovekiller (Bad Girl)", "to": "Lovekiller"},
+    {"artist": "(G)I-dle", "from": "Hann", "to": "Hann (Alone)"},
+    {"artist": "Oh My Girl", "from": "Bungee", "to": "Bungee (Fall in Love)"},
+    {"artist": "Oh My Girl", "from": "Bungee (Fall In Love)", "to": "Bungee (Fall in Love)"},
+    {"artist": "I.O.I", "from": "Whatta Man (Good Man)", "to": "Whatta Man"},
+    {"artist": "Shinhwa", "from": "Sniper (Target)", "to": "Sniper"},
+    {"artist": "NCT U", "from": "Universe", "to": "Universe (Let's Play Ball)"},
+    {"artist": "Enhypen", "from": "Future Perfect (Pass the MIC)", "to": "Future Perfect"},
+    {"artist": "WayV", "from": "Frequency (Korean Ver.)", "to": "Frequency"}
   ],
   "credit_moves": [
     {"from_artist": "Psy", "song": "That That", "to_artist": "Psy feat. Suga"},

@@ -196,8 +196,14 @@ class Command(BaseCommand):
                 "akdong musician",
                 "txt",
                 "kim woo seok",
+                "kim sung kyu",
+                "cosmic girls",
+                "(g)i-dle",
+                "b.a.p.",
+                "im chang jung",
+                "jung yonghwa",
             }
-            or len(alias_keys) != 4
+            or len(alias_keys) != 10
         ):
             raise CommandError(
                 "Bootstrap aliases must contain only the configured same-act aliases"

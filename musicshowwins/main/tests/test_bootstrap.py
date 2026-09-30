@@ -23,10 +23,10 @@ def test_bootstrap_restores_exact_domain_dataset(capsys):
     call_command("restore_bootstrap")
 
     assert MusicShow.objects.count() == 6
-    assert Artist.objects.count() == 291
-    assert Song.objects.count() == 881
+    assert Artist.objects.count() == 283
+    assert Song.objects.count() == 858
     assert Win.objects.count() == 2905
-    assert ArtistAlias.objects.count() == 4
+    assert ArtistAlias.objects.count() == 10
     assert not SourcePage.objects.exists()
     assert not ImportRun.objects.exists()
     assert ImportIssue.objects.count() == 45
@@ -60,6 +60,12 @@ def test_bootstrap_restores_exact_domain_dataset(capsys):
         ("Akdong Musician", "AKMU"),
         ("TXT", "Tomorrow X Together"),
         ("Kim Woo Seok", "Kim Woo-seok"),
+        ("Kim Sung Kyu", "Kim Sung-kyu"),
+        ("Cosmic Girls", "WJSN"),
+        ("(G)I-dle", "I-dle"),
+        ("B.A.P.", "B.A.P"),
+        ("Im Chang Jung", "Im Chang-jung"),
+        ("Jung Yonghwa", "Jung Yong-hwa"),
     }
     assert not ArtistAlias.objects.filter(alias="Blackpink and Selena Gomez").exists()
     assert Win.objects.filter(source_type=Win.SourceType.LEGACY).count() == 2905
