@@ -1,0 +1,1495 @@
+{
+  "version": 1,
+  "debuts": [
+    {
+      "artist": "10cm",
+      "debut": "2010",
+      "source": "Wikipedia: 10cm (band) / Wikidata: Q493329"
+    },
+    {
+      "artist": "2ne1",
+      "debut": "2009-05-06",
+      "source": "Wikipedia: 2NE1 / Wikidata: Q171885; manual review 2026-09-30"
+    },
+    {
+      "artist": "2pm",
+      "debut": "2008-09-04",
+      "source": "Wikipedia: 2PM / Wikidata: Q222760"
+    },
+    {
+      "artist": "4minute",
+      "debut": "2009",
+      "source": "Wikipedia: 4Minute / Wikidata: Q39682"
+    },
+    {
+      "artist": "82major",
+      "debut": "2023-10-11",
+      "source": "Wikipedia: 82Major / Wikidata: Q125200744"
+    },
+    {
+      "artist": "ab6ix",
+      "debut": "2019-05-22",
+      "source": "Wikipedia: AB6IX / Wikidata: Q63852480"
+    },
+    {
+      "artist": "aespa",
+      "debut": "2020-11-17",
+      "source": "Wikipedia: Aespa / Wikidata: Q100877982"
+    },
+    {
+      "artist": "ahof",
+      "debut": "2025-07-01",
+      "source": "Wikipedia: AHOF / Wikidata: Q135181578"
+    },
+    {
+      "artist": "ailee",
+      "debut": "2012",
+      "source": "Wikipedia: Ailee / Wikidata: Q487391"
+    },
+    {
+      "artist": "akmu",
+      "debut": "2014-04-07",
+      "source": "Wikipedia: AKMU / Wikidata: Q10728972; manual review 2026-09-30"
+    },
+    {
+      "artist": "allday-project",
+      "debut": "2025-06-23",
+      "source": "Wikipedia: AllDay Project / Wikidata: Q134986635"
+    },
+    {
+      "artist": "alpha-drive-one",
+      "debut": "2026-01-12",
+      "source": "Wikipedia: Alpha Drive One / Wikidata: Q136378026"
+    },
+    {
+      "artist": "and2ble",
+      "debut": "2026-05-26",
+      "source": "Wikipedia: And2ble / Wikidata: Q138948755"
+    },
+    {
+      "artist": "aoa",
+      "debut": "2012-07",
+      "source": "Wikipedia: AOA (group) / Wikidata: Q492035"
+    },
+    {
+      "artist": "apink",
+      "debut": "2011-04-19",
+      "source": "Wikipedia: Apink / Wikidata: Q483286"
+    },
+    {
+      "artist": "astro",
+      "debut": "2016-02-23",
+      "source": "Wikipedia: Astro (South Korean band) / Wikidata: Q23004252"
+    },
+    {
+      "artist": "ateez",
+      "debut": "2018-10-24",
+      "source": "Wikipedia: Ateez / Wikidata: Q59793088"
+    },
+    {
+      "artist": "b1a4",
+      "debut": "2011-04-23",
+      "source": "Wikipedia: B1A4 / Wikidata: Q483751"
+    },
+    {
+      "artist": "babymonster",
+      "debut": "2023-11-27",
+      "source": "Wikipedia: Babymonster / Wikidata: Q115967938; manual review 2026-09-30"
+    },
+    {
+      "artist": "baek-a-yeon",
+      "debut": "2012",
+      "source": "Wikipedia: Baek A-yeon / Wikidata: Q497735; manual review 2026-09-30"
+    },
+    {
+      "artist": "baekhyun",
+      "debut": "2019-07-10",
+      "source": "Wikipedia: Baekhyun / Wikidata: Q4688701; manual review 2026-09-30",
+      "solo": true
+    },
+    {
+      "artist": "bap",
+      "debut": "2012-01-27",
+      "source": "Wikipedia: B.A.P (South Korean band) / Wikidata: Q483234"
+    },
+    {
+      "artist": "beast",
+      "debut": "2009",
+      "source": "Wikipedia: Highlight (band) / Wikidata: Q269595"
+    },
+    {
+      "artist": "ben",
+      "debut": "2012-10",
+      "source": "Wikipedia: Ben (South Korean singer) / Wikidata: Q22808297",
+      "solo": true
+    },
+    {
+      "artist": "bibi",
+      "debut": "2019",
+      "source": "Wikipedia: Bibi (singer) / Wikidata: Q65060693"
+    },
+    {
+      "artist": "big-bang",
+      "debut": "2006",
+      "source": "Wikipedia: BigBang (South Korean band) / Wikidata: Q282104"
+    },
+    {
+      "artist": "billlie",
+      "debut": "2021-11-10",
+      "source": "Wikipedia: Billlie / Wikidata: Q108888399"
+    },
+    {
+      "artist": "blackpink",
+      "debut": "2016-08-08",
+      "source": "Wikipedia: Blackpink / Wikidata: Q25056945; manual review 2026-09-30"
+    },
+    {
+      "artist": "block-b",
+      "debut": "2011-04-15",
+      "source": "Wikipedia: Block B / Wikidata: Q498326; manual review 2026-09-30"
+    },
+    {
+      "artist": "bolbbalgan4",
+      "debut": "2016-04-22",
+      "source": "Wikipedia: BOL4 / Wikidata: Q26960605"
+    },
+    {
+      "artist": "boyfriend",
+      "debut": "2011-05-26",
+      "source": "Wikipedia: Boyfriend (band) / Wikidata: Q307457"
+    },
+    {
+      "artist": "boynextdoor",
+      "debut": "2023-05",
+      "source": "Wikipedia: BoyNextDoor / Wikidata: Q118178306"
+    },
+    {
+      "artist": "brave-girls",
+      "debut": "2011-04-07",
+      "source": "Wikipedia: BB Girls / Wikidata: Q492721"
+    },
+    {
+      "artist": "bss",
+      "debut": "2018-03-21",
+      "source": "Wikipedia: BSS (band) / Wikidata: Q116196063; manual review 2026-09-30"
+    },
+    {
+      "artist": "btob",
+      "debut": "2012-03-21",
+      "source": "Wikipedia: BtoB (band) / Wikidata: Q491067"
+    },
+    {
+      "artist": "btob-4u",
+      "debut": "2020-11-16",
+      "source": "Wikipedia: BtoB 4U / Wikidata: Q101960854"
+    },
+    {
+      "artist": "bts",
+      "debut": "2013-06-13",
+      "source": "Wikipedia: BTS / Wikidata: Q13580495"
+    },
+    {
+      "artist": "chen",
+      "debut": "2019-04-01",
+      "source": "Wikipedia: Chen (singer) / Wikidata: Q16098027; manual review 2026-09-30",
+      "solo": true
+    },
+    {
+      "artist": "chungha",
+      "debut": "2017-06-07",
+      "source": "Wikipedia: Chung Ha / Wikidata: Q26214034; manual review 2026-09-30",
+      "solo": true
+    },
+    {
+      "artist": "cix",
+      "debut": "2019-07-23",
+      "source": "Wikipedia: CIX (band) / Wikidata: Q63790991"
+    },
+    {
+      "artist": "clc",
+      "debut": "2015-03-19",
+      "source": "Wikipedia: CLC (group) / Wikidata: Q19626731"
+    },
+    {
+      "artist": "close-your-eyes",
+      "debut": "2025-04-02",
+      "source": "Wikipedia: Close Your Eyes (group) / Wikidata: Q131689681"
+    },
+    {
+      "artist": "cnblue",
+      "debut": "2010-01-14",
+      "source": "Wikipedia: CNBLUE / Wikidata: Q483172"
+    },
+    {
+      "artist": "cortis",
+      "debut": "2025-08-18",
+      "source": "Wikipedia: Cortis / Wikidata: Q135668928"
+    },
+    {
+      "artist": "cosmic-girls",
+      "debut": "2016-02-25",
+      "source": "Wikipedia: WJSN / Wikidata: Q21964258"
+    },
+    {
+      "artist": "cravity",
+      "debut": "2020-04-14",
+      "source": "Wikipedia: Cravity / Wikidata: Q90628571"
+    },
+    {
+      "artist": "crush",
+      "debut": "2014-04-01",
+      "source": "Wikipedia: Crush (singer) / Wikidata: Q12620706"
+    },
+    {
+      "artist": "csr",
+      "debut": "2022-07-27",
+      "source": "Wikipedia: CSR (group) / Wikidata: Q113240443"
+    },
+    {
+      "artist": "cxm",
+      "debut": "2025-09-29",
+      "source": "Wikipedia: S.Coups X Mingyu / Wikidata: Q136476095; manual review 2026-09-30"
+    },
+    {
+      "artist": "davichi",
+      "debut": "2008",
+      "source": "Wikipedia: Davichi / Wikidata: Q483209"
+    },
+    {
+      "artist": "day6",
+      "debut": "2015-09-07",
+      "source": "Wikipedia: Day6 / Wikidata: Q20898046"
+    },
+    {
+      "artist": "dayoung",
+      "debut": "2025",
+      "source": "Wikipedia: Dayoung / Wikidata: Q25418040",
+      "solo": true
+    },
+    {
+      "artist": "dia",
+      "debut": "2015-09-14",
+      "source": "Wikipedia: DIA (group) / Wikidata: Q20733515"
+    },
+    {
+      "artist": "dkz",
+      "debut": "2019-04-24",
+      "source": "Wikipedia: DKZ / Wikidata: Q65051964"
+    },
+    {
+      "artist": "do",
+      "debut": "2021-07-26",
+      "source": "Wikipedia: Doh Kyung-soo / Wikidata: Q15111667",
+      "solo": true
+    },
+    {
+      "artist": "doyoung",
+      "debut": "2024-04-22",
+      "source": "Wikipedia: Doyoung / Wikidata: Q26689987; manual review 2026-09-30",
+      "solo": true
+    },
+    {
+      "artist": "dreamcatcher",
+      "debut": "2017-01-13",
+      "source": "Wikipedia: Dreamcatcher (group) / Wikidata: Q20684822"
+    },
+    {
+      "artist": "dynamic-duo",
+      "debut": "2004",
+      "source": "Wikipedia: Dynamic Duo (South Korean duo) / Wikidata: Q5318904; manual review 2026-09-30"
+    },
+    {
+      "artist": "enhypen",
+      "debut": "2020-11-30",
+      "source": "Wikipedia: Enhypen / Wikidata: Q99479445"
+    },
+    {
+      "artist": "epik-high",
+      "debut": "2001",
+      "source": "Wikipedia: Epik High / Wikidata: Q18788"
+    },
+    {
+      "artist": "eunhyuk",
+      "debut": "2025",
+      "source": "Wikipedia: Eunhyuk / Wikidata: Q483161; manual review 2026-09-30",
+      "solo": true
+    },
+    {
+      "artist": "evan",
+      "debut": "2020",
+      "source": "Wikipedia: Evan (singer) / Wikidata: Q105717901"
+    },
+    {
+      "artist": "everglow",
+      "debut": "2019-03-18",
+      "source": "Wikipedia: Everglow / Wikidata: Q62067345"
+    },
+    {
+      "artist": "evnne",
+      "debut": "2023-09-19",
+      "source": "Wikipedia: Evnne / Wikidata: Q121493651"
+    },
+    {
+      "artist": "exid",
+      "debut": "2012-02",
+      "source": "Wikipedia: EXID / Wikidata: Q492381"
+    },
+    {
+      "artist": "exo",
+      "debut": "2012",
+      "source": "Wikipedia: Exo / Wikidata: Q494717"
+    },
+    {
+      "artist": "exo-cbx",
+      "debut": "2016-10-31",
+      "source": "Wikipedia: Exo-CBX / Wikidata: Q27535796"
+    },
+    {
+      "artist": "exo-k",
+      "debut": "2012",
+      "source": "Wikipedia: Exo / Wikidata: Q494717"
+    },
+    {
+      "artist": "exo-sc",
+      "debut": "2019-07-22",
+      "source": "Wikipedia: Exo-SC / Wikidata: Q64852942"
+    },
+    {
+      "artist": "fly-to-the-sky",
+      "debut": "1999",
+      "source": "Wikipedia: Fly to the Sky / Wikidata: Q483756"
+    },
+    {
+      "artist": "fromis-9",
+      "debut": "2018-01-24",
+      "source": "Wikipedia: Fromis 9 / Wikidata: Q41398331"
+    },
+    {
+      "artist": "ft-island",
+      "debut": "2007-06-07",
+      "source": "Wikipedia: F.T. Island / Wikidata: Q483248"
+    },
+    {
+      "artist": "fx",
+      "debut": "2009-09",
+      "source": "Wikipedia: F(x) (group) / Wikidata: Q344286"
+    },
+    {
+      "artist": "g-dragon",
+      "debut": "2009",
+      "source": "Wikipedia: G-Dragon / Wikidata: Q495577; manual review 2026-09-30",
+      "solo": true
+    },
+    {
+      "artist": "gary",
+      "debut": "2014",
+      "source": "Wikipedia: Gary (rapper) / Wikidata: Q495413; manual review 2026-09-30",
+      "solo": true
+    },
+    {
+      "artist": "gd-top",
+      "debut": "2010",
+      "source": "Wikipedia: GD & TOP / Wikidata: Q21575485"
+    },
+    {
+      "artist": "gd-x-taeyang",
+      "debut": "2014-11",
+      "source": "Wikipedia: GD X Taeyang / Wikidata: Q20943943; manual review 2026-09-30"
+    },
+    {
+      "artist": "gfriend",
+      "debut": "2015-01-15",
+      "source": "Wikipedia: GFriend / Wikidata: Q18733030"
+    },
+    {
+      "artist": "gi-dle",
+      "debut": "2018-05-02",
+      "source": "Wikipedia: I-dle / Wikidata: Q51885404"
+    },
+    {
+      "artist": "girls-day",
+      "debut": "2010",
+      "source": "Wikipedia: Girl's Day / Wikidata: Q497325"
+    },
+    {
+      "artist": "girls-generation",
+      "debut": "2007-08-05",
+      "source": "Wikipedia: Girls' Generation / Wikidata: Q20153"
+    },
+    {
+      "artist": "girls-generation-tts",
+      "debut": "2012-04-30",
+      "source": "Wikipedia: Girls' Generation-TTS / Wikidata: Q484588"
+    },
+    {
+      "artist": "golden-child",
+      "debut": "2017-08-28",
+      "source": "Wikipedia: Golden Child (band) / Wikidata: Q30007238"
+    },
+    {
+      "artist": "got-the-beat",
+      "debut": "2022-01-03",
+      "source": "Wikipedia: Got the Beat / Wikidata: Q110310446"
+    },
+    {
+      "artist": "got7",
+      "debut": "2014-01-16",
+      "source": "Wikipedia: Got7 / Wikidata: Q23772001; manual review 2026-09-30"
+    },
+    {
+      "artist": "h1-key",
+      "debut": "2022-01-05",
+      "source": "Wikipedia: H1-Key / Wikidata: Q111864756"
+    },
+    {
+      "artist": "ha-sung-woon",
+      "debut": "2019-02-28",
+      "source": "Wikipedia: Ha Sung-woon / Wikidata: Q30313948; manual review 2026-09-30",
+      "solo": true
+    },
+    {
+      "artist": "haechan",
+      "debut": "2025",
+      "source": "Wikipedia: Haechan / Wikidata: Q19730396; manual review 2026-09-30",
+      "solo": true
+    },
+    {
+      "artist": "han-dong-geun",
+      "debut": "2014",
+      "source": "Wikipedia: Han Dong-geun / Wikidata: Q12623951"
+    },
+    {
+      "artist": "han-seung-woo",
+      "debut": "2020-08",
+      "source": "Wikipedia: Han Seung-woo / Wikidata: Q56691163",
+      "solo": true
+    },
+    {
+      "artist": "hearts2hearts",
+      "debut": "2025-02-24",
+      "source": "Wikipedia: Hearts2Hearts / Wikidata: Q131746784"
+    },
+    {
+      "artist": "heize",
+      "debut": "2014",
+      "source": "Wikipedia: Heize / Wikidata: Q24855768"
+    },
+    {
+      "artist": "hi-suhyun",
+      "debut": "2014-11",
+      "source": "Wikipedia: Hi Suhyun / Wikidata: Q18551384; manual review 2026-09-30"
+    },
+    {
+      "artist": "highlight",
+      "debut": "2009",
+      "source": "Wikipedia: Highlight (band) / Wikidata: Q269595"
+    },
+    {
+      "artist": "hwang-chi-yeul",
+      "debut": "2007",
+      "source": "Wikipedia: Hwang Chi-yeul / Wikidata: Q21060878"
+    },
+    {
+      "artist": "hwasa",
+      "debut": "2019-02-13",
+      "source": "Wikipedia: Hwasa / Wikidata: Q19603912; manual review 2026-09-30",
+      "solo": true
+    },
+    {
+      "artist": "hyukoh",
+      "debut": "2014",
+      "source": "Wikipedia: Hyukoh / Wikidata: Q20668424"
+    },
+    {
+      "artist": "hyuna",
+      "debut": "2010",
+      "source": "Wikipedia: Hyuna / Wikidata: Q234066",
+      "solo": true
+    },
+    {
+      "artist": "idid",
+      "debut": "2025-09-15",
+      "source": "Wikipedia: Idid (group) / Wikidata: Q135466598"
+    },
+    {
+      "artist": "ikon",
+      "debut": "2015-09-15",
+      "source": "Wikipedia: IKon / Wikidata: Q18161349; manual review 2026-09-30"
+    },
+    {
+      "artist": "illit",
+      "debut": "2024-03-25",
+      "source": "Wikipedia: Illit / Wikidata: Q122179261"
+    },
+    {
+      "artist": "im-chang-jung",
+      "debut": "1995",
+      "source": "Wikipedia: Im Chang-jung / Wikidata: Q625944; manual review 2026-09-30"
+    },
+    {
+      "artist": "infinite",
+      "debut": "2010-06",
+      "source": "Wikipedia: Infinite (band) / Wikidata: Q50598"
+    },
+    {
+      "artist": "infinite-h",
+      "debut": "2013-01",
+      "source": "Wikipedia: Infinite H / Wikidata: Q6029767"
+    },
+    {
+      "artist": "ioi",
+      "debut": "2016-05-04",
+      "source": "Wikipedia: I.O.I / Wikidata: Q23688122"
+    },
+    {
+      "artist": "irene",
+      "debut": "2024-11-26",
+      "source": "Wikipedia: Irene (singer) / Wikidata: Q12605358; manual review 2026-09-30",
+      "solo": true
+    },
+    {
+      "artist": "itzy",
+      "debut": "2019-02-12",
+      "source": "Wikipedia: Itzy / Wikidata: Q60732823"
+    },
+    {
+      "artist": "iu",
+      "debut": "2008",
+      "source": "Wikipedia: IU (entertainer) / Wikidata: Q20145"
+    },
+    {
+      "artist": "ive",
+      "debut": "2021-12-01",
+      "source": "Wikipedia: Ive (group) / Wikidata: Q109375061"
+    },
+    {
+      "artist": "izna",
+      "debut": "2024-11-25",
+      "source": "Wikipedia: Izna / Wikidata: Q127162707"
+    },
+    {
+      "artist": "izone",
+      "debut": "2018-10-29",
+      "source": "Wikipedia: Iz*One / Wikidata: Q56402353"
+    },
+    {
+      "artist": "j-hope",
+      "debut": "2018-03-02",
+      "source": "Wikipedia: J-Hope / Wikidata: Q16236223; manual review 2026-09-30",
+      "solo": true
+    },
+    {
+      "artist": "jaehyun",
+      "debut": "2024-08-26",
+      "source": "Wikipedia: Jaehyun / Wikidata: Q26267642; manual review 2026-09-30",
+      "solo": true
+    },
+    {
+      "artist": "jbj",
+      "debut": "2017-10-18",
+      "source": "Wikipedia: JBJ (band) / Wikidata: Q39075630"
+    },
+    {
+      "artist": "jennie",
+      "debut": "2018-11-12",
+      "source": "Wikipedia: Jennie (singer) / Wikidata: Q26262599; manual review 2026-09-30",
+      "solo": true
+    },
+    {
+      "artist": "jeon-so-yeon",
+      "debut": "2017-11-05",
+      "source": "Wikipedia: Soyeon / Wikidata: Q26707915"
+    },
+    {
+      "artist": "jeong-se-woon",
+      "debut": "2017-08-31",
+      "source": "Wikipedia: Jeong Se-woon / Wikidata: Q16746002"
+    },
+    {
+      "artist": "jihyo",
+      "debut": "2023-08-18",
+      "source": "Wikipedia: Jihyo / Wikidata: Q22774055; manual review 2026-09-30",
+      "solo": true
+    },
+    {
+      "artist": "jimin",
+      "debut": "2023",
+      "source": "Wikipedia: Jimin / Wikidata: Q20947093; manual review 2026-09-30",
+      "solo": true
+    },
+    {
+      "artist": "jin",
+      "debut": "2022-10",
+      "source": "Wikipedia: Jin (singer) / Wikidata: Q24276424",
+      "solo": true
+    },
+    {
+      "artist": "jisoo",
+      "debut": "2023-03-31",
+      "source": "Wikipedia: Jisoo / Wikidata: Q27655361; manual review 2026-09-30",
+      "solo": true
+    },
+    {
+      "artist": "jo-yu-ri",
+      "debut": "2021-10",
+      "source": "Wikipedia: Jo Yuri / Wikidata: Q56678033",
+      "solo": true
+    },
+    {
+      "artist": "jonghyun",
+      "debut": "2015-01-12",
+      "source": "Wikipedia: Jonghyun / Wikidata: Q484484; manual review 2026-09-30",
+      "solo": true
+    },
+    {
+      "artist": "jung-eun-ji",
+      "debut": "2016-04-18",
+      "source": "Wikipedia: Jung Eun-ji / Wikidata: Q487831; manual review 2026-09-30",
+      "solo": true
+    },
+    {
+      "artist": "jung-key",
+      "debut": "2011",
+      "source": "Wikipedia: Jung Key / Wikidata: Q22974903"
+    },
+    {
+      "artist": "jung-yong-hwa",
+      "debut": "2015-01-20",
+      "source": "Wikipedia: Jung Yong-hwa / Wikidata: Q153725; manual review 2026-09-30",
+      "solo": true
+    },
+    {
+      "artist": "jungkook",
+      "debut": "2023-07-14",
+      "source": "Wikipedia: Jung Kook / Wikidata: Q22338877; manual review 2026-09-30",
+      "solo": true
+    },
+    {
+      "artist": "kai",
+      "debut": "2020-11-30",
+      "source": "Wikipedia: Kai (entertainer, born 1994) / Wikidata: Q10775090",
+      "solo": true
+    },
+    {
+      "artist": "kang-daniel",
+      "debut": "2019",
+      "source": "Wikipedia: Kang Daniel / Wikidata: Q30243777",
+      "solo": true
+    },
+    {
+      "artist": "kara",
+      "debut": "2007-03",
+      "source": "Wikipedia: Kara (South Korean group) / Wikidata: Q124459"
+    },
+    {
+      "artist": "kep1er",
+      "debut": "2022-01-03",
+      "source": "Wikipedia: Kep1er / Wikidata: Q109077000"
+    },
+    {
+      "artist": "key",
+      "debut": "2018-11",
+      "source": "Wikipedia: Key (entertainer) / Wikidata: Q483980",
+      "solo": true
+    },
+    {
+      "artist": "kickflip",
+      "debut": "2025-01-20",
+      "source": "Wikipedia: KickFlip / Wikidata: Q131722593"
+    },
+    {
+      "artist": "kiiikiii",
+      "debut": "2025-03-24",
+      "source": "Wikipedia: KiiiKiii / Wikidata: Q132526762"
+    },
+    {
+      "artist": "kim-dong-han",
+      "debut": "2018-06",
+      "source": "Wikipedia: Kim Dong-han / Wikidata: Q42650401",
+      "solo": true
+    },
+    {
+      "artist": "kim-dong-ryul",
+      "debut": "1998",
+      "source": "Wikipedia: Kim Dong-ryul / Wikidata: Q626896; manual review 2026-09-30",
+      "solo": true
+    },
+    {
+      "artist": "kim-dong-wan",
+      "debut": "2008",
+      "source": "Wikipedia: Kim Dong-wan / Wikidata: Q497319; manual review 2026-09-30",
+      "solo": true
+    },
+    {
+      "artist": "kim-jae-hwan",
+      "debut": "2019-05-20",
+      "source": "Wikipedia: Kim Jae-hwan (singer) / Wikidata: Q30311663",
+      "solo": true
+    },
+    {
+      "artist": "kim-na-young",
+      "debut": "2012",
+      "source": "Wikipedia: Kim Na-young (singer) / Wikidata: Q19939491"
+    },
+    {
+      "artist": "kim-sung-kyu-2",
+      "debut": "2012-11",
+      "source": "Wikipedia: Kim Sung-kyu / Wikidata: Q6409458",
+      "solo": true
+    },
+    {
+      "artist": "kim-woo-seok",
+      "debut": "2020-05-25",
+      "source": "Wikipedia: Kim Woo-seok (singer) / Wikidata: Q28698246",
+      "solo": true
+    },
+    {
+      "artist": "kiss-of-life",
+      "debut": "2023-07-05",
+      "source": "Wikipedia: Kiss of Life (group) / Wikidata: Q118314702"
+    },
+    {
+      "artist": "kwill",
+      "debut": "2007",
+      "source": "Wikipedia: K.Will / Wikidata: Q326575"
+    },
+    {
+      "artist": "kwon-eunbi",
+      "debut": "2021-08-24",
+      "source": "Wikipedia: Kwon Eun-bi / Wikidata: Q56505060",
+      "solo": true
+    },
+    {
+      "artist": "kyoungseo",
+      "debut": "2020",
+      "source": "Wikipedia: KyoungSeo / Wikidata: Q112021326"
+    },
+    {
+      "artist": "kyuhyun",
+      "debut": "2014-11-13",
+      "source": "Wikipedia: Cho Kyu-hyun / Wikidata: Q494816",
+      "solo": true
+    },
+    {
+      "artist": "laboum",
+      "debut": "2014-08-28",
+      "source": "Wikipedia: Laboum / Wikidata: Q18344661"
+    },
+    {
+      "artist": "le-sserafim",
+      "debut": "2022-05-02",
+      "source": "Wikipedia: Le Sserafim / Wikidata: Q111381707"
+    },
+    {
+      "artist": "lee-chan-won",
+      "debut": "2020",
+      "source": "Wikipedia: Lee Chan-won / Wikidata: Q92756882"
+    },
+    {
+      "artist": "lee-gi-kwang",
+      "debut": "2009-04-04",
+      "source": "Wikipedia: Lee Gi-kwang / Wikidata: Q10919869"
+    },
+    {
+      "artist": "lee-hi",
+      "debut": "2012-10-28",
+      "source": "Wikipedia: Lee Hi / Wikidata: Q24945"
+    },
+    {
+      "artist": "lee-hong-gi",
+      "debut": "2015",
+      "source": "Wikipedia: Lee Hong-gi / Wikidata: Q484834; manual review 2026-09-30",
+      "solo": true
+    },
+    {
+      "artist": "lee-mu-jin",
+      "debut": "2018",
+      "source": "Wikipedia: Lee Mu-jin / Wikidata: Q107109529"
+    },
+    {
+      "artist": "lee-young-ji",
+      "debut": "2019",
+      "source": "Wikipedia: Lee Young-ji / Wikidata: Q96873744"
+    },
+    {
+      "artist": "leo",
+      "debut": "2018",
+      "source": "Wikipedia: Leo (singer) / Wikidata: Q18550576; manual review 2026-09-30",
+      "solo": true
+    },
+    {
+      "artist": "lim-young-woong",
+      "debut": "2016",
+      "source": "Wikipedia: Lim Young-woong / Wikidata: Q90872620"
+    },
+    {
+      "artist": "lisa",
+      "debut": "2021-09-10",
+      "source": "Wikipedia: Lisa (rapper) / Wikidata: Q26707663; manual review 2026-09-30",
+      "solo": true
+    },
+    {
+      "artist": "loona",
+      "debut": "2018-08-19",
+      "source": "Wikipedia: Loona / Wikidata: Q28025953"
+    },
+    {
+      "artist": "lovelyz",
+      "debut": "2014-11-17",
+      "source": "Wikipedia: Lovelyz / Wikidata: Q18437003"
+    },
+    {
+      "artist": "mad-clown",
+      "debut": "2008",
+      "source": "Wikipedia: Mad Clown / Wikidata: Q12594913"
+    },
+    {
+      "artist": "mamamoo",
+      "debut": "2014-06-18",
+      "source": "Wikipedia: Mamamoo / Wikidata: Q17278068"
+    },
+    {
+      "artist": "mark",
+      "debut": "2025-04-07",
+      "source": "Wikipedia: Mark (rapper) / Wikidata: Q26689986",
+      "solo": true
+    },
+    {
+      "artist": "mc-mong",
+      "debut": "2004",
+      "source": "Wikipedia: MC Mong / Wikidata: Q489888",
+      "solo": true
+    },
+    {
+      "artist": "meovv",
+      "debut": "2024-09-06",
+      "source": "Wikipedia: Meovv / Wikidata: Q130084175"
+    },
+    {
+      "artist": "minah",
+      "debut": "2015",
+      "source": "Wikipedia: Bang Min-ah / Wikidata: Q12596240; manual review 2026-09-30",
+      "solo": true
+    },
+    {
+      "artist": "minnie",
+      "debut": "2025-01-21",
+      "source": "Wikipedia: Minnie (singer) / Wikidata: Q56761923",
+      "solo": true
+    },
+    {
+      "artist": "mino",
+      "debut": "2018-11-26",
+      "source": "Wikipedia: Mino (rapper) / Wikidata: Q17682967; manual review 2026-09-30",
+      "solo": true
+    },
+    {
+      "artist": "miyeon",
+      "debut": "2022-04-27",
+      "source": "Wikipedia: Miyeon / Wikidata: Q56259927; manual review 2026-09-30",
+      "solo": true
+    },
+    {
+      "artist": "momoland",
+      "debut": "2016-11-10",
+      "source": "Wikipedia: Momoland / Wikidata: Q27820706"
+    },
+    {
+      "artist": "monsta-x",
+      "debut": "2015-05-14",
+      "source": "Wikipedia: Monsta X / Wikidata: Q19855151"
+    },
+    {
+      "artist": "moonbin-sanha",
+      "debut": "2020-09-14",
+      "source": "Wikipedia: Moonbin & Sanha / Wikidata: Q105606047"
+    },
+    {
+      "artist": "nam-woo-hyun",
+      "debut": "2016",
+      "source": "Wikipedia: Nam Woo-hyun / Wikidata: Q10797190",
+      "solo": true
+    },
+    {
+      "artist": "naul",
+      "debut": "2005-01-08",
+      "source": "Wikipedia: Naul (singer) / Wikidata: Q7265486",
+      "solo": true
+    },
+    {
+      "artist": "nayeon",
+      "debut": "2022-06-24",
+      "source": "Wikipedia: Nayeon / Wikidata: Q22804243; manual review 2026-09-30",
+      "solo": true
+    },
+    {
+      "artist": "nct-127",
+      "debut": "2016-07-07",
+      "source": "Wikipedia: NCT 127 / Wikidata: Q55624444"
+    },
+    {
+      "artist": "nct-dojaejung",
+      "debut": "2023-04-17",
+      "source": "Wikipedia: NCT DoJaeJung / Wikidata: Q117460785"
+    },
+    {
+      "artist": "nct-dream",
+      "debut": "2016-08-25",
+      "source": "Wikipedia: NCT Dream / Wikidata: Q47002841"
+    },
+    {
+      "artist": "nct-u",
+      "debut": "2016-04-09",
+      "source": "Wikipedia: NCT (group) / Wikidata: Q23725822"
+    },
+    {
+      "artist": "nct-wish",
+      "debut": "2024-02-21",
+      "source": "Wikipedia: NCT Wish / Wikidata: Q122575981; manual review 2026-09-30"
+    },
+    {
+      "artist": "newjeans",
+      "debut": "2022-07-22",
+      "source": "Wikipedia: NewJeans / Wikidata: Q113189277; manual review 2026-09-30"
+    },
+    {
+      "artist": "nexz",
+      "debut": "2024-05-20",
+      "source": "Wikipedia: Nexz / Wikidata: Q123865358"
+    },
+    {
+      "artist": "nflying",
+      "debut": "2015-05-20",
+      "source": "Wikipedia: N.Flying / Wikidata: Q15727149"
+    },
+    {
+      "artist": "niel",
+      "debut": "2015",
+      "source": "Wikipedia: Niel (singer) / Wikidata: Q12590744; manual review 2026-09-30",
+      "solo": true
+    },
+    {
+      "artist": "niziu",
+      "debut": "2020-12-02",
+      "source": "Wikipedia: NiziU / Wikidata: Q96647935; manual review 2026-09-30"
+    },
+    {
+      "artist": "nmixx",
+      "debut": "2022-02-22",
+      "source": "Wikipedia: Nmixx / Wikidata: Q109307762"
+    },
+    {
+      "artist": "noel",
+      "debut": "2002",
+      "source": "Wikipedia: Noel (band) / Wikidata: Q12590431"
+    },
+    {
+      "artist": "nouera",
+      "debut": "2025-02-26",
+      "source": "Wikipedia: Nouera / Wikidata: Q132119456"
+    },
+    {
+      "artist": "nssign",
+      "debut": "2023-08-09",
+      "source": "Wikipedia: N.SSign / Wikidata: Q120335691"
+    },
+    {
+      "artist": "nuest",
+      "debut": "2012-03-15",
+      "source": "Wikipedia: NU'EST / Wikidata: Q225105"
+    },
+    {
+      "artist": "nuest-w",
+      "debut": "2017",
+      "source": "Wikipedia: NU'EST W / Wikidata: Q55736833; manual review 2026-09-30"
+    },
+    {
+      "artist": "oh-my-girl",
+      "debut": "2015-04-20",
+      "source": "Wikipedia: Oh My Girl / Wikidata: Q19794854"
+    },
+    {
+      "artist": "oneus",
+      "debut": "2019-01-09",
+      "source": "Wikipedia: Oneus / Wikidata: Q60528927"
+    },
+    {
+      "artist": "onew",
+      "debut": "2018-12-05",
+      "source": "Wikipedia: Onew / Wikidata: Q494692",
+      "solo": true
+    },
+    {
+      "artist": "onewe",
+      "debut": "2019-05-13",
+      "source": "Wikipedia: Onewe / Wikidata: Q42288986; manual review 2026-09-30"
+    },
+    {
+      "artist": "onf",
+      "debut": "2017-08-03",
+      "source": "Wikipedia: ONF (band) / Wikidata: Q35101861"
+    },
+    {
+      "artist": "p1harmony",
+      "debut": "2020-10-28",
+      "source": "Wikipedia: P1Harmony / Wikidata: Q101529383"
+    },
+    {
+      "artist": "park-hyo-shin",
+      "debut": "1999",
+      "source": "Wikipedia: Park Hyo-shin / Wikidata: Q484928"
+    },
+    {
+      "artist": "park-ji-hoon",
+      "debut": "2019-03-26",
+      "source": "Wikipedia: Park Ji-hoon / Wikidata: Q30114466; manual review 2026-09-30",
+      "solo": true
+    },
+    {
+      "artist": "park-kyung",
+      "debut": "2015",
+      "source": "Wikipedia: Park Kyung / Wikidata: Q22279572; manual review 2026-09-30",
+      "solo": true
+    },
+    {
+      "artist": "paul-kim",
+      "debut": "2014",
+      "source": "Wikipedia: Paul Kim (musician, born 1988) / Wikidata: Q43089370"
+    },
+    {
+      "artist": "pentagon",
+      "debut": "2016-10-10",
+      "source": "Wikipedia: Pentagon (South Korean band) / Wikidata: Q23936742"
+    },
+    {
+      "artist": "plave",
+      "debut": "2023-03-12",
+      "source": "Wikipedia: Plave / Wikidata: Q119025962"
+    },
+    {
+      "artist": "psy",
+      "debut": "2001",
+      "source": "Wikipedia: Psy / Wikidata: Q20150"
+    },
+    {
+      "artist": "qwer",
+      "debut": "2023-10-18",
+      "source": "Wikipedia: QWER / Wikidata: Q124412677"
+    },
+    {
+      "artist": "rain",
+      "debut": "2002",
+      "source": "Wikipedia: Rain (entertainer) / Wikidata: Q318485; manual review 2026-09-30"
+    },
+    {
+      "artist": "red-velvet",
+      "debut": "2014-08-01",
+      "source": "Wikipedia: Red Velvet (group) / Wikidata: Q17466114"
+    },
+    {
+      "artist": "red-velvet-irene-seulgi",
+      "debut": "2020-07-06",
+      "source": "Wikipedia: Red Velvet – Irene & Seulgi / Wikidata: Q95630547"
+    },
+    {
+      "artist": "rescene",
+      "debut": "2024-03-26",
+      "source": "Wikipedia: Rescene / Wikidata: Q124856415"
+    },
+    {
+      "artist": "riize",
+      "debut": "2023-09-04",
+      "source": "Wikipedia: Riize / Wikidata: Q121075203"
+    },
+    {
+      "artist": "rose",
+      "debut": "2021-03-12",
+      "source": "Wikipedia: Rosé (singer) / Wikidata: Q27655344; manual review 2026-09-30",
+      "solo": true
+    },
+    {
+      "artist": "roy-kim",
+      "debut": "2013",
+      "source": "Wikipedia: Roy Kim / Wikidata: Q11773473"
+    },
+    {
+      "artist": "say-my-name",
+      "debut": "2024-10-16",
+      "source": "Wikipedia: Say My Name (group) / Wikidata: Q130581752"
+    },
+    {
+      "artist": "sechs-kies",
+      "debut": "1997-04-15",
+      "source": "Wikipedia: Sechs Kies / Wikidata: Q626900"
+    },
+    {
+      "artist": "sejeong",
+      "debut": "2016",
+      "source": "Wikipedia: Kim Se-jeong / Wikidata: Q22911780",
+      "solo": true
+    },
+    {
+      "artist": "seohyun",
+      "debut": "2017-01-17",
+      "source": "Wikipedia: Seohyun / Wikidata: Q240082; manual review 2026-09-30",
+      "solo": true
+    },
+    {
+      "artist": "seventeen",
+      "debut": "2015-05-26",
+      "source": "Wikipedia: Seventeen (South Korean band) / Wikidata: Q14524548"
+    },
+    {
+      "artist": "sf9",
+      "debut": "2016-10-05",
+      "source": "Wikipedia: SF9 / Wikidata: Q26856852"
+    },
+    {
+      "artist": "shinee",
+      "debut": "2008-05",
+      "source": "Wikipedia: Shinee / Wikidata: Q269836"
+    },
+    {
+      "artist": "shinhwa",
+      "debut": "1998",
+      "source": "Wikipedia: Shinhwa / Wikidata: Q482620"
+    },
+    {
+      "artist": "sistar",
+      "debut": "2010-06-03",
+      "source": "Wikipedia: Sistar / Wikidata: Q223048"
+    },
+    {
+      "artist": "solar",
+      "debut": "2020-04-23",
+      "source": "Wikipedia: Solar (singer) / Wikidata: Q19483969",
+      "solo": true
+    },
+    {
+      "artist": "somi",
+      "debut": "2019-06-13",
+      "source": "Wikipedia: Jeon Somi / Wikidata: Q22910214",
+      "solo": true
+    },
+    {
+      "artist": "ss301",
+      "debut": "2016",
+      "source": "Wikipedia: Double S 301 / Wikidata: Q22971816; manual review 2026-09-30"
+    },
+    {
+      "artist": "ssak3",
+      "debut": "2020-07-25",
+      "source": "Wikipedia: SSAK3 / Wikidata: Q97460833"
+    },
+    {
+      "artist": "stayc",
+      "debut": "2020-11-12",
+      "source": "Wikipedia: STAYC / Wikidata: Q101541493"
+    },
+    {
+      "artist": "stray-kids",
+      "debut": "2018-03-25",
+      "source": "Wikipedia: Stray Kids / Wikidata: Q46134670; manual review 2026-09-30"
+    },
+    {
+      "artist": "suho",
+      "debut": "2020-03-30",
+      "source": "Wikipedia: Suho / Wikidata: Q10822003",
+      "solo": true
+    },
+    {
+      "artist": "sunmi",
+      "debut": "2013",
+      "source": "Wikipedia: Sunmi / Wikidata: Q624995",
+      "solo": true
+    },
+    {
+      "artist": "super-junior",
+      "debut": "2005-11-06",
+      "source": "Wikipedia: Super Junior / Wikidata: Q239693"
+    },
+    {
+      "artist": "super-junior-de",
+      "debut": "2011-12-16",
+      "source": "Wikipedia: Super Junior-D&E / Wikidata: Q7335169"
+    },
+    {
+      "artist": "suzy",
+      "debut": "2017-01-24",
+      "source": "Wikipedia: Bae Suzy / Wikidata: Q464645; manual review 2026-09-30",
+      "solo": true
+    },
+    {
+      "artist": "t-ara",
+      "debut": "2009",
+      "source": "Wikipedia: T-ara / Wikidata: Q495383"
+    },
+    {
+      "artist": "taemin",
+      "debut": "2014-08-18",
+      "source": "Wikipedia: Taemin / Wikidata: Q153597; manual review 2026-09-30",
+      "solo": true
+    },
+    {
+      "artist": "taeyang",
+      "debut": "2008",
+      "source": "Wikipedia: Taeyang / Wikidata: Q482991",
+      "solo": true
+    },
+    {
+      "artist": "taeyeon",
+      "debut": "2015-10-07",
+      "source": "Wikipedia: Taeyeon / Wikidata: Q233371; manual review 2026-09-30",
+      "solo": true
+    },
+    {
+      "artist": "taeyong",
+      "debut": "2023-06",
+      "source": "Wikipedia: Taeyong / Wikidata: Q26459163",
+      "solo": true
+    },
+    {
+      "artist": "team",
+      "debut": "2022-11-21",
+      "source": "Wikipedia: &Team / Wikidata: Q112834233"
+    },
+    {
+      "artist": "teen-top",
+      "debut": "2010-07-09",
+      "source": "Wikipedia: Teen Top / Wikidata: Q307368"
+    },
+    {
+      "artist": "tempest",
+      "debut": "2022-03-02",
+      "source": "Wikipedia: Tempest (South Korean band) / Wikidata: Q110920753"
+    },
+    {
+      "artist": "ten",
+      "debut": "2024-02",
+      "source": "Wikipedia: Ten (singer) / Wikidata: Q26451151",
+      "solo": true
+    },
+    {
+      "artist": "the-boyz",
+      "debut": "2017-12-06",
+      "source": "Wikipedia: The Boyz (South Korean band) / Wikidata: Q41949104"
+    },
+    {
+      "artist": "the-wind",
+      "debut": "2023-05-15",
+      "source": "Wikipedia: The Wind (band) / Wikidata: Q118977203"
+    },
+    {
+      "artist": "tiffany",
+      "debut": "2016-05-11",
+      "source": "Wikipedia: Tiffany Young / Wikidata: Q236355; manual review 2026-09-30",
+      "solo": true
+    },
+    {
+      "artist": "tomorrow-x-together",
+      "debut": "2019-03-04",
+      "source": "Wikipedia: Tomorrow X Together / Wikidata: Q60550265"
+    },
+    {
+      "artist": "toy",
+      "debut": "1994",
+      "source": "Wikipedia: Toy (South Korean band) / Wikidata: Q7830499"
+    },
+    {
+      "artist": "treasure",
+      "debut": "2020-08-07",
+      "source": "Wikipedia: Treasure (band) / Wikidata: Q61057550; manual review 2026-09-30"
+    },
+    {
+      "artist": "triples",
+      "debut": "2023-02-13",
+      "source": "Wikipedia: TripleS / Wikidata: Q115099831"
+    },
+    {
+      "artist": "turbo",
+      "debut": "1995",
+      "source": "Wikipedia: Turbo (South Korean band) / Wikidata: Q7853796"
+    },
+    {
+      "artist": "tvxq",
+      "debut": "2003-12-26",
+      "source": "Wikipedia: TVXQ / Wikidata: Q192983; manual review 2026-09-30"
+    },
+    {
+      "artist": "twice",
+      "debut": "2015-10-20",
+      "source": "Wikipedia: Twice / Wikidata: Q20645861"
+    },
+    {
+      "artist": "tws",
+      "debut": "2024-01-22",
+      "source": "Wikipedia: TWS (group) / Wikidata: Q124091148"
+    },
+    {
+      "artist": "u-kiss",
+      "debut": "2008",
+      "source": "Wikipedia: U-KISS / Wikidata: Q482543"
+    },
+    {
+      "artist": "u-know",
+      "debut": "2021-01-18",
+      "source": "Wikipedia: Yunho / Wikidata: Q495352; manual review 2026-09-30",
+      "solo": true
+    },
+    {
+      "artist": "uniq",
+      "debut": "2014-10-20",
+      "source": "Wikipedia: Uniq (band) / Wikidata: Q18712416"
+    },
+    {
+      "artist": "unis",
+      "debut": "2024-03-27",
+      "source": "Wikipedia: Unis (group) / Wikidata: Q124362218"
+    },
+    {
+      "artist": "v",
+      "debut": "2023-08",
+      "source": "Wikipedia: V (singer) / Wikidata: Q18388296; manual review 2026-09-30",
+      "solo": true
+    },
+    {
+      "artist": "vanner",
+      "debut": "2019-02-14",
+      "source": "Wikipedia: Vanner (band) / Wikidata: Q63790667"
+    },
+    {
+      "artist": "verivery",
+      "debut": "2019-01-09",
+      "source": "Wikipedia: Verivery / Wikidata: Q60577989"
+    },
+    {
+      "artist": "victon",
+      "debut": "2016-11-09",
+      "source": "Wikipedia: Victon / Wikidata: Q27861498"
+    },
+    {
+      "artist": "viviz",
+      "debut": "2022-02-09",
+      "source": "Wikipedia: Viviz / Wikidata: Q108853211"
+    },
+    {
+      "artist": "vixx",
+      "debut": "2012",
+      "source": "Wikipedia: VIXX / Wikidata: Q1447659"
+    },
+    {
+      "artist": "vixx-lr",
+      "debut": "2015-08-17",
+      "source": "Wikipedia: VIXX LR / Wikidata: Q20902339"
+    },
+    {
+      "artist": "wanna-one",
+      "debut": "2017-08-07",
+      "source": "Wikipedia: Wanna One / Wikidata: Q30311578"
+    },
+    {
+      "artist": "wayv",
+      "debut": "2019-01-17",
+      "source": "Wikipedia: WayV / Wikidata: Q60062907"
+    },
+    {
+      "artist": "wheein",
+      "debut": "2018-04",
+      "source": "Wikipedia: Wheein / Wikidata: Q19603930",
+      "solo": true
+    },
+    {
+      "artist": "wheesung",
+      "debut": "1999",
+      "source": "Wikipedia: Wheesung / Wikidata: Q489505"
+    },
+    {
+      "artist": "winner",
+      "debut": "2014-08-17",
+      "source": "Wikipedia: Winner (band) / Wikidata: Q15116397"
+    },
+    {
+      "artist": "wonder-girls",
+      "debut": "2007-02",
+      "source": "Wikipedia: Wonder Girls / Wikidata: Q476119"
+    },
+    {
+      "artist": "woodz",
+      "debut": "2016-07",
+      "source": "Wikipedia: Woodz / Wikidata: Q27953522",
+      "solo": true
+    },
+    {
+      "artist": "x1",
+      "debut": "2019-08-27",
+      "source": "Wikipedia: X1 (band) / Wikidata: Q65665588"
+    },
+    {
+      "artist": "yang-yo-seob",
+      "debut": "2012",
+      "source": "Wikipedia: Yang Yo-seob / Wikidata: Q233717; manual review 2026-09-30",
+      "solo": true
+    },
+    {
+      "artist": "yena",
+      "debut": "2022-01-17",
+      "source": "Wikipedia: Choi Ye-na / Wikidata: Q55694544",
+      "solo": true
+    },
+    {
+      "artist": "yeonjun",
+      "debut": "2024-09",
+      "source": "Wikipedia: Yeonjun / Wikidata: Q62396954; manual review 2026-09-30",
+      "solo": true
+    },
+    {
+      "artist": "yooa",
+      "debut": "2020-09-07",
+      "source": "Wikipedia: YooA / Wikidata: Q21710217",
+      "solo": true
+    },
+    {
+      "artist": "yoon-jong-shin",
+      "debut": "1990",
+      "source": "Wikipedia: Yoon Jong-shin / Wikidata: Q54348"
+    },
+    {
+      "artist": "young-tak",
+      "debut": "2007",
+      "source": "Wikipedia: Young Tak / Wikidata: Q24857959"
+    },
+    {
+      "artist": "younha",
+      "debut": "2006",
+      "source": "Wikipedia: Younha / Wikidata: Q235613"
+    },
+    {
+      "artist": "yuqi",
+      "debut": "2021-05",
+      "source": "Wikipedia: Yuqi / Wikidata: Q55287306",
+      "solo": true
+    },
+    {
+      "artist": "zerobaseone",
+      "debut": "2023-07-10",
+      "source": "Wikipedia: Zerobaseone / Wikidata: Q117808633"
+    },
+    {
+      "artist": "zhou-mi",
+      "debut": "2014-07",
+      "source": "Wikipedia: Zhou Mi / Wikidata: Q489459; manual review 2026-09-30",
+      "solo": true
+    },
+    {
+      "artist": "zico",
+      "debut": "2014-11",
+      "source": "Wikipedia: Zico (rapper) / Wikidata: Q7696122; manual review 2026-09-30",
+      "solo": true
+    },
+    {
+      "artist": "ziont",
+      "debut": "2011",
+      "source": "Wikipedia: Zion.T / Wikidata: Q12614205"
+    }
+  ]
+}

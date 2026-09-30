@@ -53,6 +53,12 @@ class Artist(models.Model):
     # Public URLs use the slug; it is assigned once and kept when the name is
     # corrected so shared links keep working.
     slug = models.SlugField(max_length=220, unique=True)
+    # "YYYY", "YYYY-MM" or "YYYY-MM-DD": sources often give only the year.
+    # Owned by data/artist_debuts.json; decides whether the earliest recorded
+    # win can be called the career first (catalogue coverage starts in 2014).
+    debut = models.CharField(max_length=10, blank=True, editable=False)
+    # A group member's solo debut, so pages don't imply it was the first release.
+    debut_solo = models.BooleanField(default=False, editable=False)
 
     class Meta:
         ordering = ("name",)

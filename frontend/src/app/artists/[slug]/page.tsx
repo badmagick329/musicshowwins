@@ -5,10 +5,10 @@ import { ArtistWinsByYear } from "@/components/artist-wins-by-year";
 import { parseArtistYear } from "@/lib/artist-years";
 import { formatDate } from "@/lib/utils";
 import { ApiRequestError, getAllArtistWins, getArtist } from "@/lib/api";
-import { artistHighlights, summarizeArtist } from "@/lib/artist-profile";
+import { artistHighlights, debutFact, summarizeArtist } from "@/lib/artist-profile";
 import { JsonLd } from "@/components/json-ld";
 import { Metric, MetricGrid } from "@/components/data-display";
-import type { Artist, Win } from "@/lib/api-shared";
+import type { ArtistDetail, Win } from "@/lib/api-shared";
 import { noIndexFollow, pageMetadata, plural, siteUrl } from "@/lib/seo";
 import { artistPath } from "@/lib/paths";
 import { artistJsonLd } from "@/lib/structured-data";
@@ -24,11 +24,12 @@ async function loadArtist(key: string) {
 }
 
 // Shared by the meta description and the structured data so both state the same facts.
-function artistDescription(artist: Artist, wins: Win[]) {
+function artistDescription(artist: ArtistDetail, wins: Win[]) {
   const { earliestWin, latestWin } = summarizeArtist(wins);
   const counts = `${artist.total_wins} recorded music-show ${plural(artist.total_wins, "win")} across ${artist.winning_songs} ${plural(artist.winning_songs, "song")}`;
+  const earliestLabel = debutFact(artist, earliestWin)?.kind === "first-win" ? "First win" : "Earliest recorded win";
   const dates = earliestWin && latestWin
-    ? ` Earliest recorded win: ${earliestWin.song.title} on ${earliestWin.show.name}, ${formatDate(earliestWin.date)}. Latest win: ${formatDate(latestWin.date)}.`
+    ? ` ${earliestLabel}: ${earliestWin.song.title} on ${earliestWin.show.name}, ${formatDate(earliestWin.date)}. Latest win: ${formatDate(latestWin.date)}.`
     : "";
   return `${artist.name} has ${counts}.${dates}`;
 }
@@ -61,6 +62,7 @@ export default async function ArtistPage({ params, searchParams = Promise.resolv
   const wins = await getAllArtistWins(artist.id);
   const summary = summarizeArtist(wins);
   const highlights = artistHighlights(wins);
+  const debut = debutFact(artist, summary.earliestWin);
 
   return (
     <>
@@ -81,10 +83,11 @@ export default async function ArtistPage({ params, searchParams = Promise.resolv
 
       <section className="mt-10" aria-labelledby="summary-title">
         <h2 id="summary-title" className="mb-4 border-b-2 pb-3 font-heading text-2xl font-bold">Win summary</h2>
+        {debut && <p className="mb-4 max-w-3xl leading-relaxed">{debut.sentence}</p>}
         <MetricGrid>
           <Metric label="Recorded wins" value={String(summary.totalWins)} />
           <Metric label="Winning songs" value={String(summary.winningSongs)} />
-          <Metric label="Earliest recorded win" value={summary.earliestWin ? <WinDetail win={summary.earliestWin} /> : "Not recorded"} />
+          <Metric label={debut?.kind === "first-win" ? "First win" : "Earliest recorded win"} value={summary.earliestWin ? <WinDetail win={summary.earliestWin} /> : "Not recorded"} />
           <Metric label="Latest win" value={summary.latestWin ? <WinDetail win={summary.latestWin} /> : "Not recorded"} />
         </MetricGrid>
         {highlights.length > 0 && <p className="mt-3 text-sm text-muted-foreground"><strong className="font-semibold text-foreground">Highlights:</strong> {highlights.join(" · ")}</p>}

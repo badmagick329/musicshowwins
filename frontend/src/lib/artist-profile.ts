@@ -1,4 +1,54 @@
-import type { Win } from "@/lib/api-shared";
+import type { ArtistDetail, Win } from "@/lib/api-shared";
+import { formatDate } from "@/lib/utils";
+
+// Catalogue coverage starts here; wins before it are not recorded.
+const RECORD_START_YEAR = 2014;
+const MONTH = new Intl.DateTimeFormat("en-GB", { month: "long", year: "numeric", timeZone: "UTC" });
+
+export type DebutFact =
+  | { kind: "first-win"; sentence: string }
+  | { kind: "before-record"; sentence: string };
+
+function possessive(name: string) {
+  return name.endsWith("s") ? `${name}'` : `${name}'s`;
+}
+
+function formatDebut(debut: string) {
+  if (debut.length === 10) return `on ${formatDate(debut)}`;
+  if (debut.length === 7) return `in ${MONTH.format(new Date(`${debut}-01T00:00:00Z`))}`;
+  return `in ${debut}`;
+}
+
+function timeBetween(from: string, to: string) {
+  const [start, end] = [new Date(`${from}T00:00:00Z`), new Date(`${to}T00:00:00Z`)];
+  const days = Math.round((end.getTime() - start.getTime()) / 86_400_000);
+  if (days < 60) return `${days} ${days === 1 ? "day" : "days"}`;
+  const months = (end.getUTCFullYear() - start.getUTCFullYear()) * 12 + end.getUTCMonth() - start.getUTCMonth() - (end.getUTCDate() < start.getUTCDate() ? 1 : 0);
+  if (months < 24) return `${months} months`;
+  return `over ${Math.floor(months / 12)} years`;
+}
+
+/**
+ * Answers "when was X's first music show win?", which search data shows people ask.
+ * The earliest recorded win is only the career first when the act debuted after
+ * coverage began; earlier debuts get an explanation instead, and acts without a
+ * reviewed debut get nothing, so a first recorded win is never passed off as a first.
+ */
+export function debutFact(artist: Pick<ArtistDetail, "name" | "debut" | "debut_solo">, earliestWin: Win | null): DebutFact | null {
+  const { name, debut, debut_solo: solo } = artist;
+  if (!debut) return null;
+  const noun = solo ? "solo debut" : "debut";
+  if (Number(debut.slice(0, 4)) < RECORD_START_YEAR) {
+    const debuted = solo ? "made their solo debut" : "debuted";
+    return { kind: "before-record", sentence: `${name} ${debuted} in ${debut.slice(0, 4)}, before this record begins in ${RECORD_START_YEAR}, so any earlier wins are not listed.` };
+  }
+  if (!earliestWin) return null;
+  const when = debut.length === 10 ? `, ${timeBetween(debut, earliestWin.date)} after their ${noun} ${formatDebut(debut)}` : `, after their ${noun} ${formatDebut(debut)}`;
+  return {
+    kind: "first-win",
+    sentence: `${possessive(name)} first win on the six major music shows was “${earliestWin.song.title}” on ${earliestWin.show.name}, ${formatDate(earliestWin.date)}${when}.`,
+  };
+}
 
 export type ArtistSummary = {
   totalWins: number;

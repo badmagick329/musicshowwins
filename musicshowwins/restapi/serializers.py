@@ -103,7 +103,7 @@ class ArtistDetailSerializer(ArtistSerializer):
     indexable = serializers.BooleanField(read_only=True)
 
     class Meta(ArtistSerializer.Meta):
-        fields = (*ArtistSerializer.Meta.fields, "indexable")
+        fields = (*ArtistSerializer.Meta.fields, "indexable", "debut", "debut_solo")
 
 
 class SongSummarySerializer(serializers.ModelSerializer):

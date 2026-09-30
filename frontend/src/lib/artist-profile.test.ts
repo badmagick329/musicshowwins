@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { Win } from "./api-shared";
-import { artistHighlights, buildShowBreakdown, summarizeArtist } from "./artist-profile";
+import { artistHighlights, buildShowBreakdown, debutFact, summarizeArtist } from "./artist-profile";
 
 function win(id: number, date: string, show: { id: number; slug: string; name: string }, songId: number): Win {
   return { id, date, show: { ...show, active: true }, song: { id: songId, title: `Song ${songId}`, artist: { id: 1, slug: "artist", name: "Artist" }, total_wins: 1, latest_win_date: date, winning_shows: 1 }, performed: null, references: [], milestones: { song_win: 2, song_show_win: 1, artist_win: 2 } };
@@ -37,5 +37,35 @@ describe("artist profile calculations", () => {
     expect(artistHighlights(tie)).toEqual(["Most wins: Song 10 and Song 11 (3)", "Best year: 2025 (3 wins)", "2 triple crowns"]);
     const threeWay = [win(11, "2024-01-01", bank, 1), win(12, "2024-01-02", bank, 2), win(13, "2024-01-03", bank, 3)];
     expect(artistHighlights(threeWay)).toEqual([]);
+  });
+
+  describe("debut fact", () => {
+    const first = { ...win(20, "2024-01-18", countdown, 30), song: { ...win(20, "2024-01-18", countdown, 30).song, title: "Love 119" } };
+
+    it("calls the earliest win a first win only for debuts after coverage began", () => {
+      expect(debutFact({ name: "Riize", debut_solo: false, debut: "2023-09-04" }, first)).toEqual({
+        kind: "first-win",
+        sentence: "Riize's first win on the six major music shows was “Love 119” on M Countdown, 18 Jan 2024, 4 months after their debut on 04 Sept 2023.",
+      });
+      expect(debutFact({ name: "Stray Kids", debut_solo: false, debut: "2014" }, first)?.sentence).toBe("Stray Kids' first win on the six major music shows was “Love 119” on M Countdown, 18 Jan 2024, after their debut in 2014.");
+      expect(debutFact({ name: "Ive", debut_solo: false, debut: "2023-12" }, first)?.sentence).toContain("after their debut in December 2023.");
+    });
+
+    it("measures short and long gaps in days and years", () => {
+      expect(debutFact({ name: "Ive", debut_solo: false, debut: "2023-12-01" }, first)?.sentence).toContain("48 days after their debut");
+      expect(debutFact({ name: "Ive", debut_solo: false, debut: "2021-01-19" }, first)?.sentence).toContain("over 2 years after their debut");
+    });
+
+    it("names solo debuts so a member's group debut is not implied", () => {
+      expect(debutFact({ name: "Jennie", debut_solo: true, debut: "2018-11-12" }, first)?.sentence).toContain("after their solo debut on 12 Nov 2018.");
+      expect(debutFact({ name: "Taeyang", debut_solo: true, debut: "2008" }, first)?.sentence).toBe("Taeyang made their solo debut in 2008, before this record begins in 2014, so any earlier wins are not listed.");
+    });
+
+    it("explains pre-coverage debuts and says nothing without a reviewed debut", () => {
+      expect(debutFact({ name: "Exo", debut_solo: false, debut: "2012" }, first)).toEqual({ kind: "before-record", sentence: "Exo debuted in 2012, before this record begins in 2014, so any earlier wins are not listed." });
+      expect(debutFact({ name: "Exo", debut_solo: false, debut: "2013-12-31" }, first)?.kind).toBe("before-record");
+      expect(debutFact({ name: "Collab", debut_solo: false, debut: "" }, first)).toBeNull();
+      expect(debutFact({ name: "Riize", debut_solo: false, debut: "2023" }, null)).toBeNull();
+    });
   });
 });

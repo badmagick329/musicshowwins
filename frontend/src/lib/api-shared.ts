@@ -17,7 +17,8 @@ export type Artist = {
 };
 export type Song = { id: number; title: string; artist: Pick<Artist, "id" | "slug" | "name">; total_wins: number; latest_win_date: string | null; winning_shows: number };
 // The API decides which pages have enough substance for search engines.
-export type ArtistDetail = Artist & { indexable: boolean };
+// debut is "YYYY", "YYYY-MM" or "YYYY-MM-DD", or "" when no reviewed source exists.
+export type ArtistDetail = Artist & { indexable: boolean; debut: string; debut_solo: boolean };
 export type SongDetail = Song & { indexable: boolean };
 export type ShowSummary = { id: number; slug: string; name: string; active: boolean };
 export type Show = ShowSummary & {
