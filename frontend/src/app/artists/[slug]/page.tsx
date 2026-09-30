@@ -5,7 +5,7 @@ import { ArtistWinsByYear } from "@/components/artist-wins-by-year";
 import { parseArtistYear } from "@/lib/artist-years";
 import { formatDate } from "@/lib/utils";
 import { ApiRequestError, getAllArtistWins, getArtist } from "@/lib/api";
-import { artistHighlights, debutFact, summarizeArtist } from "@/lib/artist-profile";
+import { artistHighlights, debutFact, summarizeArtist, tripleCrowns, type TripleCrown } from "@/lib/artist-profile";
 import { JsonLd } from "@/components/json-ld";
 import { Metric, MetricGrid } from "@/components/data-display";
 import type { ArtistDetail, Win } from "@/lib/api-shared";
@@ -62,6 +62,7 @@ export default async function ArtistPage({ params, searchParams = Promise.resolv
   const wins = await getAllArtistWins(artist.id);
   const summary = summarizeArtist(wins);
   const highlights = artistHighlights(wins);
+  const crowns = tripleCrowns(wins);
   const debut = debutFact(artist, summary.earliestWin);
 
   return (
@@ -91,12 +92,25 @@ export default async function ArtistPage({ params, searchParams = Promise.resolv
           <Metric label="Latest win" value={summary.latestWin ? <WinDetail win={summary.latestWin} /> : "Not recorded"} />
         </MetricGrid>
         {highlights.length > 0 && <p className="mt-3 text-sm text-muted-foreground"><strong className="font-semibold text-foreground">Highlights:</strong> {highlights.join(" · ")}</p>}
+        {crowns.length > 0 && <TripleCrowns crowns={crowns} />}
       </section>
 
       <ArtistWinsByYear artist={artist} wins={wins} initialYear={parseArtistYear(year)} />
     </main>
     </>
   );
+}
+
+function TripleCrowns({ crowns }: { crowns: TripleCrown[] }) {
+  const total = crowns.reduce((sum, crown) => sum + crown.shows.length, 0);
+  const label = total > 3 ? `${total} triple crowns` : total === 1 ? "Triple crown" : "Triple crowns";
+  return <p className="mt-2 text-sm text-muted-foreground">
+    <strong className="font-semibold text-foreground">{label}:</strong>{" "}
+    {crowns.map((crown, index) => <span key={crown.song.id}>
+      {index > 0 && ", "}
+      <Link prefetch={false} href={`/songs/${crown.song.id}`} className="underline underline-offset-4">{crown.song.title}</Link> ({crown.shows.join(", ")})
+    </span>)}
+  </p>;
 }
 
 function WinDetail({ win }: { win: Win }) {

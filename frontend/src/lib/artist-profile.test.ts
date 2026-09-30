@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { Win } from "./api-shared";
-import { artistHighlights, buildShowBreakdown, debutFact, summarizeArtist } from "./artist-profile";
+import { artistHighlights, buildShowBreakdown, debutFact, summarizeArtist, tripleCrowns } from "./artist-profile";
 
 function win(id: number, date: string, show: { id: number; slug: string; name: string }, songId: number): Win {
   return { id, date, show: { ...show, active: true }, song: { id: songId, title: `Song ${songId}`, artist: { id: 1, slug: "artist", name: "Artist" }, total_wins: 1, latest_win_date: date, winning_shows: 1 }, performed: null, references: [], milestones: { song_win: 2, song_show_win: 1, artist_win: 2 } };
@@ -32,11 +32,24 @@ describe("artist profile calculations", () => {
   it("derives highlights and skips ones that only restate the summary", () => {
     expect(artistHighlights(wins)).toEqual(["Most wins: Song 10 (2)", "Best year: 2025 (2 wins)"]);
     const crown = [win(5, "2024-01-01", bank, 10), win(6, "2024-02-01", bank, 10), win(7, "2024-03-01", bank, 10)];
-    expect(artistHighlights(crown)).toEqual(["1 triple crown"]);
+    expect(artistHighlights(crown)).toEqual([]);
     const tie = [...crown, win(8, "2025-01-01", core, 11), win(9, "2025-02-01", core, 11), win(10, "2025-03-01", core, 11)];
-    expect(artistHighlights(tie)).toEqual(["Most wins: Song 10 and Song 11 (3)", "Best year: 2025 (3 wins)", "2 triple crowns"]);
+    expect(artistHighlights(tie)).toEqual(["Most wins: Song 10 and Song 11 (3)", "Best year: 2025 (3 wins)"]);
     const threeWay = [win(11, "2024-01-01", bank, 1), win(12, "2024-01-02", bank, 2), win(13, "2024-01-03", bank, 3)];
     expect(artistHighlights(threeWay)).toEqual([]);
+  });
+
+  it("names triple crowns by song, in the order they were won", () => {
+    const history = [
+      win(1, "2024-03-01", core, 20), win(2, "2024-01-01", bank, 10), win(3, "2024-01-08", bank, 10), win(4, "2024-01-15", bank, 10),
+      win(5, "2024-01-20", core, 20), win(6, "2024-02-01", core, 20), win(7, "2024-01-10", countdown, 10), win(8, "2024-01-17", countdown, 10),
+      win(9, "2024-01-24", countdown, 10), win(10, "2024-02-02", countdown, 10), win(11, "2024-02-03", countdown, 30),
+    ];
+    expect(tripleCrowns(history)).toEqual([
+      { song: { id: 10, title: "Song 10" }, shows: ["Music Bank", "M Countdown"] },
+      { song: { id: 20, title: "Song 20" }, shows: ["Music Core"] },
+    ]);
+    expect(tripleCrowns(history.slice(0, 3))).toEqual([]);
   });
 
   describe("debut fact", () => {
