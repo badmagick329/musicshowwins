@@ -14,8 +14,8 @@ vi.mock("@/lib/api", async (importOriginal) => ({
 
 import { ApiRequestError } from "@/lib/api";
 import { metadata as rootMetadata } from "./layout";
-import { generateMetadata as artistsMetadata } from "./artists/page";
-import { generateMetadata as songsMetadata } from "./songs/page";
+import { generateMetadata as artistsMetadata } from "./artists/(index)/page";
+import { generateMetadata as songsMetadata } from "./songs/(index)/page";
 import { generateMetadata as winsMetadata } from "./wins/page";
 import { metadata as showsMetadata } from "./shows/page";
 import { metadata as aboutMetadata } from "./about/page";

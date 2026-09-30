@@ -1,17 +1,13 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import ArtistsLoading from "./artists/loading";
-import ArtistLoading from "./artists/[slug]/loading";
-import SongsLoading from "./songs/loading";
-import SongLoading from "./songs/[id]/loading";
+import ArtistsLoading from "./artists/(index)/loading";
+import SongsLoading from "./songs/(index)/loading";
 import WinsLoading from "./wins/loading";
 
 describe("route loading messages", () => {
   it.each([
     [ArtistsLoading, "Loading artists…"],
-    [ArtistLoading, "Loading artist…"],
     [SongsLoading, "Loading songs…"],
-    [SongLoading, "Loading song…"],
     [WinsLoading, "Loading wins…"],
   ])("renders the expected route-specific message", (Loading, message) => {
     expect(renderToStaticMarkup(<Loading />)).toContain(message);
