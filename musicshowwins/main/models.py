@@ -94,6 +94,21 @@ class ArtistAlias(models.Model):
         return f"{self.alias} → {self.artist.name}"
 
 
+class RetiredArtistSlug(models.Model):
+    """A merged-away artist page's slug, kept so its links reach the merged page."""
+
+    slug = models.SlugField(max_length=220, unique=True)
+    artist = models.ForeignKey(
+        Artist, on_delete=models.CASCADE, related_name="retired_slugs"
+    )
+
+    class Meta:
+        ordering = ("slug",)
+
+    def __str__(self):
+        return f"{self.slug} → {self.artist.slug}"
+
+
 class Song(models.Model):
     artist = models.ForeignKey(Artist, on_delete=models.CASCADE, related_name="songs")
     title = models.CharField(max_length=300)

@@ -7,6 +7,7 @@ from django.conf import settings
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import extend_schema
+from main.models import RetiredArtistSlug
 from main.services import (
     all_artists_queryset,
     all_songs_queryset,
@@ -223,7 +224,7 @@ class ArtistList(generics.ListAPIView):
 
 
 class ArtistDetail(generics.RetrieveAPIView):
-    """Look artists up by slug, or by the numeric ID older URLs carried."""
+    """Look artists up by slug, a retired slug, or the numeric ID older URLs carried."""
 
     serializer_class = ArtistDetailSerializer
 
@@ -232,8 +233,15 @@ class ArtistDetail(generics.RetrieveAPIView):
 
     def get_object(self):
         key = self.kwargs["key"]
-        lookup = {"pk": int(key)} if key.isdigit() else {"slug": key}
-        return get_object_or_404(self.get_queryset(), **lookup)
+        if key.isdigit():
+            return get_object_or_404(self.get_queryset(), pk=int(key))
+        artist = self.get_queryset().filter(slug=key).first()
+        if artist is not None:
+            return artist
+        # A merged-away page's slug returns the merged artist, whose own slug
+        # tells the frontend to redirect.
+        retired = get_object_or_404(RetiredArtistSlug, slug=key)
+        return get_object_or_404(self.get_queryset(), pk=retired.artist_id)
 
 
 class SongList(generics.ListAPIView):

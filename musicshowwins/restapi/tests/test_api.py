@@ -12,6 +12,7 @@ from main.models import (
     ArtistAlias,
     ImportIssue,
     MusicShow,
+    RetiredArtistSlug,
     Song,
     Win,
     WinMoment,
@@ -831,3 +832,12 @@ def test_artist_detail_resolves_slug_and_legacy_id(archive):
     assert by_slug.data == by_id.data
     assert by_slug.data["slug"] == "alpha"
     assert client.get("/api/v1/artists/missing-artist").status_code == 404
+
+
+@pytest.mark.django_db
+def test_artist_detail_resolves_retired_slug_to_merged_artist(archive):
+    RetiredArtistSlug.objects.create(slug="alpha-2", artist=archive[1])
+    response = APIClient().get("/api/v1/artists/alpha-2")
+    assert response.status_code == 200
+    assert response.data["slug"] == "alpha"
+    assert response.data == APIClient().get("/api/v1/artists/alpha").data

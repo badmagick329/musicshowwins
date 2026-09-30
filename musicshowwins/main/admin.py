@@ -16,6 +16,7 @@ from main.models import (
     ImportIssue,
     ImportRun,
     MusicShow,
+    RetiredArtistSlug,
     Song,
     SourceApproval,
     SourcePage,
@@ -94,6 +95,12 @@ class ArtistAdmin(admin.ModelAdmin):
 class ArtistAliasAdmin(admin.ModelAdmin):
     list_display = ("alias", "artist", "normalized_name")
     search_fields = ("alias", "normalized_name", "artist__name")
+
+
+@admin.register(RetiredArtistSlug)
+class RetiredArtistSlugAdmin(admin.ModelAdmin):
+    list_display = ("slug", "artist")
+    search_fields = ("slug", "artist__name")
 
 
 @admin.register(Song)
