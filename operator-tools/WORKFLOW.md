@@ -132,8 +132,16 @@ Rerunning the same applied file is harmless.
 **4. Finish ready reviews, then export, verify and import locally.** Follow the
 queue printed after `review apply`. If ready candidates remain, give another
 batch to the agent. Deferred candidates are skipped until evidence changes or
-you include them with `review batch --include-deferred`. When no ready candidates remain, run these commands
-in order:
+you include them with `review batch --include-deferred`. Deferrals usually need
+someone to watch the video. List them with `candidates list --status pending`,
+then record each verdict yourself:
+
+```powershell
+./operator.ps1 candidates approve 1120 --reviewer <you> --reason "Includes the win clip"
+./operator.ps1 candidates reject 174 313 --reviewer <you> --reason "Song clip, no win coverage"
+```
+
+When no ready candidates remain, run these commands in order:
 
 ```powershell
 ./operator.ps1 export-approved
