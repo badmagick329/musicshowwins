@@ -409,7 +409,7 @@ def main(
                             "when using an agent reviewer. "
                             "Do not apply until the review agent "
                             "has completed every decision.\n"
-                            "Agent handoff: Follow .ignore/docs/operator-workflow/"
+                            "Agent handoff: Follow .ignore/docs/context/"
                             "agent-review-playbook.md. "
                             f'Read "{directory / "batch.json"}" as evidence. '
                             f'Fill "{directory / "decisions.json"}" '

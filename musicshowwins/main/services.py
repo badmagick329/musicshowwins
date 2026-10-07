@@ -188,7 +188,7 @@ def all_songs_queryset(**filters):
 # Google demoted the whole site in September 2026 when most indexed pages were one
 # or two Wikipedia table rows in a template. Only pages with more than that are
 # offered to search engines; the rest stay browsable but noindex. Thresholds and
-# evidence: .ignore/docs/design-docs/2026-09-29-search-index-quality.md.
+# evidence: .ignore/docs/decisions/2026-09-29-search-index-quality.md.
 SONG_INDEX_MIN_WINS = 3
 ARTIST_INDEX_MIN_WINS = 2
 
