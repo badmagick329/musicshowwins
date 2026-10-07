@@ -146,6 +146,19 @@ SOURCE_DATE_CORRECTIONS = {
     ): date(2024, 7, 3),
 }
 
+# Wins a source page omits, as (date, artist, song) per show. The sync expects
+# them like source rows, so they are neither reported missing nor superseded by
+# the page's no-chart status. Each needs a matching bootstrap `win_additions`
+# rule and a data migration.
+SOURCE_OMITTED_WINS = {
+    "show-champion": (
+        # EP.287 aired 2018-10-03 with a chart that GOT7 won (Herald POP's
+        # same-night report); the page spans September 26's "No Chart and
+        # Winner" over it.
+        (date(2018, 10, 3), "Got7", "Lullaby"),
+    ),
+}
+
 
 class WikipediaError(Exception):
     """Base exception for expected source and parse failures."""
@@ -825,6 +838,18 @@ def _corrected_dates(
     ]
 
 
+def _with_omitted_wins(
+    show_slug: str, year: int, candidates: list[WinCandidate]
+) -> list[WinCandidate]:
+    keys = {candidate.key for candidate in candidates}
+    omitted = [
+        WinCandidate(*row)
+        for row in SOURCE_OMITTED_WINS.get(show_slug, ())
+        if row[0].year == year
+    ]
+    return candidates + [row for row in omitted if row.key not in keys]
+
+
 def _year_bounds(year: int) -> tuple[date, date]:
     return date(year, 1, 1), date(year + 1, 1, 1) - timedelta(days=1)
 
@@ -1206,7 +1231,11 @@ class WikipediaImporter:
                         continue
                     html = self.client.html_for_revision(revision_page)
                     parsed = parse_wikipedia_html(html, spec.year)
-                    candidates = _corrected_dates(spec.show_slug, parsed.wins)
+                    candidates = _with_omitted_wins(
+                        spec.show_slug,
+                        spec.year,
+                        _corrected_dates(spec.show_slug, parsed.wins),
+                    )
                     if dry_run or not approved:
                         reconciliation = self._dry_run_page(show, spec, candidates)
                         unapproved = not approved

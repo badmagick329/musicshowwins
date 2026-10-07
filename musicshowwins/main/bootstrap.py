@@ -11,7 +11,7 @@ from main.models import normalize_key
 
 MANIFEST_PATH = Path(__file__).resolve().parent / "data" / "bootstrap_cleanup.json"
 RAW_COUNTS = {"shows": 6, "artists": 296, "songs": 901, "wins": 2965}
-CLEAN_COUNTS = {"shows": 6, "artists": 283, "songs": 858, "wins": 2905}
+CLEAN_COUNTS = {"shows": 6, "artists": 283, "songs": 858, "wins": 2906}
 
 MUSIC_CORE_2016_EVIDENCE = (
     "Music Core rankings were abolished in November 2015 and did not return "
@@ -150,6 +150,28 @@ def _date_corrections(manifest: dict[str, Any]) -> dict[tuple[str, str, str, str
     return result
 
 
+def _win_additions(manifest: dict[str, Any]) -> list[dict[str, str]]:
+    rules = manifest.get("win_additions", [])
+    if not isinstance(rules, list):
+        raise CleanupError("Cleanup manifest win_additions must be a list")
+    result: list[dict[str, str]] = []
+    for rule in rules:
+        fields = ("show", "date", "artist", "song")
+        if not isinstance(rule, dict) or not all(
+            isinstance(rule.get(field), str) and rule[field].strip() for field in fields
+        ):
+            raise CleanupError(f"Invalid win addition rule: {rule!r}")
+        result.append(
+            {
+                "show": rule["show"],
+                "date": rule["date"],
+                "artist": rule["artist"],
+                "title": rule["song"],
+            }
+        )
+    return result
+
+
 def _rename_row(
     row: dict[str, Any],
     artist_rules: dict[str, str],
@@ -281,6 +303,7 @@ def apply_cleanup(
     song_rules = _song_renames(manifest)
     credit_moves = _credit_moves(manifest)
     date_corrections = _date_corrections(manifest)
+    win_additions = _win_additions(manifest)
 
     source_artists = {row.get("name") for row in payload["artists"]}
     if any(source not in source_artists for source in artist_rules):
@@ -420,6 +443,18 @@ def apply_cleanup(
             cleaned_wins.append(
                 _rename_row(row, artist_rules, song_rules, credit_moves)
             )
+
+    # Additions name cleaned artists and songs, and fill a date with no winner.
+    cleaned_keys = {(row["show"], row["date"]) for row in cleaned_wins}
+    cleaned_song_keys = {
+        (row["artist"], normalize_key(row["title"])) for row in cleaned_wins
+    }
+    for row in win_additions:
+        if (row["show"], row["date"]) in cleaned_keys:
+            raise CleanupError(f"Win addition date already has a winner: {row!r}")
+        if (row["artist"], normalize_key(row["title"])) not in cleaned_song_keys:
+            raise CleanupError(f"Win addition song has no other win: {row!r}")
+        cleaned_wins.append(row)
 
     for row in undated:
         issues.append(

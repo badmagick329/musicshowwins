@@ -75,6 +75,9 @@
     {"show": "show-champion", "from": "2018-10-14", "artist": "iKon", "song": "Goodbye Road", "to": "2018-10-17"},
     {"show": "show-champion", "from": "2024-07-04", "artist": "TWS", "song": "If I'm S, Can You Be My N?", "to": "2024-07-03"}
   ],
+  "win_additions": [
+    {"show": "show-champion", "date": "2018-10-03", "artist": "Got7", "song": "Lullaby"}
+  ],
   "date_decisions": [
     {
       "show": "inkigayo", "date": "2014-04-20",

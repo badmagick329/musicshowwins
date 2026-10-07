@@ -303,9 +303,36 @@ def test_source_date_correction_matches_the_aired_date(
 
     summary = sync(show, FakeClient(html=html), year=aired.year)
 
-    assert summary.wins_added == 0
     assert summary.missing_legacy == 0
-    assert list(Win.objects.values_list("date", flat=True)) == [aired]
+    assert list(Win.objects.filter(song=song).values_list("date", flat=True)) == [aired]
+    assert (
+        not Win.objects.filter(song__artist__name=artist_name)
+        .exclude(date=aired)
+        .exists()
+    )
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("existing", [True, False])
+def test_source_omitted_win_is_expected_over_the_no_chart_row(existing):
+    show = MusicShow.objects.create(slug="show-champion", name="Show Champion")
+    song = Song.objects.create(
+        artist=Artist.objects.create(name="Got7"), title="Lullaby"
+    )
+    aired = date(2018, 10, 3)
+    if existing:
+        Win.objects.create(show=show, song=song, date=aired)
+    html = wins_html(
+        ("September 19", "Sunmi", "Siren"),
+        ("October 3", "No Chart and Winner", "No Chart and Winner"),
+    )
+
+    summary = sync(show, FakeClient(html=html), year=2018)
+
+    assert summary.wins_added == (1 if existing else 2)
+    assert summary.missing_legacy == 0
+    assert Win.objects.filter(show=show, song=song, date=aired).exists()
+    assert not EpisodeStatus.objects.filter(date=aired).exists()
 
 
 class CapturingImporter:

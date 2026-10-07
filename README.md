@@ -29,7 +29,7 @@ uv run python manage.py restore_bootstrap
 
 The restore is atomic, validates all references and expected counts, and refuses
 to run when any domain table already contains data. The snapshot restores 6
-shows, 292 artists, 882 songs and 2,905 dated wins. It also creates 12 reviewed
+shows, 283 artists, 858 songs and 2,906 dated wins. It also creates 12 reviewed
 legacy discrepancy issues and 33 rejected `legacy_undated` issues for the
 aggregate-only Music Core 2016 history. Those issues remain as audit data, not
 public dated wins. A different JSON file may be supplied explicitly with

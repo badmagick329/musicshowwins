@@ -25,7 +25,7 @@ def test_bootstrap_restores_exact_domain_dataset(capsys):
     assert MusicShow.objects.count() == 6
     assert Artist.objects.count() == 283
     assert Song.objects.count() == 858
-    assert Win.objects.count() == 2905
+    assert Win.objects.count() == 2906
     assert ArtistAlias.objects.count() == 10
     assert not SourcePage.objects.exists()
     assert not ImportRun.objects.exists()
@@ -68,7 +68,7 @@ def test_bootstrap_restores_exact_domain_dataset(capsys):
         ("Jung Yonghwa", "Jung Yong-hwa"),
     }
     assert not ArtistAlias.objects.filter(alias="Blackpink and Selena Gomez").exists()
-    assert Win.objects.filter(source_type=Win.SourceType.LEGACY).count() == 2905
+    assert Win.objects.filter(source_type=Win.SourceType.LEGACY).count() == 2906
     assert Win.objects.filter(source_revision__isnull=False).count() == 0
     assert not Win.objects.filter(show__slug="music-core", date="2016-01-01").exists()
     assert not Win.objects.filter(
@@ -179,6 +179,12 @@ def test_bootstrap_restores_exact_domain_dataset(capsys):
     ).exists()
     assert not Win.objects.filter(
         show__slug="show-champion", date=date(2018, 10, 14)
+    ).exists()
+    assert Win.objects.filter(
+        show__slug="show-champion",
+        song__artist__name="Got7",
+        song__title="Lullaby",
+        date=date(2018, 10, 3),
     ).exists()
     assert all(
         win.song.artist_id and win.show_id
