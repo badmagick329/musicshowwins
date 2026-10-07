@@ -284,19 +284,28 @@ def test_exact_historical_title_shortcuts_match_canonical_songs(show):
 
 
 @pytest.mark.django_db
-def test_source_date_correction_matches_the_aired_date():
+@pytest.mark.parametrize(
+    ("source_date", "artist_name", "title", "aired"),
+    [
+        ("October 14", "iKon", "Goodbye Road", date(2018, 10, 17)),
+        ("July 4", "TWS", "If I'm S, Can You Be My N?", date(2024, 7, 3)),
+    ],
+)
+def test_source_date_correction_matches_the_aired_date(
+    source_date, artist_name, title, aired
+):
     show = MusicShow.objects.create(slug="show-champion", name="Show Champion")
     song = Song.objects.create(
-        artist=Artist.objects.create(name="TWS"), title="If I'm S, Can You Be My N?"
+        artist=Artist.objects.create(name=artist_name), title=title
     )
-    Win.objects.create(show=show, song=song, date=date(2024, 7, 3))
-    html = wins_html(("July 4", "TWS", "If I'm S, Can You Be My N?"))
+    Win.objects.create(show=show, song=song, date=aired)
+    html = wins_html((source_date, artist_name, title))
 
-    summary = sync(show, FakeClient(html=html), year=2024)
+    summary = sync(show, FakeClient(html=html), year=aired.year)
 
     assert summary.wins_added == 0
     assert summary.missing_legacy == 0
-    assert list(Win.objects.values_list("date", flat=True)) == [date(2024, 7, 3)]
+    assert list(Win.objects.values_list("date", flat=True)) == [aired]
 
 
 class CapturingImporter:

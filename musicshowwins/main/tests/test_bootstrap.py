@@ -174,6 +174,12 @@ def test_bootstrap_restores_exact_domain_dataset(capsys):
     assert not Win.objects.filter(
         show__slug="show-champion", date=date(2024, 7, 4)
     ).exists()
+    assert Win.objects.filter(
+        show__slug="show-champion", song__artist__name="iKon", date=date(2018, 10, 17)
+    ).exists()
+    assert not Win.objects.filter(
+        show__slug="show-champion", date=date(2018, 10, 14)
+    ).exists()
     assert all(
         win.song.artist_id and win.show_id
         for win in Win.objects.select_related("song__artist", "show")

@@ -132,8 +132,12 @@ CANONICAL_SONG_TITLES = {
 # `date_corrections` rule and a data migration; without this entry a later
 # revision of the page would add the win again on the source date.
 SOURCE_DATE_CORRECTIONS = {
-    # Show Champion airs on Wednesdays: EP.524 aired 2024-07-03 (MBC Plus TOP5
-    # post and the official 240703 encore upload), the 2024 page says July 4.
+    # Show Champion airs on Wednesdays. EP.289 aired 2018-10-17 (Chosun's
+    # same-day win report, cited by the New Kids: The Final article); the page
+    # repeats that week's Inkigayo date, October 14.
+    ("show-champion", date(2018, 10, 14), "ikon", "goodbye road"): date(2018, 10, 17),
+    # EP.524 aired 2024-07-03 (MBC Plus TOP5 post and the official 240703
+    # encore upload); the 2024 page says July 4.
     (
         "show-champion",
         date(2024, 7, 4),
