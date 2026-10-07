@@ -168,6 +168,12 @@ def test_bootstrap_restores_exact_domain_dataset(capsys):
     assert not Win.objects.filter(
         show__slug="music-core", song__title="Smoothie", date=date(2024, 4, 7)
     ).exists()
+    assert Win.objects.filter(
+        show__slug="show-champion", song__artist__name="TWS", date=date(2024, 7, 3)
+    ).exists()
+    assert not Win.objects.filter(
+        show__slug="show-champion", date=date(2024, 7, 4)
+    ).exists()
     assert all(
         win.song.artist_id and win.show_id
         for win in Win.objects.select_related("song__artist", "show")

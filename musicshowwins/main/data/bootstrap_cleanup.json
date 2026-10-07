@@ -71,7 +71,8 @@
     {"from_artist": "Mad Clown & Hyolyn", "song": "Without You", "to_artist": "Mad Clown ft. Hyolyn"}
   ],
   "date_corrections": [
-    {"show": "music-core", "from": "2024-04-07", "artist": "NCT Dream", "song": "Smoothie", "to": "2024-04-06"}
+    {"show": "music-core", "from": "2024-04-07", "artist": "NCT Dream", "song": "Smoothie", "to": "2024-04-06"},
+    {"show": "show-champion", "from": "2024-07-04", "artist": "TWS", "song": "If I'm S, Can You Be My N?", "to": "2024-07-03"}
   ],
   "date_decisions": [
     {

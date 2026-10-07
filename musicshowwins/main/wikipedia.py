@@ -127,6 +127,21 @@ CANONICAL_SONG_TITLES = {
     ("wayv", "frequency (korean ver.)"): "Frequency",
 }
 
+# Exact date corrections for rows a source page dates on the wrong day, keyed
+# by show and the source row's key. Each needs a matching bootstrap
+# `date_corrections` rule and a data migration; without this entry a later
+# revision of the page would add the win again on the source date.
+SOURCE_DATE_CORRECTIONS = {
+    # Show Champion airs on Wednesdays: EP.524 aired 2024-07-03 (MBC Plus TOP5
+    # post and the official 240703 encore upload), the 2024 page says July 4.
+    (
+        "show-champion",
+        date(2024, 7, 4),
+        "tws",
+        normalize_key("If I'm S, Can You Be My N?"),
+    ): date(2024, 7, 3),
+}
+
 
 class WikipediaError(Exception):
     """Base exception for expected source and parse failures."""
@@ -793,6 +808,19 @@ def parse_wikipedia_html(html: str, year: int) -> ParsedPage:
     return ParsedPage(candidates, sorted(episodes.values(), key=lambda e: e.date))
 
 
+def _corrected_dates(
+    show_slug: str, candidates: list[WinCandidate]
+) -> list[WinCandidate]:
+    return [
+        WinCandidate(
+            SOURCE_DATE_CORRECTIONS.get((show_slug, *candidate.key), candidate.date),
+            candidate.artist,
+            candidate.song,
+        )
+        for candidate in candidates
+    ]
+
+
 def _year_bounds(year: int) -> tuple[date, date]:
     return date(year, 1, 1), date(year + 1, 1, 1) - timedelta(days=1)
 
@@ -1174,7 +1202,7 @@ class WikipediaImporter:
                         continue
                     html = self.client.html_for_revision(revision_page)
                     parsed = parse_wikipedia_html(html, spec.year)
-                    candidates = parsed.wins
+                    candidates = _corrected_dates(spec.show_slug, parsed.wins)
                     if dry_run or not approved:
                         reconciliation = self._dry_run_page(show, spec, candidates)
                         unapproved = not approved

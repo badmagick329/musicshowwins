@@ -283,6 +283,22 @@ def test_exact_historical_title_shortcuts_match_canonical_songs(show):
     assert ImportIssue.objects.count() == 0
 
 
+@pytest.mark.django_db
+def test_source_date_correction_matches_the_aired_date():
+    show = MusicShow.objects.create(slug="show-champion", name="Show Champion")
+    song = Song.objects.create(
+        artist=Artist.objects.create(name="TWS"), title="If I'm S, Can You Be My N?"
+    )
+    Win.objects.create(show=show, song=song, date=date(2024, 7, 3))
+    html = wins_html(("July 4", "TWS", "If I'm S, Can You Be My N?"))
+
+    summary = sync(show, FakeClient(html=html), year=2024)
+
+    assert summary.wins_added == 0
+    assert summary.missing_legacy == 0
+    assert list(Win.objects.values_list("date", flat=True)) == [date(2024, 7, 3)]
+
+
 class CapturingImporter:
     def __init__(self):
         self.calls = []
