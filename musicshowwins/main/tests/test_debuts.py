@@ -11,13 +11,14 @@ from main.models import Artist
 DATA_FILE = Path(__file__).resolve().parents[1] / "data" / "artist_debuts.json"
 
 
-def document(*entries):
+def document(*entries, omitted=()):
     return {
-        "version": 1,
+        "version": 2,
         "debuts": [
             {"artist": slug, "debut": debut, "source": "Wikipedia: test"}
             for slug, debut in entries
         ],
+        "omitted": [{"artist": slug, "reason": "No debut stated."} for slug in omitted],
     }
 
 
@@ -72,19 +73,36 @@ def test_import_rejects_unknown_and_duplicate_artists():
 
 
 @pytest.mark.django_db
+def test_omitted_artists_get_no_debut_and_must_exist():
+    Artist.objects.create(name="Riize", debut="2023")
+    Artist.objects.create(name="Shaun")
+    assert import_debuts(document(omitted=["riize", "shaun"])) == 1
+    assert set(Artist.objects.values_list("debut", flat=True)) == {""}
+    with pytest.raises(DebutDocumentError, match="Unknown artist slug"):
+        import_debuts(document(omitted=["merged-away"]))
+    with pytest.raises(DebutDocumentError, match="duplicate"):
+        import_debuts(document(("riize", "2023"), omitted=["riize"]))
+    blank = document(omitted=["shaun"])
+    blank["omitted"][0]["reason"] = " "
+    with pytest.raises(DebutDocumentError, match="reason"):
+        import_debuts(blank)
+
+
+@pytest.mark.django_db
 def test_command_reports_document_errors(tmp_path):
     path = tmp_path / "debuts.json"
-    path.write_text(json.dumps({"version": 2, "debuts": []}), encoding="utf-8")
-    with pytest.raises(CommandError, match="version 1"):
+    path.write_text(json.dumps({"version": 1, "debuts": []}), encoding="utf-8")
+    with pytest.raises(CommandError, match="version 2"):
         call_command("import_artist_debuts", str(path))
 
 
 def test_shipped_debuts_file_is_valid():
     from main.debut_io import _validate
 
-    debuts = _validate(json.loads(DATA_FILE.read_text(encoding="utf-8")))
+    debuts, omitted = _validate(json.loads(DATA_FILE.read_text(encoding="utf-8")))
     assert debuts["riize"] == ("2023-09-04", False)
     assert debuts["jennie"] == ("2018-11-12", True)
+    assert "shaun" in omitted
 
 
 @pytest.mark.django_db
