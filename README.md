@@ -83,6 +83,13 @@ revision provenance; conflicting winners are quarantined as import issues, and
 missing historical rows are reported but never deleted. Exact credited
 collaboration names are kept as one artist.
 
+Source table expansion is bounded before allocation: at most 64 columns and
+colspan, 1,000 rowspan, and page totals of 10,000 actual rows, 250,000 expanded
+cells and 500,000 work units (row traversal, carried spans, declared span area
+and output width). Spans must be complete positive ASCII integers; overlapping
+spans are rejected. A limit or malformed table fails the page as `INVALID_SOURCE`
+with a useful error and applies no partial catalogue or provenance changes.
+
 `--dry-run` does not write `ImportRun`, `SourcePage`, `ImportIssue`, revision or
 domain data. Use it to review every proposed addition, conflict and missing
 legacy win before a real sync. `--strict` exits unsuccessfully whenever source
@@ -128,12 +135,23 @@ warms the API responses used by the unfiltered home, artists, songs, wins, and
 shows pages. The 24-hour lifetime is a fallback if an invalidation callback is
 missed.
 
-Production must set the same `INTERNAL_API_SECRET` for Django and Next.js. This
-authenticates cacheable frontend GETs, which bypass Django's public anonymous
-throttle. It must also set the same `CACHE_REVALIDATION_SECRET` for both
-services, and configure Django's `CACHE_REVALIDATION_URL` to the frontend's
+Refresh uses two authenticated requests to `/api/revalidate`: first
+`?action=invalidate`, then `?action=warm`. Next applies tag invalidation at request
+completion, so warming in that same request would expire the new entries.
+
+Production must set the same `INTERNAL_API_SECRET` for Django and Next.js. Public
+frontend cache misses carry `X-KpopWins-Public-Read: 1` and share a database-backed
+budget of 600 GETs per fixed minute across workers and replicas. Cache hits
+remain usable after exhaustion; rejected misses receive 429 with `Retry-After`.
+Trusted private consumers and explicit warming omit that marker and bypass the
+anonymous throttle. Production must also set the same `CACHE_REVALIDATION_SECRET`
+for both services, and configure Django's `CACHE_REVALIDATION_URL` to the frontend's
 `/api/revalidate` endpoint. Public POSTs remain uncached and retain their
 per-visitor throttling.
+
+The frontend accepts POST only for corrections and caps their body at 32 KiB,
+checking declared length before reading and actual stream bytes while reading.
+Oversized requests return 413 without reaching Django.
 
 ## Checks
 
@@ -167,7 +185,7 @@ server with its Node.js runtime. The same immutable image can run either process
 
 ```text
 docker build --platform linux/amd64 --tag kpopwins:0123456789ab .
-docker run --rm kpopwins:0123456789ab gunicorn musicshowwins.wsgi:application --bind 0.0.0.0:8000
+docker run --rm --env-file production.env kpopwins:0123456789ab gunicorn musicshowwins.wsgi:application --bind 0.0.0.0:8000
 docker run --rm kpopwins:0123456789ab node /app/frontend/server.js
 docker run --rm kpopwins:0123456789ab python --version
 docker run --rm kpopwins:0123456789ab node --version
@@ -176,6 +194,23 @@ docker run --rm kpopwins:0123456789ab node --version
 Production orchestration and host configuration are intentionally kept outside
 version control. The public repository only defines and verifies the portable
 application image.
+
+The runtime defaults to `DEBUG=0` and refuses Django startup without a
+non-development `SECRET_KEY`. Create `production.env` outside version control
+with a randomly generated production secret, `ALLOWED_HOSTS`, `BASE_URL`,
+`CSRF_TRUSTED_ORIGINS`, and the deployment's database settings. Configure the
+shared API/cache secrets described above for both services. The build-only
+static collection secret is never a runtime environment default. Local setup
+uses the explicit `DEBUG=1` in `.env.example`.
+
+CI actions use full commit pins and `contents: read`; uv is pinned to the same
+exact version as the Docker build. To refresh them, review each publisher's
+release notes and action inputs, resolve the release tag with
+`git ls-remote https://github.com/<publisher>/<action>.git refs/tags/<version>`,
+and verify the commit in that publisher's release before updating its SHA and
+version comment. For an annotated tag, use its peeled commit (`^{}`). Update
+both uv versions together. Run all CI jobs, including the production image's
+missing-secret and configured-startup checks, before accepting a refresh.
 
 Deployment orchestration runs migrations and synchronizes the committed
 artist-moment content before starting the API. The content file declares each

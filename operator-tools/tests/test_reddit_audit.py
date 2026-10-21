@@ -13,6 +13,7 @@ from kpopwins_operator.reddit import (
     REDDIT_SHOW_ARCHIVES,
     RedditError,
     _resolve_archive_path,
+    _write_report,
     archive_link_kind,
     episode_date,
     extract_section_links,
@@ -24,6 +25,92 @@ from kpopwins_operator.reddit import (
     run_reddit_audit,
 )
 from tests.test_reddit_client import Session, reddit_config
+
+
+@pytest.mark.parametrize("marker", ["=", "+", "-", "@"])
+@pytest.mark.parametrize(
+    "prefix", ["", " ", "\t\r\n", "\x00\x1b", "\u00a0\ufeff\u200b"]
+)
+def test_report_escapes_spreadsheet_formulas_without_changing_json(
+    tmp_path, marker, prefix
+):
+    value = prefix + marker + 'HYPERLINK("https://example.com", "클릭")'
+    report = {
+        "episodes": [
+            {
+                "show_slug": "inkigayo",
+                "win_date": "2024-06-23",
+                "local_win": {"artist_name": value, "song_title": value},
+                "winner_text": value,
+                "episode_url": "https://www.reddit.com/r/kpop/wiki/example",
+                "links": [
+                    {
+                        "link_url": "https://youtu.be/abc123XYZ_1",
+                        "provider": "youtube",
+                        "external_id": "abc123XYZ_1",
+                        "classification": "new_unverified",
+                        "video_title": value,
+                        "publisher_name": value,
+                        "publisher_external_id": value,
+                        "existing_review_status": "",
+                    }
+                ],
+            }
+        ]
+    }
+    report_path = tmp_path / "audit.json"
+    tsv_path = tmp_path / "audit.tsv"
+
+    _write_report(report_path, tsv_path, report)
+
+    assert json.loads(report_path.read_text(encoding="utf-8")) == report
+    lines = tsv_path.read_text(encoding="utf-8").split("\n")
+    assert len(lines) == 3
+    cells = lines[1].split("\t")
+    assert len(cells) == len(lines[0].split("\t")) == 14
+    escaped = "'" + value.replace("\t", " ").replace("\r", " ").replace("\n", " ")
+    for index in (2, 3, 4, 10, 11, 12):
+        assert cells[index] == escaped
+
+
+def test_report_preserves_readable_text_and_tsv_boundaries(tmp_path):
+    value = '아이유 · "Love wins all" (Live) + encore!\t팬\r\n영상'
+    report = {
+        "episodes": [
+            {
+                "show_slug": "inkigayo",
+                "win_date": "2024-06-23",
+                "local_win": {"artist_name": value, "song_title": value},
+                "winner_text": value,
+                "episode_url": "https://www.reddit.com/r/kpop/wiki/example",
+                "links": [
+                    {
+                        "link_url": "https://youtu.be/abc123XYZ_1",
+                        "provider": "youtube",
+                        "external_id": "abc123XYZ_1",
+                        "classification": "new_unverified",
+                        "video_title": value,
+                        "publisher_name": value,
+                        "publisher_external_id": "",
+                        "existing_review_status": "",
+                    }
+                ],
+            }
+        ]
+    }
+    report_path = tmp_path / "audit.json"
+    tsv_path = tmp_path / "audit.tsv"
+
+    _write_report(report_path, tsv_path, report)
+
+    assert json.loads(report_path.read_text(encoding="utf-8")) == report
+    lines = tsv_path.read_text(encoding="utf-8").splitlines()
+    assert len(lines) == 2
+    cells = lines[1].split("\t")
+    assert len(cells) == 14
+    for index in (2, 3, 4, 10, 11):
+        assert cells[index] == '아이유 · "Love wins all" (Live) + encore! 팬  영상'
+
 
 MAIN_INDEX = """**Music show archives**
 

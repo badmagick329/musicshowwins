@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { connection } from "next/server";
-import { buildServerApiUrl, publicArchiveCacheTag, publicArchiveRevalidateSeconds } from "@/lib/api-server";
+import { buildServerApiUrl } from "@/lib/api-server";
+import { readArchive } from "@/lib/archive-read";
 import { siteUrl } from "@/lib/seo";
 import { artistPath } from "@/lib/paths";
 
@@ -38,17 +39,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${siteUrl}/about`, changeFrequency: "monthly", priority: 0.5 },
   ];
 
-  const response = await fetch(buildServerApiUrl("/sitemap"), {
-    headers: {
-      "X-Forwarded-Proto": "https",
-      ...(process.env.INTERNAL_API_SECRET
-        ? { "X-KpopWins-Internal-Key": process.env.INTERNAL_API_SECRET }
-        : {}),
-    },
-    next: { revalidate: publicArchiveRevalidateSeconds, tags: [publicArchiveCacheTag] },
-  });
-  if (!response.ok) throw new Error(`Sitemap source failed (${response.status}).`);
-  const source: unknown = await response.json();
+  const source = (await readArchive(buildServerApiUrl("/sitemap"))).data;
   if (!isSitemapSource(source)) throw new Error("Sitemap source returned invalid data.");
 
   return [

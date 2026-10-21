@@ -1,11 +1,12 @@
 import "server-only";
+import { readArchive, warmArchive } from "@/lib/archive-read";
+export { internalRequestHeaders, publicArchiveCacheTag, publicArchiveRevalidateSeconds } from "@/lib/archive-read";
 import { artistOrderings, type ArtistSort } from "@/lib/artist-list";
 import { archiveToday } from "@/lib/rankings";
 import { addDays, chooseWeek, koreaToday, weekStart } from "@/lib/this-week";
 import {
   buildApiUrl,
   parseApiPage,
-  requestJson,
   type ApiPage,
   type ApiParams,
   type ApiTransport,
@@ -22,23 +23,6 @@ import {
 } from "@/lib/api-shared";
 
 const defaultBaseUrl = "http://127.0.0.1:8000/api/v1";
-export const publicArchiveCacheTag = "public-archive";
-export const publicArchiveRevalidateSeconds = 86_400;
-
-export function internalRequestHeaders() {
-  const headers: Record<string, string> = { "X-Forwarded-Proto": "https" };
-  const secret = process.env.INTERNAL_API_SECRET;
-  if (secret) headers["X-KpopWins-Internal-Key"] = secret;
-  return headers;
-}
-
-function publicArchiveRequestOptions() {
-  return {
-    headers: internalRequestHeaders(),
-    next: { revalidate: publicArchiveRevalidateSeconds, tags: [publicArchiveCacheTag] },
-  };
-}
-
 export function getServerApiBaseUrl() {
   return (process.env.DJANGO_API_BASE_URL || defaultBaseUrl).replace(/\/$/, "");
 }
@@ -48,13 +32,13 @@ export function buildServerApiUrl(path: string, params: ApiParams = {}) {
 }
 
 export async function serverRequestPage<T>(path: string, params?: ApiParams, signal?: AbortSignal) {
-  return parseApiPage<T>(await requestJson<unknown>(buildServerApiUrl(path, params), signal, publicArchiveRequestOptions()));
+  return parseApiPage<T>((await readArchive(buildServerApiUrl(path, params), signal)).data);
 }
 
 export const serverTransport: ApiTransport = { requestPage: serverRequestPage, requestDetail: serverRequestJson };
 
 async function serverRequestJson<T>(path: string, signal?: AbortSignal) {
-  return requestJson<T>(buildServerApiUrl(path), signal, publicArchiveRequestOptions());
+  return (await readArchive(buildServerApiUrl(path), signal)).data as T;
 }
 
 function nextPageNumber(next: string, expectedPath: string) {
@@ -98,7 +82,7 @@ export const getShows = () => serverRequestPage<Show>("/shows");
 export async function warmCanonicalArchivePages() {
   const today = archiveToday();
   const currentYear = today.slice(0, 4);
-  await Promise.all([
+  await warmArchive(() => Promise.all([
     serverRequestPage<ArtistLeaderboardRow>("/leaderboards/artists", { limit: 5, date_from: `${currentYear}-01-01`, date_to: today }),
     serverRequestPage<SongLeaderboardRow>("/leaderboards/songs", { limit: 5, date_from: `${currentYear}-01-01`, date_to: today }),
     serverRequestPage<ArtistLeaderboardRow>("/leaderboards/artists", { date_from: `${currentYear}-01-01`, date_to: today, page: 1 }),
@@ -109,7 +93,7 @@ export async function warmCanonicalArchivePages() {
     getArtists(),
     getSongs(),
     serverRequestPage<Win>("/wins", { ordering: "-date", page: 1 }),
-  ]);
+  ]));
 }
 
 async function safePage<T>(label: string, path: string, params?: Record<string, string | number>) {

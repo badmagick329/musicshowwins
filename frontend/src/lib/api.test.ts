@@ -34,7 +34,7 @@ describe("API URLs and pagination", () => {
 });
 
 describe("request failures and input", () => {
-  it("caches server page requests under the shared archive tag", async () => {
+  it("marks server page cache misses as public without attaching caller cancellation", async () => {
     vi.stubEnv("INTERNAL_API_SECRET", "internal-secret");
     const fetchMock = vi.fn<(input: string | URL | Request, init?: RequestInit) => Promise<Response>>(async () =>
       new Response(JSON.stringify({ count: 0, next: null, previous: null, results: [] })));
@@ -49,9 +49,9 @@ describe("request failures and input", () => {
         headers: {
           "X-KpopWins-Internal-Key": "internal-secret",
           "X-Forwarded-Proto": "https",
+          "X-KpopWins-Public-Read": "1",
         },
-        next: { revalidate: 86400, tags: ["public-archive"] },
-        signal: controller.signal,
+        cache: "no-store",
       }),
     );
   });
@@ -68,8 +68,9 @@ describe("request failures and input", () => {
       expect.objectContaining({
         headers: {
           "X-Forwarded-Proto": "https",
+          "X-KpopWins-Public-Read": "1",
         },
-        next: { revalidate: 86400, tags: ["public-archive"] },
+        cache: "no-store",
       }),
     );
   });

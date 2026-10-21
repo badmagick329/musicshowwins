@@ -4,6 +4,7 @@ import json
 import re
 import sqlite3
 import time
+import unicodedata
 from collections import deque
 from dataclasses import dataclass, field
 from datetime import UTC, date, datetime, timedelta
@@ -828,7 +829,18 @@ def _empty_totals() -> dict[str, int]:
 
 
 def _tsv_cell(value: Any) -> str:
-    return str(value).replace("\t", " ").replace("\r", " ").replace("\n", " ")
+    text = str(value).replace("\t", " ").replace("\r", " ").replace("\n", " ")
+    # Spreadsheet importers can skip leading whitespace and invisible controls.
+    # Escape only the human report; the JSON retains the original evidence.
+    significant = next(
+        (
+            char
+            for char in text
+            if not char.isspace() and unicodedata.category(char) not in {"Cc", "Cf"}
+        ),
+        "",
+    )
+    return "'" + text if significant in {"=", "+", "-", "@"} else text
 
 
 def _episode_url(page_path: str) -> str:

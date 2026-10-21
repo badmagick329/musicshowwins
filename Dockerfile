@@ -44,6 +44,7 @@ COPY --from=frontend-builder --chown=kpopwins:kpopwins /build/frontend/.next/sta
 COPY --from=frontend-builder --chown=kpopwins:kpopwins /build/frontend/.next/static ./frontend/.next/static
 ENV PATH="/opt/venv/bin:${PATH}" \
     PYTHONPATH=/app/musicshowwins \
+    DEBUG=0 \
     NODE_ENV=production \
     HOSTNAME=0.0.0.0
 USER kpopwins

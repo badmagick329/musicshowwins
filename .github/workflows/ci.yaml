@@ -4,6 +4,9 @@ on:
   push:
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
   checks:
     runs-on: ubuntu-latest
@@ -12,12 +15,12 @@ jobs:
       DJANGO_SETTINGS_MODULE: musicshowwins.test_settings
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v6
+        uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6.8.0
         with:
-          version: "latest"
+          version: "0.12.3"
           python-version: "3.13"
           enable-cache: true
 
@@ -46,15 +49,15 @@ jobs:
         working-directory: frontend
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
 
       - name: Set up pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@41ff72655975bd51cab0327fa583b6e92b6d3061 # v4.2.0
         with:
           package_json_file: frontend/package.json
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: 24
           cache: pnpm
@@ -82,12 +85,12 @@ jobs:
         working-directory: operator-tools
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v6
+        uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6.8.0
         with:
-          version: "latest"
+          version: "0.12.3"
           python-version: "3.13"
           enable-cache: true
           cache-dependency-glob: operator-tools/uv.lock
@@ -108,7 +111,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
 
       - name: Build Linux AMD64 production image
         run: docker build --platform linux/amd64 --tag kpopwins:ci .
@@ -119,10 +122,15 @@ jobs:
       - name: Check Node.js runtime
         run: docker run --rm kpopwins:ci node --version
 
+      - name: Reject Django startup without a production secret
+        run: python scripts/check-production-image.py kpopwins:ci
+
+      - name: Verify standalone public cache and warming boundaries
+        run: python scripts/check-frontend-cache.py kpopwins:ci
+
       - name: Run Django deployment checks
         run: >-
           docker run --rm
-          --env DEBUG=0
           --env SECRET_KEY=test-only-ci-production-secret-with-sufficient-entropy
           --env ALLOWED_HOSTS=api.example.test
           --env CSRF_TRUSTED_ORIGINS=https://api.example.test

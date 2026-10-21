@@ -20,18 +20,27 @@ def invalidate_public_archive_cache() -> None:
     if not url or not secret:
         raise CacheInvalidationError("Cache invalidation is incompletely configured.")
 
-    try:
-        response = requests.post(
-            url,
-            headers={"Authorization": f"Bearer {secret}"},
-            timeout=10,
-        )
-        response.raise_for_status()
-    except (requests.ConnectionError, requests.Timeout) as exc:
-        raise CacheInvalidationUnavailable(
-            "The frontend cache endpoint is unavailable."
-        ) from exc
-    except requests.RequestException as exc:
-        raise CacheInvalidationError(
-            "Could not invalidate the public archive cache."
-        ) from exc
+    # Next flushes tag invalidation at request completion. Warming in that same
+    # request creates entries that the pending invalidation immediately expires.
+    for action, confirmation in (("invalidate", "revalidated"), ("warm", "warmed")):
+        try:
+            response = requests.post(
+                url,
+                params={"action": action},
+                headers={"Authorization": f"Bearer {secret}"},
+                timeout=10,
+            )
+            response.raise_for_status()
+            payload = response.json()
+            if not isinstance(payload, dict) or payload.get(confirmation) is not True:
+                raise CacheInvalidationError(
+                    f"Frontend did not confirm cache action '{action}'."
+                )
+        except (requests.ConnectionError, requests.Timeout) as exc:
+            raise CacheInvalidationUnavailable(
+                f"The frontend cache endpoint is unavailable during '{action}'."
+            ) from exc
+        except (requests.RequestException, ValueError) as exc:
+            raise CacheInvalidationError(
+                f"Could not {action} the public archive cache."
+            ) from exc

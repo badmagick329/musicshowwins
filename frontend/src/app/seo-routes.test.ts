@@ -43,11 +43,12 @@ describe("SEO and agent discovery routes", () => {
     const [url, options] = fetchMock.mock.calls[0]!;
     expect(String(url)).toContain("/api/v1/sitemap");
     expect(new Headers(options?.headers).get("X-Forwarded-Proto")).toBe("https");
+    expect(new Headers(options?.headers).get("X-KpopWins-Public-Read")).toBe("1");
   });
 
   it("fails generation instead of publishing a partial sitemap", async () => {
     vi.stubGlobal("fetch", vi.fn(async () => new Response(null, { status: 503 })));
-    await expect(sitemap()).rejects.toThrow("Sitemap source failed (503).");
+    await expect(sitemap()).rejects.toMatchObject({ status: 503 });
   });
 
   it("publishes concise agent guidance as markdown", async () => {

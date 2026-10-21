@@ -1,6 +1,11 @@
+from datetime import date, timedelta
+
 import pytest
 
+from main import wikipedia
 from main.wikipedia import (
+    MAX_SOURCE_ROWS,
+    MAX_TABLE_COLUMNS,
     RevisionPage,
     WikipediaClient,
     WikipediaParseError,
@@ -408,3 +413,121 @@ def test_parser_drops_an_episode_status_on_a_date_with_a_winner():
     """
 
     assert parse_wikipedia_html(html, 2014).episodes == []
+
+
+@pytest.mark.parametrize("attribute", ["rowspan", "colspan"])
+@pytest.mark.parametrize("value", ["1000000000", "9" * 10_000])
+def test_parser_rejects_huge_spans_as_source_errors(attribute, value):
+    html = (
+        "<table><tr><th>Date</th><th>Artist</th><th>Song</th></tr>"
+        f'<tr><td>January 5</td><td {attribute}="{value}">Alpha</td>'
+        "<td>Song</td></tr></table>"
+    )
+
+    with pytest.raises(WikipediaParseError, match=f"{attribute}.*limit"):
+        parse_wikipedia_html(html, 2025)
+
+
+@pytest.mark.parametrize("attribute", ["rowspan", "colspan"])
+@pytest.mark.parametrize("value", ["0", "-1", "1.5", "junk", "", "2;", "٢"])
+def test_parser_rejects_malformed_spans_instead_of_guessing(attribute, value):
+    html = f'<table><tr><td {attribute}="{value}">Ignored</td></tr></table>'
+
+    with pytest.raises(WikipediaParseError, match=attribute):
+        parse_wikipedia_html(html, 2025)
+
+
+def test_parser_limits_actual_rows_even_when_they_are_empty():
+    html = "<table>" + "<tr></tr>" * (MAX_SOURCE_ROWS + 1) + "</table>"
+
+    with pytest.raises(WikipediaParseError, match="rows exceed page limit"):
+        parse_wikipedia_html(html, 2025)
+
+
+def test_parser_limits_columns_with_only_individually_valid_spans():
+    html = (
+        '<table><tr><td colspan="32">First</td>'
+        '<td colspan="33">Second</td></tr></table>'
+    )
+
+    with pytest.raises(WikipediaParseError, match="columns exceed limit"):
+        parse_wikipedia_html(html, 2025)
+
+
+def test_parser_limits_columns_accumulated_by_active_rowspans():
+    html = (
+        '<table><tr><td rowspan="1000" colspan="32">First</td></tr>'
+        '<tr><td rowspan="1000" colspan="32">Second</td></tr>'
+        "<tr><td>Overflow</td></tr></table>"
+    )
+
+    with pytest.raises(WikipediaParseError, match="columns exceed limit"):
+        parse_wikipedia_html(html, 2025)
+
+
+def test_parser_limits_work_across_tables_before_reserving_more_active_spans():
+    table = '<table><tr><td rowspan="1000" colspan="64">X</td></tr></table>'
+
+    with pytest.raises(WikipediaParseError, match="work exceeds page limit"):
+        parse_wikipedia_html(table * 8, 2025)
+
+
+def test_parser_charges_actual_rows_carried_by_active_spans(monkeypatch):
+    monkeypatch.setattr(wikipedia, "MAX_EXPANSION_WORK", 100)
+    html = (
+        '<table><tr><td rowspan="10" colspan="8">X</td></tr>'
+        + "<tr></tr>" * 9
+        + "</table>"
+    )
+
+    with pytest.raises(WikipediaParseError, match="work exceeds page limit"):
+        parse_wikipedia_html(html, 2025)
+
+
+def test_parser_limits_actual_rows_across_tables(monkeypatch):
+    monkeypatch.setattr(wikipedia, "MAX_SOURCE_ROWS", 4)
+    table = "<table><tr></tr><tr></tr><tr></tr></table>"
+
+    with pytest.raises(WikipediaParseError, match="rows exceed page limit"):
+        parse_wikipedia_html(table * 2, 2025)
+
+
+def test_parser_limits_expanded_cells_across_tables(monkeypatch):
+    monkeypatch.setattr(wikipedia, "MAX_EXPANDED_CELLS", 2 * MAX_TABLE_COLUMNS)
+    table = f'<table><tr><td colspan="{MAX_TABLE_COLUMNS}">X</td></tr></table>'
+
+    with pytest.raises(WikipediaParseError, match="cells exceed page limit"):
+        parse_wikipedia_html(table * 3, 2025)
+
+
+def test_parser_rejects_overlapping_spans():
+    html = (
+        '<table><tr><td>First</td><td rowspan="2">Active</td></tr>'
+        '<tr><td colspan="2">Overlap</td></tr></table>'
+    )
+
+    with pytest.raises(WikipediaParseError, match="overlapping cell spans"):
+        parse_wikipedia_html(html, 2025)
+
+
+def test_parser_keeps_a_full_year_with_a_spanning_artist_and_grouped_header():
+    body = []
+    for week in range(52):
+        day = date(2014, 1, 3) + timedelta(weeks=week)
+        artist = '<td rowspan="52">Alpha &amp; Beta</td>' if week == 0 else ""
+        body.append(
+            f"<tr><td>{day.isoformat()}</td>{artist}<td>Song {week}</td>"
+            "<td>9,000</td></tr>"
+        )
+    html = (
+        '<h2>2014</h2><table><tr><th rowspan="2">Date</th>'
+        '<th rowspan="2">Artist</th><th colspan="2">Song and score</th></tr>'
+        "<tr><th>Song</th><th>Score</th></tr>" + "".join(body) + "</table>"
+    )
+
+    rows = parse_wikipedia_html(html, 2014).wins
+
+    assert len(rows) == 52
+    assert rows[-1].date == date(2014, 12, 26)
+    assert rows[-1].artist == "Alpha & Beta"
+    assert rows[-1].song == "Song 51"

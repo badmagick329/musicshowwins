@@ -159,6 +159,57 @@ def test_invalid_page_records_failure_and_preserves_existing_revision(show):
 
 
 @pytest.mark.django_db
+@pytest.mark.parametrize("existing_source", [True, False])
+@pytest.mark.parametrize(
+    "poison",
+    [
+        '<table><tr><td colspan="' + "9" * 10_000 + '">X</td></tr></table>',
+        '<table><tr><td rowspan="1000" colspan="32">X</td></tr>'
+        '<tr><td rowspan="1000" colspan="32">Y</td></tr>'
+        "<tr><td>Z</td></tr></table>",
+        '<table><tr><td rowspan="1000" colspan="64">X</td></tr></table>' * 8,
+    ],
+    ids=["huge-integer", "active-columns", "aggregate-work"],
+)
+def test_oversized_page_changes_no_catalogue_or_provenance(
+    show, existing_source, poison
+):
+    source = None
+    if existing_source:
+        source = SourcePage.objects.create(
+            show=show,
+            year=2026,
+            page_title="Existing title",
+            latest_revision="100",
+            last_synced_at=datetime(2026, 8, 1, tzinfo=timezone.utc),
+        )
+    # The first table is valid; rejection anywhere must precede reconciliation.
+    client = FakeClient(
+        revision="101",
+        html=wins_html(("January 3", "New Artist", "New Song")) + poison,
+    )
+
+    summary = sync(show, client)
+
+    assert summary.wins_added == 0
+    assert summary.pages_processed == 0
+    assert summary.page_reports[0].status == "failed"
+    assert summary.failures
+    assert Artist.objects.count() == Song.objects.count() == Win.objects.count() == 0
+    assert EpisodeStatus.objects.count() == 0
+    assert SourcePage.objects.count() == int(existing_source)
+    if source is not None:
+        source.refresh_from_db()
+        assert source.page_title == "Existing title"
+        assert source.latest_revision == "100"
+        assert source.last_synced_at == datetime(2026, 8, 1, tzinfo=timezone.utc)
+    assert ImportRun.objects.get().status == ImportRun.Status.FAILED
+    issue = ImportIssue.objects.get()
+    assert issue.issue_type == ImportIssue.IssueType.INVALID_SOURCE
+    assert "limit" in issue.notes
+
+
+@pytest.mark.django_db
 def test_new_win_has_source_provenance_and_rerun_is_idempotent(show):
     client = FakeClient(revision="101")
 

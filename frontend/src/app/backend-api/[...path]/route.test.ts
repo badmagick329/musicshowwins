@@ -59,14 +59,13 @@ describe("backend API proxy", () => {
     expect(options).toBeDefined();
     if (!options) throw new Error("Expected proxy request options");
     const headers = new Headers(options.headers);
-    expect(String(url)).toBe("http://backend:8000/api/v1/wins?page=2&show=music-bank");
-    expect(options.method).toBe("GET");
-    expect(options.credentials).toBe("omit");
+    expect(String(url)).toBe("http://backend:8000/api/v1/wins?show=music-bank&page=2");
     expect(headers.get("X-Forwarded-Proto")).toBe("https");
     expect(headers.get("X-KpopWins-Internal-Key")).toBe("internal-secret");
+    expect(headers.get("X-KpopWins-Public-Read")).toBe("1");
     expect(headers.has("X-Forwarded-For")).toBe(false);
     expect(headers.has("X-Real-IP")).toBe(false);
-    expect(options.next).toEqual({ revalidate: 86400, tags: ["public-archive"] });
+    expect(options.cache).toBe("no-store");
     expect(headers.has("cookie")).toBe(false);
     expect(headers.has("host")).toBe(false);
     expect(response.status).toBe(206);
@@ -111,6 +110,95 @@ describe("backend API proxy", () => {
 
     expect(response.status).toBe(202);
     expect(await response.json()).toEqual({ detail: "accepted" });
+  });
+
+  it.each([undefined, "1", "invalid", "-1", "0"])('bounds streamed POST bytes with content-length %s', async (declaredLength) => {
+    const cancel = vi.fn();
+    let chunks = 0;
+    const body = new ReadableStream<Uint8Array>({
+      pull(controller) {
+        chunks += 1;
+        controller.enqueue(new Uint8Array(16385));
+      },
+      cancel,
+    });
+    const fetchMock = vi.fn();
+    vi.stubGlobal("fetch", fetchMock);
+    const headers = new Headers({ "Content-Type": "application/json" });
+    if (declaredLength !== undefined) headers.set("Content-Length", declaredLength);
+    const response = await POST(new NextRequest("https://kpopwins.info/backend-api/corrections", {
+      method: "POST", headers, body, duplex: "half",
+    } as ConstructorParameters<typeof NextRequest>[1]), context("corrections"));
+
+    expect(response.status).toBe(413);
+    expect(fetchMock).not.toHaveBeenCalled();
+    expect(cancel).toHaveBeenCalledOnce();
+    expect(chunks).toBeLessThanOrEqual(3);
+  });
+
+  it("rejects excessive declared length before reading the stream", async () => {
+    const cancel = vi.fn();
+    const fetchMock = vi.fn();
+    vi.stubGlobal("fetch", fetchMock);
+    const request = new NextRequest("https://kpopwins.info/backend-api/corrections", {
+      method: "POST", headers: { "Content-Length": "32769" },
+      body: new ReadableStream({ cancel }), duplex: "half",
+    } as ConstructorParameters<typeof NextRequest>[1]);
+    const reader = vi.spyOn(request.body!, "getReader");
+
+    const response = await POST(request, context("corrections"));
+
+    expect(response.status).toBe(413);
+    expect(reader).not.toHaveBeenCalled();
+    expect(cancel).toHaveBeenCalledOnce();
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it.each(["", "{}", "malformed JSON", "x".repeat(32768)])("forwards bounded body case %# for backend validation", async (body) => {
+    const fetchMock = vi.fn(async (_url: URL, options: RequestInit) => {
+      expect(new TextDecoder().decode(options.body as ArrayBuffer)).toBe(body);
+      return new Response("{}", { status: 400 });
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    const response = await POST(new NextRequest("https://kpopwins.info/backend-api/corrections", {
+      method: "POST", body,
+    }), context("corrections"));
+
+    expect(response.status).toBe(400);
+    expect(fetchMock).toHaveBeenCalledOnce();
+  });
+
+  it("accepts maximum-length correction fields serialized with surrogate escapes", async () => {
+    const report = {
+      page_or_record: "😀".repeat(300), correction: "😀".repeat(1000),
+      supporting_source: "https://example.com/" + "😀".repeat(480),
+      contact: "😀".repeat(200), website: "😀".repeat(300),
+    };
+    const body = JSON.stringify(report).replace(/[\u007f-\uffff]/g, (character) => `\\u${character.charCodeAt(0).toString(16).padStart(4, "0")}`);
+    expect(new TextEncoder().encode(body).byteLength).toBeGreaterThan(16384);
+    const fetchMock = vi.fn(async (_url: URL, options: RequestInit) => {
+      expect(JSON.parse(new TextDecoder().decode(options.body as ArrayBuffer))).toEqual(report);
+      return Response.json({ detail: "Report accepted." }, { status: 202 });
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    const response = await POST(new NextRequest("https://kpopwins.info/backend-api/corrections", {
+      method: "POST", headers: { "Content-Type": "application/json" }, body,
+    }), context("corrections"));
+
+    expect(response.status).toBe(202);
+    expect(fetchMock).toHaveBeenCalledOnce();
+  });
+
+  it("does not proxy writes to other backend endpoints", async () => {
+    const fetchMock = vi.fn();
+    vi.stubGlobal("fetch", fetchMock);
+    const response = await POST(new NextRequest("https://kpopwins.info/backend-api/artists", {
+      method: "POST", body: "{}",
+    }), context("artists"));
+    expect(response.status).toBe(404);
+    expect(fetchMock).not.toHaveBeenCalled();
   });
 
   it.each([[".."], ["."], ["wins", ""]])("rejects unsafe path segments %j without fetching", async (...path) => {

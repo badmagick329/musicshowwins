@@ -60,7 +60,8 @@ def _validate(document: Any) -> tuple[dict[str, tuple[str, bool]], set[str]]:
             or not ENTRY_FIELDS <= set(entry) <= ENTRY_FIELDS | OPTIONAL_FIELDS
         ):
             raise DebutDocumentError(
-                f"Entry {index}: must contain artist, debut, source and optional solo and note."
+                f"Entry {index}: must contain artist, debut, source "
+                "and optional solo and note."
             )
         if entry.get("solo", True) is not True:
             raise DebutDocumentError(f"Entry {index}: solo must be true or omitted.")

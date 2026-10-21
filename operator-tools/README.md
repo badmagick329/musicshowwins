@@ -125,6 +125,9 @@ Behavior:
   `.ignore/operator-tools/reports/reddit-audit.json` with a TSV beside it for
   quick manual inspection. Both are written atomically. Totals are printed after
   every run even while collection is incomplete.
+  The TSV prefixes formula-capable cells (`=`, `+`, `-`, `@`, including leading
+  whitespace/control variants) with an apostrophe for spreadsheet inspection;
+  embedded tabs and line breaks become spaces. JSON preserves original evidence.
 
 Transient HTTP failures and HTTP 429 responses retry with bounded backoff while
 respecting `Retry-After`, and all requests set connection and response timeouts.

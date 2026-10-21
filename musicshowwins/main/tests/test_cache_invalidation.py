@@ -1,5 +1,5 @@
 from io import StringIO
-from unittest.mock import Mock, patch
+from unittest.mock import Mock, call, patch
 
 import pytest
 import requests
@@ -20,18 +20,64 @@ def test_cache_invalidation_is_optional_when_fully_unconfigured(settings):
     post.assert_not_called()
 
 
-def test_cache_invalidation_posts_bearer_secret(settings):
+def test_cache_invalidation_finishes_before_separate_authenticated_warming(settings):
+    settings.CACHE_REVALIDATION_URL = "http://frontend:3000/api/revalidate"
+    settings.CACHE_REVALIDATION_SECRET = "revalidation-secret"
+    invalidated = Mock()
+    invalidated.json.return_value = {"revalidated": True}
+    warmed = Mock()
+    warmed.json.return_value = {"warmed": True}
+
+    def respond(*args, **kwargs):
+        if kwargs["params"]["action"] == "invalidate":
+            return invalidated
+        # The invalidation response must be validated before warming starts.
+        invalidated.raise_for_status.assert_called_once_with()
+        invalidated.json.assert_called_once_with()
+        return warmed
+
+    with patch("main.cache_invalidation.requests.post", side_effect=respond) as post:
+        invalidate_public_archive_cache()
+    assert post.call_args_list == [
+        call(
+            "http://frontend:3000/api/revalidate",
+            params={"action": action},
+            headers={"Authorization": "Bearer revalidation-secret"},
+            timeout=10,
+        )
+        for action in ("invalidate", "warm")
+    ]
+    warmed.raise_for_status.assert_called_once_with()
+
+
+@pytest.mark.parametrize("payload", [{}, {"revalidated": False}, [], "invalid"])
+def test_failed_invalidation_confirmation_never_starts_warming(settings, payload):
     settings.CACHE_REVALIDATION_URL = "http://frontend:3000/api/revalidate"
     settings.CACHE_REVALIDATION_SECRET = "revalidation-secret"
     response = Mock()
-    with patch("main.cache_invalidation.requests.post", return_value=response) as post:
+    response.json.return_value = payload
+    with (
+        patch("main.cache_invalidation.requests.post", return_value=response) as post,
+        pytest.raises(CacheInvalidationError, match="did not confirm"),
+    ):
         invalidate_public_archive_cache()
-    post.assert_called_once_with(
-        "http://frontend:3000/api/revalidate",
-        headers={"Authorization": "Bearer revalidation-secret"},
-        timeout=10,
-    )
-    response.raise_for_status.assert_called_once_with()
+    post.assert_called_once()
+
+
+def test_warming_failure_is_reported_after_successful_invalidation(settings):
+    settings.CACHE_REVALIDATION_URL = "http://frontend:3000/api/revalidate"
+    settings.CACHE_REVALIDATION_SECRET = "revalidation-secret"
+    invalidated = Mock()
+    invalidated.json.return_value = {"revalidated": True}
+    warmed = Mock()
+    warmed.raise_for_status.side_effect = requests.HTTPError("upstream failed")
+    with (
+        patch(
+            "main.cache_invalidation.requests.post", side_effect=[invalidated, warmed]
+        ),
+        pytest.raises(CacheInvalidationError, match="Could not warm"),
+    ):
+        invalidate_public_archive_cache()
 
 
 def test_cache_invalidation_reports_configuration_and_request_failures(settings):

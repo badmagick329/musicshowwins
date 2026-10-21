@@ -44,6 +44,13 @@ DEFAULT_USER_AGENT = (
 )
 DEFAULT_MAX_RETRIES = 3
 DEFAULT_BACKOFF_FACTOR = 1.0
+# Shared historical pages contain many annual tables. These page-wide budgets
+# leave room for them while bounding amplification from untrusted HTML spans.
+MAX_TABLE_ROWSPAN = 1_000
+MAX_TABLE_COLUMNS = 64
+MAX_SOURCE_ROWS = 10_000
+MAX_EXPANDED_CELLS = 250_000
+MAX_EXPANSION_WORK = 500_000
 # Music Core's 2016 page is not published as a dated wins table.  It is a
 # known source gap, not a failed request, and is tracked separately by the
 # historical reconciliation work.
@@ -522,22 +529,51 @@ def _label(value: str) -> str:
 
 
 def _span_value(cell: Any) -> tuple[str, int, int]:
-    text = _clean_cell(cell.get_text(" ", strip=True))
+    def span(name: str, maximum: int) -> int:
+        raw = str(cell.get(name, "1")).strip()
+        # Check length before int(): even parsing an attacker-sized integer is
+        # unnecessary work, and Python may reject it outside our error contract.
+        if len(raw) > len(str(maximum)):
+            raise WikipediaParseError(f"Table {name} exceeds limit {maximum}")
+        if not re.fullmatch(r"[0-9]+", raw):
+            raise WikipediaParseError(
+                f"Invalid table {name}: expected a positive integer"
+            )
+        value = int(raw)
+        if not 1 <= value <= maximum:
+            raise WikipediaParseError(f"Table {name} must be between 1 and {maximum}")
+        return value
 
-    def span(name: str) -> int:
-        raw = str(cell.get(name, "1")).replace(";", "")
-        match = re.search(r"\d+", raw)
-        return max(1, int(match.group(0))) if match else 1
-
-    return text, span("rowspan"), span("colspan")
+    rowspan = span("rowspan", MAX_TABLE_ROWSPAN)
+    colspan = span("colspan", MAX_TABLE_COLUMNS)
+    return _clean_cell(cell.get_text(" ", strip=True)), rowspan, colspan
 
 
-def _expanded_rows(table: Any) -> list[list[str]]:
+@dataclass
+class _ExpansionBudget:
+    rows: int = 0
+    cells: int = 0
+    work: int = 0
+
+    def reserve_work(self, count: int) -> None:
+        if self.work + count > MAX_EXPANSION_WORK:
+            raise WikipediaParseError(
+                f"Table expansion work exceeds page limit {MAX_EXPANSION_WORK}"
+            )
+        self.work += count
+
+
+def _expanded_rows(table: Any, budget: _ExpansionBudget) -> list[list[str]]:
     """Expand HTML row/column spans into rectangular text rows."""
 
     rows: list[list[str]] = []
     active: dict[int, tuple[str, int]] = {}
-    for tr in table.find_all("tr"):
+    # Bound the temporary BeautifulSoup result lists too, not only output rows.
+    for tr in table.find_all("tr", limit=MAX_SOURCE_ROWS - budget.rows + 1):
+        if budget.rows >= MAX_SOURCE_ROWS:
+            raise WikipediaParseError(f"Table rows exceed page limit {MAX_SOURCE_ROWS}")
+        budget.rows += 1
+        budget.reserve_work(1 + len(active))
         current: dict[int, str] = {
             column: value for column, (value, _) in active.items()
         }
@@ -547,10 +583,21 @@ def _expanded_rows(table: Any) -> list[list[str]]:
             if remaining > 1
         }
         column = 0
-        for cell in tr.find_all(["th", "td"], recursive=False):
+        for cell in tr.find_all(
+            ["th", "td"], recursive=False, limit=MAX_TABLE_COLUMNS + 1
+        ):
             while column in current:
                 column += 1
             value, rowspan, colspan = _span_value(cell)
+            if column + colspan > MAX_TABLE_COLUMNS:
+                raise WikipediaParseError(
+                    f"Table columns exceed limit {MAX_TABLE_COLUMNS}"
+                )
+            if any(index in current for index in range(column, column + colspan)):
+                raise WikipediaParseError("Table contains overlapping cell spans")
+            # Reserve the full declared area before creating active spans. A
+            # short table cannot hide excessive work in long-lived rowspans.
+            budget.reserve_work(rowspan * colspan)
             for offset in range(colspan):
                 current[column + offset] = value
                 if rowspan > 1:
@@ -558,6 +605,13 @@ def _expanded_rows(table: Any) -> list[list[str]]:
             column += colspan
         if current:
             max_column = max(current)
+            width = max_column + 1
+            if budget.cells + width > MAX_EXPANDED_CELLS:
+                raise WikipediaParseError(
+                    f"Expanded table cells exceed page limit {MAX_EXPANDED_CELLS}"
+                )
+            budget.cells += width
+            budget.reserve_work(width)
             rows.append([current.get(index, "") for index in range(max_column + 1)])
         active = next_active
     return rows
@@ -720,9 +774,8 @@ def _episode_candidate(
 
 
 def _candidate_rows(
-    table: Any, year: int
+    rows: list[list[str]], year: int
 ) -> tuple[list[WinCandidate], list[EpisodeCandidate]]:
-    rows = _expanded_rows(table)
     header = _header_positions(rows)
     if header is None:
         raise WikipediaParseError("No complete Date/Artist/Song table found")
@@ -778,17 +831,18 @@ def parse_wikipedia_html(html: str, year: int) -> ParsedPage:
     tables = soup.find_all("table")
     if not tables:
         raise WikipediaParseError("Wikipedia page contains no tables")
-    identified = [
-        (table, _table_scope_years(table, year))
-        for table in tables
-        if _header_positions(_expanded_rows(table)) is not None
-    ]
+    identified = []
+    budget = _ExpansionBudget()
+    for table in tables:
+        rows = _expanded_rows(table, budget)
+        if _header_positions(rows) is not None:
+            identified.append((rows, _table_scope_years(table, year)))
     if not identified:
         raise WikipediaParseError("No complete Date/Artist/Song table found")
 
-    scoped = [(table, scopes) for table, scopes in identified if scopes]
+    scoped = [(rows, scopes) for rows, scopes in identified if scopes]
     if scoped:
-        selected = [(table, scopes) for table, scopes in scoped if year in scopes]
+        selected = [(rows, scopes) for rows, scopes in scoped if year in scopes]
         if not selected:
             raise WikipediaParseError(f"No wins table scoped to {year}")
     else:
@@ -796,8 +850,8 @@ def parse_wikipedia_html(html: str, year: int) -> ParsedPage:
 
     candidates: list[WinCandidate] = []
     episode_rows: list[EpisodeCandidate] = []
-    for table, _ in selected:
-        table_wins, table_episodes = _candidate_rows(table, year)
+    for rows, _ in selected:
+        table_wins, table_episodes = _candidate_rows(rows, year)
         candidates.extend(table_wins)
         episode_rows.extend(table_episodes)
     keys = [candidate.key for candidate in candidates]
