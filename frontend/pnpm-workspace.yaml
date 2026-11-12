@@ -1,3 +1,8 @@
+# GHSA-68fv-2mgg-jv7q: next -> postcss pins source-map-js ^1.2.1; raise the
+# floor so the locked graph cannot resolve the vulnerable 1.2.1 again.
+overrides:
+  source-map-js: ^1.2.2
+
 allowBuilds:
   sharp: false
   unrs-resolver: false
