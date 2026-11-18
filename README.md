@@ -1,7 +1,36 @@
-# Music Show Wins
+# KpopWins
 
-Music Show Wins is a small Django community resource for browsing K-pop music
-show wins from 2014 onward. Wikipedia is the automated source in this phase.
+[![CI](https://github.com/badmagick329/musicshowwins/actions/workflows/ci.yaml/badge.svg?branch=main)](https://github.com/badmagick329/musicshowwins/actions/workflows/ci.yaml)
+
+A searchable archive of every K-pop music show win since 2014, with win counts,
+rankings and histories by artist, song, show and year.
+
+**Live:** [kpopwins.info](https://kpopwins.info) · **API docs:** [api.kpopwins.info/api/docs](https://api.kpopwins.info/api/docs/)
+
+[![KpopWins home page](.github/readme/home.png)](https://kpopwins.info)
+
+- **Automated import with validation.** A daily sync reads revisioned Wikipedia
+  winner lists, bounds-checks and validates each page, then applies it
+  atomically with source revision provenance. Missing rows are reported, never
+  deleted.
+- **Review queue.** Conflicting winners are quarantined as import issues, new
+  sources stay blocked until approved, and win videos enter only through
+  reviewed manifests.
+- **API and frontend.** A read-only Django REST API with OpenAPI docs feeds a
+  Next.js App Router frontend with tag-based caching and warming.
+
+```mermaid
+flowchart LR
+    W[Wikipedia] --> S[Sync and validate]
+    S --> P[(PostgreSQL)]
+    S -- conflicts, new sources --> R[Review queue]
+    R --> P
+    V[YouTube / Reddit] --> O[Operator tools] --> R
+    P --> A[Django REST API] --> N[Next.js frontend]
+```
+
+**Stack:** Python 3.13, Django, Django REST Framework, PostgreSQL, Next.js 16,
+TypeScript, Tailwind CSS, Docker, GitHub Actions.
 
 ## Requirements
 
@@ -35,16 +64,15 @@ aggregate-only Music Core 2016 history. Those issues remain as audit data, not
 public dated wins. A different JSON file may be supplied explicitly with
 `--input`; local paths do not need to be committed.
 
-Start the temporary Django UI with:
+Start the API with:
 
 ```text
 uv run python manage.py runserver
 ```
 
-The UI provides artist and song leaderboards, artist search and details, and a
-dated wins view. It is intentionally small while the backend is being revived.
-
-The public Next.js frontend lives in [`frontend/`](frontend/README.md).
+Django also serves a minimal server-rendered view of leaderboards, artists and
+wins for checking local data. The public Next.js frontend lives in
+[`frontend/`](frontend/README.md).
 
 ## YouTube reference workflow
 

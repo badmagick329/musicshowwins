@@ -6,7 +6,7 @@ shows, rankings and about pages), backed by the read-only Django API. See
 
 ## Stack
 
-- Next.js 16.3 with the App Router and TypeScript
+- Next.js 16.4 with the App Router and TypeScript
 - Tailwind CSS 4
 - shadcn/ui (Base UI, neutral CSS-variable theme)
 - TanStack Query for interactive browser-side archive data
